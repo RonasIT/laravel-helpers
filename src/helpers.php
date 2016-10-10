@@ -74,25 +74,23 @@ function array_lists($array, $key) {
  *
  * @param array|string $array
  * @param string $path
- * @param array $oldKeys
  *
  * @return mixed
  */
-function array_get_list($array, $path, $oldKeys = []) {
+function array_get_list($array, $path) {
     if (is_string($path)) {
         $path = explode('.', $path);
     }
 
     $key = array_shift($path);
-    $oldKeys[] = $key;
 
     if (empty($path)) {
         return array_get($array, $key);
     }
 
     if ($key == '*') {
-        $values = array_map(function ($item) use ($path, $oldKeys) {
-            $value = array_get_list($item, $path, $oldKeys);
+        $values = array_map(function ($item) use ($path) {
+            $value = array_get_list($item, $path);
 
             if (!is_array($value)) {
                 return [$value];
@@ -105,7 +103,7 @@ function array_get_list($array, $path, $oldKeys = []) {
     } else {
         $value = array_get($array, $key);
 
-        return array_get_list($value, $path, $oldKeys);
+        return array_get_list($value, $path);
     }
 }
 
@@ -160,7 +158,7 @@ function array_equals($array1, $array2) {
 }
 
 /**
- * Return subsctaction of two arrays
+ * Return subtraction of two arrays
  *
  * @param array $array1
  * @param array $array2
