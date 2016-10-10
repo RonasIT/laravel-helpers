@@ -1,0 +1,34 @@
+{
+  "name": "ronasit/laravel-helpers",
+  "version" : "0.0.0",
+  "description": "Provided helpers function and some helper class.",
+  "keywords": ["laravel", "helpers"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Roman Dubrovin",
+      "email": "rdubrovin@ronasit.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "laravel/framework": ">=5.3.0",
+    "minime/annotations": "2.3.1"
+  },
+  "require-dev": {
+    "fzaninotto/faker": "~1.4",
+    "mockery/mockery": "0.9.*",
+    "phpunit/phpunit": "~4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "RonasIT\\Support\\Tests\\": "tests/",
+      "RonasIT\\Support\\": "src/"
+    },
+    "files": [
+      "tests/TestCase.php",
+      "src/helpers.php"
+    ]
+  },
+  "minimum-stability": "stable"
+}

@@ -1,0 +1,160 @@
+[
+  {
+    "id": 2,
+    "state_id": 2,
+    "name": "New York(Manhattan)",
+    "created_at": "2016-09-09 10:10:10",
+    "updated_at": "2016-09-09 10:10:10",
+    "city_id": 2,
+    "zips": [
+      {
+        "id": 1,
+        "state_id": 2,
+        "neighborhood_id": 2,
+        "code": 10010,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10010,
+        "1bedroom": "100",
+        "2bedrooms": "200",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      },
+      {
+        "id": 2,
+        "state_id": 2,
+        "neighborhood_id": 2,
+        "code": 10013,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10013,
+        "1bedroom": "110",
+        "2bedrooms": "220",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      },
+      {
+        "id": 3,
+        "state_id": 2,
+        "neighborhood_id": 2,
+        "code": 10014,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10014,
+        "1bedroom": "120",
+        "2bedrooms": "240",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "state_id": 2,
+    "name": "New York(Queens)",
+    "created_at": "2016-09-09 10:10:10",
+    "updated_at": "2016-09-09 10:10:10",
+    "city_id": 2,
+    "zips": [
+      {
+        "id": 4,
+        "state_id": 2,
+        "neighborhood_id": 3,
+        "code": 10019,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10019,
+        "1bedroom": "130",
+        "2bedrooms": "260",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      },
+      {
+        "id": 5,
+        "state_id": 2,
+        "neighborhood_id": 3,
+        "code": 10022,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10022,
+        "1bedroom": "150",
+        "2bedrooms": "300",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "state_id": 2,
+    "name": "New York(Brooklyn)",
+    "created_at": "2016-09-09 10:10:10",
+    "updated_at": "2016-09-09 10:10:10",
+    "city_id": 2,
+    "zips": [
+      {
+        "id": 6,
+        "state_id": 2,
+        "neighborhood_id": 4,
+        "code": 10023,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10023,
+        "1bedroom": "160",
+        "2bedrooms": "320",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      },
+      {
+        "id": 7,
+        "state_id": 2,
+        "neighborhood_id": 4,
+        "code": 10024,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10024,
+        "1bedroom": "170",
+        "2bedrooms": "340",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      },
+      {
+        "id": 8,
+        "state_id": 2,
+        "neighborhood_id": 4,
+        "code": 10025,
+        "created_at": "2016-09-09 10:10:10",
+        "updated_at": "2016-09-09 10:10:10",
+        "coli_code": "02-3456-3456",
+        "population": 1000,
+        "zip": 10025,
+        "1bedroom": "180",
+        "2bedrooms": "360",
+        "3bedrooms": null,
+        "4bedrooms": null,
+        "5bedrooms": null
+      }
+    ]
+  }
+]

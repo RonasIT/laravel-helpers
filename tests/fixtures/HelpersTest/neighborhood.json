@@ -1,0 +1,58 @@
+{
+  "id": 2,
+  "state_id": 2,
+  "name": "New York(Manhattan)",
+  "created_at": "2016-09-09 10:10:10",
+  "updated_at": "2016-09-09 10:10:10",
+  "city_id": 2,
+  "zips": [
+    {
+      "id": 1,
+      "state_id": 2,
+      "neighborhood_id": 2,
+      "code": 10010,
+      "created_at": "2016-09-09 10:10:10",
+      "updated_at": "2016-09-09 10:10:10",
+      "coli_code": "02-3456-3456",
+      "population": 1000,
+      "zip": 10010,
+      "1bedroom": "100",
+      "2bedrooms": "200",
+      "3bedrooms": null,
+      "4bedrooms": null,
+      "5bedrooms": null
+    },
+    {
+      "id": 2,
+      "state_id": 2,
+      "neighborhood_id": 2,
+      "code": 10013,
+      "created_at": "2016-09-09 10:10:10",
+      "updated_at": "2016-09-09 10:10:10",
+      "coli_code": "02-3456-3456",
+      "population": 1000,
+      "zip": 10013,
+      "1bedroom": "110",
+      "2bedrooms": "220",
+      "3bedrooms": null,
+      "4bedrooms": null,
+      "5bedrooms": null
+    },
+    {
+      "id": 3,
+      "state_id": 2,
+      "neighborhood_id": 2,
+      "code": 10014,
+      "created_at": "2016-09-09 10:10:10",
+      "updated_at": "2016-09-09 10:10:10",
+      "coli_code": "02-3456-3456",
+      "population": 1000,
+      "zip": 10014,
+      "1bedroom": "120",
+      "2bedrooms": "240",
+      "3bedrooms": null,
+      "4bedrooms": null,
+      "5bedrooms": null
+    }
+  ]
+}
