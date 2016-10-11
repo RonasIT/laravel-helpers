@@ -11,7 +11,7 @@ namespace RonasIT\Support\Services;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Log\Writer;
 use GuzzleHttp\Client;
-use App\Exceptions\UnknownRequestMethodException;
+use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
 class HttpRequestService
 {
