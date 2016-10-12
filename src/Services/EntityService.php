@@ -7,7 +7,7 @@
  * Time: 9:39
  */
 
-namespace App\Services;
+namespace RonasIT\Support\Services;
 
 class EntityService
 {
