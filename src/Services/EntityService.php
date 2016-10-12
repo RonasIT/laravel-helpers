@@ -121,4 +121,12 @@ class EntityService
     public function forceDelete($id) {
         $this->getQuery()->find($id)->forceDelete();
     }
+
+    public function getOrCreate($data) {
+        if ($this->exists($data)) {
+            return $this->get($data);
+        } else {
+            return $this->create($data);
+        }
+    }
 }
