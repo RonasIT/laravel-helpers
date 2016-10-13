@@ -115,4 +115,10 @@ class HttpRequestService
             $this->logger->info('');
         }
     }
+
+    public function parseJsonResponse($response) {
+        $stringResponse = (string)$response->getBody();
+
+        return json_decode($stringResponse, true);
+    }
 }
