@@ -12,6 +12,8 @@ use Illuminate\Support\Collection;
  * @return mixed
 */
 function elseChain(...$callbacks) {
+    $value = null;
+
     foreach ($callbacks as $callback) {
         $value = $callback();
 
@@ -20,7 +22,7 @@ function elseChain(...$callbacks) {
         }
     }
 
-    return null;
+    return $value;
 }
 
 /**

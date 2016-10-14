@@ -8,7 +8,7 @@
 
 namespace RonasIT\Support\Services;
 
-use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Log\Writer;
 use GuzzleHttp\Client;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
@@ -16,70 +16,53 @@ use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 class HttpRequestService
 {
     private $logger;
+    protected $cookies = null;
 
     public function __construct() {
         $this->logger = app(Writer::class);
     }
 
     public function sendGet($url, $data = null, $headers = null) {
-        /* @var Client $client */
+        return $this->send('get', $url, $data, $headers);
+    }
 
+    public function sendPost($url, $data, $headers = null) {
+        return $this->send('post', $url, $data, $headers);
+    }
+
+    public function sendDelete($url, $headers = null) {
+        return $this->send('delete', $url, $headers);
+    }
+
+    public function sendPut($url, $data, $headers = null) {
+        return $this->send('put', $url, $data, $headers);
+    }
+
+    protected function send($method, $url, $data = [], $headers = []) {
         $client = new Client();
-
-        $this->logRequest('get', $url, $data);
-
-        $time = microtime(true);
-
-        try {
-            if (!empty($data)) {
-                $response = $client->get($url, [
-                    'query' => $data,
-                    'headers' => $headers
-                ]);
-            } else {
-                $response = $client->get($url, [
-                    'headers' => $headers
-                ]);
-            }
-        } catch (BadResponseException $e) {
-            $this->logResponse($e->getResponse(), $time);
-
-            throw $e;
-        }
-
-        $this->logResponse($response);
-
-        return $response;
-    }
-
-    public function sendPost($url, $data) {
-        return $this->send('post', $url, $data);
-    }
-
-    public function sendDelete($url) {
-        return $this->send('delete', $url);
-    }
-
-    public function sendPut($url, $data) {
-        return $this->send('put', $url, $data);
-    }
-
-    protected function send($method, $url, $data = null) {
-        $client = new Client($url);
 
         $time = microtime(true);
 
         $this->logRequest('put', $url, $data);
+        $options = [
+            'headers' => $headers,
+            'cookies' => $this->cookies
+        ];
+
+        $this->setData($options, $method, $headers, $data);
 
         switch ($method) {
+            case 'get' :
+                $response = $client->get($url, $options);
+                break;
             case 'post' :
-                $response = $client->post($url, null, $data);
+                $response = $client->post($url, $options);
                 break;
             case 'put' :
-                $response = $client->put($url, null, $data);
+                $response = $client->put($url, $options);
                 break;
             case 'delete' :
-                $response = $client->delete($url)->send();
+                $response = $client->delete($url, $options)->send();
                 break;
             default :
                 throw app(UnknownRequestMethodException::class)->setMethod($method);
@@ -120,5 +103,43 @@ class HttpRequestService
         $stringResponse = (string)$response->getBody();
 
         return json_decode($stringResponse, true);
+    }
+
+    public function saveCookieSession() {
+        $this->cookies = app(CookieJar::class);
+
+        return $this;
+    }
+
+    public function getCookie() {
+        if (empty($this->cookies)) {
+            return [];
+        }
+
+        return $this->cookies->toArray();
+    }
+
+    private function setData(&$options, $method, $headers, $data = []) {
+        if (empty($data)) {
+            return;
+        }
+
+        if ($method == 'get') {
+            $options['query'] = $data;
+            return;
+        }
+
+        $contentType = elseChain(
+            function () use ($headers) { return $headers['Content-Type']; },
+            function () use ($headers) { return $headers['content-type']; },
+            function () use ($headers) { return $headers['CONTENT-TYPE']; }
+        );
+
+        if (preg_match('/application\/json/', $contentType)) {
+            $options['json'] = $data;
+            return;
+        }
+
+        $options['form_params'] = $data;
     }
 }
