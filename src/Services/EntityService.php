@@ -102,10 +102,15 @@ class EntityService
         return empty($entity) ? [] : $entity->toArray();
     }
 
-    public function delete($id) {
+    public function delete($where) {
         $model = new $this->model;
 
-        $model::where('id', $id)->delete();
+        if (is_array($where)) {
+            $model::where(array_only($where, $model::getFields()))
+                ->delete();
+        } else {
+            $model::where('id', $where)->delete();
+        }
     }
 
     public function withTrashed() {
