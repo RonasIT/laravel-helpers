@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Services;
+
+use RonasIT\Support\Traits\EntityControlTrait;
+use App\Models\Model;
+
+/**
+ * @property Model $model
+*/
+class EntityService
+{
+    use EntityControlTrait;
+
+    public function __construct()
+    {
+        $this->setModel(Model::class);
+    }
+}

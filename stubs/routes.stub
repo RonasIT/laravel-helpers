@@ -1,0 +1,5 @@
+
+Route::post('/entities', ['uses' => EntityController::class.'@create']);
+Route::get('/entities/{id}', ['uses' => EntityController::class.'@get']);
+Route::put('/entities/{id}', ['uses' => EntityController::class.'@update']);
+Route::delete('/entities/{id}', ['uses' => EntityController::class.'@delete']);

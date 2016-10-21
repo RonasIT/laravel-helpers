@@ -1,0 +1,5 @@
+/*truncates*/
+
+INSERT INTO entities(id, created_at, updated_at, /*fields*/) VALUES (1, '2016-09-30 11:20:31', '2016-09-30 11:20:31', /*values*/);
+
+SELECT pg_catalog.setval('entities_id_seq', 1, true);

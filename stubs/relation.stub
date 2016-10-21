@@ -1,0 +1,4 @@
+    function relationName() {
+        return $this->relationType(EntityClass::class);
+    }
+

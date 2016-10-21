@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Repositories;
+
+use RonasIT\Support\Repositories\BaseRepository;
+use App\Models\EntityModel;
+
+/**
+ * @property EntityModel $model
+*/
+class EntityRepository extends BaseRepository
+{
+    public function __construct()
+    {
+        $this->setModel(EntityModel::class);
+    }
+}
