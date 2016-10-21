@@ -9,7 +9,10 @@ class DummyClass extends Model
 {
     use ModelTrait;
 
-    protected $fillable = [/*fillable*/];
+    protected $fillable = [
+        'id', /*fillable*/
+    ];
+    protected $hidden = ['pivot'];
 
     /*relations*/
 }

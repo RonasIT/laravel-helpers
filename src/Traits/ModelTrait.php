@@ -18,8 +18,4 @@ trait ModelTrait
     public static function getFields() {
         return (new static)->fields();
     }
-
-    public static function getTable() {
-        return (new static)->getTable();
-    }
 }

@@ -58,7 +58,7 @@ class ModelGenerator extends EntityGenerator
     protected function getFillableContent() {
         $fields = implode("', '", $this->fields);
 
-        return "\n        '{$fields}'\n    ";
+        return "'{$fields}'";
     }
 
     protected function getRelationsContent() {
