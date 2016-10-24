@@ -133,4 +133,12 @@ trait EntityControlTrait
             return $this->create($data);
         }
     }
+
+    public function firstOrCreate($data) {
+        if ($this->exists($data)) {
+            return $this->first($data);
+        } else {
+            return $this->create($data);
+        }
+    }
 }
