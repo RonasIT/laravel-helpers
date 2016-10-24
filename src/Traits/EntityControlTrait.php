@@ -141,4 +141,10 @@ trait EntityControlTrait
             return $this->create($data);
         }
     }
+
+    public function count($where) {
+        return $this->getQuery()
+            ->where($where)
+            ->count();
+    }
 }
