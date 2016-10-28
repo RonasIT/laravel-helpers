@@ -9,6 +9,8 @@
 namespace RonasIT\Support\Generators;
 
 
+use Illuminate\Support\Str;
+
 class RequestsGenerator extends EntityGenerator
 {
     protected $model;
@@ -46,24 +48,39 @@ class RequestsGenerator extends EntityGenerator
 
         foreach ($parameters as $type => $parameterNames) {
             $explodedType = explode('-', $type);
-
             $type = $explodedType[0];
             $isRequired = array_has($explodedType, '1');
 
             foreach ($parameterNames as $name) {
-                $replaces = [
-                    'name' => $name,
-                    'type' => $type
-                ];
+                if ($type == 'belongsTo') {
+                    $content .= $this->getRelationValidationContent($name, $requiredAvailable);
+                } else {
+                    $required = $isRequired && $requiredAvailable;
 
-                if (!$isRequired || !$requiredAvailable) {
-                    $replaces['|required'] = '';
+                    $content .= $this->getValidationContent($name, $type, $required);
                 }
-
-                $content .= $this->getStub('validation_parameter', $replaces);
             }
         }
 
         return $content;
+    }
+
+    protected function getRelationValidationContent($name, $required) {
+        $validation = "integer|exists:{$this->getTableName($name)},id";
+
+        $name = Str::lower($name).'_id';
+
+        return $this->getValidationContent($name, $validation, $required);
+    }
+
+    protected function getValidationContent($name, $validation, $required) {
+        if ($required) {
+            $validation .= '|required';
+        }
+
+        return $this->getStub('validation_parameter', [
+            'name' => $name,
+            'validation' => $validation
+        ]);
     }
 }

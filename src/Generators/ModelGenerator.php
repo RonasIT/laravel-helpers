@@ -9,6 +9,7 @@
 namespace RonasIT\Support\Generators;
 
 
+use Illuminate\Support\Str;
 use RonasIT\Support\Exceptions\ClassAlreadyExistsException;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
 
@@ -33,6 +34,11 @@ class ModelGenerator extends EntityGenerator
     /** @return $this */
     public function setRelations($relations) {
         $this->relations = $relations;
+
+        foreach ($relations['belongsTo'] as $relation) {
+            $this->fields[] = Str::lower($relation).'_id';
+        }
+
         return $this;
     }
 
@@ -42,12 +48,13 @@ class ModelGenerator extends EntityGenerator
             throw new ClassAlreadyExistsException("Model {$this->name} already exists");
         }
 
-        $modelContent = $this->getModelContent();
+        $this->prepareRelatedModels();
+        $modelContent = $this->getNewModelContent();
 
         $this->saveClass('models', $this->name, $modelContent);
     }
 
-    protected function getModelContent() {
+    protected function getNewModelContent() {
         return $this->getStub('model', [
             'DummyClass' => $this->name,
             '/*fillable*/' => $this->getFillableContent(),
@@ -66,10 +73,6 @@ class ModelGenerator extends EntityGenerator
 
         foreach ($this->relations as $type => $entities) {
             foreach ($entities as $entity) {
-                if (!$this->classExists('models', $entity)) {
-                    throw new ClassNotExistsException("Model {$entity} does not exists");
-                }
-
                 $content .= $this->getStub('relation', [
                     'relationName' => strtolower($entity),
                     'relationType' => $type,
@@ -79,5 +82,34 @@ class ModelGenerator extends EntityGenerator
         }
 
         return trim($content);
+    }
+
+    public function prepareRelatedModels() {
+        $relations = array_only($this->relations, ['hasOne', 'hasMany']);
+        $relations = array_collapse($relations);
+
+        foreach ($relations as $relation) {
+            if (!$this->classExists('models', $relation)) {
+                throw new ClassNotExistsException("Model {$relation} does not exists");
+            }
+
+            $content = $this->getModelContent($relation);
+
+            $newRelation = $this->getStub('relation', [
+                'relationName' => Str::lower($this->name),
+                'relationType' => 'belongsTo',
+                'EntityClass' => $this->name
+            ]);
+
+            $fixedContent = preg_replace('/\}$/', "{$newRelation}\n}", $content);
+
+            $this->saveClass('models', $relation, $fixedContent);
+        }
+    }
+
+    public function getModelContent($model) {
+        $modelPath = base_path($this->paths['models']."/{$model}.php");
+
+        return file_get_contents($modelPath);
     }
 }

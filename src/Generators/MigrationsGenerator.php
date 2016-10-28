@@ -106,7 +106,8 @@ class MigrationsGenerator extends EntityGenerator
         return [
             'name' => implode('_', $namePieces),
             'content' => $this->getStub('migrations.foreign_key', [
-                'SomeTable' => $fromTable,
+                'SomeTable' => $this->prepareEntityName($fromTable),
+                'AnotherTable' => $this->prepareEntityName($toTable),
                 'some_table' => $this->getTableName($fromTable),
                 'local_key' => $fieldName,
                 'other_table' => $this->getTableName($toTable)
@@ -116,13 +117,14 @@ class MigrationsGenerator extends EntityGenerator
 
     protected function generateAddFieldMigration($entityName, $field, $type, $isRequired = true) {
         $namePieces = [
-            $this->getNewMigrationTimestamp(), 'add', $field, 'field_to', $this->getTableName($entityName)
+            $this->getNewMigrationTimestamp(), 'add', $field, 'to', $this->getTableName($entityName)
         ];
 
         $replaces = [
             'entities' => $this->getTableName($entityName),
             'Entities' => Str::plural($entityName),
             'field' => $field,
+            'Field' => Str::camel($field),
             'type' => $type
         ];
 
@@ -144,11 +146,18 @@ class MigrationsGenerator extends EntityGenerator
         return [
             'name' => implode('_', $namePieces),
             'content' => $this->getStub('migrations.create', [
-                'Entity' => $entityName,
+                'Entity' => $this->prepareEntityName($entityName),
                 'entities' => $this->getTableName($entityName),
                 '/*fields*/' => $this->getFieldsContent($fields)
             ])
         ];
+    }
+
+    protected function prepareEntityName($entityName) {
+        $camelName = Str::camel($entityName);
+        $entityName = ucfirst($camelName);
+
+        return Str::plural($entityName);
     }
 
     protected function getNewMigrationTimestamp() {

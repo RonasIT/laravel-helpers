@@ -38,7 +38,7 @@ class ServiceGenerator extends EntityGenerator
 
         $serviceContent = $this->getStub('service_with_trait', [
             'Model' => $this->model,
-            'EntityService' => "{$this->model}Service",
+            'NewService' => "{$this->model}Service",
         ]);
 
         $this->saveClass('services', "{$this->model}Service", $serviceContent);

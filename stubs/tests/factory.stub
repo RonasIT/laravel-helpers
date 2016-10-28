@@ -1,4 +1,5 @@
 
+
 $factory->define(App\Models\Entity::class, function (Faker\Generator $faker) {
     return [
 /*fields*/

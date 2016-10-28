@@ -1,100 +1,88 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: roman
- * Date: 17.10.16
- * Time: 17:41
+ * Date: 22.10.16
+ * Time: 19:56
  */
-
 namespace App\Tests;
 
-
-use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class EntityTest extends TestCase
 {
-    public function testCreateEntity() {
-        $this->post('/entities', [
-            /*create_fields*/
+    public function testCreate() {
+        $this->json('post', '/entities', [
+            /*fields*/
         ]);
 
         $this->assertResponseOk();
-
-        $this->seeInDatabase('entities', [
-            /*create_fields*/
-        ]);
     }
 
-    /*create_tests_with_not_existed_required_fields*/
-    /*create_tests_with_wrong_parameters*/
+    public function testCreateCheckResponse() {
+        $this->json('post', '/entities', [
+            /*fields*/
+        ]);
 
-    public function testUpdateEntity() {
-        $this->put('/entities/{existedEntityId}', [
-            /*update_fields*/
+        $response = array_except(
+            $this->getJsonResponse(),
+            ['id', 'updated_at', 'created_at']
+        );
+
+        $this->assertEqualsFixture('new_entity.json', $response);
+    }
+
+    /*required-failure-create-tests*/
+    /*wrong-type-failure-create-tests*/
+
+    public function testUpdate() {
+        $this->json('put', '/entities/1', [
+            /*fields*/
         ]);
 
         $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
-
-        $this->seeInDatabase('entities', [
-            /*update_fields*/
-        ]);
-
-        $this->notSeeInDatabase('entities', [
-            'id' => existedEntityId,
-            /*get_fields*/
-        ]);
     }
 
-    public function testUpdateEntityNotExists() {
-        $this->put('/entities/{notExistedEntityId}', [
-            /*update_fields*/
+    public function testUpdateNotExists() {
+        $this->json('put', '/entities/2', [
+            /*fields*/
         ]);
 
         $this->assertResponseStatus(Response::HTTP_NOT_FOUND);
-
-        $this->seeInDatabase('entities', [
-            /*get_fields*/
-        ]);
     }
 
-    /*update_tests_with_wrong_parameters*/
+    /*wrong-type-failure-update-tests*/
 
-    public function testDeleteEntity() {
-        $this->delete('/entities/{existedEntityId}');
+    public function testDelete() {
+        $this->json('delete', '/entities/1');
 
         $this->assertResponseStatus(Response::HTTP_NO_CONTENT);
-
-        $this->notSeeInDatabase('favorites', [
-            'id' => existedEntityId
-        ]);
     }
 
-    public function testDeleteEntityNotExists() {
-        $this->delete('/entities/{notExistedEntityId}');
+    public function testDeleteNotExists() {
+        $this->json('delete', '/entities/2');
 
         $this->assertResponseStatus(Response::HTTP_NOT_FOUND);
-
-        $this->notSeeInDatabase('favorites', [
-            'id' => existedEntityId,
-            /*get_fields*/
-        ]);
     }
 
-    public function testGetEntity() {
-        $this->get('/entities/{existedEntityId}');
+    public function testGet() {
+        $this->json('get', '/entities/1');
 
         $this->assertResponseOk();
-
-        $expected = [
-            /*get_fields*/
-        ];
-
-        $this->assertEquals($expected, $this->getJsonResponse());
     }
 
-    public function testGetEntityNotExists() {
-        $this->delete('/entities/{notExistedEntityId}');
+    public function testGetCheckResponse() {
+        $this->json('get', '/entities/1');
+
+        $response = $this->getJsonResponse();
+        $filteredResponse = array_except($response, ['created_at', 'updated_at']);
+
+        $this->assertEqualsFixture('entity.json', $filteredResponse);
+    }
+
+    public function testGetNotExists() {
+        $this->json('get', '/entities/2');
 
         $this->assertResponseStatus(Response::HTTP_NOT_FOUND);
     }

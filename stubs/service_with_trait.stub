@@ -8,7 +8,7 @@ use App\Models\Model;
 /**
  * @property Model $model
 */
-class EntityService
+class NewService
 {
     use EntityControlTrait;
 

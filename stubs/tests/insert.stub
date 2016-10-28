@@ -1,2 +1,1 @@
-
-INSERT INTO entities(id, created_at, updated_at, /*fields*/) VALUES(1, '2016-10-20 11:05:00', '2016-10-20 11:05:00', /*values*/);
+INSERT INTO entities(/*fields*/, created_at, updated_at) VALUES(/*values*/, '2016-10-20 11:05:00', '2016-10-20 11:05:00');

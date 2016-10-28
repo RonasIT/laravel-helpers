@@ -212,7 +212,7 @@ class MakeEntityCommand extends Command
         $fieldsFromRelations = $this->option('belongs-to');
 
         foreach ($fieldsFromRelations as $field) {
-            $fields['integer-required'][] = Str::lower($field).'_id';
+            $fields['belongsTo'][] = $field;
         }
 
         $this->requestsGenerator
