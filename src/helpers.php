@@ -205,3 +205,12 @@ function array_concat($array, $callback) {
 
     return $content;
 }
+
+function rmdir_recursively($dir) {
+    if ($objs = glob($dir."/*")) {
+        foreach($objs as $obj) {
+            is_dir($obj) ? rmdir_recursively($obj) : unlink($obj);
+        }
+    }
+    rmdir($dir);
+}
