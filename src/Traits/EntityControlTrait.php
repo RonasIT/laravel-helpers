@@ -54,7 +54,9 @@ trait EntityControlTrait
                 array_only($data, $this->fields)
             );
 
-        return $this->get($data);
+        $where = array_merge($where, $data);
+
+        return $this->get($where);
     }
 
     public function updateOrCreate($where, $data) {

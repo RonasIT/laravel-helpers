@@ -158,13 +158,15 @@ class TestsGenerator extends EntityGenerator
     protected function getValuesListContent($model) {
         $values = $this->getValues($model);
 
-        $this->getFields = $values;
+        foreach ($values as $key => $value) {
+            if (in_array($key, $this->fields['timestamp']) || in_array($key, $this->fields['timestamp-required'])) {
+                $this->getFields[$key] = $value->format('Y-m-d h:i:s');
+            } else {
+                $this->getFields[$key] = var_export($value, true);
+            }
+        }
 
-        $values = array_map(function ($value) {
-            return var_export($value, true);
-        }, $values);
-
-        return implode(', ', $values);
+        return implode(', ', $this->getFields);
     }
 
     protected function getValues($model) {

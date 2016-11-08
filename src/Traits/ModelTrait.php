@@ -11,11 +11,11 @@ namespace RonasIT\Support\Traits;
 
 trait ModelTrait
 {
-    public function fields() {
-        return $this->fillable;
-    }
-
     public static function getFields() {
-        return (new static)->fields();
+        $fillable = (new static)->getFillable();
+
+        $fillable[] = 'id';
+
+        return $fillable;
     }
 }
