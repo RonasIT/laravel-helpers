@@ -9,6 +9,8 @@
 
 namespace RonasIT\Support\Traits;
 
+use Schema;
+
 trait ModelTrait
 {
     public static function getFields() {
@@ -17,5 +19,13 @@ trait ModelTrait
         $fillable[] = 'id';
 
         return $fillable;
+    }
+
+    public function getAllFieldsWithTable() {
+        $fields = Schema::getColumnListing($this->getTable());
+
+        return array_map(function ($field) {
+            return "{$this->getTable()}.{$field}";
+        }, $fields);
     }
 }
