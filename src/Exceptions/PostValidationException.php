@@ -6,7 +6,7 @@
  * Time: 14:57
  */
 
-namespace App\Exceptions;
+namespace RonasIT\Support\Exceptions;
 
 use Exception;
 

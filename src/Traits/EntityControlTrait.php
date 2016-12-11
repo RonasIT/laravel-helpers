@@ -8,7 +8,7 @@
 
 namespace RonasIT\Support\Traits;
 
-use App\Exceptions\PostValidationException;
+use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
 {
