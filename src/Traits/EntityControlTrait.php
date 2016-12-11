@@ -8,6 +8,8 @@
 
 namespace RonasIT\Support\Traits;
 
+use App\Exceptions\PostValidationException;
+
 trait EntityControlTrait
 {
     protected $model;
@@ -148,5 +150,23 @@ trait EntityControlTrait
         return $this->getQuery()
             ->where($where)
             ->count();
+    }
+
+    public function validateField($id, $field, $value) {
+        $query = $this->getQuery()
+            ->where('id', '<>', $id)
+            ->where($field, $value);
+
+        if ($query->exists()) {
+            $message = "{$this->getEntityName()} with {$field} {$value} already exists";
+
+            throw new PostValidationException($message);
+        }
+    }
+
+    protected function getEntityName() {
+        $explodedModel = explode('\\', $this->model);
+
+        return end($explodedModel);
     }
 }
