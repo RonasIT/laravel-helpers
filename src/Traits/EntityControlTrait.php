@@ -29,7 +29,7 @@ trait EntityControlTrait
 
         $query = $model->query();
 
-        if ($this->withTrashed) {
+        if ($this->withTrashed && method_exists($this->model, 'withTrashed')) {
             $query->withTrashed();
         }
 
