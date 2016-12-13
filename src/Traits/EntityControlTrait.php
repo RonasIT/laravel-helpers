@@ -8,6 +8,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
@@ -29,7 +30,7 @@ trait EntityControlTrait
 
         $query = $model->query();
 
-        if ($this->withTrashed && method_exists($this->model, 'withTrashed')) {
+        if ($this->withTrashed && $this->isSoftDelete()) {
             $query->withTrashed();
         }
 
@@ -168,5 +169,11 @@ trait EntityControlTrait
         $explodedModel = explode('\\', $this->model);
 
         return end($explodedModel);
+    }
+
+    protected function isSoftDelete() {
+        $traits = class_uses($this->model);
+
+        return in_array(SoftDeletes::class, $traits);
     }
 }
