@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace RonasIT\Support\Middleware;
 
 use Symfony\Component\HttpFoundation\Response;
 use Closure;
