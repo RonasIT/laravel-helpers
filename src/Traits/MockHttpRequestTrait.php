@@ -28,6 +28,16 @@ trait MockHttpRequestTrait
         return $http;
     }
 
+    public function makePostRequest($response, $http = null) {
+        if (empty($http)) {
+            $http = Mockery::mock(HttpRequestService::class);
+        }
+
+        $http->shouldReceive('sendPost')->once()->andReturn($response);
+
+        return $http;
+    }
+
     public function makeResponse($body = null) {
         $httpResponse = Mockery::mock(ClientInterface::class);
         $httpResponse->shouldReceive('isSuccessful')->andReturn(true);
