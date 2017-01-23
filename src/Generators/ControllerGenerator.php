@@ -36,6 +36,8 @@ class ControllerGenerator extends EntityGenerator
         $this->saveClass('controllers', "{$this->model}Controller", $controllerContent);
 
         $this->createRoutes();
+
+        echo "Created a new Controller: {$this->model}Controller \n";
     }
 
     protected function getControllerContent($model) {
@@ -60,6 +62,13 @@ class ControllerGenerator extends EntityGenerator
             'Entity' => $this->model,
             'entities' => $this->getTableName($this->model)
         ]);
+        $routes = explode("\n", $routesContent);
+
+        foreach ($routes as $route) {
+            if (!empty($route)) {
+                echo "Created a new Route: $route\n";
+            }
+        }
 
         return file_put_contents($routesPath, $routesContent, FILE_APPEND);
     }

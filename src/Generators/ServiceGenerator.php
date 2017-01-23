@@ -29,6 +29,8 @@ class ServiceGenerator extends EntityGenerator
 
             $this->saveClass('services', "{$this->model}Service", $serviceContent);
 
+            echo "Created a new Service: {$this->model}Service \n";
+
             return;
         }
 

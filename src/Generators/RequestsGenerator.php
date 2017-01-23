@@ -41,6 +41,8 @@ class RequestsGenerator extends EntityGenerator
         ]);
 
         $this->saveClass('requests', "{$method}{$this->model}Request", $content);
+
+        echo "Created a new Request: {$method}{$this->model}Request \n";
     }
 
     public function getValidationParametersContent($parameters, $requiredAvailable) {

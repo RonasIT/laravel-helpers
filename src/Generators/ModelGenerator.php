@@ -50,8 +50,9 @@ class ModelGenerator extends EntityGenerator
 
         $this->prepareRelatedModels();
         $modelContent = $this->getNewModelContent();
-
         $this->saveClass('models', $this->name, $modelContent);
+
+        echo "Created a new Model: {$this->name}\n";
     }
 
     protected function getNewModelContent() {

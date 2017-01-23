@@ -41,7 +41,10 @@ class MigrationsGenerator extends EntityGenerator
 
         foreach ($this->migrations as $migration) {
             $this->saveClass('migrations', $migration['name'], $migration['content']);
+
+            echo "Created a new Migration: " . $migration['name'] . "\n";
         }
+
     }
 
     protected function resolveNeededMigrations() {

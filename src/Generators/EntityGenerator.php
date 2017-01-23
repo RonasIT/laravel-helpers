@@ -49,7 +49,6 @@ abstract class EntityGenerator
         $stubPath = config("entity-generator.stubs.$stub");
 
         $stub = file_get_contents($stubPath);
-
         foreach ($replaces as $search => $replace) {
             $stub = str_replace($search, $replace, $stub);
         }

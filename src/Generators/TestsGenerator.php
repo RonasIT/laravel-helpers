@@ -52,6 +52,8 @@ class TestsGenerator extends EntityGenerator
         $this->createFactory();
         $this->createDump();
         $this->createTests();
+
+        echo "Created a new Test: {$this->model}Test \n";
     }
 
     protected function createFactory() {
@@ -61,6 +63,8 @@ class TestsGenerator extends EntityGenerator
         ]);
 
         file_put_contents($this->paths['factory'], $content, FILE_APPEND);
+
+        echo "Created a new Test factory for {$this->model} model in '{$this->paths['factory']}'\n";
     }
 
     protected function createDump() {
@@ -75,6 +79,8 @@ class TestsGenerator extends EntityGenerator
         mkdir_recursively($this->getFixturesPath());
 
         file_put_contents($this->getFixturesPath('dump.sql'), $content);
+
+        echo "Created a new Test dump on path: {$this->paths['tests']}/fixtures/{$this->getTestClassName()}/dump.sql\n";
     }
 
     protected function createTests() {
@@ -255,6 +261,8 @@ class TestsGenerator extends EntityGenerator
         $content = json_encode($data, JSON_PRETTY_PRINT);
 
         file_put_contents($fixturePath, $content);
+
+        echo "Created a new Test fixture on path: {$this->paths['tests']}/fixtures/{$this->getTestClassName()}/{$fixtureName}\n";
     }
 
     protected function generateTest() {

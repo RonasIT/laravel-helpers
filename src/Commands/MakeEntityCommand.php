@@ -61,8 +61,8 @@ class MakeEntityCommand extends Command
         {--t|timestamp=* : Add boolean field to entity. }
         {--T|timestamp-required=* : Add boolean field to entity. If you want to specify default value you have to do it manually.}
         
-        {--a|has-one=* : Set nasOne relations between you entity and existed entity. }
-        {--A|has-many=* : Set nasMany relations between you entity and existed entity. }
+        {--a|has-one=* : Set hasOne relations between you entity and existed entity. }
+        {--A|has-many=* : Set hasMany relations between you entity and existed entity. }
         {--e|belongs-to=* : Set belongsTo relations between you entity and existed entity. }
         {--E|belongs-to-many=* : Set belongsToMany relations between you entity and existed entity. }';
 
