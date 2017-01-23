@@ -64,6 +64,10 @@ class ModelGenerator extends EntityGenerator
 
     protected function getFillableContent() {
         $fields = implode("', '", $this->fields);
+        
+        if (empty($fields)) {
+            return false;
+        }
 
         return "'{$fields}'";
     }
