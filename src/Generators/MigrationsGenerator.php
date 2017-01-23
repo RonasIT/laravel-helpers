@@ -44,7 +44,6 @@ class MigrationsGenerator extends EntityGenerator
 
             echo "Created a new Migration: " . $migration['name'] . "\n";
         }
-
     }
 
     protected function resolveNeededMigrations() {

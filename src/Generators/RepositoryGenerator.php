@@ -32,7 +32,6 @@ class RepositoryGenerator extends EntityGenerator
         $this->saveClass('repositories', "{$this->model}Repository", $repositoryContent);
 
         echo "Created a new Repository: {$this->model}Repository \n";
-
     }
 
     protected function getRepositoryContent() {
