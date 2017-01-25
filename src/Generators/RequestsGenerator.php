@@ -8,8 +8,8 @@
 
 namespace RonasIT\Support\Generators;
 
-
 use Illuminate\Support\Str;
+use RonasIT\Support\Events\SuccessCreateMessage;
 
 class RequestsGenerator extends EntityGenerator
 {
@@ -39,10 +39,12 @@ class RequestsGenerator extends EntityGenerator
             'Entity' => $this->model,
             '/*parameters*/' => $parametersContent
         ]);
+        $requestName = "{$method}{$this->model}Request";
+        $createMessage = "Created a new Request: {$requestName}";
 
-        $this->saveClass('requests', "{$method}{$this->model}Request", $content);
+        $this->saveClass('requests', $requestName, $content);
 
-        echo "Created a new Request: {$method}{$this->model}Request \n";
+        event(new SuccessCreateMessage($createMessage));
     }
 
     public function getValidationParametersContent($parameters, $requiredAvailable) {

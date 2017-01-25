@@ -12,6 +12,7 @@ namespace RonasIT\Support\Generators;
 use Illuminate\Support\Str;
 use RonasIT\Support\Exceptions\ClassAlreadyExistsException;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
+use RonasIT\Support\Events\SuccessCreateMessage;
 
 class ModelGenerator extends EntityGenerator
 {
@@ -50,9 +51,12 @@ class ModelGenerator extends EntityGenerator
 
         $this->prepareRelatedModels();
         $modelContent = $this->getNewModelContent();
-        $this->saveClass('models', $this->name, $modelContent);
+        $modelName = $this->name;
+        $createMessage = "Created a new Model: {$modelName}";
 
-        echo "Created a new Model: {$this->name}\n";
+        $this->saveClass('models', $modelName, $modelContent);
+
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function getNewModelContent() {

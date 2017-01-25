@@ -11,6 +11,7 @@ namespace RonasIT\Support\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use RonasIT\Support\Events\SuccessCreateMessage;
 use RonasIT\Support\Generators\ControllerGenerator;
 use RonasIT\Support\Generators\MigrationsGenerator;
 use RonasIT\Support\Generators\ModelGenerator;
@@ -19,6 +20,7 @@ use RonasIT\Support\Generators\RequestsGenerator;
 use RonasIT\Support\Generators\ServiceGenerator;
 use RonasIT\Support\Generators\TestsGenerator;
 use RonasIT\Support\Services\ClassGeneratorService;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 
 /**
  * @property ControllerGenerator $controllerGenerator
@@ -28,6 +30,7 @@ use RonasIT\Support\Services\ClassGeneratorService;
  * @property RequestsGenerator $requestsGenerator
  * @property ServiceGenerator $serviceGenerator
  * @property TestsGenerator $testGenerator
+ * @property EventDispatcher $eventDispatcher
 */
 class MakeEntityCommand extends Command
 {
@@ -80,6 +83,7 @@ class MakeEntityCommand extends Command
     protected $requestsGenerator;
     protected $serviceGenerator;
     protected $testGenerator;
+    protected $eventDispatcher;
 
     /**
      * Create a new command instance.
@@ -97,6 +101,7 @@ class MakeEntityCommand extends Command
         $this->requestsGenerator = app(RequestsGenerator::class);
         $this->serviceGenerator = app(ServiceGenerator::class);
         $this->testGenerator = app(TestsGenerator::class);
+        $this->eventDispatcher = app(EventDispatcher::class);
     }
 
     /**
@@ -106,6 +111,8 @@ class MakeEntityCommand extends Command
      */
     public function handle()
     {
+        $this->eventDispatcher->listen(SuccessCreateMessage::class, $this->getOutputCallback());
+
         if ($this->option('only-model')) {
             $this->generateModel();
 
@@ -241,6 +248,12 @@ class MakeEntityCommand extends Command
             'belongsTo' => $this->option('belongs-to'),
             'belongsToMany' => $this->option('belongs-to-many')
         ];
+    }
+
+    protected function getOutputCallback() {
+        return function (SuccessCreateMessage $event) {
+            $this->info($event->message);
+        };
     }
 }
 

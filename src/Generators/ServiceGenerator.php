@@ -10,6 +10,7 @@ namespace RonasIT\Support\Generators;
 
 
 use RonasIT\Support\Exceptions\ClassNotExistsException;
+use RonasIT\Support\Events\SuccessCreateMessage;
 
 class ServiceGenerator extends EntityGenerator
 {
@@ -26,10 +27,12 @@ class ServiceGenerator extends EntityGenerator
                 'EntityRepository' => "{$this->model}Repository",
                 'NewService' => "{$this->model}Service",
             ]);
+            $serviceName = "{$this->model}Service";
+            $createMessage = "Created a new Service: {$serviceName}";
 
-            $this->saveClass('services', "{$this->model}Service", $serviceContent);
+            $this->saveClass('services', $serviceName, $serviceContent);
 
-            echo "Created a new Service: {$this->model}Service \n";
+            event(new SuccessCreateMessage($createMessage));
 
             return;
         }

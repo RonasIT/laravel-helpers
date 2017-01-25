@@ -10,6 +10,7 @@ namespace RonasIT\Support\Generators;
 
 
 use Illuminate\Support\Str;
+use RonasIT\Support\Events\SuccessCreateMessage;
 
 class MigrationsGenerator extends EntityGenerator
 {
@@ -40,9 +41,11 @@ class MigrationsGenerator extends EntityGenerator
         $this->resolveNeededMigrations();
 
         foreach ($this->migrations as $migration) {
+            $createMessage = "Created a new Migration: {$migration['name']}" ;
+
             $this->saveClass('migrations', $migration['name'], $migration['content']);
 
-            echo "Created a new Migration: " . $migration['name'] . "\n";
+            event(new SuccessCreateMessage($createMessage));
         }
     }
 

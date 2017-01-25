@@ -8,10 +8,11 @@
 
 namespace RonasIT\Support\Generators;
 
-
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use RonasIT\Support\Exceptions\ClassAlreadyExistsException;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
+use RonasIT\Support\Events\SuccessCreateMessage;
+use Illuminate\Support\Facades\Event;
 
 class ControllerGenerator extends EntityGenerator
 {
@@ -32,12 +33,13 @@ class ControllerGenerator extends EntityGenerator
         }
 
         $controllerContent = $this->getControllerContent($this->model);
+        $controllerName = "{$this->model}Controller";
+        $createMessage = "Created a new Controller: {$controllerName}";
 
-        $this->saveClass('controllers', "{$this->model}Controller", $controllerContent);
-
+        $this->saveClass('controllers', $controllerName, $controllerContent);
         $this->createRoutes();
 
-        echo "Created a new Controller: {$this->model}Controller \n";
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function getControllerContent($model) {
@@ -66,7 +68,9 @@ class ControllerGenerator extends EntityGenerator
 
         foreach ($routes as $route) {
             if (!empty($route)) {
-                echo "Created a new Route: $route\n";
+                $createMessage = "Created a new Route: $route";
+
+                event(new SuccessCreateMessage($createMessage));
             }
         }
 

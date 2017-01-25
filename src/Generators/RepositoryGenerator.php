@@ -10,6 +10,7 @@ namespace RonasIT\Support\Generators;
 
 
 use RonasIT\Support\Exceptions\ClassNotExistsException;
+use RonasIT\Support\Events\SuccessCreateMessage;
 
 class RepositoryGenerator extends EntityGenerator
 {
@@ -28,10 +29,12 @@ class RepositoryGenerator extends EntityGenerator
         }
 
         $repositoryContent = $this->getRepositoryContent();
+        $repositoryName = "{$this->model}Repository";
+        $createMessage = "Created a new Repository: {$repositoryName}";
 
-        $this->saveClass('repositories', "{$this->model}Repository", $repositoryContent);
+        $this->saveClass('repositories', $repositoryName, $repositoryContent);
 
-        echo "Created a new Repository: {$this->model}Repository \n";
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function getRepositoryContent() {

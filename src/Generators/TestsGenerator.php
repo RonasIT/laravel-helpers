@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use RonasIT\Support\Exceptions\CircularRelationsFoundedException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
+use RonasIT\Support\Events\SuccessCreateMessage;
 
 class TestsGenerator extends EntityGenerator
 {
@@ -52,8 +53,6 @@ class TestsGenerator extends EntityGenerator
         $this->createFactory();
         $this->createDump();
         $this->createTests();
-
-        echo "Created a new Test: {$this->model}Test \n";
     }
 
     protected function createFactory() {
@@ -61,10 +60,11 @@ class TestsGenerator extends EntityGenerator
             'Entity' => $this->model,
             '/*fields*/' => $this->getFactoryFieldsContent()
         ]);
+        $createMessage = "Created a new Test factory for {$this->model} model in '{$this->paths['factory']}'";
 
         file_put_contents($this->paths['factory'], $content, FILE_APPEND);
 
-        echo "Created a new Test factory for {$this->model} model in '{$this->paths['factory']}'\n";
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function createDump() {
@@ -75,12 +75,13 @@ class TestsGenerator extends EntityGenerator
             '/*inserts*/' => $this->getInsertsContent(),
             'entities' => $this->getTableName($this->model)
         ]);
+        $createMessage = "Created a new Test dump on path: {$this->paths['tests']}/fixtures/{$this->getTestClassName()}/dump.sql";
 
         mkdir_recursively($this->getFixturesPath());
 
         file_put_contents($this->getFixturesPath('dump.sql'), $content);
 
-        echo "Created a new Test dump on path: {$this->paths['tests']}/fixtures/{$this->getTestClassName()}/dump.sql\n";
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function createTests() {
@@ -259,10 +260,12 @@ class TestsGenerator extends EntityGenerator
     protected function generateFixture($fixtureName, $data) {
         $fixturePath = $this->getFixturesPath($fixtureName);
         $content = json_encode($data, JSON_PRETTY_PRINT);
+        $fixtureRelativePath = "{$this->paths['tests']}/fixtures/{$this->getTestClassName()}/{$fixtureName}";
+        $createMessage = "Created a new Test fixture on path: {$fixtureRelativePath}";
 
         file_put_contents($fixturePath, $content);
 
-        echo "Created a new Test fixture on path: {$this->paths['tests']}/fixtures/{$this->getTestClassName()}/{$fixtureName}\n";
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function generateTest() {
@@ -272,8 +275,12 @@ class TestsGenerator extends EntityGenerator
             'entity' => Str::lower($this->model),
             '/*fields*/' => $this->getFieldsContent($this->createFields)
         ]);
+        $testName = $this->getTestClassName();
+        $createMessage = "Created a new Test: {$testName}";
 
-        $this->saveClass('tests', $this->getTestClassName(), $content);
+        $this->saveClass('tests', $testName, $content);
+
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function prepareRelatedFactories() {
