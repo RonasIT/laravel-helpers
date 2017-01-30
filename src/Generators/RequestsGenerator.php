@@ -8,7 +8,6 @@
 
 namespace RonasIT\Support\Generators;
 
-
 use Illuminate\Support\Str;
 use RonasIT\Support\Events\SuccessCreateMessage;
 
