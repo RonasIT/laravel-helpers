@@ -8,9 +8,9 @@
 
 namespace RonasIT\Support\Exceptions;
 
-use RonasIT\Support\Exceptions\EntityCreateException;
+use Exception;
 
-class UnknownRequestMethodException extends EntityCreateException
+class EntityCreateException extends Exception
 {
 
 }

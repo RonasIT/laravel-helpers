@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use RonasIT\Support\Exceptions\CircularRelationsFoundedException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
+use RonasIT\Support\Exceptions\ClassNotExistsException;
 use RonasIT\Support\Events\SuccessCreateMessage;
 
 class TestsGenerator extends EntityGenerator
@@ -293,10 +294,10 @@ class TestsGenerator extends EntityGenerator
             $modelFactoryContent = file_get_contents($this->paths['factory']);
 
             if (!str_contains($modelFactoryContent, $this->getModelClass($relation))) {
-                throw new ModelFactoryNotFound(
-                    "Model factory for mode {$relation} not found. Please create it and after thar you can run 
-                    this command with flag --only-tests"
-                );
+                $failureMessage = "Model factory for mode {$relation} not found.";
+                $recommendedMessage = "Please create it and after thar you can run this command with flag '--only-tests'.";
+
+                throw new ModelFactoryNotFound("{$failureMessage} {$recommendedMessage}");
             }
 
             $matches = [];
@@ -331,9 +332,10 @@ class TestsGenerator extends EntityGenerator
             }
 
             if (in_array($this->model, $relations)) {
-                throw new CircularRelationsFoundedException(
-                    "Circular relations founded. Please resolve you relations in models, factories and database"
-                );
+                $failureMessage = "Circular relations founded.";
+                $recommendedMessage = "Please resolve you relations in models, factories and database.";
+
+                throw new CircularRelationsFoundedException("{$failureMessage} {$recommendedMessage}");
             }
 
             $relatedModels = $this->getAllModels($relations);
@@ -354,6 +356,13 @@ class TestsGenerator extends EntityGenerator
 
     protected function getModelClassContent($model) {
         $path = base_path("{$this->paths['models']}/{$model}.php");
+
+        if (!$this->classExists('models', $model)) {
+            $failureMessage = "Cannot create {$model} Model cause {$model} Model does not exists.";
+            $recommendedMessage = "Create a {$model} Model by himself or run command 'php artisan make:entity {$model} --only-model'.";
+
+            throw new ClassNotExistsException("{$failureMessage} {$recommendedMessage}");
+        }
 
         return file_get_contents($path);
     }

@@ -12,6 +12,7 @@ namespace RonasIT\Support\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use RonasIT\Support\Events\SuccessCreateMessage;
+use RonasIT\Support\Exceptions\EntityCreateException;
 use RonasIT\Support\Generators\ControllerGenerator;
 use RonasIT\Support\Generators\MigrationsGenerator;
 use RonasIT\Support\Generators\ModelGenerator;
@@ -21,7 +22,6 @@ use RonasIT\Support\Generators\ServiceGenerator;
 use RonasIT\Support\Generators\TestsGenerator;
 use RonasIT\Support\Services\ClassGeneratorService;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
-
 /**
  * @property ControllerGenerator $controllerGenerator
  * @property MigrationsGenerator $migrationsGenerator
@@ -111,8 +111,16 @@ class MakeEntityCommand extends Command
      */
     public function handle()
     {
-        $this->eventDispatcher->listen(SuccessCreateMessage::class, $this->getOutputCallback());
+        $this->eventDispatcher->listen(SuccessCreateMessage::class, $this->getSuccessMessageCallback());
 
+        try {
+            $this->generate();
+        } catch (EntityCreateException $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    protected function generate() {
         if ($this->option('only-model')) {
             $this->generateModel();
 
@@ -250,7 +258,7 @@ class MakeEntityCommand extends Command
         ];
     }
 
-    protected function getOutputCallback() {
+    protected function getSuccessMessageCallback() {
         return function (SuccessCreateMessage $event) {
             $this->info($event->message);
         };

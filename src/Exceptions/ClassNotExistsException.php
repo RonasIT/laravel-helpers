@@ -8,9 +8,9 @@
 
 namespace RonasIT\Support\Exceptions;
 
-use Exception;
+use RonasIT\Support\Exceptions\EntityCreateException;
 
-class ClassNotExistsException extends Exception
+class ClassNotExistsException extends EntityCreateException
 {
 
 }

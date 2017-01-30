@@ -12,7 +12,6 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use RonasIT\Support\Exceptions\ClassAlreadyExistsException;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
 use RonasIT\Support\Events\SuccessCreateMessage;
-use Illuminate\Support\Facades\Event;
 
 class ControllerGenerator extends EntityGenerator
 {
@@ -25,11 +24,17 @@ class ControllerGenerator extends EntityGenerator
 
     public function generate() {
         if ($this->classExists('controllers', "{$this->model}Controller")) {
-            throw new ClassAlreadyExistsException("Controller {$this->model}Controller already exists");
+            $failureMessage = "Cannot create {$this->model}Controller cause {$this->model}Controller already exists.";
+            $recommendedMessage = "Remove {$this->model}Controller or run your command with options:'—without-controller'.";
+
+            throw new ClassAlreadyExistsException("{$failureMessage} {$recommendedMessage}");
         }
 
         if (!$this->classExists('services', "{$this->model}Service")) {
-            throw new ClassNotExistsException("Service {$this->model}Service not exists");
+            $failureMessage = "Cannot create {$this->model}Service cause {$this->model}Service does not exists.";
+            $recommendedMessage = "Create a {$this->model}Service by himself or run your command with options:'--without-controller --without-migrations --without-requests --without-tests'.";
+
+            throw new ClassNotExistsException("{$failureMessage} {$recommendedMessage}");
         }
 
         $controllerContent = $this->getControllerContent($this->model);
