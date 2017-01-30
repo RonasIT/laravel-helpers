@@ -57,7 +57,7 @@ abstract class EntityGenerator
     }
 
     protected function getTableName($entityName) {
-        $entityName = Str::lower($entityName);
+        $entityName = snake_case($entityName);
 
         return Str::plural($entityName);
     }
