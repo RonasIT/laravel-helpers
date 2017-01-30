@@ -8,9 +8,9 @@
 
 namespace RonasIT\Support\Exceptions;
 
-use Exception;
+use RonasIT\Support\Exceptions\EntityCreateException;
 
-class CircularRelationsFoundedException extends Exception
+class CircularRelationsFoundedException extends EntityCreateException
 {
 
 }

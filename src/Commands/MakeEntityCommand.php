@@ -11,6 +11,8 @@ namespace RonasIT\Support\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use RonasIT\Support\Events\SuccessCreateMessage;
+use RonasIT\Support\Exceptions\EntityCreateException;
 use RonasIT\Support\Generators\ControllerGenerator;
 use RonasIT\Support\Generators\MigrationsGenerator;
 use RonasIT\Support\Generators\ModelGenerator;
@@ -19,7 +21,7 @@ use RonasIT\Support\Generators\RequestsGenerator;
 use RonasIT\Support\Generators\ServiceGenerator;
 use RonasIT\Support\Generators\TestsGenerator;
 use RonasIT\Support\Services\ClassGeneratorService;
-
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 /**
  * @property ControllerGenerator $controllerGenerator
  * @property MigrationsGenerator $migrationsGenerator
@@ -28,6 +30,7 @@ use RonasIT\Support\Services\ClassGeneratorService;
  * @property RequestsGenerator $requestsGenerator
  * @property ServiceGenerator $serviceGenerator
  * @property TestsGenerator $testGenerator
+ * @property EventDispatcher $eventDispatcher
 */
 class MakeEntityCommand extends Command
 {
@@ -61,8 +64,8 @@ class MakeEntityCommand extends Command
         {--t|timestamp=* : Add boolean field to entity. }
         {--T|timestamp-required=* : Add boolean field to entity. If you want to specify default value you have to do it manually.}
         
-        {--a|has-one=* : Set nasOne relations between you entity and existed entity. }
-        {--A|has-many=* : Set nasMany relations between you entity and existed entity. }
+        {--a|has-one=* : Set hasOne relations between you entity and existed entity. }
+        {--A|has-many=* : Set hasMany relations between you entity and existed entity. }
         {--e|belongs-to=* : Set belongsTo relations between you entity and existed entity. }
         {--E|belongs-to-many=* : Set belongsToMany relations between you entity and existed entity. }';
 
@@ -80,6 +83,7 @@ class MakeEntityCommand extends Command
     protected $requestsGenerator;
     protected $serviceGenerator;
     protected $testGenerator;
+    protected $eventDispatcher;
 
     /**
      * Create a new command instance.
@@ -97,6 +101,7 @@ class MakeEntityCommand extends Command
         $this->requestsGenerator = app(RequestsGenerator::class);
         $this->serviceGenerator = app(ServiceGenerator::class);
         $this->testGenerator = app(TestsGenerator::class);
+        $this->eventDispatcher = app(EventDispatcher::class);
     }
 
     /**
@@ -106,6 +111,16 @@ class MakeEntityCommand extends Command
      */
     public function handle()
     {
+        $this->eventDispatcher->listen(SuccessCreateMessage::class, $this->getSuccessMessageCallback());
+
+        try {
+            $this->generate();
+        } catch (EntityCreateException $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    protected function generate() {
         if ($this->option('only-model')) {
             $this->generateModel();
 
@@ -241,6 +256,12 @@ class MakeEntityCommand extends Command
             'belongsTo' => $this->option('belongs-to'),
             'belongsToMany' => $this->option('belongs-to-many')
         ];
+    }
+
+    protected function getSuccessMessageCallback() {
+        return function (SuccessCreateMessage $event) {
+            $this->info($event->message);
+        };
     }
 }
 

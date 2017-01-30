@@ -8,10 +8,10 @@
 
 namespace RonasIT\Support\Generators;
 
-
 use Illuminate\Support\Str;
 use RonasIT\Support\Exceptions\ClassAlreadyExistsException;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
+use RonasIT\Support\Events\SuccessCreateMessage;
 
 class ModelGenerator extends EntityGenerator
 {
@@ -45,13 +45,20 @@ class ModelGenerator extends EntityGenerator
     public function generate()
     {
         if ($this->classExists('models', $this->name)) {
-            throw new ClassAlreadyExistsException("Model {$this->name} already exists");
+            $failureMessage = "Cannot create {$this->name} Model cause {$this->name} Model already exists.";
+            $recommendedMessage = "Remove {$this->name} Model or run your command with options:'—without-model'.";
+
+            throw new ClassAlreadyExistsException("{$failureMessage} {$recommendedMessage}");
         }
 
         $this->prepareRelatedModels();
         $modelContent = $this->getNewModelContent();
+        $modelName = $this->name;
+        $createMessage = "Created a new Model: {$modelName}";
 
-        $this->saveClass('models', $this->name, $modelContent);
+        $this->saveClass('models', $modelName, $modelContent);
+
+        event(new SuccessCreateMessage($createMessage));
     }
 
     protected function getNewModelContent() {
@@ -94,7 +101,10 @@ class ModelGenerator extends EntityGenerator
 
         foreach ($relations as $relation) {
             if (!$this->classExists('models', $relation)) {
-                throw new ClassNotExistsException("Model {$relation} does not exists");
+                $failureMessage = "Cannot create {$relation} Model cause {$relation} Model does not exists.";
+                $recommendedMessage = "Create a {$relation} Model by himself or run command 'php artisan make:entity {$relation} --only-model'.";
+
+                throw new ClassNotExistsException("{$failureMessage} {$recommendedMessage}");
             }
 
             $content = $this->getModelContent($relation);

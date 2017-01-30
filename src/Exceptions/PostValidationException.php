@@ -8,9 +8,9 @@
 
 namespace RonasIT\Support\Exceptions;
 
-use Exception;
+use RonasIT\Support\Exceptions\EntityCreateException;
 
-class PostValidationException extends Exception
+class PostValidationException extends EntityCreateException
 {
     protected $data = [];
 
