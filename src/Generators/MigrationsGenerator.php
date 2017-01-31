@@ -20,7 +20,7 @@ class MigrationsGenerator extends EntityGenerator
 
     /** @return $this */
     public function setName($name) {
-        $this->name = $name;
+        $this->name = snake_case($name);
         return $this;
     }
 
@@ -58,6 +58,7 @@ class MigrationsGenerator extends EntityGenerator
 
     protected function resolveHasOneMigrations() {
         foreach ($this->relations['hasOne'] as $relation) {
+            $relation = snake_case($relation);
             $fieldName = strtolower($this->name).'_id';
 
             $this->migrations[] = $this->generateAddFieldMigration($relation, $fieldName, 'integer');
@@ -67,6 +68,7 @@ class MigrationsGenerator extends EntityGenerator
 
     protected function resolveHasManyMigrations() {
         foreach ($this->relations['hasMany'] as $relation) {
+            $relation = snake_case($relation);
             $fieldName = strtolower($this->name).'_id';
 
             $this->migrations[] = $this->generateAddFieldMigration($relation, $fieldName, 'integer');
@@ -76,6 +78,7 @@ class MigrationsGenerator extends EntityGenerator
 
     protected function resolveBelongsToMigrations() {
         foreach ($this->relations['belongsTo'] as $relation) {
+            $relation = snake_case($relation);
             $fieldName = strtolower($relation).'_id';
 
             $this->migrations[] = $this->generateAddFieldMigration($this->name, $fieldName, 'integer');
@@ -85,6 +88,7 @@ class MigrationsGenerator extends EntityGenerator
 
     protected function resolveBelongsToManyMigrations() {
         foreach ($this->relations['belongsToMany'] as $relation) {
+            $relation = snake_case($relation);
             $localKey = strtolower($this->name).'_id';
             $otherKey = strtolower($relation).'_id';
             $fields = [
