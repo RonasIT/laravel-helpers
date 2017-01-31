@@ -14,6 +14,7 @@ use Faker\Generator as Faker;
 use RonasIT\Support\Exceptions\CircularRelationsFoundedException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
+use RonasIT\Support\Exceptions\ModelFactoryNotFoundedException;
 use RonasIT\Support\Events\SuccessCreateMessage;
 
 class TestsGenerator extends EntityGenerator
@@ -69,8 +70,22 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function createDump() {
-        $this->prepareRelatedFactories();
+        $modelFactoryContent = file_get_contents($this->paths['factory']);
+        $relatedModels = $this->getRelatedModels($this->model);
 
+        foreach ($relatedModels as $relatedModel) {
+            $relatedFactoryClass = "App\\Models\\$relatedModel::class";
+            $existModelFactory = strpos($modelFactoryContent, $relatedFactoryClass);
+
+            if (!$existModelFactory) {
+                $failureMessage = "Not found $relatedModel factory for $relatedModel model in '{$this->paths['factory']}";
+                $recommendedMessage = "Please declare a factory for $relatedModel model on '{$this->paths['factory']}' path.";
+
+                throw new ModelFactoryNotFoundedException("{$failureMessage} {$recommendedMessage}");
+            }
+        }
+
+        $this->prepareRelatedFactories();
         $content = $this->getStub('tests.dump', [
             '/*truncates*/' => $this->getTruncatesContent(),
             '/*inserts*/' => $this->getInsertsContent(),
