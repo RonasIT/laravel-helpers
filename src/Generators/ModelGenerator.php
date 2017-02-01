@@ -47,8 +47,9 @@ class ModelGenerator extends EntityGenerator
         if ($this->classExists('models', $this->name)) {
             $failureMessage = "Cannot create {$this->name} Model cause {$this->name} Model already exists.";
             $recommendedMessage = "Remove {$this->name} Model or run your command with options:'—without-model'.";
+            $exceptionClass = ClassAlreadyExistsException::class;
 
-            throw new ClassAlreadyExistsException("{$failureMessage} {$recommendedMessage}");
+            $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
         }
 
         $this->prepareRelatedModels();
@@ -103,8 +104,9 @@ class ModelGenerator extends EntityGenerator
             if (!$this->classExists('models', $relation)) {
                 $failureMessage = "Cannot create {$relation} Model cause {$relation} Model does not exists.";
                 $recommendedMessage = "Create a {$relation} Model by himself or run command 'php artisan make:entity {$relation} --only-model'.";
+                $exceptionClass = ClassNotExistsException::class;
 
-                throw new ClassNotExistsException("{$failureMessage} {$recommendedMessage}");
+                $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
             }
 
             $content = $this->getModelContent($relation);

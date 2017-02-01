@@ -27,8 +27,10 @@ class RepositoryGenerator extends EntityGenerator
         if (!$this->classExists('models', $this->model)) {
             $failureMessage = "Cannot create {$this->model} Model cause {$this->model} Model does not exists.";
             $recommendedMessage = "Create a {$this->model} Model by himself or run command 'php artisan make:entity {$this->model} --only-model'.";
+            $exceptionClass = ClassNotExistsException::class;
 
-            throw new ClassNotExistsException("{$failureMessage} {$recommendedMessage}");
+            $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
+
         }
 
         $repositoryContent = $this->getRepositoryContent();

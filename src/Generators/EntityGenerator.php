@@ -61,4 +61,8 @@ abstract class EntityGenerator
 
         return Str::plural($entityName);
     }
+
+    protected function throwFailureException($exceptionClass, $failureMessage, $recommendedMessage) {
+        throw new $exceptionClass("{$failureMessage} {$recommendedMessage}");
+    }
 }

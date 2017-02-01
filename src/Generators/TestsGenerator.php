@@ -70,21 +70,7 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function createDump() {
-        $modelFactoryContent = file_get_contents($this->paths['factory']);
-        $relatedModels = $this->getRelatedModels($this->model);
-
-        foreach ($relatedModels as $relatedModel) {
-            $relatedFactoryClass = "App\\Models\\$relatedModel::class";
-            $existModelFactory = strpos($modelFactoryContent, $relatedFactoryClass);
-
-            if (!$existModelFactory) {
-                $failureMessage = "Not found $relatedModel factory for $relatedModel model in '{$this->paths['factory']}";
-                $recommendedMessage = "Please declare a factory for $relatedModel model on '{$this->paths['factory']}' path.";
-
-                throw new ModelFactoryNotFoundedException("{$failureMessage} {$recommendedMessage}");
-            }
-        }
-
+        $this->checkExistRelatedModelsFactories();
         $this->prepareRelatedFactories();
         $content = $this->getStub('tests.dump', [
             '/*truncates*/' => $this->getTruncatesContent(),
@@ -311,8 +297,9 @@ class TestsGenerator extends EntityGenerator
             if (!str_contains($modelFactoryContent, $this->getModelClass($relation))) {
                 $failureMessage = "Model factory for mode {$relation} not found.";
                 $recommendedMessage = "Please create it and after thar you can run this command with flag '--only-tests'.";
+                $exceptionClass = ModelFactoryNotFound::class;
 
-                throw new ModelFactoryNotFound("{$failureMessage} {$recommendedMessage}");
+                $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
             }
 
             $matches = [];
@@ -349,8 +336,9 @@ class TestsGenerator extends EntityGenerator
             if (in_array($this->model, $relations)) {
                 $failureMessage = "Circular relations founded.";
                 $recommendedMessage = "Please resolve you relations in models, factories and database.";
+                $exceptionClass = CircularRelationsFoundedException::class;
 
-                throw new CircularRelationsFoundedException("{$failureMessage} {$recommendedMessage}");
+                $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
             }
 
             $relatedModels = $this->getAllModels($relations);
@@ -375,10 +363,29 @@ class TestsGenerator extends EntityGenerator
         if (!$this->classExists('models', $model)) {
             $failureMessage = "Cannot create {$model} Model cause {$model} Model does not exists.";
             $recommendedMessage = "Create a {$model} Model by himself or run command 'php artisan make:entity {$model} --only-model'.";
+            $exceptionClass = ClassNotExistsException::class;
 
-            throw new ClassNotExistsException("{$failureMessage} {$recommendedMessage}");
+            $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
         }
 
         return file_get_contents($path);
+    }
+
+    protected function checkExistRelatedModelsFactories() {
+        $modelFactoryContent = file_get_contents($this->paths['factory']);
+        $relatedModels = $this->getRelatedModels($this->model);
+
+        foreach ($relatedModels as $relatedModel) {
+            $relatedFactoryClass = "App\\Models\\$relatedModel::class";
+            $existModelFactory = strpos($modelFactoryContent, $relatedFactoryClass);
+
+            if (!$existModelFactory) {
+                $failureMessage = "Not found $relatedModel factory for $relatedModel model in '{$this->paths['factory']}";
+                $recommendedMessage = "Please declare a factory for $relatedModel model on '{$this->paths['factory']}' path.";
+                $exceptionClass = ModelFactoryNotFoundedException::class;
+
+                $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
+            }
+        }
     }
 }
