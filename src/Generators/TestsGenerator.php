@@ -14,6 +14,7 @@ use Faker\Generator as Faker;
 use RonasIT\Support\Exceptions\CircularRelationsFoundedException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
+use RonasIT\Support\Exceptions\ModelFactoryNotFoundedException;
 use RonasIT\Support\Events\SuccessCreateMessage;
 
 class TestsGenerator extends EntityGenerator
@@ -69,8 +70,8 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function createDump() {
+        $this->checkExistRelatedModelsFactories();
         $this->prepareRelatedFactories();
-
         $content = $this->getStub('tests.dump', [
             '/*truncates*/' => $this->getTruncatesContent(),
             '/*inserts*/' => $this->getInsertsContent(),
@@ -294,10 +295,11 @@ class TestsGenerator extends EntityGenerator
             $modelFactoryContent = file_get_contents($this->paths['factory']);
 
             if (!str_contains($modelFactoryContent, $this->getModelClass($relation))) {
-                $failureMessage = "Model factory for mode {$relation} not found.";
-                $recommendedMessage = "Please create it and after thar you can run this command with flag '--only-tests'.";
-
-                throw new ModelFactoryNotFound("{$failureMessage} {$recommendedMessage}");
+                $this->throwFailureException(
+                    ModelFactoryNotFound::class,
+                    "Model factory for mode {$relation} not found.",
+                    "Please create it and after thar you can run this command with flag '--only-tests'."
+                );
             }
 
             $matches = [];
@@ -332,10 +334,11 @@ class TestsGenerator extends EntityGenerator
             }
 
             if (in_array($this->model, $relations)) {
-                $failureMessage = "Circular relations founded.";
-                $recommendedMessage = "Please resolve you relations in models, factories and database.";
-
-                throw new CircularRelationsFoundedException("{$failureMessage} {$recommendedMessage}");
+                $this->throwFailureException(
+                    CircularRelationsFoundedException::class,
+                    "Circular relations founded.",
+                    "Please resolve you relations in models, factories and database."
+                );
             }
 
             $relatedModels = $this->getAllModels($relations);
@@ -358,12 +361,31 @@ class TestsGenerator extends EntityGenerator
         $path = base_path("{$this->paths['models']}/{$model}.php");
 
         if (!$this->classExists('models', $model)) {
-            $failureMessage = "Cannot create {$model} Model cause {$model} Model does not exists.";
-            $recommendedMessage = "Create a {$model} Model by himself or run command 'php artisan make:entity {$model} --only-model'.";
-
-            throw new ClassNotExistsException("{$failureMessage} {$recommendedMessage}");
+            $this->throwFailureException(
+                ClassNotExistsException::class,
+                "Cannot create {$model} Model cause {$model} Model does not exists.",
+                "Create a {$model} Model by himself or run command 'php artisan make:entity {$model} --only-model'."
+            );
         }
 
         return file_get_contents($path);
+    }
+
+    protected function checkExistRelatedModelsFactories() {
+        $modelFactoryContent = file_get_contents($this->paths['factory']);
+        $relatedModels = $this->getRelatedModels($this->model);
+
+        foreach ($relatedModels as $relatedModel) {
+            $relatedFactoryClass = "App\\Models\\$relatedModel::class";
+            $existModelFactory = strpos($modelFactoryContent, $relatedFactoryClass);
+
+            if (!$existModelFactory) {
+                $this->throwFailureException(
+                    ModelFactoryNotFoundedException::class,
+                    "Not found $relatedModel factory for $relatedModel model in '{$this->paths['factory']}",
+                    "Please declare a factory for $relatedModel model on '{$this->paths['factory']}' path."
+                );
+            }
+        }
     }
 }
