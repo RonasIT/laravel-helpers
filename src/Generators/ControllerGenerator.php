@@ -24,20 +24,20 @@ class ControllerGenerator extends EntityGenerator
 
     public function generate() {
         if ($this->classExists('controllers', "{$this->model}Controller")) {
-            $failureMessage = "Cannot create {$this->model}Controller cause {$this->model}Controller already exists.";
-            $recommendedMessage = "Remove {$this->model}Controller or run your command with options:'—without-controller'.";
-            $exceptionClass = ClassAlreadyExistsException::class;
-
-            $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
+            $this->throwFailureException(
+                ClassAlreadyExistsException::class,
+                "Cannot create {$this->model}Controller cause {$this->model}Controller already exists.",
+                "Remove {$this->model}Controller or run your command with options:'—without-controller'."
+            );
 
         }
 
         if (!$this->classExists('services', "{$this->model}Service")) {
-            $failureMessage = "Cannot create {$this->model}Service cause {$this->model}Service does not exists.";
-            $recommendedMessage = "Create a {$this->model}Service by himself or run your command with options:'--without-controller --without-migrations --without-requests --without-tests'.";
-            $exceptionClass = ClassNotExistsException::class;
-
-            $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
+            $this->throwFailureException(
+                ClassNotExistsException::class,
+                "Cannot create {$this->model}Service cause {$this->model}Service does not exists.",
+                "Create a {$this->model}Service by himself or run your command with options:'--without-controller --without-migrations --without-requests --without-tests'."
+            );
         }
 
         $controllerContent = $this->getControllerContent($this->model);
@@ -60,11 +60,11 @@ class ControllerGenerator extends EntityGenerator
         $routesPath = base_path($this->paths['routes']);
 
         if (!file_exists($routesPath)) {
-            $failureMessage = "Not found file with routes.";
-            $recommendedMessage = "Create a routes file on path: '{$routesPath}'.";
-            $exceptionClass = FileNotFoundException::class;
-
-            $this->throwFailureException($exceptionClass, $failureMessage, $recommendedMessage);
+            $this->throwFailureException(
+                FileNotFoundException::class,
+                "Not found file with routes.",
+                "Create a routes file on path: '{$routesPath}'."
+            );
         }
 
         $this->addUseController($routesPath);
