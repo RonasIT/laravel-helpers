@@ -15,6 +15,7 @@ use RonasIT\Support\Exceptions\CircularRelationsFoundedException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFoundedException;
+use RonasIT\Support\Exceptions\ModelFactoryAlreadyExistException;
 use RonasIT\Support\Events\SuccessCreateMessage;
 
 class TestsGenerator extends EntityGenerator
@@ -58,6 +59,7 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function createFactory() {
+        $this->checkExistModelFactory();
         $content = $this->getStub('tests.factory', [
             'Entity' => $this->model,
             '/*fields*/' => $this->getFactoryFieldsContent()
@@ -386,6 +388,20 @@ class TestsGenerator extends EntityGenerator
                     "Please declare a factory for $relatedModel model on '{$this->paths['factory']}' path and run your command with option '--only-tests'."
                 );
             }
+        }
+    }
+
+    protected function checkExistModelFactory() {
+        $modelFactoryContent = file_get_contents($this->paths['factory']);
+        $factoryClass = "App\\Models\\$this->model::class";
+        $existModelFactory = strpos($modelFactoryContent, $factoryClass);
+
+        if ($existModelFactory) {
+            $this->throwFailureException(
+                ModelFactoryAlreadyExistException::class,
+                "Factory for $this->model model already exist in '{$this->paths['factory']}",
+                "Please delete a factory for $this->model model on '{$this->paths['factory']}' path and run your command with option '--only-tests'."
+            );
         }
     }
 }
