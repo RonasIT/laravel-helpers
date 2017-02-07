@@ -15,7 +15,6 @@ use RonasIT\Support\Exceptions\CircularRelationsFoundedException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Exceptions\ClassNotExistsException;
 use RonasIT\Support\Exceptions\ModelFactoryNotFoundedException;
-use RonasIT\Support\Exceptions\ModelFactoryAlreadyExistException;
 use RonasIT\Support\Events\SuccessCreateMessage;
 
 class TestsGenerator extends EntityGenerator
@@ -59,14 +58,19 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function createFactory() {
-        $this->checkExistModelFactory();
-        $content = $this->getStub('tests.factory', [
-            'Entity' => $this->model,
-            '/*fields*/' => $this->getFactoryFieldsContent()
-        ]);
-        $createMessage = "Created a new Test factory for {$this->model} model in '{$this->paths['factory']}'";
+        $existModelFactory = $this->checkExistModelFactory();
 
-        file_put_contents($this->paths['factory'], $content, FILE_APPEND);
+        if (!$existModelFactory) {
+            $content = $this->getStub('tests.factory', [
+                'Entity' => $this->model,
+                '/*fields*/' => $this->getFactoryFieldsContent()
+            ]);
+            $createMessage = "Created a new Test factory for {$this->model} model in '{$this->paths['factory']}'";
+
+            file_put_contents($this->paths['factory'], $content, FILE_APPEND);
+        } else {
+            $createMessage = "Factory for {$this->model} model has already created, so new factory not necessary create.";
+        }
 
         event(new SuccessCreateMessage($createMessage));
     }
@@ -396,12 +400,6 @@ class TestsGenerator extends EntityGenerator
         $factoryClass = "App\\Models\\$this->model::class";
         $existModelFactory = strpos($modelFactoryContent, $factoryClass);
 
-        if ($existModelFactory) {
-            $this->throwFailureException(
-                ModelFactoryAlreadyExistException::class,
-                "Factory for $this->model model already exist in '{$this->paths['factory']}",
-                "Please delete a factory for $this->model model on '{$this->paths['factory']}' path and run your command with option '--only-tests'."
-            );
-        }
+        return $existModelFactory;
     }
 }
