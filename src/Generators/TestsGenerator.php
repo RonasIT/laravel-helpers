@@ -58,9 +58,7 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function createFactory() {
-        $existModelFactory = $this->checkExistModelFactory();
-
-        if (!$existModelFactory) {
+        if (!$this->checkExistModelFactory()) {
             $content = $this->getStub('tests.factory', [
                 'Entity' => $this->model,
                 '/*fields*/' => $this->getFactoryFieldsContent()
