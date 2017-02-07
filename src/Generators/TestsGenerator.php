@@ -396,8 +396,7 @@ class TestsGenerator extends EntityGenerator
     protected function checkExistModelFactory() {
         $modelFactoryContent = file_get_contents($this->paths['factory']);
         $factoryClass = "App\\Models\\$this->model::class";
-        $existModelFactory = strpos($modelFactoryContent, $factoryClass);
 
-        return $existModelFactory;
+        return strpos($modelFactoryContent, $factoryClass);
     }
 }
