@@ -383,7 +383,7 @@ class TestsGenerator extends EntityGenerator
                 $this->throwFailureException(
                     ModelFactoryNotFoundedException::class,
                     "Not found $relatedModel factory for $relatedModel model in '{$this->paths['factory']}",
-                    "Please declare a factory for $relatedModel model on '{$this->paths['factory']}' path."
+                    "Please declare a factory for $relatedModel model on '{$this->paths['factory']}' path and run your command with option '--only-tests'."
                 );
             }
         }
