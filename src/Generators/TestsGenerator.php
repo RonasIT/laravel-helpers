@@ -58,13 +58,17 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function createFactory() {
-        $content = $this->getStub('tests.factory', [
-            'Entity' => $this->model,
-            '/*fields*/' => $this->getFactoryFieldsContent()
-        ]);
-        $createMessage = "Created a new Test factory for {$this->model} model in '{$this->paths['factory']}'";
+        if (!$this->checkExistModelFactory()) {
+            $content = $this->getStub('tests.factory', [
+                'Entity' => $this->model,
+                '/*fields*/' => $this->getFactoryFieldsContent()
+            ]);
+            $createMessage = "Created a new Test factory for {$this->model} model in '{$this->paths['factory']}'";
 
-        file_put_contents($this->paths['factory'], $content, FILE_APPEND);
+            file_put_contents($this->paths['factory'], $content, FILE_APPEND);
+        } else {
+            $createMessage = "Factory for {$this->model} model has already created, so new factory not necessary create.";
+        }
 
         event(new SuccessCreateMessage($createMessage));
     }
@@ -387,5 +391,12 @@ class TestsGenerator extends EntityGenerator
                 );
             }
         }
+    }
+
+    protected function checkExistModelFactory() {
+        $modelFactoryContent = file_get_contents($this->paths['factory']);
+        $factoryClass = "App\\Models\\$this->model::class";
+
+        return strpos($modelFactoryContent, $factoryClass);
     }
 }
