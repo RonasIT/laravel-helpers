@@ -51,7 +51,11 @@ function array_round($array) {
     $keys = array_keys($array);
 
     $values = array_map(function ($value) {
-        return round($value);
+        if (is_numeric($value)) {
+            return round($value);
+        }
+
+        return $value;
     }, $array);
 
     return array_combine($keys, $values);
@@ -213,20 +217,4 @@ function rmdir_recursively($dir) {
         }
     }
     rmdir($dir);
-}
-
-function fPutQuotedCsv($handle, $row, $fd=',', $quot='"') {
-    $cells = array_map(function($cell) use ($fd, $quot) {
-        if (preg_match("/[;.\",\n]/", $cell)) {
-            $cell = $quot . str_replace($quot, "{$quot}{$quot}", $cell) . $quot;
-        }
-
-        return $cell;
-    }, $row);
-
-    $str = implode($fd, $cells);
-
-    fputs($handle, $str."\n");
-
-    return strlen($str);
 }

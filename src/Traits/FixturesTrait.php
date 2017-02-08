@@ -54,4 +54,11 @@ trait FixturesTrait
     public function assertEqualsFixture($fixture, $data) {
         $this->assertEquals($this->getJsonFixture($fixture), $data);
     }
+
+    public function exportJsonResponse($fixture) {
+        $response = $this->getJsonResponse();
+        $content = json_encode($response, JSON_PRETTY_PRINT);
+
+        return file_put_contents($this->getFixturePath($fixture), $content);
+    }
 }
