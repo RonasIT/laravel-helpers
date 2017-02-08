@@ -7,7 +7,7 @@
  * Time: 10:15
  */
 
-namespace App\Support\Iterators;
+namespace RonasIT\Support\Iterators;
 
 use Iterator;
 
