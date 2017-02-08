@@ -127,12 +127,13 @@ class MigrationsGenerator extends EntityGenerator
         $namePieces = [
             $this->getNewMigrationTimestamp(), 'add', $field, 'to', $this->getTableName($entityName)
         ];
+        $fieldCamelName = Str::camel($field);
 
         $replaces = [
             'entities' => $this->getTableName($entityName),
-            'Entities' => Str::plural($entityName),
+            'Entities' => $this->prepareEntityName($entityName),
             'field' => $field,
-            'Field' => Str::camel($field),
+            'Field' => ucfirst($fieldCamelName),
             'type' => $type
         ];
 
