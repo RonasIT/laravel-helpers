@@ -175,11 +175,11 @@ class TestsGenerator extends EntityGenerator
             if (in_array($key, $this->fields['timestamp']) || in_array($key, $this->fields['timestamp-required'])) {
                 $this->getFields[$key] = $value->format('Y-m-d h:i:s');
             } else {
-                $this->getFields[$key] = var_export($value, true);
+                $this->getFields[$key] = $value;
             }
         }
 
-        return implode(', ', $this->getFields);
+        return "'" . implode("', '", $this->getFields) . "'";
     }
 
     protected function getValues($model) {
