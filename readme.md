@@ -184,7 +184,9 @@ It contains following methods:
 ### EntityService
 This service designer for easily creation of services with control any entity.
 
+##Tests
+Automatic generation of test is supported only for PostgreSQL.
 
 ## License
 
-Auto-doc plugin is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+Laravel Helpers plugin is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
