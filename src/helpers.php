@@ -218,3 +218,19 @@ function rmdir_recursively($dir) {
     }
     rmdir($dir);
 }
+
+function fPutQuotedCsv($handle, $row, $fd=',', $quot='"') {
+    $cells = array_map(function($cell) use ($fd, $quot) {
+        if (preg_match("/[;.\",\n]/", $cell)) {
+            $cell = $quot . str_replace($quot, "{$quot}{$quot}", $cell) . $quot;
+        }
+
+        return $cell;
+    }, $row);
+
+    $str = implode($fd, $cells);
+
+    fputs($handle, $str."\n");
+
+    return strlen($str);
+}
