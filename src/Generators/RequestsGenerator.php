@@ -78,6 +78,12 @@ class RequestsGenerator extends EntityGenerator
     }
 
     protected function getValidationContent($name, $validation, $required) {
+        if ($validation == 'timestamp') {
+            $validation = 'date';
+        } elseif ($validation == 'float') {
+            $validation = 'numeric';
+        }
+
         if ($required) {
             $validation .= '|required';
         }

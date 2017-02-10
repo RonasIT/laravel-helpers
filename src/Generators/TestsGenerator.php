@@ -8,7 +8,6 @@
 
 namespace RonasIT\Support\Generators;
 
-
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use RonasIT\Support\Exceptions\CircularRelationsFoundedException;
@@ -22,6 +21,7 @@ class TestsGenerator extends EntityGenerator
     protected $model;
     protected $fields;
     protected $relations;
+    protected $fieldsValues;
     protected $annotationReader;
     protected $fakerMethods = [];
     protected $fakerProperties = [];
@@ -169,17 +169,17 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function getValuesListContent($model) {
-        $values = $this->getValues($model);
+        $this->fieldsValues = $this->getValues($model);
 
-        foreach ($values as $key => $value) {
+        foreach ($this->fieldsValues as $key => $value) {
             if (in_array($key, $this->fields['timestamp']) || in_array($key, $this->fields['timestamp-required'])) {
-                $this->getFields[$key] = $value->format('Y-m-d h:i:s');
+                $this->getFields[$key] = "'" . $value->format('Y-m-d h:i:s') . "'";
             } else {
-                $this->getFields[$key] = $value;
+                $this->getFields[$key] = var_export($value, true);
             }
         }
 
-        return "'" . implode("', '", $this->getFields) . "'";
+        return implode(', ', $this->getFields);
     }
 
     protected function getValues($model) {
@@ -245,21 +245,22 @@ class TestsGenerator extends EntityGenerator
 
     protected function generateNewEntityFixture() {
         $this->createFields = $this->getMockModel($this->model);
-
+        $fields = $this->prepareFieldsContent($this->createFields);
         $entity = Str::lower($this->model);
 
         $this->generateFixture(
             "new_{$entity}.json",
-            $this->createFields
+            $fields
         );
     }
 
     protected function generateExistedEntityFixture() {
         $entity = Str::lower($this->model);
+        $fields = $this->prepareFieldsContent($this->fieldsValues);
 
         $this->generateFixture(
             "{$entity}.json",
-            $this->getFields
+            $fields
         );
     }
 
@@ -398,5 +399,20 @@ class TestsGenerator extends EntityGenerator
         $factoryClass = "App\\Models\\$this->model::class";
 
         return strpos($modelFactoryContent, $factoryClass);
+    }
+
+    protected function prepareFieldsContent($content) {
+        foreach ($content as $key => $value) {
+            if (gettype($value) == 'object') {
+                if (get_class($value) == 'DateTime') {
+                    $content[$key] = $value->format('Y-m-d h:i:s');
+                }
+            }
+            if (gettype($value) != ('bool' || 'int')) {
+                $content[$key] = trim($value, "'");
+            }
+        }
+
+        return $content;
     }
 }
