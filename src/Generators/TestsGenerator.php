@@ -403,9 +403,15 @@ class TestsGenerator extends EntityGenerator
 
     protected function prepareFieldsContent($content) {
         foreach ($content as $key => $value) {
+            $type = gettype($value);
+
             if ($this->checkDatetimeObject($value)) {
                 $content[$key] = $value->format('Y-m-d h:i:s');
-            } elseif (gettype($value) != ('bool' || 'int')) {
+
+                continue;
+            }
+
+            if (($type != 'bool') && ($type != 'int')) {
                 $content[$key] = trim($value, "'");
             }
         }
@@ -414,10 +420,8 @@ class TestsGenerator extends EntityGenerator
     }
 
     protected function checkDatetimeObject($content) {
-        if (gettype($content) == 'object') {
-            if (get_class($content) == 'DateTime') {
-                return true;
-            }
+        if ((gettype($content) == 'object') && (get_class($content) == 'DateTime')) {
+            return true;
         }
 
         return false;
