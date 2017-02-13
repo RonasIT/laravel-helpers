@@ -403,16 +403,23 @@ class TestsGenerator extends EntityGenerator
 
     protected function prepareFieldsContent($content) {
         foreach ($content as $key => $value) {
-            if (gettype($value) == 'object') {
-                if (get_class($value) == 'DateTime') {
-                    $content[$key] = $value->format('Y-m-d h:i:s');
-                }
-            }
-            if (gettype($value) != ('bool' || 'int')) {
+            if ($this->checkDatetimeObject($value)) {
+                $content[$key] = $value->format('Y-m-d h:i:s');
+            } elseif (gettype($value) != ('bool' || 'int')) {
                 $content[$key] = trim($value, "'");
             }
         }
 
         return $content;
+    }
+
+    protected function checkDatetimeObject($content) {
+        if (gettype($content) == 'object') {
+            if (get_class($content) == 'DateTime') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
