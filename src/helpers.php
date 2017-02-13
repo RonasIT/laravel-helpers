@@ -234,3 +234,18 @@ function fPutQuotedCsv($handle, $row, $fd=',', $quot='"') {
 
     return strlen($str);
 }
+
+
+function clear_folder($path) {
+    $files = glob("$path/*");
+
+    foreach($files as $file){
+        if (is_file($file)) {
+            unlink($file);
+        }
+
+        if (is_dir($file)) {
+            clear_folder($file);
+        }
+    }
+}
