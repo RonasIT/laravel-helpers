@@ -161,7 +161,9 @@ trait EntityControlTrait
         if ($query->exists()) {
             $message = "{$this->getEntityName()} with {$field} {$value} already exists";
 
-            throw new PostValidationException($message);
+            throw (new PostValidationException())->setData([
+                $field => $message
+            ]);
         }
     }
 
