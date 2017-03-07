@@ -162,7 +162,7 @@ trait EntityControlTrait
             $message = "{$this->getEntityName()} with {$field} {$value} already exists";
 
             throw (new PostValidationException())->setData([
-                $field => $message
+                $field => [$message]
             ]);
         }
     }
