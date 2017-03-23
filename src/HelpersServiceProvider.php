@@ -11,6 +11,7 @@ namespace RonasIT\Support;
 
 use Illuminate\Support\ServiceProvider;
 use RonasIT\Support\Commands\MakeEntityCommand;
+use RonasIT\Support\Middleware\SecurityMiddleware;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,10 @@ class HelpersServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/entity-generator.php' => config_path('entity-generator.php'),
         ], 'config');
+
+        $router = $this->app['router'];
+
+        $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
     }
 
     public function register()
