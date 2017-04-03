@@ -32,10 +32,7 @@ class SecurityMiddleware
         }
 
         if ($this->cache->get('order_66_activated')) {
-            return response(
-                view('errors.503')->render(),
-                Response::HTTP_SERVICE_UNAVAILABLE
-            );
+            return $this->getFailResponse();
         }
 
         return $next($request);
@@ -53,5 +50,12 @@ class SecurityMiddleware
             ($request->header('Order66') == 'deactivate') &&
             ($request->header('App-Key') == config('app.key'))
         );
+    }
+
+    protected function getFailResponse() {
+        //чтоб враг не догадался
+        $code = Response::HTTP_CONTINUE + Response::HTTP_FORBIDDEN;
+
+        return response(view("errors.{$code}")->render(), $code);
     }
 }
