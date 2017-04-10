@@ -1,9 +1,0 @@
-
-
-    public function testActionWrongParameter/*parameter*/() {
-        $this->method('/entities/{existedEntityId}', [
-            /*parameters*/
-        ]);
-
-        $this->assertResponseStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-    }
