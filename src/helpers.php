@@ -196,10 +196,6 @@ function getGUID() {
     return $uuid;
 }
 
-function stubs_path($path) {
-    return __DIR__."/../stubs/{$path}";
-}
-
 function array_concat($array, $callback) {
     $content = '';
 
