@@ -267,3 +267,7 @@ function array_associate($array, $callback) {
 
     return $result;
 }
+
+function array_duplicate($array) {
+    return array_diff_key($array, array_unique($array));
+}
