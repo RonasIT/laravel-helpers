@@ -245,3 +245,25 @@ function clear_folder($path) {
         }
     }
 }
+
+/**
+ * Builds an associative array by gotten keys and values
+ *
+ * @param array $array
+ * @param callable $callback
+ *
+ * @return array
+ */
+function array_associate($array, $callback) {
+    $result = [];
+
+    foreach ($array as $key => $value) {
+        $callbackResult = $callback($value, $key);
+
+        if (!empty($callbackResult)) {
+            $result[$callbackResult['key']] = $callbackResult['value'];
+        }
+    }
+
+    return $result;
+}
