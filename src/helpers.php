@@ -26,22 +26,6 @@ function elseChain(...$callbacks) {
 }
 
 /**
- * Add missing zeros in beginning on zip-string. As example 123 will be 00123
- *
- * @param int $zip
- * @return string
- */
-function toZip($zip) {
-    $convertedZip = (string)$zip;
-
-    while(strlen($convertedZip) < 5) {
-        $convertedZip = "0{$convertedZip}";
-    }
-
-    return $convertedZip;
-}
-
-/**
  * Round all values in list of floats.
  *
  * @param array $array
