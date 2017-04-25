@@ -18,6 +18,7 @@ class HelpersServiceProvider extends ServiceProvider
     public function boot() {
         $router = $this->app['router'];
 
+        $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
         $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
     }
 
