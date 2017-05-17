@@ -9,6 +9,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
@@ -16,6 +17,8 @@ trait EntityControlTrait
     protected $model;
     protected $withTrashed = false;
     protected $fields;
+    protected $filter;
+    protected $query;
 
     public function setModel($model) {
         $this->model = $model;
@@ -177,5 +180,80 @@ trait EntityControlTrait
         $traits = class_uses($this->model);
 
         return in_array(SoftDeletes::class, $traits);
+    }
+
+    public function paginate($query, $data = [])
+    {
+        $defaultPerPage = config('defaults.items_per_page');
+        $perPage = empty($data['per_page']) ? $defaultPerPage : $data['per_page'];
+
+        return $query->paginate($perPage);
+    }
+
+    protected function filterBy($field)
+    {
+        if (!empty($this->filter[$field])) {
+            $this->query->where($field, $this->filter[$field]);
+        }
+
+        return $this;
+    }
+
+    protected function filterByQuery($fields)
+    {
+        if (!empty($this->filter['query'])) {
+            $this->query->where(function ($query) use ($fields) {
+                foreach ($fields as $field) {
+                    $loweredQuery = strtolower($this->filter['query']);
+                    $field = DB::raw("lower({$field})");
+
+                    $query->orWhere($field, 'like', "%{$loweredQuery}%");
+                }
+            });
+        }
+
+        return $this;
+    }
+
+    protected function searchQuery($filter)
+    {
+        if (!empty($filter['with_trashed'])) {
+            $this->withTrashed();
+        }
+
+        $this->query = $this->getQuery();
+
+        $this->filter = $filter;
+
+        return $this;
+    }
+
+    protected function getSearchResults()
+    {
+        if (empty($this->filter['all'])) {
+            $results = $this->paginate($this->query, $this->filter);
+        } else {
+            $results = $this->query->get();
+        }
+
+        return $results->toArray();
+    }
+
+    protected function orderBy()
+    {
+        if (!empty($this->filter['order_by'])) {
+            $desk = $this->getDesc($this->filter);
+
+            $this->query->orderBy($this->filter['order_by'], $desk);
+        }
+
+        return $this;
+    }
+
+    protected function getDesc($options = [])
+    {
+        $isDesc = array_get($options, 'desc', false);
+
+        return $isDesc ? 'DESC' : 'ASC';
     }
 }
