@@ -16,6 +16,7 @@ trait EntityControlTrait
 {
     protected $model;
     protected $withTrashed = false;
+    protected $onlyTrashed = false;
     protected $fields;
     protected $filter;
     protected $query;
@@ -32,6 +33,12 @@ trait EntityControlTrait
         $model = new $this->model;
 
         $query = $model->query();
+
+        if ($this->onlyTrashed) {
+            $query->onlyTrashed();
+
+            $this->withTrashed = false;
+        }
 
         if ($this->withTrashed && $this->isSoftDelete()) {
             $query->withTrashed();
@@ -122,6 +129,12 @@ trait EntityControlTrait
 
     public function withTrashed() {
         $this->withTrashed = true;
+
+        return $this;
+    }
+
+    public function onlyTrashed() {
+        $this->onlyTrashed = true;
 
         return $this;
     }
