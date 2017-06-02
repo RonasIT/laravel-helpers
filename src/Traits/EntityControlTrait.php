@@ -269,18 +269,4 @@ trait EntityControlTrait
 
         return $isDesc ? 'DESC' : 'ASC';
     }
-
-    protected function addSelect($query, $fields)
-    {
-        $this->prepareSelect($query)->addSelect($fields);
-
-        return $query;
-    }
-
-    protected function prepareSelect($query)
-    {
-        $query->select($this->fields);
-
-        return $query;
-    }
 }

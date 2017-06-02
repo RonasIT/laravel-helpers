@@ -13,6 +13,8 @@ use Schema;
 
 trait ModelTrait
 {
+    protected $selectedFields;
+
     public static function getFields() {
         $fillable = (new static)->getFillable();
 
@@ -27,5 +29,18 @@ trait ModelTrait
         return array_map(function ($field) {
             return "{$this->getTable()}.{$field}";
         }, $fields);
+    }
+
+    public function scopeAddFieldsToSelect($query, $fields)
+    {
+        if (empty($this->selectedFields)) {
+            $this->selectedFields = $this->getAllFieldsWithTable();
+        }
+
+        $fields = array_merge($this->selectedFields, $fields);
+
+        $query->addSelect($fields);
+
+        return $query;
     }
 }
