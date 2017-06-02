@@ -31,6 +31,10 @@ trait ModelTrait
         }, $fields);
     }
 
+    /**
+     * This method was added, because native laravel's method addSelect
+     * mashed exits select clause
+     */
     public function scopeAddFieldsToSelect($query, $fields)
     {
         if (empty($this->selectedFields)) {
