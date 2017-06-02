@@ -33,7 +33,7 @@ trait ModelTrait
 
     /**
      * This method was added, because native laravel's method addSelect
-     * overwrites exists select clause
+     * overwrites existed select clause
      */
     public function scopeAddFieldsToSelect($query, $fields)
     {
