@@ -255,3 +255,18 @@ function array_associate($array, $callback) {
 function array_duplicate($array) {
     return array_diff_key($array, array_unique($array));
 }
+
+function array_unique_object($objectsList, $key = 'id') {
+    $uniqueKeys = [];
+
+    $uniqueObjects = array_map(function ($object) use (&$uniqueKeys, $key) {
+        if (in_array($object[$key], $uniqueKeys)) {
+            return null;
+        }
+        $uniqueKeys[] = $object[$key];
+
+        return $object;
+    }, $objectsList);
+
+    return array_filter($uniqueObjects);
+}
