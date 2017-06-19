@@ -59,4 +59,12 @@ trait ImageTestTrait
             $this->uploadPath($destination)
         );
     }
+
+    protected function getImageRoute($imagePath) {
+        $route = config('imagecache.route');
+        $templates = config('imagecache.templates');
+        $templatesKeys = array_keys($templates);
+
+        return "/{$route}/{$templatesKeys[0]}/{$imagePath}";
+    }
 }
