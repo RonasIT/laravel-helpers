@@ -297,7 +297,7 @@ function array_remove_elements($array, $elements)
     return array_diff($array, $elements);
 }
 
-function prependSymbols($string, $expectedLength, $symbol)
+function prepend_symbols($string, $expectedLength, $symbol)
 {
     while (strlen($string) < $expectedLength) {
         $string = "{$symbol}{$string}";
