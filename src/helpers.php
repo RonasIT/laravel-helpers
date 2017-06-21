@@ -270,3 +270,38 @@ function array_unique_object($objectsList, $key = 'id') {
 
     return array_filter($uniqueObjects);
 }
+
+function array_trim($array)
+{
+    return array_map(
+        function ($item) {
+            return (is_string($item)) ? trim($item) : $item;
+        },
+        $array
+    );
+}
+
+function array_remove_by_field($array, $fieldName, $fieldValue)
+{
+    $array = array_values($array);
+    $key = array_search($fieldValue, array_column($array, $fieldName));
+    if ($key !== false) {
+        unset($array[$key]);
+    }
+
+    return array_values($array);
+}
+
+function array_remove_elements($array, $elements)
+{
+    return array_diff($array, $elements);
+}
+
+function prepend_symbols($string, $expectedLength, $symbol)
+{
+    while (strlen($string) < $expectedLength) {
+        $string = "{$symbol}{$string}";
+    }
+
+    return $string;
+}
