@@ -18,7 +18,7 @@ trait ModelTrait
     public static function getFields() {
         $fillable = (new static)->getFillable();
 
-        $fillable[] = 'id';
+        array_unshift($fillable, 'id');
 
         return $fillable;
     }
