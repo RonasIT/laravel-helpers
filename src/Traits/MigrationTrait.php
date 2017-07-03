@@ -13,24 +13,6 @@ use Illuminate\Support\Facades\Schema;
 
 trait MigrationTrait
 {
-    public function createTable($tableName, $fields) {
-        Schema::create($this->getTableName($tableName), function (Blueprint $table) use ($fields) {
-            $table->increments('id');
-            $table->timestamps();
-
-            foreach ($fields as $typeName => $fieldName) {
-                $explodedType = explode('-', $typeName);
-                $type = $explodedType[0];
-
-                if (empty($explodedType[1])) {
-                    $table->$type()->nullable();
-                } else {
-                    $table->$type();
-                }
-            }
-        });
-    }
-
     public function addForeignKey($fromTable, $toTable) {
         Schema::table($this->getTableName($fromTable), function (Blueprint $table) use ($toTable) {
             $fieldName = strtolower($toTable) . '_id';
