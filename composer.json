@@ -1,6 +1,6 @@
 {
   "name": "ronasit/laravel-helpers",
-  "version" : "1.0.19",
+  "version" : "1.0.20",
   "description": "Provided helpers function and some helper class.",
   "keywords": ["laravel", "helpers"],
   "license": "MIT",

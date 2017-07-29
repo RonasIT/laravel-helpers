@@ -305,3 +305,7 @@ function prepend_symbols($string, $expectedLength, $symbol)
 
     return $string;
 }
+
+function array_default(&$array, $key, $default) {
+    $array[$key] = array_get($array, $key, $default);
+}
