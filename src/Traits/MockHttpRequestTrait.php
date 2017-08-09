@@ -14,11 +14,13 @@ use Mockery;
 
 trait MockHttpRequestTrait
 {
-    public function setResponse($response, $http = null) {
+    public function setResponse($response, $http = null)
+    {
         return $this->makeGetRequest($this->makeResponse($response), $http);
     }
 
-    public function makeGetRequest($response, $http = null) {
+    public function makeGetRequest($response, $http = null)
+    {
         if (empty($http)) {
             $http = Mockery::mock(HttpRequestService::class);
         }
@@ -28,7 +30,8 @@ trait MockHttpRequestTrait
         return $http;
     }
 
-    public function makePostRequest($response, $http = null) {
+    public function makePostRequest($response, $http = null)
+    {
         if (empty($http)) {
             $http = Mockery::mock(HttpRequestService::class);
         }
@@ -38,7 +41,8 @@ trait MockHttpRequestTrait
         return $http;
     }
 
-    public function makeResponse($body = null) {
+    public function makeResponse($body = null)
+    {
         $httpResponse = Mockery::mock(ClientInterface::class);
         $httpResponse->shouldReceive('isSuccessful')->andReturn(true);
         $httpResponse->shouldReceive('getBody')->andReturn($body);
@@ -46,7 +50,8 @@ trait MockHttpRequestTrait
         return $httpResponse;
     }
 
-    public function mockMethod($method, $result, $http) {
+    public function mockMethod($method, $result, $http)
+    {
         if (empty($http)) {
             $http = Mockery::mock(HttpRequestService::class);
         }

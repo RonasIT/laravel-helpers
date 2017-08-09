@@ -12,7 +12,8 @@ trait ImageTestTrait
 {
     use ImagesTrait;
 
-    protected function clearPublicImages($folder) {
+    protected function clearPublicImages($folder)
+    {
         $imagesPath = $this->uploadPath($folder);
 
         if (!file_exists($imagesPath)) {
@@ -32,13 +33,15 @@ trait ImageTestTrait
         }, $images);
     }
 
-    protected function getEncryptedImage($imageName) {
+    protected function getEncryptedImage($imageName)
+    {
         $image = $this->getFixture($imageName);
 
         return base64_encode($image);
     }
 
-    protected function checkImage($expectedFixture, $imagePath) {
+    protected function checkImage($expectedFixture, $imagePath)
+    {
         $imagePath = preg_replace('/^\//', '', $imagePath);
 
         $imagePath = $this->uploadPath($imagePath);
@@ -49,7 +52,8 @@ trait ImageTestTrait
         );
     }
 
-    protected function copyImage($imageName, $destination) {
+    protected function copyImage($imageName, $destination)
+    {
         if (!file_exists($this->uploadPath('flags'))) {
             mkdir_recursively($this->uploadPath('flags'));
         }
@@ -60,7 +64,8 @@ trait ImageTestTrait
         );
     }
 
-    protected function getImageRoute($imagePath) {
+    protected function getImageRoute($imagePath)
+    {
         $route = config('imagecache.route');
         $templates = config('imagecache.templates');
         $templatesKeys = array_keys($templates);
