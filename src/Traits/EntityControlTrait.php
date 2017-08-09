@@ -21,7 +21,8 @@ trait EntityControlTrait
     protected $filter;
     protected $query;
 
-    public function setModel($model) {
+    public function setModel($model)
+    {
         $this->model = $model;
 
         $model = new $this->model;
@@ -29,7 +30,8 @@ trait EntityControlTrait
         $this->fields = $model::getFields();
     }
 
-    protected function getQuery() {
+    protected function getQuery()
+    {
         $model = new $this->model;
 
         $query = $model->query();
@@ -47,19 +49,22 @@ trait EntityControlTrait
         return $query;
     }
 
-    public function exists($data) {
+    public function exists($data)
+    {
         $query = $this->getQuery();
 
         return $query->where(array_only($data, $this->fields))->exists();
     }
 
-    public function create($data) {
+    public function create($data)
+    {
         $model = $this->model;
 
         return $model::create(array_only($data, $model::getFields()))->toArray();
     }
 
-    public function update($where, $data) {
+    public function update($where, $data)
+    {
         $query = $this->getQuery();
 
         $query->where($where)
@@ -72,7 +77,8 @@ trait EntityControlTrait
         return $this->get($where);
     }
 
-    public function updateOrCreate($where, $data) {
+    public function updateOrCreate($where, $data)
+    {
         if ($this->exists($where)) {
             return $this->update($where, $data);
         } else {
@@ -80,11 +86,13 @@ trait EntityControlTrait
         }
     }
 
-    public function get($data) {
+    public function get($data)
+    {
         return $this->getWithRelations($data, []);
     }
 
-    public function getWithRelations($data, $with = []) {
+    public function getWithRelations($data, $with = [])
+    {
         $query = $this->getQuery()->where(array_only(
             $data, $this->fields
         ));
@@ -98,11 +106,13 @@ trait EntityControlTrait
         return empty($entity) ? [] : $entity->toArray();
     }
 
-    public function first($data) {
+    public function first($data)
+    {
         return $this->firstWithRelations($data, []);
     }
 
-    public function firstWithRelations($data, $with = []) {
+    public function firstWithRelations($data, $with = [])
+    {
         $query = $this->getQuery()->where(array_only(
             $data, $this->fields
         ));
@@ -116,7 +126,8 @@ trait EntityControlTrait
         return empty($entity) ? [] : $entity->toArray();
     }
 
-    public function delete($where) {
+    public function delete($where)
+    {
         $model = new $this->model;
 
         if (is_array($where)) {
@@ -127,27 +138,32 @@ trait EntityControlTrait
         }
     }
 
-    public function withTrashed() {
+    public function withTrashed()
+    {
         $this->withTrashed = true;
 
         return $this;
     }
 
-    public function onlyTrashed() {
+    public function onlyTrashed()
+    {
         $this->onlyTrashed = true;
 
         return $this;
     }
 
-    public function restore($id) {
-        $this->getQuery()->find($id)->restore();
+    public function restore($id)
+    {
+        $this->getQuery()->withTrashed()->find($id)->restore();
     }
 
-    public function forceDelete($id) {
+    public function forceDelete($id)
+    {
         $this->getQuery()->find($id)->forceDelete();
     }
 
-    public function getOrCreate($data) {
+    public function getOrCreate($data)
+    {
         if ($this->exists($data)) {
             return $this->get($data);
         } else {
@@ -155,7 +171,8 @@ trait EntityControlTrait
         }
     }
 
-    public function firstOrCreate($data) {
+    public function firstOrCreate($data)
+    {
         if ($this->exists($data)) {
             return $this->first($data);
         } else {
@@ -163,13 +180,15 @@ trait EntityControlTrait
         }
     }
 
-    public function count($where) {
+    public function count($where)
+    {
         return $this->getQuery()
             ->where($where)
             ->count();
     }
 
-    public function validateField($id, $field, $value) {
+    public function validateField($id, $field, $value)
+    {
         $query = $this->getQuery()
             ->where('id', '<>', $id)
             ->where($field, $value);
@@ -183,13 +202,15 @@ trait EntityControlTrait
         }
     }
 
-    protected function getEntityName() {
+    protected function getEntityName()
+    {
         $explodedModel = explode('\\', $this->model);
 
         return end($explodedModel);
     }
 
-    protected function isSoftDelete() {
+    protected function isSoftDelete()
+    {
         $traits = class_uses($this->model);
 
         return in_array(SoftDeletes::class, $traits);

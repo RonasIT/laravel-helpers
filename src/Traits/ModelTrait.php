@@ -15,7 +15,8 @@ trait ModelTrait
 {
     protected $selectedFields;
 
-    public static function getFields() {
+    public static function getFields()
+    {
         $fillable = (new static)->getFillable();
 
         $fillable[] = 'id';
@@ -23,7 +24,8 @@ trait ModelTrait
         return $fillable;
     }
 
-    public function getAllFieldsWithTable() {
+    public function getAllFieldsWithTable()
+    {
         $fields = Schema::getColumnListing($this->getTable());
 
         return array_map(function ($field) {

@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 trait FixturesTrait
 {
-    protected function loadTestDump() {
+    protected function loadTestDump()
+    {
         $dump = $this->getFixture('dump.sql');
 
         if (!empty($dump)) {
@@ -21,7 +22,8 @@ trait FixturesTrait
         }
     }
 
-    public function getFixturePath($fn) {
+    public function getFixturePath($fn)
+    {
         $class = get_class($this);
         $explodedClass = explode('\\', $class);
         $className = array_last($explodedClass);
@@ -45,17 +47,20 @@ trait FixturesTrait
         return json_decode($this->getFixture($fn), $assoc);
     }
 
-    public function getJsonResponse() {
+    public function getJsonResponse()
+    {
         $response = $this->response->getContent();
 
         return json_decode($response, true);
     }
 
-    public function assertEqualsFixture($fixture, $data) {
+    public function assertEqualsFixture($fixture, $data)
+    {
         $this->assertEquals($this->getJsonFixture($fixture), $data);
     }
 
-    public function exportJsonResponse($fixture) {
+    public function exportJsonResponse($fixture)
+    {
         $response = $this->getJsonResponse();
         $content = json_encode($response, JSON_PRETTY_PRINT);
 
