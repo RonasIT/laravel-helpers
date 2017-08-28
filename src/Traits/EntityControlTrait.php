@@ -238,7 +238,7 @@ trait EntityControlTrait
         if (!empty($this->filter['query'])) {
             $this->query->where(function ($query) use ($fields) {
                 foreach ($fields as $field) {
-                    $loweredQuery = strtolower($this->filter['query']);
+                    $loweredQuery = mb_strtolower($this->filter['query']);
                     $field = DB::raw("lower({$field})");
 
                     $query->orWhere($field, 'like', "%{$loweredQuery}%");
