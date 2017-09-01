@@ -66,4 +66,13 @@ trait FixturesTrait
 
         return file_put_contents($this->getFixturePath($fixture), $content);
     }
+
+    public function callRawRequest($method, $uri, $content, array $headers = [])
+    {
+        $server = $this->transformHeadersToServerVars($headers);
+
+        $this->call($method, $uri, [], [], [], $server, $content);
+
+        return $this;
+    }
 }
