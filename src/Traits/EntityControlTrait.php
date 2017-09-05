@@ -14,6 +14,8 @@ use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
 {
+    use SearchTrait;
+
     protected $model;
     protected $withTrashed = false;
     protected $onlyTrashed = false;
