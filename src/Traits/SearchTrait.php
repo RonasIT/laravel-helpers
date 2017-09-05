@@ -8,6 +8,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Support\Facades\DB;
 
 trait SearchTrait
 {
