@@ -128,4 +128,13 @@ trait SearchTrait
 
         return $this;
     }
+
+    protected function with()
+    {
+        if (!empty($this->filter['with'])) {
+            $this->query->with($this->filter['with']);
+        }
+
+        return $this;
+    }
 }

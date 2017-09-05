@@ -51,6 +51,11 @@ trait EntityControlTrait
         return $query;
     }
 
+    public function all()
+    {
+        return $this->get([]);
+    }
+
     public function exists($data)
     {
         $query = $this->getQuery();
