@@ -209,6 +209,13 @@ trait EntityControlTrait
         }
     }
 
+    public function truncate()
+    {
+        $model = $this->model;
+
+        $model::truncate();
+    }
+
     protected function getEntityName()
     {
         $explodedModel = explode('\\', $this->model);
