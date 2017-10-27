@@ -9,6 +9,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Facades\DB;
 
 trait FixturesTrait
@@ -74,5 +75,16 @@ trait FixturesTrait
         $this->call($method, $uri, [], [], [], $server, $content);
 
         return $this;
+    }
+
+    public function exportJson($data, $fixture) {
+        if ($data instanceof TestResponse) {
+            $data = $data->json();
+        }
+
+        file_put_contents(
+            $this->getFixturePath($fixture),
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+        );
     }
 }
