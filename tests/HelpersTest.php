@@ -13,6 +13,11 @@ class HelpersTest extends TestCase
     public function getData() {
         return [
             [
+                'array' => 'city.json',
+                'key' => 'neighborhoods.*.zips.*.state',
+                'expected' => 'states.json'
+            ],
+            [
                 'array' => 'neighborhood.json',
                 'key' => 'zips.*.code',
                 'expected' => 'neighborhood.zips.codes.json'

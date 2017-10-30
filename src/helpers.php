@@ -82,7 +82,7 @@ function array_get_list($array, $path) {
         $values = array_map(function ($item) use ($path) {
             $value = array_get_list($item, $path);
 
-            if (!is_array($value)) {
+            if (!is_array($value) || isAssociative($value)) {
                 return [$value];
             }
 

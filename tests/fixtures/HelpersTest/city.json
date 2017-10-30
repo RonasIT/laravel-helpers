@@ -27,7 +27,12 @@
           "2bedrooms": "200",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         },
         {
           "id": 2,
@@ -43,7 +48,12 @@
           "2bedrooms": "220",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         },
         {
           "id": 3,
@@ -59,7 +69,12 @@
           "2bedrooms": "240",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         }
       ]
     },
@@ -85,7 +100,12 @@
           "2bedrooms": "260",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         },
         {
           "id": 5,
@@ -101,7 +121,12 @@
           "2bedrooms": "300",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         }
       ]
     },
@@ -127,7 +152,12 @@
           "2bedrooms": "320",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         },
         {
           "id": 7,
@@ -143,7 +173,12 @@
           "2bedrooms": "340",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         },
         {
           "id": 8,
@@ -159,7 +194,12 @@
           "2bedrooms": "360",
           "3bedrooms": null,
           "4bedrooms": null,
-          "5bedrooms": null
+          "5bedrooms": null,
+          "state": {
+            "id": 1,
+            "name": "Test State",
+            "abbreviation": "TS"
+          }
         }
       ]
     }
