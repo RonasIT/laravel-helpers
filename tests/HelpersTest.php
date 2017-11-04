@@ -37,7 +37,6 @@ class HelpersTest extends TestCase
                 'key' => 'neighborhoods',
                 'expected' => 'city.neighborhoods.json'
             ],
-
             [
                 'array' => 'neighborhood.json',
                 'key' => 'zips',

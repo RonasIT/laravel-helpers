@@ -309,3 +309,16 @@ function prepend_symbols($string, $expectedLength, $symbol)
 function array_default(&$array, $key, $default) {
     $array[$key] = array_get($array, $key, $default);
 }
+
+/**
+ * inverse transformation from array_dot
+ */
+function array_undot($array) {
+    $result = [];
+
+    foreach ($array as $key => $value) {
+        array_set($result, $key, $value);
+    }
+
+    return $result;
+}
