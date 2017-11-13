@@ -18,7 +18,7 @@ trait FilesTestTrait
     public function checkFile($uploadedFileName, $fixturePath)
     {
         return $this->assertEquals(
-            file_get_contents($fixturePath),
+            $this->getFixture($fixturePath),
             Storage::get($uploadedFileName)
         );
     }
