@@ -30,7 +30,9 @@ trait SearchTrait
         }
 
         if (!empty($this->filter[$field])) {
-            $this->query->where($field, $this->filter[$field]);
+            $preparedField = str_replace('.', '->', $field);
+
+            $this->query->where($preparedField, $this->filter[$field]);
         }
 
         return $this;
