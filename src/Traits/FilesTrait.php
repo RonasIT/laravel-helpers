@@ -17,43 +17,21 @@ trait FilesTrait
     {
         $preparedName = $this->prepareName($name);
 
-        $folder = $this->getStorageFolder();
+        Storage::put($preparedName, $content);
 
-        $path = "{$folder}/{$preparedName}";
-
-        Storage::put($path, $content);
-
-        return $returnUrl ? Storage::url($path) : Storage::path($path);
+        return $returnUrl ? Storage::url($preparedName) : Storage::path($preparedName);
     }
 
     public function removeFileByUrl($url)
     {
         $fileName = $this->getFileNameFromUrl($url);
 
-        $folder = $this->getStorageFolder();
-
-        $path = "{$folder}/{$fileName}";
-
-        Storage::delete($path);
-    }
-
-    public function removeFileByPath($path)
-    {
-        Storage::delete($path);
+        $this->removeFileByName($fileName);
     }
 
     public function removeFileByName($name)
     {
-        $folder = $this->getStorageFolder();
-
-        $path = "{$folder}/{$name}";
-
-        Storage::delete($path);
-    }
-
-    protected function getStorageFolder()
-    {
-        return (env('APP_ENV') == 'testing') ? config('defaults.upload.test') : config('defaults.upload.prod');
+        Storage::delete($name);
     }
 
     protected function prepareName($name)

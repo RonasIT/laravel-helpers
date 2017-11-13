@@ -19,15 +19,30 @@ trait FilesTestTrait
     {
         $explodedUrl = explode('/', $url);
 
-        $fileName = last($explodedUrl);
-        $folder = $this->getStorageFolder();
-
-        return "{$folder}/{$fileName}";
+        return last($explodedUrl);
     }
 
     public function clearFolder()
     {
-        Storage::deleteDirectory($this->getStorageFolder());
+        $files = Storage::allFiles();
+
+        if (!empty($files)) {
+            $this->deleteFiles($files);
+        }
     }
 
+    public function checkImage($uploadedFileName, $fixturePath)
+    {
+        return $this->assertEquals(
+            file_get_contents($fixturePath),
+            Storage::get($uploadedFileName)
+        );
+    }
+
+    protected function deleteFiles($files)
+    {
+        foreach ($files as $file) {
+            Storage::delete($file);
+        }
+    }
 }
