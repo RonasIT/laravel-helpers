@@ -15,11 +15,12 @@ trait FilesTestTrait
 {
     use FilesTrait;
 
-    public function getFilePathFromUrl($url)
+    public function checkFile($uploadedFileName, $fixturePath)
     {
-        $explodedUrl = explode('/', $url);
-
-        return last($explodedUrl);
+        return $this->assertEquals(
+            file_get_contents($fixturePath),
+            Storage::get($uploadedFileName)
+        );
     }
 
     public function clearFolder()
@@ -31,12 +32,11 @@ trait FilesTestTrait
         }
     }
 
-    public function checkImage($uploadedFileName, $fixturePath)
+    public function getFilePathFromUrl($url)
     {
-        return $this->assertEquals(
-            file_get_contents($fixturePath),
-            Storage::get($uploadedFileName)
-        );
+        $explodedUrl = explode('/', $url);
+
+        return last($explodedUrl);
     }
 
     protected function deleteFiles($files)
