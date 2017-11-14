@@ -54,6 +54,24 @@ trait SearchTrait
         return $this;
     }
 
+    protected function filterByQueryOnRelation($relation, $fields)
+    {
+        if (!empty($this->filter['query'])) {
+            $this->query->whereHas($relation, function($query) use ($fields) {
+                $query->where(function ($query) use ($fields) {
+                    foreach ($fields as $field) {
+                        $loweredQuery = mb_strtolower($this->filter['query']);
+                        $field = DB::raw("lower({$field})");
+
+                        $query->orWhere($field, 'like', "%{$loweredQuery}%");
+                    }
+                });
+            });
+        }
+
+        return $this;
+    }
+
     protected function searchQuery($filter)
     {
         if (!empty($filter['with_trashed'])) {
