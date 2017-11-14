@@ -41,13 +41,21 @@ trait SearchTrait
     protected function filterByQuery($fields)
     {
         if (!empty($this->filter['query'])) {
-            $this->query->where(function ($query) use ($fields) {
-                foreach ($fields as $field) {
-                    $loweredQuery = mb_strtolower($this->filter['query']);
-                    $field = DB::raw("lower({$field})");
+            $this->query->where(
+                $this->getQuerySearchCallback($this->query, $fields)
+            );
+        }
 
-                    $query->orWhere($field, 'like', "%{$loweredQuery}%");
-                }
+        return $this;
+    }
+
+    protected function filterByQueryOnRelation($relation, $fields)
+    {
+        if (!empty($this->filter['query'])) {
+            $this->query->whereHas($relation, function($query) use ($fields) {
+                $query->where(
+                    $this->getQuerySearchCallback($query, $fields)
+                );
             });
         }
 
@@ -138,5 +146,17 @@ trait SearchTrait
         }
 
         return $this;
+    }
+
+    protected function getQuerySearchCallback($query, $fields)
+    {
+        return function ($query) use ($fields) {
+            foreach ($fields as $field) {
+                $loweredQuery = mb_strtolower($this->filter['query']);
+                $field = DB::raw("lower({$field})");
+
+                $query->orWhere($field, 'like', "%{$loweredQuery}%");
+            }
+        };
     }
 }
