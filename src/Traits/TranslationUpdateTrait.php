@@ -17,7 +17,10 @@ trait TranslationUpdateTrait {
         $translationModel = $modelInstance->getTranslationClass();
 
         foreach ($translations as $translation) {
-            $translationModel::where([$foreignKey => $id, 'locale' => $translation['locale']])->update($translation);
+            $translationModel::where([
+                $foreignKey => $id,
+                'locale' => $translation['locale']
+            ])->update($translation);
         }
 
         return $this->firstWithRelations(['id' => $id], ['translations']);
