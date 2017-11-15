@@ -322,32 +322,3 @@ function array_undot($array) {
 
     return $result;
 }
-
-/**
- * Function remove values by keys from nested associative array.
- * It is convenient way to remove timestamps from array
- * @param $array array
- * @param $fields array
- * @return array
- * */
-
-function array_except_recursive($array, $fields = [])
-{
-    if (empty($array) || empty($fields)) {
-        return $array;
-    }
-
-    $result = [];
-
-    foreach ($array as $key => $value) {
-        if (!in_array($key, $fields)) {
-            $result[$key] = $value;
-        }
-
-        if (is_array($value)) {
-            $result[$key] = array_except_recursive($value, $fields);
-        }
-    }
-
-    return $result;
-}

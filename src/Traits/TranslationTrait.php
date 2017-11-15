@@ -16,7 +16,7 @@ trait TranslationTrait {
             ->where('locale', $lang);
     }
 
-    public function translations()
+    public function allTranslations()
     {
         return $this->hasMany($this->getTranslationClass());
     }
