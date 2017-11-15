@@ -21,7 +21,7 @@ trait TranslationTrait {
         return $this->hasMany($this->getTranslationClass());
     }
 
-    protected function getTranslationClass() {
+    public function getTranslationClass() {
         return get_class($this) . 'Translation';
     }
 }
