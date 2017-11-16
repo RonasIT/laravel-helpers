@@ -12,7 +12,7 @@ trait TranslationUpdateTrait {
 
         $modelInstance = new $this->model;
 
-        $foreignKey = $modelInstance->translations()->getForeignKeyName();
+        $foreignKey = $modelInstance->allTranslations()->getForeignKeyName();
 
         $translationModel = $modelInstance->getTranslationClass();
 
@@ -23,6 +23,6 @@ trait TranslationUpdateTrait {
             ])->update($translation);
         }
 
-        return $this->firstWithRelations(['id' => $id], ['translations']);
+        return $this->firstWithRelations(['id' => $id], ['allTranslations']);
     }
 }
