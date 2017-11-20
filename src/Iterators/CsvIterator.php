@@ -10,6 +10,7 @@
 namespace RonasIT\Support\Iterators;
 
 use Iterator;
+use RonasIT\Support\Exceptions\IncorrectCSVFileException;
 
 class CsvIterator implements Iterator
 {
@@ -46,6 +47,10 @@ class CsvIterator implements Iterator
     {
         if (empty($this->columns)) {
             return $this->currentCsvLine;
+        }
+
+        if (count($this->columns) !== count($this->currentCsvLine)) {
+            throw new IncorrectCSVFileException('Incorrect CSV file');
         }
 
         return array_associate($this->currentCsvLine, function ($value, $key) {
