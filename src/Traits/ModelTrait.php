@@ -9,6 +9,8 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Schema;
 
 trait ModelTrait
@@ -48,5 +50,22 @@ trait ModelTrait
         $query->addSelect($fields);
 
         return $query;
+    }
+
+    public function withCount($query, $target, $as = 'count') {
+        $targetTable = (new $target)->getTable();
+        $fields = $this->getAllFieldsWithTable();
+        $currentTable = $this->getTable();
+        $relationFieldName = Str::singular($currentTable) . '_id';
+
+        if (empty($this->selectedFields)) {
+            $this->selectedFields = $fields;
+
+            $query->select($fields);
+        }
+
+        $query->leftJoin($targetTable, "{$targetTable}.{$relationFieldName}", '=', "{$currentTable}.id")
+            ->addSelect(DB::raw("count({$targetTable}.id) as {$as}"))
+            ->groupBy($fields);
     }
 }
