@@ -14,7 +14,7 @@
     "php": ">=5.6",
     "laravel/framework": ">=5.2.0",
     "guzzlehttp/guzzle": "~6.0",
-    "tymon/jwt-auth": "0.5.*",
+    "tymon/jwt-auth": "0.5.* || 1.0.*",
     "minime/annotations": "2.3.1",
     "ronasit/laravel-entity-generator": "0.* || 1.*"
   },
