@@ -29,7 +29,7 @@ trait SearchTrait
             $this->filter[$field] = array_get($this->filter, $field, $default);
         }
 
-        if (!empty($this->filter[$field])) {
+        if (array_has($this->filter, $field)) {
             $preparedField = str_replace('.', '->', $field);
 
             $this->query->where($preparedField, $this->filter[$field]);
