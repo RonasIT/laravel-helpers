@@ -16,9 +16,14 @@ use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 class HttpRequestService
 {
     private $logger;
+    protected $debug;
     protected $cookies = null;
 
-    public function __construct() {
+    public function __construct($debug = null) {
+        if (isNull($debug)) {
+            $this->debug = config('app.debug');
+        }
+
         $this->logger = app(Writer::class);
     }
 
@@ -74,7 +79,7 @@ class HttpRequestService
     }
 
     protected function logRequest($typeOfRequest, $url, $data) {
-        if (config('app.debug')) {
+        if ($this->debug) {
             $this->logger->info('');
             $this->logger->info('-------------------------------------');
             $this->logger->info('');
@@ -87,7 +92,7 @@ class HttpRequestService
     }
 
     protected function logResponse($response, $time = null) {
-        if (config('app.debug')) {
+        if ($this->debug) {
             $this->logger->info('');
             $this->logger->info('-------------------------------------');
             $this->logger->info('');
