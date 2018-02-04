@@ -10,6 +10,7 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 trait MigrationTrait
 {
