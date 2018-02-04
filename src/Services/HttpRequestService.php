@@ -20,7 +20,7 @@ class HttpRequestService
     protected $cookies = null;
 
     public function __construct($debug = null) {
-        if (isNull($debug)) {
+        if ($debug === null) {
             $this->debug = config('app.debug');
         }
 
