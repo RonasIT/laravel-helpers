@@ -107,7 +107,13 @@ trait FixturesTrait
 
         foreach ($tables as $table) {
             if ($table != 'migrations') {
-                DB::statement("SELECT setval('{$table}_id_seq', (select max(id) from {$table}));");
+                try {
+                    DB::statement("SELECT setval('{$table}_id_seq', (select max(id) from {$table}));");
+                } catch (\Exception $e) {
+                    continue;
+                } catch (\Throwable $t) {
+                    continue;
+                }
             }
         }
     }
