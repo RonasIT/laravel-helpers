@@ -101,7 +101,7 @@ trait FixturesTrait
         }
     }
 
-    protected function prepareSequences()
+    public function prepareSequences()
     {
         $tables = $this->getTables();
 
