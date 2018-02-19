@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 
 trait FixturesTrait
 {
+    protected $tables;
+
     protected function loadTestDump()
     {
         $dump = $this->getFixture('dump.sql');
@@ -86,5 +88,32 @@ trait FixturesTrait
             $this->getFixturePath($fixture),
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
+    }
+
+    public function clearDatabase()
+    {
+        $tables = $this->getTables();
+
+        foreach ($tables as $table) {
+            if ($table != 'migrations') {
+                DB::statement("TRUNCATE {$table} RESTART IDENTITY CASCADE");
+            }
+        }
+    }
+
+    public function prepareSequences()
+    {
+        $tables = $this->getTables();
+
+        foreach ($tables as $table) {
+            if ($table != 'migrations') {
+                DB::statement("SELECT setval('{$table}_id_seq', (select max(id) from {$table}));");
+            }
+        }
+    }
+
+    protected function getTables()
+    {
+        return DB::connection()->getDoctrineSchemaManager()->listTableNames();
     }
 }
