@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 trait FixturesTrait
 {
-    protected $tables;
+    protected static $tables;
 
     protected function loadTestDump()
     {
@@ -90,36 +90,44 @@ trait FixturesTrait
         );
     }
 
-    public function clearDatabase()
+    public function clearDatabase($except = ['migrations'])
     {
         $tables = $this->getTables();
 
-        foreach ($tables as $table) {
-            if ($table != 'migrations') {
-                DB::statement("TRUNCATE {$table} RESTART IDENTITY CASCADE");
+        $query = array_concat($tables, function ($table) use ($except) {
+            if (in_array($table, $except)) {
+                return '';
+            } else {
+                return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
             }
-        }
+        });
+
+        app('db.connection')->unprepared($query);
     }
 
-    public function prepareSequences()
+    public function prepareSequences($except = ['migrations', 'password_resets'])
     {
         $tables = $this->getTables();
 
-        foreach ($tables as $table) {
-            if ($table != 'migrations') {
-                try {
-                    DB::statement("SELECT setval('{$table}_id_seq', (select max(id) from {$table}));");
-                } catch (\Exception $e) {
-                    continue;
-                } catch (\Throwable $t) {
-                    continue;
-                }
+        $query = array_concat($tables, function ($table) use ($except) {
+            if (in_array($table, $except)) {
+                return '';
+            } else {
+                return "SELECT setval('{$table}_id_seq', (select max(id) from {$table}));\n";
             }
-        }
+        });
+
+        app('db.connection')->unprepared($query);
     }
 
     protected function getTables()
     {
-        return DB::connection()->getDoctrineSchemaManager()->listTableNames();
+        if (empty(self::$tables)) {
+            self::$tables = app('db.connection')
+                ->getDoctrineSchemaManager()
+                ->listTableNames();
+        }
+
+        return self::$tables;
     }
 }
