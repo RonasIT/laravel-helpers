@@ -38,10 +38,10 @@ trait FilesTrait
     {
         $explodedName = explode('.', $name);
         $extension = array_pop($explodedName);
-        $name = implode('_', $explodedName);
         $timestamp = Carbon::now()->timestamp;
+        $hash = md5($name);
 
-        return "{$name}_{$timestamp}.{$extension}";
+        return "{$hash}_{$timestamp}.{$extension}";
     }
 
     protected function getFileNameFromUrl($url)
