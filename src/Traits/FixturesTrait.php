@@ -14,11 +14,13 @@ use Illuminate\Support\Facades\DB;
 
 trait FixturesTrait
 {
-    protected $tables;
+    protected static $tables;
 
     protected function loadTestDump()
     {
         $dump = $this->getFixture('dump.sql');
+
+        $this->clearDatabase(config('database.default'));
 
         if (!empty($dump)) {
             DB::unprepared($dump);
@@ -90,36 +92,70 @@ trait FixturesTrait
         );
     }
 
-    public function clearDatabase()
+    public function clearDatabase($scheme, $except = ['migrations'])
     {
+        $query = '';
         $tables = $this->getTables();
 
-        foreach ($tables as $table) {
-            if ($table != 'migrations') {
-                DB::statement("TRUNCATE {$table} RESTART IDENTITY CASCADE");
-            }
+        if ($scheme === 'psql') {
+            $query = $this->getClearPsqlDatabaseQuery($tables, $except);
+            $query .= $this->prepareSequences($tables, $except);
+        } elseif ($scheme === 'mysql') {
+            $query = $this->getClearMySQLDatabaseQuery($tables, $except);
+        }
+
+        if (!empty($query)) {
+            app('db.connection')->unprepared($query);
         }
     }
 
-    public function prepareSequences()
+    public function getClearPsqlDatabaseQuery($tables, $except = ['migrations'])
     {
-        $tables = $this->getTables();
-
-        foreach ($tables as $table) {
-            if ($table != 'migrations') {
-                try {
-                    DB::statement("SELECT setval('{$table}_id_seq', (select max(id) from {$table}));");
-                } catch (\Exception $e) {
-                    continue;
-                } catch (\Throwable $t) {
-                    continue;
-                }
+        return array_concat($tables, function ($table) use ($except) {
+            if (in_array($table, $except)) {
+                return '';
+            } else {
+                return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
             }
-        }
+        });
+    }
+
+    public function getClearMySQLDatabaseQuery($tables, $except = ['migrations'])
+    {
+        $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
+
+        $query .= array_concat($tables, function ($table) use ($except) {
+            if (in_array($table, $except)) {
+                return '';
+            } else {
+                return "TRUNCATE TABLE {$table}; \n";
+            }
+        });
+
+        $query .= "SET FOREIGN_KEY_CHECKS = 1;\n";
+
+        return $query;
+    }
+
+    public function prepareSequences($tables, $except = ['migrations', 'password_resets'])
+    {
+        return array_concat($tables, function ($table) use ($except) {
+            if (in_array($table, $except)) {
+                return '';
+            } else {
+                return "SELECT setval('{$table}_id_seq', (select max(id) from {$table}));\n";
+            }
+        });
     }
 
     protected function getTables()
     {
-        return DB::connection()->getDoctrineSchemaManager()->listTableNames();
+        if (empty(self::$tables)) {
+            self::$tables = app('db.connection')
+                ->getDoctrineSchemaManager()
+                ->listTableNames();
+        }
+
+        return self::$tables;
     }
 }
