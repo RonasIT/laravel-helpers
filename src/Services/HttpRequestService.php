@@ -19,31 +19,35 @@ class HttpRequestService
     protected $debug;
     protected $cookies = null;
 
-    public function __construct($debug = null) {
-        if (isNull($debug)) {
-            $this->debug = config('app.debug');
-        }
+    public function __construct()
+    {
+        $this->debug = config('defaults.http_service_debug', false);
 
         $this->logger = app(Writer::class);
     }
 
-    public function sendGet($url, $data = null, $headers = null) {
+    public function sendGet($url, $data = null, $headers = null)
+    {
         return $this->send('get', $url, $data, $headers);
     }
 
-    public function sendPost($url, $data, $headers = null) {
+    public function sendPost($url, $data, $headers = null)
+    {
         return $this->send('post', $url, $data, $headers);
     }
 
-    public function sendDelete($url, $headers = null) {
+    public function sendDelete($url, $headers = null)
+    {
         return $this->send('delete', $url, $headers);
     }
 
-    public function sendPut($url, $data, $headers = null) {
+    public function sendPut($url, $data, $headers = null)
+    {
         return $this->send('put', $url, $data, $headers);
     }
 
-    protected function send($method, $url, $data = [], $headers = []) {
+    protected function send($method, $url, $data = [], $headers = [])
+    {
         $client = new Client();
 
         $time = microtime(true);
@@ -78,7 +82,8 @@ class HttpRequestService
         return $response;
     }
 
-    protected function logRequest($typeOfRequest, $url, $data) {
+    protected function logRequest($typeOfRequest, $url, $data)
+    {
         if ($this->debug) {
             $this->logger->info('');
             $this->logger->info('-------------------------------------');
@@ -91,7 +96,8 @@ class HttpRequestService
         }
     }
 
-    protected function logResponse($response, $time = null) {
+    protected function logResponse($response, $time = null)
+    {
         if ($this->debug) {
             $this->logger->info('');
             $this->logger->info('-------------------------------------');
@@ -104,19 +110,22 @@ class HttpRequestService
         }
     }
 
-    public function parseJsonResponse($response) {
+    public function parseJsonResponse($response)
+    {
         $stringResponse = (string)$response->getBody();
 
         return json_decode($stringResponse, true);
     }
 
-    public function saveCookieSession() {
+    public function saveCookieSession()
+    {
         $this->cookies = app(CookieJar::class);
 
         return $this;
     }
 
-    public function getCookie() {
+    public function getCookie()
+    {
         if (empty($this->cookies)) {
             return [];
         }
@@ -124,7 +133,8 @@ class HttpRequestService
         return $this->cookies->toArray();
     }
 
-    private function setData(&$options, $method, $headers, $data = []) {
+    private function setData(&$options, $method, $headers, $data = [])
+    {
         if (empty($data)) {
             return;
         }
