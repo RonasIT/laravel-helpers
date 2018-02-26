@@ -20,8 +20,17 @@ trait FixturesTrait
     {
         $dump = $this->getFixture('dump.sql');
 
+        $tables = $this->getTables();
+        $scheme = config('database.default');
+
+        $this->clearDatabase($scheme, $tables);
+
         if (!empty($dump)) {
             DB::unprepared($dump);
+        }
+
+        if ($scheme === 'pgsql') {
+            $this->prepareSequences($tables);
         }
     }
 
@@ -90,25 +99,49 @@ trait FixturesTrait
         );
     }
 
-    public function clearDatabase($except = ['migrations'])
+    public function clearDatabase($scheme, $tables, $except = ['migrations'])
     {
-        $tables = $this->getTables();
+        if ($scheme === 'pgsql') {
+            $query = $this->getClearPsqlDatabaseQuery($tables, $except);
+        } elseif ($scheme === 'mysql') {
+            $query = $this->getClearMySQLDatabaseQuery($tables, $except);
+        }
 
-        $query = array_concat($tables, function ($table) use ($except) {
+        if (!empty($query)) {
+            app('db.connection')->unprepared($query);
+        }
+    }
+
+    public function getClearPsqlDatabaseQuery($tables, $except = ['migrations'])
+    {
+        return array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {
                 return '';
             } else {
                 return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
             }
         });
-
-        app('db.connection')->unprepared($query);
     }
 
-    public function prepareSequences($except = ['migrations', 'password_resets'])
+    public function getClearMySQLDatabaseQuery($tables, $except = ['migrations'])
     {
-        $tables = $this->getTables();
+        $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
+        $query .= array_concat($tables, function ($table) use ($except) {
+            if (in_array($table, $except)) {
+                return '';
+            } else {
+                return "TRUNCATE TABLE {$table}; \n";
+            }
+        });
+
+        $query .= "SET FOREIGN_KEY_CHECKS = 1;\n";
+
+        return $query;
+    }
+
+    public function prepareSequences($tables, $except = ['migrations', 'password_resets'])
+    {
         $query = array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {
                 return '';
