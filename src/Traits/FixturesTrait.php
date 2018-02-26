@@ -20,10 +20,17 @@ trait FixturesTrait
     {
         $dump = $this->getFixture('dump.sql');
 
-        $this->clearDatabase(config('database.default'));
+        $tables = $this->getTables();
+        $scheme = config('database.default');
+
+        $this->clearDatabase($scheme, $tables);
 
         if (!empty($dump)) {
             DB::unprepared($dump);
+        }
+
+        if ($scheme === 'pgsql') {
+            $this->prepareSequences($tables);
         }
     }
 
@@ -92,14 +99,10 @@ trait FixturesTrait
         );
     }
 
-    public function clearDatabase($scheme, $except = ['migrations'])
+    public function clearDatabase($scheme, $tables, $except = ['migrations'])
     {
-        $query = '';
-        $tables = $this->getTables();
-
-        if ($scheme === 'psql') {
+        if ($scheme === 'pgsql') {
             $query = $this->getClearPsqlDatabaseQuery($tables, $except);
-            $query .= $this->prepareSequences($tables, $except);
         } elseif ($scheme === 'mysql') {
             $query = $this->getClearMySQLDatabaseQuery($tables, $except);
         }
@@ -139,13 +142,15 @@ trait FixturesTrait
 
     public function prepareSequences($tables, $except = ['migrations', 'password_resets'])
     {
-        return array_concat($tables, function ($table) use ($except) {
+        $query = array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {
                 return '';
             } else {
                 return "SELECT setval('{$table}_id_seq', (select max(id) from {$table}));\n";
             }
         });
+
+        app('db.connection')->unprepared($query);
     }
 
     protected function getTables()
