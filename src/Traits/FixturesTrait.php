@@ -16,21 +16,21 @@ trait FixturesTrait
 {
     protected static $tables;
 
-    protected function loadTestDump()
+    protected function loadTestDump($except = ['migrations', 'password_resets'])
     {
         $dump = $this->getFixture('dump.sql');
 
         $tables = $this->getTables();
         $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $tables);
+        $this->clearDatabase($scheme, $tables, $except);
 
         if (!empty($dump)) {
             DB::unprepared($dump);
         }
 
         if ($scheme === 'pgsql') {
-            $this->prepareSequences($tables);
+            $this->prepareSequences($tables, $except);
         }
     }
 
@@ -99,7 +99,7 @@ trait FixturesTrait
         );
     }
 
-    public function clearDatabase($scheme, $tables, $except = ['migrations'])
+    public function clearDatabase($scheme, $tables, $except)
     {
         if ($scheme === 'pgsql') {
             $query = $this->getClearPsqlDatabaseQuery($tables, $except);
@@ -140,7 +140,7 @@ trait FixturesTrait
         return $query;
     }
 
-    public function prepareSequences($tables, $except = ['migrations', 'password_resets'])
+    public function prepareSequences($tables, $except)
     {
         $query = array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {
