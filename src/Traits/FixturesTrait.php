@@ -48,7 +48,7 @@ trait FixturesTrait
         $path = $this->getFixturePath($fn);
 
         if (!file_exists($path)) {
-            return null;
+            $this->fail($fn . ' fixture does not exist');
         }
 
         return file_get_contents($path);
