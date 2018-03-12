@@ -18,16 +18,18 @@ trait FixturesTrait
 
     protected function loadTestDump($except = ['migrations', 'password_resets'])
     {
-        $dump = $this->getFixture('dump.sql');
+        $dump = $this->getFixture('dump.sql', false);
+
+        if (empty($dump)) {
+            return;
+        }
 
         $tables = $this->getTables();
         $scheme = config('database.default');
 
         $this->clearDatabase($scheme, $tables, $except);
 
-        if (!empty($dump)) {
-            DB::unprepared($dump);
-        }
+        DB::unprepared($dump);
 
         if ($scheme === 'pgsql') {
             $this->prepareSequences($tables, $except);
@@ -43,15 +45,19 @@ trait FixturesTrait
         return base_path("tests/fixtures/{$className}/{$fn}");
     }
 
-    public function getFixture($fn)
+    public function getFixture($fn, $failIfNotExists = true)
     {
         $path = $this->getFixturePath($fn);
 
-        if (!file_exists($path)) {
+        if (file_exists($path)) {
+            return file_get_contents($path);
+        }
+
+        if ($failIfNotExists) {
             $this->fail($fn . ' fixture does not exist');
         }
 
-        return file_get_contents($path);
+        return '';
     }
 
     public function getJsonFixture($fn, $assoc = true)
