@@ -14,56 +14,68 @@ use Illuminate\Support\Str;
 
 trait MigrationTrait
 {
-    public function addForeignKey($fromTable, $toTable) {
-        Schema::table($this->getTableName($fromTable), function (Blueprint $table) use ($toTable) {
-            $fieldName = strtolower($toTable) . '_id';
+    public function addForeignKey($fromEntity, $toEntity, $needAddField = false) {
+        Schema::table($this->getTableName($fromEntity), function (Blueprint $table) use ($toEntity, $needAddField) {
+            $fieldName = snake_case($toEntity) . '_id';
+
+            if ($needAddField) {
+                $table->integer($fieldName);
+            }
 
             $table->foreign($fieldName)
                 ->references('id')
-                ->on($this->getTableName($toTable))
+                ->on($this->getTableName($toEntity))
                 ->onDelete('cascade');
         });
     }
 
-    public function createBridgeTable($fromTable, $toTable) {
-        $from = strtolower($fromTable);
-        $to = strtolower($toTable);
+    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false) {
+        $field = snake_case($toEntity) . '_id';
+        $table = $this->getTableName($fromEntity);
 
-        $bridgeTableName = $this->getBridgeTable($fromTable, $toTable);
+        if (Schema::hasColumn($table, $field)) {
+            Schema::table($table, function (Blueprint $table) use ($field, $needDropField) {
+                $table->dropForeign([$field]);
 
-        $this->createTable($bridgeTableName, [
-            'integer-required' => [
-                "{$from}_id", "{$to}_id"
-            ]
-        ]);
-
-        $this->addForeignKey($bridgeTableName, $fromTable);
-        $this->addForeignKey($bridgeTableName, $toTable);
-    }
-
-    public function dropBridgeTables($fromTable, $toTables) {
-        Schema::drop($this->getBridgeTable($fromTable, $toTables));
-    }
-
-    public function addField($table, $field) {
-        $field = strtolower($field) . '_id';
-        $table = $this->getTableName($table);
-
-        if (!Schema::hasColumn($table, $field)) {
-            Schema::table($table, function (Blueprint $table) use ($field) {
-                $table->integer($field);
+                if ($needDropField) {
+                    $table->dropColumn([$field]);
+                }
             });
         }
     }
 
-    protected function getBridgeTable($fromTable, $toTable) {
-        $from = strtolower($fromTable);
-        $to = strtolower($toTable);
+    public function createBridgeTable($fromEntity, $toEntity) {
+        $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
-        return $this->getTableName("{$from}_{$to}");
+        Schema::create($bridgeTableName, function (Blueprint $table) use ($fromEntity, $toEntity) {
+            $table->increments('id');
+        });
+
+        $this->addForeignKey($bridgeTableName, $fromEntity, true);
+        $this->addForeignKey($bridgeTableName, $toEntity, true);
+    }
+
+    public function dropBridgeTable($fromEntity, $toEntity) {
+        $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
+
+        $this->dropForeignKey($bridgeTableName, $fromEntity, true);
+        $this->dropForeignKey($bridgeTableName, $toEntity, true);
+
+        Schema::drop($bridgeTableName);
+    }
+
+    protected function getBridgeTable($fromEntity, $toEntity) {
+        $entities = [snake_case($fromEntity), snake_case($toEntity)];
+        sort($entities, SORT_STRING);
+        $tableName = implode('_', $entities);
+
+        return $tableName;
     }
 
     protected function getTableName($entityName) {
+        if (Schema::hasTable($entityName)) {
+            return $entityName;
+        }
         $entityName = snake_case($entityName);
 
         return Str::plural($entityName);
