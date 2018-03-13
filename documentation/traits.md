@@ -11,8 +11,7 @@ Also you can tune your TestCase for restore dump of database witch will be place
 
 ### EntityControlTrait
 This trait implement all typical behavior of repositories which should be wrapper under models. It contains all crud 
-operations and 
-
+operations. 
 
 ### MockHttpRequestTrait
 
@@ -35,7 +34,7 @@ Also you can specify results order using `order_by()` method and specify relatio
 method if you want retrive related data too.
 
 To get results call `getSearchResults()` method, that's it. You can pass `all` filter to get all results, or use
-`per_page` if you need paginate your results.
+`page` or `per_page` if you need paginate your results.
 
 **Example**
 ```php

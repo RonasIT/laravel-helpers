@@ -10,7 +10,7 @@ $repository - valid class name of repository class.
 
 
 ### HttpRequestService
-Service to working with http protocol. It is wrap on Guzzle.
+Service to working with http protocol. It is wrapper on Guzzle.
 
 To on debug mode you need to add "http_service_debug" key to configs/defaults.php file, by default - debug is off.
 If debug is on - information about all queries will write to log.
