@@ -52,6 +52,8 @@ function array_round($array) {
  * @param string $key
  *
  * @return array
+ *
+ * @deprecated
  */
 function array_lists($array, $key) {
     return array_map(function ($item) use ($key) {
@@ -103,8 +105,21 @@ function array_get_list($array, $path) {
  * @param array $array
  *
  * @return boolean
+ *
+ * @deprecated
  */
 function isAssociative($array) {
+    return $array !== array_values($array);
+}
+
+/**
+ * Verifies whether an associative array or a list
+ *
+ * @param array $array
+ *
+ * @return boolean
+ */
+function is_associative($array) {
     return $array !== array_values($array);
 }
 
@@ -183,8 +198,8 @@ function getGUID() {
 function array_concat($array, $callback) {
     $content = '';
 
-    foreach ($array as $key => $item) {
-        $content .= $callback($item, $key);
+    foreach ($array as $key => $value) {
+        $content .= $callback($value, $key);
     }
 
     return $content;
