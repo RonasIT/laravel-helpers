@@ -1,7 +1,8 @@
 <?php
 namespace RonasIT\Support\Traits;
 
-trait TranslationUpdateTrait {
+trait TranslationUpdateTrait
+{
     public function updateWithTranslations($id, $data)
     {
         $translations = array_pull($data, 'translations');
