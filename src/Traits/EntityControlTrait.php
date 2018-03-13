@@ -20,8 +20,6 @@ trait EntityControlTrait
     protected $withTrashed = false;
     protected $onlyTrashed = false;
     protected $fields;
-    protected $filter;
-    protected $query;
 
     public function setModel($model)
     {
