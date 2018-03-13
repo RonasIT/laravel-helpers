@@ -64,10 +64,10 @@ Verifies whether an associative array or a list
     ]; 
 >>> $list = ['some', 'values'];
 
->>> isAssociative($associative);
+>>> is_associative($associative);
 => true
 
->>> isAssociative($list);
+>>> is_associative($list);
 => false
 
 ````
@@ -79,7 +79,7 @@ Return subtraction of two arrays
 ```php
 >>> $array1 = [1, 2, 3];
 >>> $array2 = [1, 2];
->>> $result = array_subtraction($array1, $array2); $result = [3];
+>>> $result = array_subtraction($array1, $array2);
 => [3]
 ````
 
