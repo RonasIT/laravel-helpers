@@ -14,7 +14,8 @@ use Illuminate\Support\Str;
 
 trait MigrationTrait
 {
-    public function addForeignKey($fromEntity, $toEntity, $needAddField = false) {
+    public function addForeignKey($fromEntity, $toEntity, $needAddField = false)
+    {
         Schema::table($this->getTableName($fromEntity), function (Blueprint $table) use ($toEntity, $needAddField) {
             $fieldName = snake_case($toEntity) . '_id';
 
@@ -29,7 +30,8 @@ trait MigrationTrait
         });
     }
 
-    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false) {
+    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false)
+    {
         $field = snake_case($toEntity) . '_id';
         $table = $this->getTableName($fromEntity);
 
@@ -44,7 +46,8 @@ trait MigrationTrait
         }
     }
 
-    public function createBridgeTable($fromEntity, $toEntity) {
+    public function createBridgeTable($fromEntity, $toEntity)
+    {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
         Schema::create($bridgeTableName, function (Blueprint $table) use ($fromEntity, $toEntity) {
@@ -55,7 +58,8 @@ trait MigrationTrait
         $this->addForeignKey($bridgeTableName, $toEntity, true);
     }
 
-    public function dropBridgeTable($fromEntity, $toEntity) {
+    public function dropBridgeTable($fromEntity, $toEntity)
+    {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
         $this->dropForeignKey($bridgeTableName, $fromEntity, true);
@@ -64,7 +68,8 @@ trait MigrationTrait
         Schema::drop($bridgeTableName);
     }
 
-    protected function getBridgeTable($fromEntity, $toEntity) {
+    protected function getBridgeTable($fromEntity, $toEntity)
+    {
         $entities = [snake_case($fromEntity), snake_case($toEntity)];
         sort($entities, SORT_STRING);
         $tableName = implode('_', $entities);
@@ -72,7 +77,8 @@ trait MigrationTrait
         return $tableName;
     }
 
-    protected function getTableName($entityName) {
+    protected function getTableName($entityName)
+    {
         if (Schema::hasTable($entityName)) {
             return $entityName;
         }
