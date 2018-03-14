@@ -17,6 +17,7 @@ class HttpRequestService
 {
     private $logger;
     protected $debug;
+    protected $options = [];
     protected $cookies = null;
 
     public function __construct()
@@ -26,22 +27,22 @@ class HttpRequestService
         $this->logger = app(Writer::class);
     }
 
-    public function sendGet($url, $data = null, $headers = null)
+    public function sendGet($url, $data = null, $headers = [])
     {
         return $this->send('get', $url, $data, $headers);
     }
 
-    public function sendPost($url, $data, $headers = null)
+    public function sendPost($url, $data, $headers = [])
     {
         return $this->send('post', $url, $data, $headers);
     }
 
-    public function sendDelete($url, $headers = null)
+    public function sendDelete($url, $headers = [])
     {
         return $this->send('delete', $url, $headers);
     }
 
-    public function sendPut($url, $data, $headers = null)
+    public function sendPut($url, $data, $headers = [])
     {
         return $this->send('put', $url, $data, $headers);
     }
@@ -52,26 +53,25 @@ class HttpRequestService
 
         $time = microtime(true);
 
-        $this->logRequest('put', $url, $data);
-        $options = [
-            'headers' => $headers,
-            'cookies' => $this->cookies
-        ];
+        $this->logRequest($method, $url, $data);
 
-        $this->setData($options, $method, $headers, $data);
+        $this->options['headers'] = $headers;
+        $this->options['cookies'] = $this->cookies;
+
+        $this->setData($method, $headers, $data);
 
         switch ($method) {
             case 'get' :
-                $response = $client->get($url, $options);
+                $response = $client->get($url, $this->options);
                 break;
             case 'post' :
-                $response = $client->post($url, $options);
+                $response = $client->post($url, $this->options);
                 break;
             case 'put' :
-                $response = $client->put($url, $options);
+                $response = $client->put($url, $this->options);
                 break;
             case 'delete' :
-                $response = $client->delete($url, $options)->send();
+                $response = $client->delete($url, $this->options)->send();
                 break;
             default :
                 throw app(UnknownRequestMethodException::class)->setMethod($method);
@@ -133,14 +133,21 @@ class HttpRequestService
         return $this->cookies->toArray();
     }
 
-    private function setData(&$options, $method, $headers, $data = [])
+    public function disallowRedirects()
+    {
+        $this->options['allow_redirects'] = false;
+
+        return $this;
+    }
+
+    private function setData($method, $headers, $data = [])
     {
         if (empty($data)) {
             return;
         }
 
         if ($method == 'get') {
-            $options['query'] = $data;
+            $this->options['query'] = $data;
             return;
         }
 
@@ -151,10 +158,10 @@ class HttpRequestService
         );
 
         if (preg_match('/application\/json/', $contentType)) {
-            $options['json'] = $data;
+            $this->options['json'] = $data;
             return;
         }
 
-        $options['form_params'] = $data;
+        $this->options['form_params'] = $data;
     }
 }
