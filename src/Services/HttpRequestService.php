@@ -9,13 +9,11 @@
 namespace RonasIT\Support\Services;
 
 use GuzzleHttp\Cookie\CookieJar;
-use Illuminate\Log\Writer;
 use GuzzleHttp\Client;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
 class HttpRequestService
 {
-    private $logger;
     protected $debug;
     protected $options = [];
     protected $cookies = null;
@@ -23,8 +21,6 @@ class HttpRequestService
     public function __construct()
     {
         $this->debug = config('defaults.http_service_debug', false);
-
-        $this->logger = app(Writer::class);
     }
 
     public function sendGet($url, $data = null, $headers = [])
@@ -85,28 +81,28 @@ class HttpRequestService
     protected function logRequest($typeOfRequest, $url, $data)
     {
         if ($this->debug) {
-            $this->logger->info('');
-            $this->logger->info('-------------------------------------');
-            $this->logger->info('');
-            $this->logger->info("sending {$typeOfRequest} request:", [
+            logger('');
+            logger('-------------------------------------');
+            logger('');
+            logger("sending {$typeOfRequest} request:", [
                 'url' => $url,
                 'data' => $data
             ]);
-            $this->logger->info('');
+            logger('');
         }
     }
 
     protected function logResponse($response, $time = null)
     {
         if ($this->debug) {
-            $this->logger->info('');
-            $this->logger->info('-------------------------------------');
-            $this->logger->info('');
-            $this->logger->info('getting response: ');
-            $this->logger->info('code', ["<{$response->getStatusCode()}>"]);
-            $this->logger->info('body', ["<{$response->getBody(true)}>"]);
-            $this->logger->info('time', [!empty($time) ? (microtime(true) - $time) : null]);
-            $this->logger->info('');
+            logger('');
+            logger('-------------------------------------');
+            logger('');
+            logger('getting response: ');
+            logger('code', ["<{$response->getStatusCode()}>"]);
+            logger('body', ["<{$response->getBody(true)}>"]);
+            logger('time', [!empty($time) ? (microtime(true) - $time) : null]);
+            logger('');
         }
     }
 
