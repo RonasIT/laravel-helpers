@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\JWTAuth;
 
-
 class HelpersServiceProvider extends ServiceProvider
 {
     public function boot() {
