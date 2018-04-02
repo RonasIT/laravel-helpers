@@ -35,22 +35,24 @@ trait SearchTrait
     protected function filterByQuery($fields)
     {
         if (!empty($this->filter['query'])) {
-            foreach ($fields as $field) {
-                if (str_contains($field, '.')) {
-                    $entities = explode('.', $field);
-                    $fieldName = array_pop($entities);
+            $this->query->where(function ($query) use ($fields) {
+                foreach ($fields as $field) {
+                    if (str_contains($field, '.')) {
+                        $entities = explode('.', $field);
+                        $fieldName = array_pop($entities);
 
-                    $this->query->orWhereHas(implode('.', $entities), function ($query) use ($fieldName, $entities) {
-                        $query->where(
-                            $this->getQuerySearchCallback($this->query, $fieldName)
+                        $query->orWhereHas(implode('.', $entities), function ($query) use ($fieldName, $entities) {
+                            $query->where(
+                                $this->getQuerySearchCallback($this->query, $fieldName)
+                            );
+                        });
+                    } else {
+                        $query->orWhere(
+                            $this->getQuerySearchCallback($this->query, $field)
                         );
-                    });
-                } else {
-                    $this->query->orWhere(
-                        $this->getQuerySearchCallback($this->query, $field)
-                    );
+                    }
                 }
-            }
+            });
         }
 
         return $this;
