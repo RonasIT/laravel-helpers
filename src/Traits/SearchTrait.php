@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: romandubrovin
- * Date: 05.09.17
- * Time: 7:37
- */
 
 namespace RonasIT\Support\Traits;
 
@@ -41,21 +35,37 @@ trait SearchTrait
     protected function filterByQuery($fields)
     {
         if (!empty($this->filter['query'])) {
-            $this->query->where(
-                $this->getQuerySearchCallback($this->query, $fields)
-            );
+            foreach ($fields as $field) {
+                if (str_contains($field, '.')) {
+                    $entities = explode('.', $field);
+                    $fieldName = array_pop($entities);
+
+                    $this->query->orWhereHas(implode('.', $entities), function ($query) use ($fieldName, $entities) {
+                        $query->where(
+                            $this->getQuerySearchCallback($this->query, $fieldName)
+                        );
+                    });
+                } else {
+                    $this->query->orWhere(
+                        $this->getQuerySearchCallback($this->query, $field)
+                    );
+                }
+            }
         }
 
         return $this;
     }
 
+    //DEPRECATED use filterByQuery function using related fields names in dot style
     protected function filterByQueryOnRelation($relation, $fields)
     {
         if (!empty($this->filter['query'])) {
             $this->query->whereHas($relation, function($query) use ($fields) {
-                $query->where(
-                    $this->getQuerySearchCallback($query, $fields)
-                );
+                foreach ($fields as $field) {
+                    $query->orWhere(
+                        $this->getQuerySearchCallback($query, $field)
+                    );
+                }
             });
         }
 
@@ -131,7 +141,8 @@ trait SearchTrait
         return $this->filterValue($field, '<', $value);
     }
 
-    protected function filterValue($field, $sign, $value) {
+    protected function filterValue($field, $sign, $value)
+    {
         if (!empty($value)) {
             $this->query->where($field, $sign, $value);
         }
@@ -148,15 +159,13 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getQuerySearchCallback($query, $fields)
+    protected function getQuerySearchCallback($query, $field)
     {
-        return function ($query) use ($fields) {
-            foreach ($fields as $field) {
-                $loweredQuery = mb_strtolower($this->filter['query']);
-                $field = DB::raw("lower({$field})");
+        return function ($query) use ($field) {
+            $loweredQuery = mb_strtolower($this->filter['query']);
+            $field = DB::raw("lower({$field})");
 
-                $query->orWhere($field, 'like', "%{$loweredQuery}%");
-            }
+            $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
     }
 }
