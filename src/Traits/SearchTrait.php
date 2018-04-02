@@ -56,7 +56,9 @@ trait SearchTrait
         return $this;
     }
 
-    //DEPRECATED use filterByQuery function using related fields names in dot style
+    /**
+     * @deprecated
+    */
     protected function filterByQueryOnRelation($relation, $fields)
     {
         if (!empty($this->filter['query'])) {
