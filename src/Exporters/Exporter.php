@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Exporters;
+namespace RonasIT\Support\Exporters;
 
 use Maatwebsite\Excel\Facades\Excel;
 use RonasIT\Support\Iterators\DBIterator;

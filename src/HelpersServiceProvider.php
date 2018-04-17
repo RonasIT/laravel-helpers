@@ -31,11 +31,15 @@ class HelpersServiceProvider extends ServiceProvider
             return $result[0]->count == 0;
         });
 
-        app(ExcelServiceProvider::class)->boot();
+        app(ExcelServiceProvider::class, [
+            'app' => app()
+        ])->boot();
     }
 
     public function register()
     {
-        app(ExcelServiceProvider::class)->register();
+        app(ExcelServiceProvider::class, [
+            'app' => app()
+        ])->register();
     }
 }

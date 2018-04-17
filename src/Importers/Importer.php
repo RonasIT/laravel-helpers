@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Support\Importers;
+namespace RonasIT\Support\Importers;
 
-use App\Exceptions\IncorrectImportFileException;
-use App\Exceptions\IncorrectImportLineException;
-use App\Support\Exporters\LogExporter;
+use RonasIT\Exceptions\IncorrectImportFileException;
+use RonasIT\Exceptions\IncorrectImportLineException;
 use RonasIT\Support\Iterators\CsvIterator;
 
 class Importer
@@ -98,8 +97,6 @@ class Importer
     {
         $this->createAllMarked();
         $this->updateAllMarked();
-
-        $this->exportLogs();
     }
 
     protected function prepareFields($line)
@@ -209,16 +206,6 @@ class Importer
         $importedLine = array_values($this->iterator->current());
 
         return array_diff($exportedLine, $importedLine);
-    }
-
-    public function exportLogs()
-    {
-        /** @var LogExporter $exporter */
-        $exporter = app(LogExporter::class);
-
-        $exporter->setReport($this->report);
-
-        $this->report['log_file'] = $exporter->run();
     }
 
     protected function validateHeader()
