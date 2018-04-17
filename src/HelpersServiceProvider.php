@@ -10,11 +10,11 @@
 namespace RonasIT\Support;
 
 use Illuminate\Support\ServiceProvider;
-use RonasIT\Support\Commands\MakeEntityCommand;
 use RonasIT\Support\Middleware\SecurityMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\JWTAuth;
+use Maatwebsite\Excel\ExcelServiceProvider;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -30,10 +30,12 @@ class HelpersServiceProvider extends ServiceProvider
 
             return $result[0]->count == 0;
         });
+
+        app(ExcelServiceProvider::class)->boot();
     }
 
     public function register()
     {
-
+        app(ExcelServiceProvider::class)->register();
     }
 }

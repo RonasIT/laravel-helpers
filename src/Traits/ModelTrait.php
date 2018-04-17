@@ -68,4 +68,21 @@ trait ModelTrait
             ->addSelect(DB::raw("count({$targetTable}.id) as {$as}"))
             ->groupBy($fields);
     }
+
+    public function scopeOrderByRelated($query, $targetModel, $field, $desc = 'DESC') {
+        $targetTable = (new $targetModel)->getTable();
+        $fields = $this->getAllFieldsWithTable();
+        $currentTable = $this->getTable();
+        $relationFieldName = Str::singular($currentTable) . '_id';
+
+        if (empty($this->selectedFields)) {
+            $this->selectedFields = $fields;
+            $fields[] = "{$targetTable}.{$field}";
+
+            $query->select($fields);
+        }
+
+        $query->join($targetTable, "{$targetTable}.{$relationFieldName}", '=', "{$currentTable}.id")
+            ->orderBy($field, $desc);
+    }
 }
