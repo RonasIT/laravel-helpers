@@ -159,6 +159,13 @@ trait FixturesTrait
         app('db.connection')->unprepared($query);
     }
 
+    public function exportFile($response, $fixture) {
+        $this->exportContent(
+            file_get_contents($response->getFile()->getPathName()),
+            $fixture
+        );
+    }
+
     protected function getTables()
     {
         if (empty(self::$tables)) {
@@ -168,5 +175,13 @@ trait FixturesTrait
         }
 
         return self::$tables;
+    }
+
+    protected function exportContent($content, $fixture)
+    {
+        file_put_contents(
+            $this->getFixturePath($fixture),
+            $content
+        );
     }
 }
