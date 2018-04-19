@@ -52,7 +52,8 @@ trait ModelTrait
         return $query;
     }
 
-    public function withCount($query, $target, $as = 'count') {
+    public function withCount($query, $target, $as = 'count')
+    {
         $targetTable = (new $target)->getTable();
         $fields = $this->getAllFieldsWithTable();
         $currentTable = $this->getTable();
@@ -69,20 +70,24 @@ trait ModelTrait
             ->groupBy($fields);
     }
 
-    public function scopeOrderByRelated($query, $targetModel, $field, $desc = 'DESC') {
-        $targetTable = (new $targetModel)->getTable();
-        $fields = $this->getAllFieldsWithTable();
-        $currentTable = $this->getTable();
-        $relationFieldName = Str::singular($currentTable) . '_id';
+    public function scopeOrderByRelated($query, $orderField, $desc = 'DESC')
+    {
+        $entities = explode('.', $orderField);
 
-        if (empty($this->selectedFields)) {
-            $this->selectedFields = $fields;
-            $fields[] = "{$targetTable}.{$field}";
+        $fieldName = array_pop($entities);
+        $relationName = array_shift($entities);
 
-            $query->select($fields);
+        if (Str::plural($relationName) !== $relationName) {
+            $table = $this->getTable();
+            $relation = $this->__callStatic($relationName, []);
+
+            $relatedTable = $relation->getRelated()->getTable();
+            $foreignKey = $relation->getForeignKey();
+            $ownerKey = $relation->getOwnerKey();
+
+            $query
+                ->addSelect("{$table}.*", DB::raw("(SELECT {$fieldName} FROM {$relatedTable} WHERE {$foreignKey} = {$relatedTable}.{$ownerKey} ) as orderedField"))
+                ->orderBy('orderedField', $desc);
         }
-
-        $query->join($targetTable, "{$targetTable}.{$relationFieldName}", '=', "{$currentTable}.id")
-            ->orderBy($field, $desc);
     }
 }
