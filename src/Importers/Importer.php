@@ -2,8 +2,8 @@
 
 namespace RonasIT\Support\Importers;
 
-use RonasIT\Exceptions\IncorrectImportFileException;
-use RonasIT\Exceptions\IncorrectImportLineException;
+use RonasIT\Support\Exceptions\IncorrectImportFileException;
+use RonasIT\Support\Exceptions\IncorrectImportLineException;
 use RonasIT\Support\Iterators\CsvIterator;
 
 class Importer

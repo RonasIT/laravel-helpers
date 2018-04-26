@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Exceptions;
+namespace RonasIT\Support\Exceptions;
 
 use Exception;
 
