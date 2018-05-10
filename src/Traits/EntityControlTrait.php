@@ -131,6 +131,20 @@ trait EntityControlTrait
         return empty($entity) ? [] : $entity->toArray();
     }
 
+    public function findBy($field, $value, $relations = [])
+    {
+        return $this->firstWithRelations([
+            $field => $value
+        ], $relations);
+    }
+
+    public function find($id, $relations = [])
+    {
+        return $this->firstWithRelations([
+            'id' => $id
+        ], $relations);
+    }
+
     public function delete($where)
     {
         $model = new $this->model;
