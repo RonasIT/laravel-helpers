@@ -271,19 +271,51 @@ function array_duplicate($array) {
     return array_diff_key($array, array_unique($array));
 }
 
-function array_unique_object($objectsList, $key = 'id') {
+/**
+ * Get only unique objects from array by key (array of keys) or by closure
+ *
+ * @param array $objectsList
+ * @param string|callable|array $filter
+ *
+ * @return array
+ */
+function array_unique_objects($objectsList, $filter = 'id') {
     $uniqueKeys = [];
 
-    $uniqueObjects = array_map(function ($object) use (&$uniqueKeys, $key) {
-        if (in_array($object[$key], $uniqueKeys)) {
+    $uniqueObjects = array_map(function ($object) use (&$uniqueKeys, $filter) {
+        if (is_string($filter)) {
+            $value = $object[$filter];
+        }
+
+        if (is_callable($filter)) {
+            $value = $filter($object);
+        }
+
+        if (is_array($filter)) {
+            $value = array_only($object, $filter);
+        }
+
+        if (in_array($value, $uniqueKeys)) {
             return null;
         }
-        $uniqueKeys[] = $object[$key];
+        $uniqueKeys[] = $value;
 
         return $object;
     }, $objectsList);
 
     return array_filter($uniqueObjects);
+}
+
+/**
+ * @deprecated
+ *
+ * @param array $objectsList
+ * @param string|callable|array $filter
+ *
+ * @return array
+ */
+function array_unique_object($objectsList, $filter = 'id') {
+    return array_unique_objects($objectsList, $filter);
 }
 
 function array_trim($array)
