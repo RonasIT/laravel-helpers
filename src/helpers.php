@@ -272,12 +272,14 @@ function array_duplicate($array) {
 }
 
 /**
+ * Get only unique objects from array by key (array of keys) or by closure
+ *
  * @param array $objectsList
  * @param string|callable|array $filter
  *
  * @return array
  */
-function array_unique_object($objectsList, $filter = 'id') {
+function array_unique_objects($objectsList, $filter = 'id') {
     $uniqueKeys = [];
 
     $uniqueObjects = array_map(function ($object) use (&$uniqueKeys, $filter) {
@@ -302,6 +304,18 @@ function array_unique_object($objectsList, $filter = 'id') {
     }, $objectsList);
 
     return array_filter($uniqueObjects);
+}
+
+/**
+ * @deprecated
+ *
+ * @param array $objectsList
+ * @param string|callable|array $filter
+ *
+ * @return array
+ */
+function array_unique_object($objectsList, $filter = 'id') {
+    return array_unique_objects($objectsList, $filter);
 }
 
 function array_trim($array)
