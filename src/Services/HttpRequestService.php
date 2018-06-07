@@ -148,9 +148,9 @@ class HttpRequestService
         }
 
         $contentType = elseChain(
-            function () use ($headers) { return $headers['Content-Type']; },
-            function () use ($headers) { return $headers['content-type']; },
-            function () use ($headers) { return $headers['CONTENT-TYPE']; }
+            function () use ($headers) { return array_get($headers, 'Content-Type'); },
+            function () use ($headers) { return array_get($headers, 'content-type'); },
+            function () use ($headers) { return array_get($headers, 'CONTENT-TYPE'); }
         );
 
         if (preg_match('/application\/json/', $contentType)) {
