@@ -11,7 +11,7 @@ use RonasIT\Support\Iterators\DBIterator;
 class Exporter
 {
     protected $iterator;
-    protected $file;
+    protected $fileName;
     protected $filters;
     protected $type = 'csv';
     protected $fields = [];
@@ -19,6 +19,13 @@ class Exporter
     public function setQuery($query)
     {
         $this->iterator = new DBIterator($query);
+
+        return $this;
+    }
+
+    public function setFileName($fileName)
+    {
+        $this->fileName = $fileName;
 
         return $this;
     }
@@ -37,9 +44,9 @@ class Exporter
         return $this;
     }
 
-    public function export($fileName = null)
+    public function export()
     {
-        $info = Excel::create($fileName ?? uniqid(), function($excel) {
+        $info = Excel::create($this->fileName ?? uniqid(), function($excel) {
             $excel->sheet('export', function($sheet) {
                 $this->exportFilters($sheet);
 
