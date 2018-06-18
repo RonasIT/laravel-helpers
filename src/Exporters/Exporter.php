@@ -37,9 +37,9 @@ class Exporter
         return $this;
     }
 
-    public function export()
+    public function export($fileName = null)
     {
-        $info = Excel::create(uniqid(), function($excel) {
+        $info = Excel::create($fileName ?? uniqid(), function($excel) {
             $excel->sheet('export', function($sheet) {
                 $this->exportFilters($sheet);
 
