@@ -157,16 +157,16 @@ trait EntityControlTrait
         }
     }
 
-    public function withTrashed()
+    public function withTrashed($enable = true)
     {
-        $this->withTrashed = true;
+        $this->withTrashed = $enable;
 
         return $this;
     }
 
-    public function onlyTrashed()
+    public function onlyTrashed($enable = true)
     {
-        $this->onlyTrashed = true;
+        $this->onlyTrashed = $enable;
 
         return $this;
     }
