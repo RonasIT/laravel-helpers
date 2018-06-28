@@ -65,7 +65,9 @@ trait EntityControlTrait
     {
         $model = $this->model;
 
-        return $model::create(array_only($data, $model::getFields()))->toArray();
+        $model::create(array_only($data, $model::getFields()));
+
+        return $this->first($data);
     }
 
     public function update($where, $data)
