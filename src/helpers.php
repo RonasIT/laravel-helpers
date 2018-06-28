@@ -304,7 +304,7 @@ function array_unique_objects($objectsList, $filter = 'id') {
     }, $objectsList);
 
     return array_filter($uniqueObjects, function ($item) {
-        return $item !== false;
+        return !is_null($item);
     });
 }
 
