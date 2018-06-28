@@ -303,7 +303,9 @@ function array_unique_objects($objectsList, $filter = 'id') {
         return $object;
     }, $objectsList);
 
-    return array_filter($uniqueObjects);
+    return array_filter($uniqueObjects, function ($item) {
+        return $item !== false;
+    });
 }
 
 /**
