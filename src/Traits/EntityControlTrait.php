@@ -1,15 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 18.10.16
- * Time: 11:57
- */
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
@@ -64,10 +59,11 @@ trait EntityControlTrait
     public function create($data)
     {
         $model = $this->model;
+        $this->checkPrimaryKey();
 
-        $model::create(array_only($data, $model::getFields()));
+        $newEntity = $model::create(array_only($data, $model::getFields()));
 
-        return $this->first($data);
+        return $newEntity->refresh()->toArray();
     }
 
     public function update($where, $data)
@@ -242,5 +238,14 @@ trait EntityControlTrait
         $traits = class_uses($this->model);
 
         return in_array(SoftDeletes::class, $traits);
+    }
+
+    protected function checkPrimaryKey()
+    {
+        $modelClass = app($this->model);
+
+        if (is_null($modelClass->getKeyName())) {
+            throw new Exception("Model {$this->model} must have primary key.");
+        }
     }
 }
