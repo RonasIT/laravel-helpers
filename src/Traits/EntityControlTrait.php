@@ -70,14 +70,31 @@ trait EntityControlTrait
         return $this->first($data);
     }
 
+    /**
+     * Update rows by condition or primary key
+     * @param array|integer $where
+     * @param array $data
+     * @return array
+     */
     public function update($where, $data)
     {
         $query = $this->getQuery();
 
-        $query->where($where)
-            ->update(
-                array_only($data, $this->fields)
-            );
+        $model = $this->model;
+
+        if (is_array($where)) {
+            $query->where($where)
+                ->update(
+                    array_only($data, $this->fields)
+                );
+        } else {
+            $row = $query->where($model->getKey(), $where)
+                ->first();
+            if($row) {
+                $row->fill($data)
+                    ->save();
+            }
+        }
 
         $where = array_merge($where, $data);
 
@@ -147,6 +164,10 @@ trait EntityControlTrait
         ], $relations);
     }
 
+    /**
+     * Delete rows by condition or primary key
+     * @param array|integer $where
+     */
     public function delete($where)
     {
         $model = new $this->model;
