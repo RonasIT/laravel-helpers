@@ -15,6 +15,7 @@ trait EntityControlTrait
     protected $withTrashed = false;
     protected $onlyTrashed = false;
     protected $fields;
+    protected $primaryKey;
 
     public function setModel($model)
     {
@@ -23,6 +24,8 @@ trait EntityControlTrait
         $model = new $this->model;
 
         $this->fields = $model::getFields();
+
+        $this->primaryKey = $model->getKeyName();
     }
 
     protected function getQuery()
@@ -66,15 +69,31 @@ trait EntityControlTrait
         return $newEntity->refresh()->toArray();
     }
 
+    /**
+     * Update rows by condition or primary key
+     * @param array|integer $where
+     * @param array $data
+     * @return array
+     */
     public function update($where, $data)
     {
         $query = $this->getQuery();
 
-        $query->where($where)
-            ->update(
-                array_only($data, $this->fields)
-            );
 
+        if (is_array($where)) {
+            $query->where($where)
+                ->update(
+                    array_only($data, $this->fields)
+                );
+        } else {
+            $row = $query->where($this->primaryKey, $where)
+                ->first();
+            if ($row) {
+                $row->fill($data)
+                    ->save();
+
+            }
+        }
         $where = array_merge($where, $data);
 
         return $this->get($where);
@@ -139,7 +158,7 @@ trait EntityControlTrait
     public function find($id, $relations = [])
     {
         return $this->firstWithRelations([
-            'id' => $id
+            $this->primaryKey => $id
         ], $relations);
     }
 
@@ -151,7 +170,7 @@ trait EntityControlTrait
             $model::where(array_only($where, $model::getFields()))
                 ->delete();
         } else {
-            $model::where('id', $where)->delete();
+            $model::where($this->primaryKey, $where)->delete();
         }
     }
 
@@ -242,9 +261,7 @@ trait EntityControlTrait
 
     protected function checkPrimaryKey()
     {
-        $modelClass = app($this->model);
-
-        if (is_null($modelClass->getKeyName())) {
+        if (is_null($this->primaryKey)) {
             throw new Exception("Model {$this->model} must have primary key.");
         }
     }
