@@ -92,7 +92,7 @@ trait EntityControlTrait
                 ->first();
 
             if (empty($row)) {
-                return null;
+                return [];
             }
 
             return $row->fill($data)->save()->toArray();
