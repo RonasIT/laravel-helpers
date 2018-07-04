@@ -8,9 +8,9 @@ class AddDefaultUser extends Migration
     {
         if (config('app.env') != 'testing') {
             User::create([
-                'name'     => {{$name}},
-                'email'    => {{$email}},
-                'password' => {{$password}},
+                'name'     => '{{$name}}',
+                'email'    => '{{$email}}',
+                'password' => bcrypt('{{$password}}')
             ]);
         }
     }
@@ -18,7 +18,7 @@ class AddDefaultUser extends Migration
     public function down()
     {
         if (config('app.env') != 'testing') {
-            User::where('email', {{$email}})->delete();
+            User::where('email', '{{$email}}')->delete();
         }
     }
 }
