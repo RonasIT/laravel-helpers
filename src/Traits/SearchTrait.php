@@ -24,8 +24,6 @@ trait SearchTrait
         }
 
         if (array_has($this->filter, $field)) {
-            $preparedField = str_replace('.', '->', $field);
-
             $this->query->where($preparedField, $this->filter[$field]);
         }
 
