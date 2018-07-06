@@ -24,7 +24,7 @@ trait SearchTrait
         }
 
         if (array_has($this->filter, $field)) {
-            $this->query->where($preparedField, $this->filter[$field]);
+            $this->query->where($field, $this->filter[$field]);
         }
 
         return $this;
