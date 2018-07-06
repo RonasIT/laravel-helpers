@@ -1,4 +1,6 @@
 use App\Models\User;
+use Illuminate\Database\Migrations\Migration;
+use RonasIT\Support\Traits\MigrationTrait;
 
 class AddDefaultUser extends Migration
 {
