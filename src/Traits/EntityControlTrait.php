@@ -81,26 +81,22 @@ trait EntityControlTrait
     {
         $query = $this->getQuery();
 
-
         if (is_array($where)) {
             $query->where($where)
                 ->update(
                     array_only($data, $this->fields)
                 );
-        } else {
-            $row = $query->where('id', $this->primaryKey)
-                ->first();
 
-            if (empty($row)) {
-                return [];
-            }
+            $where = array_merge($where, $data);
 
-            return $row->fill($data)->save()->toArray();
-
+            return $this->get($where);
         }
-        $where = array_merge($where, $data);
 
-        return $this->get($where);
+        $this->checkPrimaryKey();
+
+        $row = $query->where($this->primaryKey, $where)->first();
+
+        return (empty($row)) ? [] : $row->fill($data)->save()->toArray();
     }
 
     public function updateOrCreate($where, $data)
