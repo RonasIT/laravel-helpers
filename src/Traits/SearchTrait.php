@@ -89,6 +89,8 @@ trait SearchTrait
 
     protected function getSearchResults()
     {
+        $this->query->orderBy('id');
+
         if (empty($this->filter['all'])) {
             $results = $this->paginate($this->query, $this->filter);
         } else {
