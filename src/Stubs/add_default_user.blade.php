@@ -10,7 +10,8 @@ class AddDefaultUser extends Migration
             User::create([
                 'name'     => '{{$name}}',
                 'email'    => '{{$email}}',
-                'password' => bcrypt('{{$password}}')
+                'password' => bcrypt('{{$password}}'),
+                'role_id' => {{$role}}
             ]);
         }
     }
