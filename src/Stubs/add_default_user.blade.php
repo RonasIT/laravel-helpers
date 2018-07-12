@@ -11,7 +11,7 @@ class AddDefaultUser extends Migration
                 'name'     => '{{$name}}',
                 'email'    => '{{$email}}',
                 'password' => bcrypt('{{$password}}'),
-                'role_id' => {{$role}}
+                'role_id' => '{{$role}}'
             ]);
         }
     }
