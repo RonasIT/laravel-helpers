@@ -79,25 +79,39 @@ trait EntityControlTrait
      */
     public function update($where, $data)
     {
+        if (is_array($where)) {
+            return $this->updateByCondition($where, $data);
+        }
+
+        return $this->updateByPrimary($where, $data);
+    }
+
+    protected function updateByPrimary($value, $data)
+    {
+        $this->checkPrimaryKey();
+
         $query = $this->getQuery();
 
+        $row = $query->where($this->primaryKey, $value)->first();
 
-        if (is_array($where)) {
-            $query->where($where)
-                ->update(
-                    array_only($data, $this->fields)
-                );
-        } else {
-            $row = $query->where('id', $this->primaryKey)
-                ->first();
-
-            if (empty($row)) {
-                return [];
-            }
-
-            return $row->fill($data)->save()->toArray();
-
+        if (empty($row)) {
+            return [];
         }
+
+        $row->fill($data)->save();
+
+        return $row->refresh()->toArray();
+    }
+
+    protected function updateByCondition($where, $data)
+    {
+        $query = $this->getQuery();
+
+        $query->where($where)
+            ->update(
+                array_only($data, $this->fields)
+            );
+
         $where = array_merge($where, $data);
 
         return $this->get($where);
