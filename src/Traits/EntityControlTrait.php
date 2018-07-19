@@ -49,14 +49,25 @@ trait EntityControlTrait
 
     public function all()
     {
-        return $this->get([]);
+        return $this->get();
     }
 
-    public function exists($data)
+    public function exists($where)
     {
         $query = $this->getQuery();
 
-        return $query->where(array_only($data, $this->fields))->exists();
+        if (is_array($where)) {
+            return $query->where($where)->exists();
+        }
+
+        return $query->where($this->primaryKey, $where)->exists();
+    }
+
+    public function existsBy($field, $value)
+    {
+        return $this->getQuery()
+            ->where($field, $value)
+            ->exists();
     }
 
     public function create($data)
@@ -125,10 +136,10 @@ trait EntityControlTrait
             return $this->create(array_merge($where, $data));
         }
     }
-
-    public function get($data)
+    
+    public function get($where = [])
     {
-        return $this->getWithRelations($data, []);
+        return $this->getWithRelations($where, []);
     }
 
     public function getWithRelations($data, $with = [])
@@ -239,7 +250,7 @@ trait EntityControlTrait
         }
     }
 
-    public function count($where)
+    public function count($where = [])
     {
         return $this->getQuery()
             ->where($where)
