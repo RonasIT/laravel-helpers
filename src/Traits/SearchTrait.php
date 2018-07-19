@@ -24,7 +24,7 @@ trait SearchTrait
         }
 
         if (array_has($this->filter, $field)) {
-            $this->query->where($preparedField, $this->filter[$field]);
+            $this->query->where($field, $this->filter[$field]);
         }
 
         return $this;
@@ -58,7 +58,7 @@ trait SearchTrait
 
     /**
      * @deprecated
-    */
+     */
     protected function filterByQueryOnRelation($relation, $fields)
     {
         if (!empty($this->filter['query'])) {
@@ -89,7 +89,8 @@ trait SearchTrait
 
     protected function getSearchResults()
     {
-        $this->query->orderBy($this->primaryKey);
+
+        $this->orderBy();
 
         if (empty($this->filter['all'])) {
             $results = $this->paginate($this->query, $this->filter);
