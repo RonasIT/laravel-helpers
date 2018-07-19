@@ -26,9 +26,9 @@ class HelpersServiceProvider extends ServiceProvider
 
         Validator::extend('unique_except_of_current_user', function ($attribute, $value, $parameters, $validator) {
             $userId = app(JWTAuth::class)->toUser()->id;
-            $result = DB::select("select count(*) from users where id <> {$userId} and {$attribute} = '{$value}';");
+            $result = DB::select("select count(*) as entities_count from users where id <> {$userId} and {$attribute} = '{$value}';");
 
-            return $result[0]->count == 0;
+            return $result[0]->entities_count == 0;
         });
 
         app(ExcelServiceProvider::class, [

@@ -20,8 +20,11 @@ trait ModelTrait
     public static function getFields()
     {
         $fillable = (new static)->getFillable();
+        $keyname = (new static)->getKeyName();
 
-        array_unshift($fillable, 'id');
+        if(!array_has($fillable, $keyname)) {
+            array_unshift($fillable, $keyname);
+        }
 
         return $fillable;
     }
