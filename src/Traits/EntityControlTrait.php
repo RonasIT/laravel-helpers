@@ -136,23 +136,12 @@ trait EntityControlTrait
             return $this->create(array_merge($where, $data));
         }
     }
-
-    /**
-     * @param  array $where
-     *
-     * @return array
-     */
+    
     public function get($where = [])
     {
         return $this->getWithRelations($where, []);
     }
 
-    /**
-     * @param $data
-     * @param array $with
-     *
-     * @return array
-     */
     public function getWithRelations($data, $with = [])
     {
         $query = $this->getQuery()->where(array_only(
