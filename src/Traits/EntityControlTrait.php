@@ -70,13 +70,7 @@ trait EntityControlTrait
             ->exists();
     }
 
-    /**
-     * @param array $data
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
+
     public function create($data)
     {
         $model = $this->model;
@@ -180,12 +174,6 @@ trait EntityControlTrait
         return $this->firstWithRelations($data, []);
     }
 
-    /**
-     * @param $data
-     * @param array $with
-     *
-     * @return array
-     */
     public function firstWithRelations($data, $with = [])
     {
         $query = $this->getQuery()->where(array_only(
@@ -274,11 +262,6 @@ trait EntityControlTrait
         }
     }
 
-    /**
-     * @param array $where
-     *
-     * @return mixed
-     */
     public function count($where = [])
     {
         return $this->getQuery()
