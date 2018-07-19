@@ -70,7 +70,6 @@ trait EntityControlTrait
             ->exists();
     }
 
-
     public function create($data)
     {
         $model = $this->model;
