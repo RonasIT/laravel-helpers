@@ -56,7 +56,7 @@ trait EntityControlTrait
     {
         $query = $this->getQuery();
 
-        if(is_array($where)) {
+        if (is_array($where)) {
             return $query->where($where)->exists();
         }
 
@@ -70,19 +70,12 @@ trait EntityControlTrait
             ->exists();
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function create($fields)
+    public function create($data)
     {
         $model = $this->model;
         $this->checkPrimaryKey();
 
-        $newEntity = $model::create(array_only($fields, $model::getFields()));
+        $newEntity = $model::create(array_only($data, $model::getFields()));
 
         return $newEntity->refresh()->toArray();
     }
@@ -143,24 +136,12 @@ trait EntityControlTrait
             return $this->create(array_merge($where, $data));
         }
     }
-
-    /**
-     * @param  array $where
-     *
-     * @return array
-     */
-
+    
     public function get($where = [])
     {
         return $this->getWithRelations($where, []);
     }
 
-    /**
-     * @param $data
-     * @param array $with
-     *
-     * @return array
-     */
     public function getWithRelations($data, $with = [])
     {
         $query = $this->getQuery()->where(array_only(
@@ -181,12 +162,6 @@ trait EntityControlTrait
         return $this->firstWithRelations($data, []);
     }
 
-    /**
-     * @param $data
-     * @param array $with
-     *
-     * @return array
-     */
     public function firstWithRelations($data, $with = [])
     {
         $query = $this->getQuery()->where(array_only(
@@ -275,12 +250,7 @@ trait EntityControlTrait
         }
     }
 
-    /**
-     * @param array $where
-     *
-     * @return mixed
-     */
-    public function count($where=[])
+    public function count($where = [])
     {
         return $this->getQuery()
             ->where($where)
