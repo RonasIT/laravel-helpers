@@ -71,18 +71,18 @@ trait EntityControlTrait
     }
 
     /**
-     * @param array $fields
+     * @param array $data
      *
      * @return mixed
      *
      * @throws Exception
      */
-    public function create($fields)
+    public function create($data)
     {
         $model = $this->model;
         $this->checkPrimaryKey();
 
-        $newEntity = $model::create(array_only($fields, $model::getFields()));
+        $newEntity = $model::create(array_only($data, $model::getFields()));
 
         return $newEntity->refresh()->toArray();
     }
