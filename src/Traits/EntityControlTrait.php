@@ -56,7 +56,7 @@ trait EntityControlTrait
     {
         $query = $this->getQuery();
 
-        if(is_array($where)) {
+        if (is_array($where)) {
             return $query->where($where)->exists();
         }
 
@@ -149,7 +149,6 @@ trait EntityControlTrait
      *
      * @return array
      */
-
     public function get($where = [])
     {
         return $this->getWithRelations($where, []);
@@ -280,7 +279,7 @@ trait EntityControlTrait
      *
      * @return mixed
      */
-    public function count($where=[])
+    public function count($where = [])
     {
         return $this->getQuery()
             ->where($where)
