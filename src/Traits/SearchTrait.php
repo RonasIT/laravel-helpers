@@ -24,7 +24,7 @@ trait SearchTrait
         }
 
         if (array_has($this->filter, $field)) {
-            $this->query->where($preparedField, $this->filter[$field]);
+            $this->query->where($field, $this->filter[$field]);
         }
 
         return $this;
@@ -58,11 +58,11 @@ trait SearchTrait
 
     /**
      * @deprecated
-    */
+     */
     protected function filterByQueryOnRelation($relation, $fields)
     {
         if (!empty($this->filter['query'])) {
-            $this->query->whereHas($relation, function($query) use ($fields) {
+            $this->query->whereHas($relation, function ($query) use ($fields) {
                 foreach ($fields as $field) {
                     $query->orWhere(
                         $this->getQuerySearchCallback($query, $field)
@@ -123,7 +123,7 @@ trait SearchTrait
         }
 
         if (array_has($this->filter, $filterName)) {
-            $this->query->whereHas($relation, function($query) use ($field, $filterName) {
+            $this->query->whereHas($relation, function ($query) use ($field, $filterName) {
                 $query->where(
                     $field, $this->filter[$filterName]
                 );
@@ -141,6 +141,16 @@ trait SearchTrait
     public function filterLessThan($field, $value)
     {
         return $this->filterValue($field, '<', $value);
+    }
+
+    public function filterMoreOrEqualThan($field, $value)
+    {
+        return $this->filterValue($field, '>=', $value);
+    }
+
+    public function filterLessOrEqualThan($field, $value)
+    {
+        return $this->filterValue($field, '<=', $value);
     }
 
     protected function filterValue($field, $sign, $value)

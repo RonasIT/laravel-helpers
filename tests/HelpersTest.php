@@ -1,16 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 09.10.16
- * Time: 20:29
- */
 
 namespace RonasIT\Support\Tests;
 
 class HelpersTest extends TestCase
 {
-    public function getData() {
+    public function getData()
+    {
         return [
             [
                 'array' => 'city.json',
@@ -51,8 +46,9 @@ class HelpersTest extends TestCase
      * @param array $input
      * @param string $key
      * @param array $expected
-    */
-    public function testGetList($input, $key, $expected) {
+     */
+    public function testGetList($input, $key, $expected)
+    {
         $input = $this->getJsonFixture($input);
 
         $result = array_get_list($input, $key);

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 10.10.16
- * Time: 14:56
- */
-
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Foundation\Testing\TestResponse;
@@ -16,7 +9,8 @@ trait FixturesTrait
 {
     protected static $tables;
 
-    protected function loadTestDump($except = ['migrations', 'password_resets'])
+    protected function loadTestDump($truncateExcept = ['migrations', 'password_resets'],
+                                    $prepareSequencesExcept = ['migrations', 'password_resets', 'settings'])
     {
         $dump = $this->getFixture('dump.sql', false);
 
@@ -27,12 +21,12 @@ trait FixturesTrait
         $tables = $this->getTables();
         $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $tables, $except);
+        $this->clearDatabase($scheme, $tables, $truncateExcept);
 
         DB::unprepared($dump);
 
         if ($scheme === 'pgsql') {
-            $this->prepareSequences($tables, $except);
+            $this->prepareSequences($tables, $prepareSequencesExcept);
         }
     }
 
@@ -94,7 +88,8 @@ trait FixturesTrait
         return $this;
     }
 
-    public function exportJson($data, $fixture) {
+    public function exportJson($fixture, $data)
+    {
         if ($data instanceof TestResponse) {
             $data = $data->json();
         }
@@ -159,7 +154,8 @@ trait FixturesTrait
         app('db.connection')->unprepared($query);
     }
 
-    public function exportFile($response, $fixture) {
+    public function exportFile($response, $fixture)
+    {
         $this->exportContent(
             file_get_contents($response->getFile()->getPathName()),
             $fixture

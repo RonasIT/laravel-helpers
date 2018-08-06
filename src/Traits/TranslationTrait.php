@@ -1,8 +1,11 @@
 <?php
+
 namespace RonasIT\Support\Traits;
 
-trait TranslationTrait {
-    public function scopeWithTranslation($query) {
+trait TranslationTrait
+{
+    public function scopeWithTranslation($query)
+    {
         if (class_exists($this->getTranslationClass())) {
             $query->with('translation');
         }
@@ -21,7 +24,8 @@ trait TranslationTrait {
         return $this->hasMany($this->getTranslationClass());
     }
 
-    public function getTranslationClass() {
+    public function getTranslationClass()
+    {
         return get_class($this) . 'Translation';
     }
 }

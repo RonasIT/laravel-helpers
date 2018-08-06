@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 30.09.16
- * Time: 18:16
- */
 
 namespace RonasIT\Support\Traits;
 
@@ -22,7 +16,7 @@ trait ImageTestTrait
 
         $images = scandir($imagesPath);
 
-        array_map(function($image) use ($folder) {
+        array_map(function ($image) use ($folder) {
             $except = ['.', '..'];
 
             if (!in_array($image, $except)) {
