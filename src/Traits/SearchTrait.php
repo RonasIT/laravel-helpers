@@ -98,16 +98,20 @@ trait SearchTrait
         return $results->toArray();
     }
 
-    protected function orderBy()
-    {
-        if (!empty($this->filter['order_by'])) {
-            $desk = $this->getDesc($this->filter);
+    protected function orderBy($default = null, $defaultDesc = false) {
+        $default = (empty($default)) ? $this->primaryKey() : $default;
+        $orderBy = array_get($this->filter, 'order_by', $default);
+        $isDesc = array_get($this->filter, 'desc', $defaultDesc);
 
-            $this->query->orderBy($this->filter['order_by'], $desk);
+        $this->query->orderBy($orderBy, $this->getDesc($isDesc));
+
+        if ($orderBy != $default) {
+            $this->query->orderBy($default, $this->getDesc($defaultDesc));
         }
 
         return $this;
     }
+
 
     protected function getDesc($options = [])
     {

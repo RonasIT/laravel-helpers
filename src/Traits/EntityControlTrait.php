@@ -50,6 +50,13 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * Check entity existing in database.
+     *
+     * @param mixed $where
+     *
+     * @return boolean
+     */
     public function exists($where)
     {
         $query = $this->getQuery();
@@ -68,18 +75,11 @@ trait EntityControlTrait
             ->exists();
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return mixed
-     *
-     * @throws Exception
-     */
-    public function create($fields)
+    public function create($data)
     {
         $model = $this->model;
 
-        $newEntity = $model::create(array_only($fields, $model::getFields()));
+        $newEntity = $model::create(array_only($data, $model::getFields()));
 
         return $newEntity->refresh()->toArray();
     }
@@ -94,31 +94,37 @@ trait EntityControlTrait
      */
     public function updateMany($where, $data)
     {
-        if (is_array($where)) {
-            return $this->updateByCondition($where, $data);
-        }
-
-        return $this->updateByPrimary($where, $data);
-    }
-
-
-    public function update($where, $data = [], $field = null)
-    {
-
         $query = $this->getQuery();
 
-        if (empty($field)) {
-            $field = $this->primaryKey;
-        }
-        $row = $query->where($field, $where)->first();
+        $query->where($where)
+            ->update(
+                array_only($data, $this->fields)
+            );
 
-        if (empty($row)) {
+        $where = array_merge($where, $data);
+
+        return $this->get($where);
+    }
+
+    public function update($where, $data = [])
+    {
+        $query = $this->getQuery();
+
+        if (!is_array($where)) {
+            $where = [
+                $this->primaryKey => $where
+            ];
+        }
+
+        $item = $query->where($where)->first();
+
+        if (empty($item)) {
             return [];
         }
 
-        $row->fill(array_only($data, $field))->save();
+        $item->fill($data)->save();
 
-        return $row->refresh()->toArray();
+        return $item->refresh()->toArray();
     }
 
     public function updateOrCreate($where, $data)
@@ -130,45 +136,11 @@ trait EntityControlTrait
         return $this->create(array_merge($where, $data));
     }
 
-    /**
-     * @param  array $where
-     *
-     * @return array
-     */
-    public function get($where = [])
+    public function count($where = [])
     {
-        $query = $this->getQuery()->where(array_only(
-            $where, $this->fields
-        ));
-
-        $entity = $query->get();
-
-        return empty($entity) ? [] : $entity->toArray();
-    }
-
-    public function first($data)
-    {
-        $query = $this->getQuery()->where(array_only(
-            $data, $this->fields
-        ));
-
-        $entity = $query->first();
-
-        return empty($entity) ? [] : $entity->toArray();
-    }
-
-    public function findBy($field, $value)
-    {
-        return $this->first([
-            $field => $value
-        ]);
-    }
-
-    public function find($id)
-    {
-        return $this->first([
-            $this->primaryKey => $id
-        ]);
+        return $this->getQuery()
+            ->where($where)
+            ->count();
     }
 
     /**
@@ -188,6 +160,70 @@ trait EntityControlTrait
         }
     }
 
+    public function forceDelete($id)
+    {
+        $this->getQuery()->find($id)->forceDelete();
+    }
+
+    /**
+     * @param  array $where
+     *
+     * @return array
+     */
+    public function get($where = [])
+    {
+        $query = $this->getQuery()->where(array_only(
+            $where, $this->fields
+        ));
+
+        $entity = $query->get();
+
+        return empty($entity) ? [] : $entity->toArray();
+    }
+
+    public function getOrCreate($data)
+    {
+        if ($this->exists($data)) {
+            return $this->get($data);
+        }
+
+        return $this->create($data);
+    }
+
+    public function first($data)
+    {
+        $query = $this->getQuery()->where(array_only(
+            $data, $this->fields
+        ));
+
+        $entity = $query->first();
+
+        return empty($entity) ? [] : $entity->toArray();
+    }
+
+    public function firstOrCreate($where, $data = [])
+    {
+        if ($this->exists($where)) {
+            return $this->first($where);
+        }
+
+        return $this->create($data);
+    }
+
+    public function findBy($field, $value)
+    {
+        return $this->first([
+            $field => $value
+        ]);
+    }
+
+    public function find($id)
+    {
+        return $this->first([
+            $this->primaryKey => $id
+        ]);
+    }
+
     public function withTrashed($enable = true)
     {
         $this->withTrashed = $enable;
@@ -205,41 +241,6 @@ trait EntityControlTrait
     public function restore($id)
     {
         $this->getQuery()->withTrashed()->find($id)->restore();
-    }
-
-    public function forceDelete($id)
-    {
-        $this->getQuery()->find($id)->forceDelete();
-    }
-
-    public function getOrCreate($data)
-    {
-        if ($this->exists($data)) {
-            return $this->get($data);
-        }
-
-        return $this->create($data);
-    }
-
-    public function firstOrCreate($where, $data = [])
-    {
-        if ($this->exists($where)) {
-            return $this->first($where);
-        }
-
-        return $this->create($data);
-    }
-
-    /**
-     * @param array $where
-     *
-     * @return mixed
-     */
-    public function count($where = [])
-    {
-        return $this->getQuery()
-            ->where($where)
-            ->count();
     }
 
     public function validateField($id, $field, $value)
@@ -276,35 +277,6 @@ trait EntityControlTrait
         if (is_null($this->primaryKey)) {
             throw new Exception("Model {$this->model} must have primary key.");
         }
-    }
-
-    protected function updateByPrimary($value, $data)
-    {
-        $query = $this->getQuery();
-
-        $row = $query->where($this->primaryKey, $value)->first();
-
-        if (empty($row)) {
-            return [];
-        }
-
-        $row->fill($data)->save();
-
-        return $row->refresh()->toArray();
-    }
-
-    protected function updateByCondition($where, $data)
-    {
-        $query = $this->getQuery();
-
-        $query->where($where)
-            ->update(
-                array_only($data, $this->fields)
-            );
-
-        $where = array_merge($where, $data);
-
-        return $this->get($where);
     }
 
     protected function getQuery()
