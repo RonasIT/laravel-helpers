@@ -102,8 +102,7 @@ trait SearchTrait
     }
 
     protected function orderBy($default = null, $defaultDesc = false) {
-        $default = empty($default) ? $this->primaryKey : $default;
-
+        $default = (empty($default)) ? $this->primaryKey : $default;
         $orderBy = array_get($this->filter, 'order_by', $default);
         $isDesc = array_get($this->filter, 'desc', $defaultDesc);
 
