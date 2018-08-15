@@ -34,13 +34,13 @@ trait EntityControlTrait
     {
         $this->model = $model;
 
-        $this->checkPrimaryKey();
-
         $model = new $this->model;
 
         $this->fields = $model::getFields();
 
         $this->primaryKey = $model->getKeyName();
+
+        $this->checkPrimaryKey();
     }
 
     protected function getQuery()
