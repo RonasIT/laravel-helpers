@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 25.11.16
- * Time: 10:15
- */
-
 namespace RonasIT\Support\Iterators;
 
 use Iterator;

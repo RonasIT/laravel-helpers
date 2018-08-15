@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 10.10.16
- * Time: 14:56
- */
-
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\Storage;

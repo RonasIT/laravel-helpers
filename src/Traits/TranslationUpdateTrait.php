@@ -1,4 +1,5 @@
 <?php
+
 namespace RonasIT\Support\Traits;
 
 trait TranslationUpdateTrait

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 06.05.16
- * Time: 16:46
- */
 
 namespace RonasIT\Support\Traits;
 

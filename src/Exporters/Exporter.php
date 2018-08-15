@@ -48,8 +48,8 @@ class Exporter
     {
         $fileName = $this->fileName ?? uniqid();
 
-        $info = Excel::create($fileName, function($excel) {
-            $excel->sheet('export', function($sheet) {
+        $info = Excel::create($fileName, function ($excel) {
+            $excel->sheet('export', function ($sheet) {
                 $this->exportFilters($sheet);
 
                 $sheet->appendRow($this->fields);
