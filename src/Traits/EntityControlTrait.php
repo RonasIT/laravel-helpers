@@ -146,7 +146,7 @@ trait EntityControlTrait
     /**
      * Delete rows by condition or primary key
      *
-     * @param array $where
+     * @param array|integer|string $where
      */
     public function delete($where)
     {

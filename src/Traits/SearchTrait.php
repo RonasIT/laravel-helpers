@@ -112,7 +112,6 @@ trait SearchTrait
         return $this;
     }
 
-
     protected function getDesc($options = [])
     {
         $isDesc = array_get($options, 'desc', false);
