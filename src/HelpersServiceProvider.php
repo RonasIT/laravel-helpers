@@ -18,7 +18,8 @@ use Maatwebsite\Excel\ExcelServiceProvider;
 
 class HelpersServiceProvider extends ServiceProvider
 {
-    public function boot() {
+    public function boot()
+    {
         $router = $this->app['router'];
 
         $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
@@ -35,7 +36,7 @@ class HelpersServiceProvider extends ServiceProvider
             'app' => app()
         ])->boot();
 
-        $this->loadViewsFrom(__DIR__.'/Stubs', 'ronasit');
+        $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
     }
 
     public function register()

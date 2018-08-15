@@ -30,13 +30,13 @@ class UndemandingAuthorizationMiddleware extends BaseMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if (! $token = $this->auth->setRequest($request)->getToken()) {
+        if (!$token = $this->auth->setRequest($request)->getToken()) {
             return $next($request);
         }
 
@@ -48,7 +48,7 @@ class UndemandingAuthorizationMiddleware extends BaseMiddleware
             return $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
         }
 
-        if (! $user) {
+        if (!$user) {
             return $this->respond('tymon.jwt.user_not_found', 'user_not_found', 404);
         }
 

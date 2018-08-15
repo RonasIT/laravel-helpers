@@ -62,7 +62,7 @@ trait SearchTrait
     protected function filterByQueryOnRelation($relation, $fields)
     {
         if (!empty($this->filter['query'])) {
-            $this->query->whereHas($relation, function($query) use ($fields) {
+            $this->query->whereHas($relation, function ($query) use ($fields) {
                 foreach ($fields as $field) {
                     $query->orWhere(
                         $this->getQuerySearchCallback($query, $field)
@@ -101,12 +101,15 @@ trait SearchTrait
         return $results->toArray();
     }
 
-    protected function orderBy()
-    {
-        if (!empty($this->filter['order_by'])) {
-            $desk = $this->getDesc($this->filter);
+    protected function orderBy($default = null, $defaultDesc = false) {
+        $default = (empty($default)) ? $this->primaryKey() : $default;
+        $orderBy = array_get($this->filter, 'order_by', $default);
+        $isDesc = array_get($this->filter, 'desc', $defaultDesc);
 
-            $this->query->orderBy($this->filter['order_by'], $desk);
+        $this->query->orderBy($orderBy, $this->getDesc($isDesc));
+
+        if ($orderBy != $default) {
+            $this->query->orderBy($default, $this->getDesc($defaultDesc));
         }
 
         return $this;
@@ -126,7 +129,7 @@ trait SearchTrait
         }
 
         if (array_has($this->filter, $filterName)) {
-            $this->query->whereHas($relation, function($query) use ($field, $filterName) {
+            $this->query->whereHas($relation, function ($query) use ($field, $filterName) {
                 $query->where(
                     $field, $this->filter[$filterName]
                 );
@@ -144,6 +147,16 @@ trait SearchTrait
     public function filterLessThan($field, $value)
     {
         return $this->filterValue($field, '<', $value);
+    }
+
+    public function filterMoreOrEqualThan($field, $value)
+    {
+        return $this->filterValue($field, '>=', $value);
+    }
+
+    public function filterLessOrEqualThan($field, $value)
+    {
+        return $this->filterValue($field, '<=', $value);
     }
 
     protected function filterValue($field, $sign, $value)

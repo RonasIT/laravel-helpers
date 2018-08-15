@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ascet
- * Date: 12.07.15
- * Time: 17:23
- */
 
 namespace RonasIT\Support\Services;
 
@@ -148,9 +142,15 @@ class HttpRequestService
         }
 
         $contentType = elseChain(
-            function () use ($headers) { return array_get($headers, 'Content-Type'); },
-            function () use ($headers) { return array_get($headers, 'content-type'); },
-            function () use ($headers) { return array_get($headers, 'CONTENT-TYPE'); }
+            function () use ($headers) {
+                return array_get($headers, 'Content-Type');
+            },
+            function () use ($headers) {
+                return array_get($headers, 'content-type');
+            },
+            function () use ($headers) {
+                return array_get($headers, 'CONTENT-TYPE');
+            }
         );
 
         if (preg_match('/application\/json/', $contentType)) {

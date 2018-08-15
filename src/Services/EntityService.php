@@ -1,24 +1,18 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 11.05.16
- * Time: 9:39
- */
-
 namespace RonasIT\Support\Services;
 
 use BadMethodCallException;
 
 /**
  * @property BaseRepository $repository
-*/
+ */
 class EntityService
 {
     protected $repository;
 
-    public function setRepository($repository) {
+    public function setRepository($repository)
+    {
         $this->repository = app($repository);
 
         return $this;
