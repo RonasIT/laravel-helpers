@@ -7,7 +7,7 @@ All relations variables moved form method call to withRelations method.
 Methods : withRelations, withTrashed, onlyTrashed return this and using for making chains.
 Examples: 
 ```php
-    $object->withRelations($relation)->withTrashed()->get();
+$object->withRelations($relation)->withTrashed()->get();
 ```
 Before: 
 ```php
