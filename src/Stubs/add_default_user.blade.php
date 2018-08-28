@@ -1,6 +1,7 @@
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use RonasIT\Support\Traits\MigrationTrait;
+use App\Repositories\RoleRepository;
 
 class AddDefaultUser extends Migration
 {
@@ -12,7 +13,8 @@ class AddDefaultUser extends Migration
             User::create([
                 'name'     => '{{$name}}',
                 'email'    => '{{$email}}',
-                'password' => bcrypt('{{$password}}')
+                'password' => bcrypt('{{$password}}'),
+                'role_id' => RoleRepository::ADMIN_ROLE
             ]);
         }
     }
