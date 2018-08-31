@@ -9,12 +9,13 @@ trait SearchTrait
     protected $query;
     protected $filter;
 
-    public function paginate($query, $data = [])
+    public function paginate()
     {
         $defaultPerPage = config('defaults.items_per_page');
-        $perPage = empty($data['per_page']) ? $defaultPerPage : $data['per_page'];
+        $perPage = array_get($this->filter, 'per_page', $defaultPerPage );
+        $page = array_get($this->filter, 'page', $defaultPerPage );
 
-        return $query->paginate($perPage);
+        return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function filterBy($field, $default = null)
