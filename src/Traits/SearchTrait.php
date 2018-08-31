@@ -13,7 +13,7 @@ trait SearchTrait
     {
         $defaultPerPage = config('defaults.items_per_page');
         $perPage = array_get($this->filter, 'per_page', $defaultPerPage );
-        $page = array_get($this->filter, 'page', $defaultPerPage );
+        $page = array_get($this->filter, 'page', 1);
 
         return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
