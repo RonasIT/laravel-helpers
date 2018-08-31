@@ -7,12 +7,15 @@ All relations variables moved form method call to withRelations method.
 Methods : withRelations, withTrashed, onlyTrashed return this and using for making chains.
 Examples: 
 ```php
-$object->withRelations($relation)->withTrashed()->get();
+$repository
+    ->withRelations($relation)
+    ->withTrashed()
+    ->get();
 ```
 Before: 
 ```php
-$object->withRelations($relation);
-$object->withTrashed();
+$repository->withRelations($relation);
+$repository->withTrashed();
 ```
 
 Method updateMany: now is used for updating multiple entities in database.
@@ -20,39 +23,70 @@ Method update: now is used for updated first entity in database.
 
 Examples: 
 ```php
-$where = ['id' => 1];
-$data = ['name' => 'newName'];
-$object->update($where, $data);
+$where = [
+    'id' => 1
+];
 
-$where = ['name' => 'Jon'];
-$data = ['name' => 'Jonatan'];
-$obhect->updateMany($where, $data);
+$data = [
+    'name' => 'newName'
+];
+
+$repository->update($where, $data);
+
+$where = [
+    'name' => 'Jon'
+];
+
+$data = [
+    'name' => 'Jonatan'
+];
+
+$repository->updateMany($where, $data);
 ```
 Before: 
 ```php
 $where = 1;
-$data = ['name' => 'newName'];
-$object->update($where, $data);
 
-$where = ['name' => 'Jon'];
-$data = ['name' => 'Jonatan'];
-$object->update($where, $data);
+$data = [
+    'name' => 'newName'
+];
+
+$repository->update($where, $data);
+
+$where = [
+    'name' => 'Jon'
+];
+
+$data = [
+    'name' => 'Jonatan'
+];
+
+$repository->update($where, $data);
 ```
 Method firstOrCreate: now is accepting 2 parameters.
 
 Examples: 
 ```php
-$data = ['name' => 'Jon'];
-$where = ['id' => 5];
-$object->firstOrCreate($where, $data);
+$data = [
+    'name' => 'Jon'
+];
+
+$where = [
+    'id' => 5
+];
+
+$repository->firstOrCreate($where, $data);
 ```
 Before: 
 ```php
-$data = ['name' = 'Jon'];
-$object->firstOrCreate($data);
+$data = [
+    'name' = 'Jon'
+];
+
+$repository->firstOrCreate($data);
 ```
 #### FilesUploadTrait 
-``
+
 This class is now used to upload files, all other clasess is now @depricated.
 
 #### FixturesTrait
@@ -61,7 +95,7 @@ jsonExport now have jsonExport($fixture, $data) call.
 
 Examples:
 ```php
- exportJson($fixture, $data)
+exportJson($fixture, $data)
  ```
 Before: 
 ```php

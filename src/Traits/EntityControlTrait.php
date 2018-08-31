@@ -18,18 +18,6 @@ trait EntityControlTrait
     protected $fields;
     protected $primaryKey;
 
-    public function all()
-    {
-        return $this->get();
-    }
-
-    public function truncate()
-    {
-        $model = $this->model;
-
-        $model::truncate();
-    }
-
     public function setModel($model)
     {
         $this->model = $model;
@@ -43,11 +31,32 @@ trait EntityControlTrait
         $this->primaryKey = $model->getKeyName();
     }
 
-    public function withRelations(array $relations)
+    protected function getQuery()
     {
-        $this->requiredRelations = $relations;
+        $model = new $this->model;
 
-        return $this;
+        $query = $model->query();
+
+        if ($this->onlyTrashed) {
+            $query->onlyTrashed();
+
+            $this->withTrashed = false;
+        }
+
+        if ($this->withTrashed && $this->isSoftDelete()) {
+            $query->withTrashed();
+        }
+
+        if (!empty($this->requiredRelations)) {
+            $query->with($this->requiredRelations);
+        }
+
+        return $query;
+    }
+
+    public function all()
+    {
+        return $this->get();
     }
 
     /**
@@ -66,13 +75,6 @@ trait EntityControlTrait
         }
 
         return $query->where($this->primaryKey, $where)->exists();
-    }
-
-    public function existsBy($field, $value)
-    {
-        return $this->getQuery()
-            ->where($field, $value)
-            ->exists();
     }
 
     public function create($data)
@@ -136,11 +138,64 @@ trait EntityControlTrait
         return $this->create(array_merge($where, $data));
     }
 
-    public function count($where = [])
+    /**
+     * @param  array $where
+     *
+     * @return array
+     */
+    public function get($where = [])
+    {
+        $query = $this->getQuery()->where(array_only(
+            $where, $this->fields
+        ));
+
+        $entity = $query->get();
+
+        return empty($entity) ? [] : $entity->toArray();
+    }
+
+    public function first($data)
+    {
+        $query = $this->getQuery()->where(array_only(
+            $data, $this->fields
+        ));
+
+        $entity = $query->first();
+
+        return empty($entity) ? [] : $entity->toArray();
+    }
+
+    public function withRelations(array $relations)
+    {
+        $this->requiredRelations = $relations;
+
+        return $this;
+    }
+
+    public function existsBy($field, $value)
     {
         return $this->getQuery()
-            ->where($where)
-            ->count();
+            ->where($field, $value)
+            ->exists();
+    }
+
+    public function forceDelete($id)
+    {
+        $this->getQuery()->find($id)->forceDelete();
+    }
+
+    public function findBy($field, $value)
+    {
+        return $this->first([
+            $field => $value
+        ]);
+    }
+
+    public function find($id)
+    {
+        return $this->first([
+            $this->primaryKey => $id
+        ]);
     }
 
     /**
@@ -158,70 +213,6 @@ trait EntityControlTrait
         } else {
             $model::where($this->primaryKey, $where)->delete();
         }
-    }
-
-    public function forceDelete($id)
-    {
-        $this->getQuery()->find($id)->forceDelete();
-    }
-
-    /**
-     * @param  array $where
-     *
-     * @return array
-     */
-    public function get($where = [])
-    {
-        $query = $this->getQuery()->where(array_only(
-            $where, $this->fields
-        ));
-
-        $entity = $query->get();
-
-        return empty($entity) ? [] : $entity->toArray();
-    }
-
-    public function getOrCreate($data)
-    {
-        if ($this->exists($data)) {
-            return $this->get($data);
-        }
-
-        return $this->create($data);
-    }
-
-    public function first($data)
-    {
-        $query = $this->getQuery()->where(array_only(
-            $data, $this->fields
-        ));
-
-        $entity = $query->first();
-
-        return empty($entity) ? [] : $entity->toArray();
-    }
-
-    public function firstOrCreate($where, $data = [])
-    {
-        if ($this->exists($where)) {
-            return $this->first($where);
-        }
-
-        return $this->create($data);
-    }
-
-    public function findBy($field, $value)
-    {
-        return $this->first([
-            $field => $value
-        ]);
-    }
-
-    public function find($id)
-    {
-        return $this->first([
-            $this->primaryKey => $id
-        ]);
     }
 
     public function withTrashed($enable = true)
@@ -243,6 +234,31 @@ trait EntityControlTrait
         $this->getQuery()->withTrashed()->find($id)->restore();
     }
 
+    public function getOrCreate($data)
+    {
+        if ($this->exists($data)) {
+            return $this->get($data);
+        }
+
+        return $this->create($data);
+    }
+
+    public function firstOrCreate($where, $data = [])
+    {
+        if ($this->exists($where)) {
+            return $this->first($where);
+        }
+
+        return $this->create($data);
+    }
+
+    public function count($where = [])
+    {
+        return $this->getQuery()
+            ->where($where)
+            ->count();
+    }
+
     public function validateField($id, $field, $value)
     {
         $query = $this->getQuery()
@@ -256,6 +272,13 @@ trait EntityControlTrait
                 $field => [$message]
             ]);
         }
+    }
+
+    public function truncate()
+    {
+        $model = $this->model;
+
+        $model::truncate();
     }
 
     protected function getEntityName()
@@ -277,28 +300,5 @@ trait EntityControlTrait
         if (is_null($this->primaryKey)) {
             throw new Exception("Model {$this->model} must have primary key.");
         }
-    }
-
-    protected function getQuery()
-    {
-        $model = new $this->model;
-
-        $query = $model->query();
-
-        if ($this->onlyTrashed) {
-            $query->onlyTrashed();
-
-            $this->withTrashed = false;
-        }
-
-        if ($this->withTrashed && $this->isSoftDelete()) {
-            $query->withTrashed();
-        }
-
-        if (!empty($this->requiredRelations)) {
-            $query->with($this->requiredRelations);
-        }
-
-        return $query;
     }
 }
