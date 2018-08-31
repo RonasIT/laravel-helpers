@@ -17,6 +17,13 @@ class HttpRequestService
         $this->debug = config('defaults.http_service_debug', false);
     }
 
+    public function set($key, $value)
+    {
+        $this->options[$key] = $value;
+
+        return $this;
+    }
+
     public function sendGet($url, $data = null, $headers = [])
     {
         return $this->send('get', $url, $data, $headers);
