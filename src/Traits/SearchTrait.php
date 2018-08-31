@@ -94,7 +94,7 @@ trait SearchTrait
         $this->query->orderBy($this->primaryKey);
 
         if (empty($this->filter['all'])) {
-            $results = $this->paginate($this->query, $this->filter);
+            $results = $this->paginate();
         } else {
             $results = $this->query->get();
         }
