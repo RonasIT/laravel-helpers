@@ -91,7 +91,6 @@ trait SearchTrait
     protected function getSearchResults()
     {
         $this->orderBy();
-        $this->query->orderBy($this->primaryKey);
 
         if (empty($this->filter['all'])) {
             $results = $this->paginate();
@@ -116,10 +115,8 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getDesc($options = [])
+    protected function getDesc($isDesc)
     {
-        $isDesc = array_get($options, 'desc', false);
-
         return $isDesc ? 'DESC' : 'ASC';
     }
 
