@@ -51,10 +51,7 @@ class HttpRequestService
         $time = microtime(true);
 
         $this->logRequest($method, $url, $data);
-
-        $this->options['headers'] = $headers;
-        $this->options['cookies'] = $this->cookies;
-
+        $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
         switch ($method) {
@@ -135,6 +132,14 @@ class HttpRequestService
         $this->options['allow_redirects'] = false;
 
         return $this;
+    }
+
+    private function setOptions($headers)
+    {
+        $this->options = [];
+
+        $this->options['headers'] = $headers;
+        $this->options['cookies'] = $this->cookies;
     }
 
     private function setData($method, $headers, $data = [])
