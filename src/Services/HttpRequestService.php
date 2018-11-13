@@ -9,6 +9,9 @@ use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 class HttpRequestService
 {
     protected $debug;
+
+    protected $allowRedirects = true;
+
     protected $options = [];
     protected $cookies = null;
 
@@ -129,7 +132,7 @@ class HttpRequestService
 
     public function disallowRedirects()
     {
-        $this->options['allow_redirects'] = false;
+        $this->allowRedirects = false;
 
         return $this;
     }
@@ -140,6 +143,7 @@ class HttpRequestService
 
         $this->options['headers'] = $headers;
         $this->options['cookies'] = $this->cookies;
+        $this->options['allow_redirects'] = $this->allowRedirects;
     }
 
     private function setData($method, $headers, $data = [])
