@@ -222,7 +222,7 @@ trait EntityControlTrait
             return $this->first($where);
         }
 
-        return $this->create($data);
+        return $this->create(array_merge($where, $data));
     }
 
     /**
