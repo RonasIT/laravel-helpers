@@ -130,9 +130,9 @@ class HttpRequestService
         return $this->cookies->toArray();
     }
 
-    public function disallowRedirects()
+    public function allowRedirects($value = true)
     {
-        $this->allowRedirects = false;
+        $this->allowRedirects = $value;
 
         return $this;
     }
