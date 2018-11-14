@@ -220,9 +220,11 @@ trait EntityControlTrait
     {
         $entity = $this->first($where);
 
-        return (empty($entity)) ?
-            $this->create(array_merge($where, $data)) :
-            $entity;
+        if (empty($entity)) {
+            return $this->create(array_merge($where, $data));
+        }
+
+        return $entity;
     }
 
     /**
