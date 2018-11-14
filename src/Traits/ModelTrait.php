@@ -12,14 +12,16 @@ trait ModelTrait
 
     public static function getFields()
     {
-        $fillable = (new static)->getFillable();
-        $keyname = (new static)->getKeyName();
+        $model = (new static);
 
-        if(!array_has($fillable, $keyname)) {
-            array_unshift($fillable, $keyname);
-        }
+        $keyName = $model->getKeyName();
+        $guarded = $model->getGuarded();
+        $fillable = $model->getFillable();
+        $timeStamps = ($model->timestamps) ? ['created_at', 'updated_at'] : [];
 
-        return $fillable;
+        array_unshift($fillable, $keyName);
+
+        return array_merge($fillable, $guarded, $timeStamps);
     }
 
     public function getAllFieldsWithTable()
