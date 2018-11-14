@@ -218,11 +218,13 @@ trait EntityControlTrait
 
     public function firstOrCreate($where, $data = [])
     {
-        if ($this->exists($where)) {
-            return $this->first($where);
+        $entity = $this->first($where);
+
+        if (empty($entity)) {
+            return $this->create(array_merge($where, $data));
         }
 
-        return $this->create($data);
+        return $entity;
     }
 
     /**
