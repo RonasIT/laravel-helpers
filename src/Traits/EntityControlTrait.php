@@ -69,9 +69,8 @@ trait EntityControlTrait
      * @param $field
      * @param $value
      *
-     * @return mixed
+     * @return boolean
      */
-
     public function existsBy($field, $value)
     {
         return $this->getQuery()
