@@ -91,6 +91,14 @@ trait EntityControlTrait
         return $query->where($this->primaryKey, $where)->exists();
     }
 
+    /**
+     * Checking that record with this key value exists
+     *
+     * @param $field
+     * @param $value
+     *
+     * @return boolean
+     */
     public function existsBy($field, $value)
     {
         return $this->getQuery()
