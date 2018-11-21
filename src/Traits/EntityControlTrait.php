@@ -112,6 +112,10 @@ trait EntityControlTrait
 
         $newEntity = $model::create(array_only($data, $model::getFields()));
 
+        if (!empty($this->requiredRelations)) {
+            $newEntity->load($this->requiredRelations);
+        }
+
         return $newEntity->refresh()->toArray();
     }
 
