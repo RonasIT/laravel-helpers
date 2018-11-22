@@ -15,7 +15,7 @@ trait ModelTrait
         $fillable = (new static)->getFillable();
         $keyname = (new static)->getKeyName();
 
-        if(!array_has($fillable, $keyname)) {
+        if (!array_has($fillable, $keyname)) {
             array_unshift($fillable, $keyname);
         }
 

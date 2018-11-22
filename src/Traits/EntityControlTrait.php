@@ -18,18 +18,6 @@ trait EntityControlTrait
     protected $fields;
     protected $primaryKey;
 
-    public function all()
-    {
-        return $this->get();
-    }
-
-    public function truncate()
-    {
-        $model = $this->model;
-
-        $model::truncate();
-    }
-
     public function setModel($model)
     {
         $this->model = $model;
@@ -71,6 +59,11 @@ trait EntityControlTrait
         $this->requiredRelations = $relations;
 
         return $this;
+    }
+
+    public function all()
+    {
+        return $this->get();
     }
 
     /**
@@ -159,13 +152,6 @@ trait EntityControlTrait
         return $this->create(array_merge($where, $data));
     }
 
-    public function count($where = [])
-    {
-        return $this->getQuery()
-            ->where($where)
-            ->count();
-    }
-
     /**
      * @param  array $where
      *
@@ -180,15 +166,6 @@ trait EntityControlTrait
         $entity = $query->get();
 
         return empty($entity) ? [] : $entity->toArray();
-    }
-
-    public function getOrCreate($data)
-    {
-        if ($this->exists($data)) {
-            return $this->get($data);
-        }
-
-        return $this->create($data);
     }
 
     public function first($data)
@@ -216,15 +193,6 @@ trait EntityControlTrait
         ]);
     }
 
-    public function firstOrCreate($where, $data = [])
-    {
-        if ($this->exists($where)) {
-            return $this->first($where);
-        }
-
-        return $this->create($data);
-    }
-
     /**
      * Delete rows by condition or primary key
      *
@@ -240,11 +208,6 @@ trait EntityControlTrait
         } else {
             $model::where($this->primaryKey, $where)->delete();
         }
-    }
-
-    public function forceDelete($id)
-    {
-        $this->getQuery()->find($id)->forceDelete();
     }
 
     public function withTrashed($enable = true)
@@ -266,6 +229,36 @@ trait EntityControlTrait
         $this->getQuery()->withTrashed()->find($id)->restore();
     }
 
+    public function forceDelete($id)
+    {
+        $this->getQuery()->find($id)->forceDelete();
+    }
+
+    public function getOrCreate($data)
+    {
+        if ($this->exists($data)) {
+            return $this->get($data);
+        }
+
+        return $this->create($data);
+    }
+
+    public function firstOrCreate($where, $data = [])
+    {
+        if ($this->exists($where)) {
+            return $this->first($where);
+        }
+
+        return $this->create($data);
+    }
+
+    public function count($where = [])
+    {
+        return $this->getQuery()
+            ->where($where)
+            ->count();
+    }
+
     public function validateField($id, $field, $value)
     {
         $query = $this->getQuery()
@@ -279,6 +272,13 @@ trait EntityControlTrait
                 $field => [$message]
             ]);
         }
+    }
+
+    public function truncate()
+    {
+        $model = $this->model;
+
+        $model::truncate();
     }
 
     protected function getEntityName()

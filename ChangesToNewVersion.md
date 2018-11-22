@@ -5,6 +5,7 @@
 All relations variables moved form method call to withRelations method.
 
 Methods : withRelations, withTrashed, onlyTrashed return this and using for making chains.
+
 Examples: 
 ```php
 $repository
@@ -14,7 +15,11 @@ $repository
 ```
 Before: 
 ```php
-$repository->withRelations($relation);
+$repository->firstWithRelations(
+    ['id' => 1], 
+    ['some_relation']
+);
+
 $repository->withTrashed();
 ```
 
@@ -23,67 +28,46 @@ Method update: now is used for updated first entity in database.
 
 Examples: 
 ```php
-$where = [
+$repository->update([
     'id' => 1
-];
-
-$data = [
+], [
     'name' => 'newName'
-];
+]);
 
-$repository->update($where, $data);
-
-$where = [
+$repository->updateMany([
     'name' => 'Jon'
-];
-
-$data = [
+], [
     'name' => 'Jonatan'
-];
-
-$repository->updateMany($where, $data);
+]);
 ```
 Before: 
 ```php
-$where = 1;
 
-$data = [
+$repository->update(1, [
     'name' => 'newName'
-];
+]);
 
-$repository->update($where, $data);
-
-$where = [
+$repository->update([
     'name' => 'Jon'
-];
-
-$data = [
+], [
     'name' => 'Jonatan'
-];
-
-$repository->update($where, $data);
+]);
 ```
 Method firstOrCreate: now is accepting 2 parameters.
 
 Examples: 
 ```php
-$data = [
-    'name' => 'Jon'
-];
-
-$where = [
+$repository->firstOrCreate([
     'id' => 5
-];
-
-$repository->firstOrCreate($where, $data);
+], [
+    'name' => 'Jon'
+]);
 ```
 Before: 
 ```php
-$data = [
+$repository->firstOrCreate([
     'name' = 'Jon'
-];
-
-$repository->firstOrCreate($data);
+]);
 ```
 #### FilesUploadTrait 
 
