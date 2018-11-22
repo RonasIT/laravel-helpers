@@ -59,6 +59,9 @@ trait SearchTrait
 
     /**
      * @deprecated
+     * @param $relation
+     * @param $fields
+     * @return SearchTrait
      */
     protected function filterByQueryOnRelation($relation, $fields)
     {

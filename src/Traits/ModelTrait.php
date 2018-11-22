@@ -36,6 +36,9 @@ trait ModelTrait
     /**
      * This method was added, because native laravel's method addSelect
      * overwrites existed select clause
+     * @param $query
+     * @param $fields
+     * @return mixed
      */
     public function scopeAddFieldsToSelect($query, $fields)
     {

@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use RonasIT\Support\Traits\FixturesTrait;
 

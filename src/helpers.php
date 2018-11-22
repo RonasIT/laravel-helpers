@@ -7,10 +7,10 @@ use Illuminate\Support\Collection;
  * It calls on all callbacks to the first, which did not return null.
  * The resulting value is the result of the function and returns.
  *
- * @param callable $callbacks
+ * @param mixed ...$callbacks
  *
  * @return mixed
-*/
+ */
 function elseChain(...$callbacks) {
     $value = null;
 
@@ -361,6 +361,8 @@ function array_default(&$array, $key, $default) {
 
 /**
  * inverse transformation from array_dot
+ * @param $array
+ * @return array
  */
 function array_undot($array) {
     $result = [];

@@ -50,7 +50,7 @@ Return response.
 
 ####parseJsonResponse($response)
 Get response data and parse it to associative array.
-- $response - response object fron sendGet/sendPost/sendDelete/sendDelete functions;
+- $response - response object from sendGet/sendPost/sendDelete/sendDelete functions;
 
 ####saveCookieSession()
 Saving cookies from request.

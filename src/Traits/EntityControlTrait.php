@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Traits;
 
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\PostValidationException;
 
