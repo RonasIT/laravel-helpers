@@ -100,6 +100,27 @@ trait EntityControlTrait
         return $newEntity->refresh()->toArray();
     }
 
+    public function update($where, $data = [])
+    {
+        $query = $this->getQuery();
+
+        if (!is_array($where)) {
+            $where = [
+                $this->primaryKey => $where
+            ];
+        }
+
+        $item = $query->where($where)->first();
+
+        if (empty($item)) {
+            return [];
+        }
+
+        $item->fill($data)->save();
+
+        return $item->refresh()->toArray();
+    }
+
     /**
      * Update rows by condition or primary key
      *
@@ -120,27 +141,6 @@ trait EntityControlTrait
         $where = array_merge($where, $data);
 
         return $this->get($where);
-    }
-
-    public function update($where, $data = [])
-    {
-        $query = $this->getQuery();
-
-        if (!is_array($where)) {
-            $where = [
-                $this->primaryKey => $where
-            ];
-        }
-
-        $item = $query->where($where)->first();
-
-        if (empty($item)) {
-            return [];
-        }
-
-        $item->fill($data)->save();
-
-        return $item->refresh()->toArray();
     }
 
     public function updateOrCreate($where, $data)
