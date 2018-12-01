@@ -84,7 +84,7 @@ function array_get_list($array, $path) {
         $values = array_map(function ($item) use ($path) {
             $value = array_get_list($item, $path);
 
-            if (!is_array($value) || isAssociative($value)) {
+            if (!is_array($value) || is_associative($value)) {
                 return [$value];
             }
 
@@ -183,14 +183,14 @@ function array_subtraction($array1, $array2) {
  */
 function getGUID() {
     mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
-    $charid = strtoupper(md5(uniqid(rand(), true)));
+    $charId = strtoupper(md5(uniqid(rand(), true)));
     $hyphen = chr(45);// "-"
     $uuid = chr(123)// "{"
-        .substr($charid, 0, 8).$hyphen
-        .substr($charid, 8, 4).$hyphen
-        .substr($charid,12, 4).$hyphen
-        .substr($charid,16, 4).$hyphen
-        .substr($charid,20,12)
+        .substr($charId, 0, 8).$hyphen
+        .substr($charId, 8, 4).$hyphen
+        .substr($charId,12, 4).$hyphen
+        .substr($charId,16, 4).$hyphen
+        .substr($charId,20,12)
         .chr(125);// "}"
     return $uuid;
 }

@@ -14,7 +14,7 @@ Method firstOrCreate: now is accepting 2 parameters.
 
 #### FilesUploadTrait 
 ``
-This class is now used to upload files, all other clasess is now @depricated.
+This class is now used to upload files, all other classes is now @deprecated.
 
 #### FixturesTrait
 
