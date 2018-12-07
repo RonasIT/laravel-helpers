@@ -23,8 +23,6 @@ class TestCase extends BaseTest
      */
     public function createApplication()
     {
-        $app = require __DIR__ . '/../bootstrap/app.php';
-
-        return $app;
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 }

@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Middleware;
 
 use Closure;
-
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Middleware\GetUserFromToken;
@@ -21,27 +20,35 @@ class AuthWithRefresh extends GetUserFromToken
      */
     public function handle($request, Closure $next)
     {
+        $response = null;
+
+        try {
+            $response = $this->authenticate($request, $next);
+        } catch (TokenExpiredException $e) {
+            $response = $this->refreshToken($request, $next);
+        } catch (JWTException $e) {
+            $response = $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
+        }
+
+        return $response;
+    }
+
+    private function authenticate($request, $next)
+    {
         if (!$token = $this->auth->setRequest($request)->getToken()) {
             return $this->respond('tymon.jwt.absent', 'token_not_provided', 400);
         }
 
-        try {
-            $user = $this->auth->authenticate($token);
-        } catch (TokenExpiredException $e) {
-
-            return $this->refreshToken($request, $next);
-
-        } catch (JWTException $e) {
-            return $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
-        }
+        $user = $this->auth->authenticate($token);
 
         if (!$user) {
-            return $this->respond('tymon.jwt.user_not_found', 'user_not_found', 404);
+            $response = $this->respond('tymon.jwt.user_not_found', 'user_not_found', 404);
+        } else {
+            $this->events->fire('tymon.jwt.valid', $user);
+            $response = $next($request);
         }
 
-        $this->events->fire('tymon.jwt.valid', $user);
-
-        return $next($request);
+        return $response;
     }
 
     /**

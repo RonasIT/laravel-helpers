@@ -72,9 +72,8 @@ trait MigrationTrait
     {
         $entities = [snake_case($fromEntity), snake_case($toEntity)];
         sort($entities, SORT_STRING);
-        $tableName = implode('_', $entities);
 
-        return $tableName;
+        return implode('_', $entities);
     }
 
     protected function getTableName($entityName)

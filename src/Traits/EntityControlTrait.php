@@ -2,8 +2,8 @@
 
 namespace RonasIT\Support\Traits;
 
-use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
@@ -24,29 +24,29 @@ trait EntityControlTrait
 
     public function truncate()
     {
-        $model = $this->model;
+        $modelLink = $this->model;
 
-        $model::truncate();
+        $modelLink::truncate();
     }
 
-    public function setModel($model)
+    public function setModel($newModel)
     {
-        $this->model = $model;
+        $this->model = $newModel;
 
-        $model = new $this->model;
+        $newModel = new $this->model;
 
-        $this->fields = $model::getFields();
+        $this->fields = $newModel::getFields();
 
-        $this->primaryKey = $model->getKeyName();
+        $this->primaryKey = $newModel->getKeyName();
 
         $this->checkPrimaryKey();
     }
 
     protected function getQuery()
     {
-        $model = new $this->model;
+        $modelLink = new $this->model;
 
-        $query = $model->query();
+        $query = $modelLink->query();
 
         if ($this->onlyTrashed) {
             $query->onlyTrashed();
@@ -107,9 +107,9 @@ trait EntityControlTrait
 
     public function create($data)
     {
-        $model = $this->model;
+        $modelLink = $this->model;
 
-        $newEntity = $model::create(array_only($data, $model::getFields()));
+        $newEntity = $modelLink::create(array_only($data, $modelLink::getFields()));
 
         if (!empty($this->requiredRelations)) {
             $newEntity->load($this->requiredRelations);
@@ -245,13 +245,13 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        $model = new $this->model;
+        $modelLink = new $this->model;
 
         if (is_array($where)) {
-            $model::where(array_only($where, $model::getFields()))
+            $modelLink::where(array_only($where, $modelLink::getFields()))
                 ->delete();
         } else {
-            $model::where($this->primaryKey, $where)->delete();
+            $modelLink::where($this->primaryKey, $where)->delete();
         }
     }
 
@@ -311,7 +311,7 @@ trait EntityControlTrait
     protected function checkPrimaryKey()
     {
         if (is_null($this->primaryKey)) {
-            throw new Exception("Model {$this->model} must have primary key.");
+            throw new InvalidModelException("Model {$this->model} must have primary key.");
         }
     }
 }
