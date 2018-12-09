@@ -11,7 +11,7 @@ Examples:
 $repository
     ->withRelations($relation)
     ->withTrashed()
-    ->get();
+    ->first();
 ```
 Before: 
 ```php
@@ -24,7 +24,7 @@ $repository->withTrashed();
 ```
 
 Method updateMany: now is used for updating multiple entities in database.
-Method update: now is used for updated first entity in database.
+Method update: now is used for updated first entity in database. Triggers eloquent functional such as casts, mutator, accessor.
 
 Examples: 
 ```php
@@ -79,11 +79,11 @@ jsonExport now have jsonExport($fixture, $data) call.
 
 Examples:
 ```php
-exportJson($fixture, $data)
- ```
+$this->exportJson($fixture, $data)
+```
 Before: 
 ```php
-exportJson($data, $fixture);
+$this->exportJson($data, $fixture);
 ```
 ## New features
 

@@ -2,8 +2,8 @@
 
 namespace RonasIT\Support\Traits;
 
+use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
@@ -24,9 +24,7 @@ trait EntityControlTrait
 
     public function truncate()
     {
-        $modelLink = $this->model;
-
-        $modelLink::truncate();
+        $this->getQuery()->truncate();
     }
 
     public function setModel($newModel)
@@ -86,7 +84,8 @@ trait EntityControlTrait
     {
         $modelLink = $this->model;
 
-        $newEntity = $modelLink::create(array_only($data, $modelLink::getFields()));
+        $newEntity = $this->getQuery()
+            ->create(array_only($data, $modelLink::getFields()));
 
         if (!empty($this->requiredRelations)) {
             $newEntity->load($this->requiredRelations);
@@ -161,19 +160,24 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        $modelLink = new $this->model;
+        $modelLink = $this->model;
 
         if (is_array($where)) {
-            $modelLink::where(array_only($where, $modelLink::getFields()))
+            $this->getQuery()
+                ->where(array_only($where, $modelLink::getFields()))
                 ->delete();
         } else {
-            $modelLink::where($this->primaryKey, $where)->delete();
+            $this->getQuery()
+                ->where($this->primaryKey, $where)
+                ->delete();
         }
     }
 
     public function forceDelete($id)
     {
-        $this->getQuery()->find($id)->forceDelete();
+        $this->getQuery()
+            ->find($id)
+            ->forceDelete();
     }
 
     /**
@@ -253,7 +257,10 @@ trait EntityControlTrait
 
     public function restore($id)
     {
-        $this->getQuery()->withTrashed()->find($id)->restore();
+        $this->getQuery()
+            ->withTrashed()
+            ->find($id)
+            ->restore();
     }
 
     public function validateField($id, $field, $value)
@@ -288,8 +295,7 @@ trait EntityControlTrait
     protected function checkPrimaryKey()
     {
         if (is_null($this->primaryKey)) {
-            throw new InvalidModelException("Model {$this->model} must have primary key.");
-        }
+            throw new Exception("Model {$this->model} must have primary key.");        }
     }
 
     protected function getQuery()
