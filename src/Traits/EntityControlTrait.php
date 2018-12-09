@@ -295,7 +295,8 @@ trait EntityControlTrait
     protected function checkPrimaryKey()
     {
         if (is_null($this->primaryKey)) {
-            throw new Exception("Model {$this->model} must have primary key.");        }
+            throw new Exception("Model {$this->model} must have primary key.");
+        }
     }
 
     protected function getQuery()
