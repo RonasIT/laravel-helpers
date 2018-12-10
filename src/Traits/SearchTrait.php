@@ -31,7 +31,7 @@ trait SearchTrait
         return $this;
     }
 
-    protected function filterByQuery($fields)
+    public function filterByQuery($fields)
     {
         if (!empty($this->filter['query'])) {
             $this->query->where(function ($query) use ($fields) {
@@ -57,25 +57,7 @@ trait SearchTrait
         return $this;
     }
 
-    /**
-     * @deprecated
-     */
-    protected function filterByQueryOnRelation($relation, $fields)
-    {
-        if (!empty($this->filter['query'])) {
-            $this->query->whereHas($relation, function ($query) use ($fields) {
-                foreach ($fields as $field) {
-                    $query->orWhere(
-                        $this->getQuerySearchCallback($query, $field)
-                    );
-                }
-            });
-        }
-
-        return $this;
-    }
-
-    protected function searchQuery($filter)
+    public function searchQuery($filter)
     {
         if (!empty($filter['with_trashed'])) {
             $this->withTrashed();
@@ -88,7 +70,7 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getSearchResults()
+    public function getSearchResults()
     {
         $this->orderBy();
 
@@ -101,7 +83,7 @@ trait SearchTrait
         return $results->toArray();
     }
 
-    protected function orderBy($default = null, $defaultDesc = false) {
+    public function orderBy($default = null, $defaultDesc = false) {
         $default = (empty($default)) ? $this->primaryKey : $default;
         $orderBy = array_get($this->filter, 'order_by', $default);
         $isDesc = array_get($this->filter, 'desc', $defaultDesc);
@@ -120,7 +102,7 @@ trait SearchTrait
         return $isDesc ? 'DESC' : 'ASC';
     }
 
-    protected function filterByRelationField($relation, $field, $filterName = null)
+    public function filterByRelationField($relation, $field, $filterName = null)
     {
         if (empty($filterName)) {
             $filterName = $field;
@@ -157,7 +139,7 @@ trait SearchTrait
         return $this->filterValue($field, '<=', $value);
     }
 
-    protected function filterValue($field, $sign, $value)
+    public function filterValue($field, $sign, $value)
     {
         if (!empty($value)) {
             $this->query->where($field, $sign, $value);
@@ -166,7 +148,7 @@ trait SearchTrait
         return $this;
     }
 
-    protected function with()
+    public function with()
     {
         if (!empty($this->filter['with'])) {
             $this->query->with($this->filter['with']);
