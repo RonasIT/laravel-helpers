@@ -297,9 +297,7 @@ trait EntityControlTrait
 
     protected function getQuery()
     {
-        $modelLink = new $this->model;
-
-        $query = $modelLink->query();
+        $query = (new $this->model)->query();
 
         if ($this->onlyTrashed) {
             $query->onlyTrashed();
