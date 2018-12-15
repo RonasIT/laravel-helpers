@@ -82,10 +82,8 @@ trait EntityControlTrait
 
     public function create($data)
     {
-        $modelLink = $this->model;
-
         $newEntity = $this->getQuery()
-            ->create(array_only($data, $modelLink::getFields()));
+            ->create(array_only($data, $this->model::getFields()));
 
         if (!empty($this->requiredRelations)) {
             $newEntity->load($this->requiredRelations);
@@ -160,11 +158,9 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        $modelLink = $this->model;
-
         if (is_array($where)) {
             $this->getQuery()
-                ->where(array_only($where, $modelLink::getFields()))
+                ->where(array_only($where, $this->model::getFields()))
                 ->delete();
         } else {
             $this->getQuery()

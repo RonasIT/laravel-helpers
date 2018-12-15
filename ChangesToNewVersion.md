@@ -15,12 +15,12 @@ $repository
 ```
 Before: 
 ```php
+$repository->withTrashed();
+
 $repository->firstWithRelations(
     ['id' => 1], 
     ['some_relation']
 );
-
-$repository->withTrashed();
 ```
 
 Method updateMany: now is used for updating multiple entities in database.
@@ -71,7 +71,7 @@ $repository->firstOrCreate([
 ```
 #### FilesUploadTrait 
 
-This class is now used to upload files, all other clasess is now @depricated.
+This class is now used to upload files, all other classes is now @deprecated.
 
 #### FixturesTrait
 
