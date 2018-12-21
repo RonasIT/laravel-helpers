@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 18.10.16
- * Time: 8:37
- */
-
 namespace RonasIT\Support;
 
 use Illuminate\Support\ServiceProvider;
