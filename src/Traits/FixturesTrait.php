@@ -48,7 +48,7 @@ trait FixturesTrait
         }
 
         if ($failIfNotExists) {
-            $this->fail($fn . ' fixture does not exist');
+            $this->fail($path . ' fixture does not exist');
         }
 
         return '';

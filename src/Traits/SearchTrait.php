@@ -9,12 +9,13 @@ trait SearchTrait
     protected $query;
     protected $filter;
 
-    public function paginate($query, $data = [])
+    public function paginate()
     {
         $defaultPerPage = config('defaults.items_per_page');
-        $perPage = empty($data['per_page']) ? $defaultPerPage : $data['per_page'];
+        $perPage = array_get($this->filter, 'per_page', $defaultPerPage );
+        $page = array_get($this->filter, 'page', 1);
 
-        return $query->paginate($perPage);
+        return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function filterBy($field, $default = null)
@@ -92,7 +93,7 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            $results = $this->paginate($this->query, $this->filter);
+            $results = $this->paginate();
         } else {
             $results = $this->query->get();
         }
@@ -101,7 +102,7 @@ trait SearchTrait
     }
 
     protected function orderBy($default = null, $defaultDesc = false) {
-        $default = (empty($default)) ? $this->primaryKey() : $default;
+        $default = (empty($default)) ? $this->primaryKey : $default;
         $orderBy = array_get($this->filter, 'order_by', $default);
         $isDesc = array_get($this->filter, 'desc', $defaultDesc);
 
@@ -114,10 +115,8 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getDesc($options = [])
+    protected function getDesc($isDesc)
     {
-        $isDesc = array_get($options, 'desc', false);
-
         return $isDesc ? 'DESC' : 'ASC';
     }
 

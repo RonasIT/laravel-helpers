@@ -9,12 +9,22 @@ use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 class HttpRequestService
 {
     protected $debug;
+
+    protected $allowRedirects = true;
+
     protected $options = [];
     protected $cookies = null;
 
     public function __construct()
     {
         $this->debug = config('defaults.http_service_debug', false);
+    }
+
+    public function set($key, $value)
+    {
+        $this->options[$key] = $value;
+
+        return $this;
     }
 
     public function sendGet($url, $data = null, $headers = [])
@@ -44,10 +54,7 @@ class HttpRequestService
         $time = microtime(true);
 
         $this->logRequest($method, $url, $data);
-
-        $this->options['headers'] = $headers;
-        $this->options['cookies'] = $this->cookies;
-
+        $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
         switch ($method) {
@@ -123,11 +130,20 @@ class HttpRequestService
         return $this->cookies->toArray();
     }
 
-    public function disallowRedirects()
+    public function allowRedirects($value = true)
     {
-        $this->options['allow_redirects'] = false;
+        $this->allowRedirects = $value;
 
         return $this;
+    }
+
+    private function setOptions($headers)
+    {
+        $this->options = [];
+
+        $this->options['headers'] = $headers;
+        $this->options['cookies'] = $this->cookies;
+        $this->options['allow_redirects'] = $this->allowRedirects;
     }
 
     private function setData($method, $headers, $data = [])

@@ -40,6 +40,27 @@ trait EntityControlTrait
         $this->checkPrimaryKey();
     }
 
+    protected function getQuery()
+    {
+        $query = (new $this->model)->query();
+
+        if ($this->onlyTrashed) {
+            $query->onlyTrashed();
+
+            $this->withTrashed = false;
+        }
+
+        if ($this->withTrashed && $this->isSoftDelete()) {
+            $query->withTrashed();
+        }
+
+        if (!empty($this->requiredRelations)) {
+            $query->with($this->requiredRelations);
+        }
+
+        return $query;
+    }
+
     public function withRelations(array $relations)
     {
         $this->requiredRelations = $relations;
@@ -152,31 +173,6 @@ trait EntityControlTrait
     }
 
     /**
-     * Delete rows by condition or primary key
-     *
-     * @param array|integer|string $where
-     */
-    public function delete($where)
-    {
-        if (is_array($where)) {
-            $this->getQuery()
-                ->where(array_only($where, $this->model::getFields()))
-                ->delete();
-        } else {
-            $this->getQuery()
-                ->where($this->primaryKey, $where)
-                ->delete();
-        }
-    }
-
-    public function forceDelete($id)
-    {
-        $this->getQuery()
-            ->find($id)
-            ->forceDelete();
-    }
-
-    /**
      * @param  array $where
      *
      * @return array
@@ -212,17 +208,6 @@ trait EntityControlTrait
         return empty($entity) ? [] : $entity->toArray();
     }
 
-    public function firstOrCreate($where, $data = [])
-    {
-        $entity = $this->first($where);
-
-        if (empty($entity)) {
-            return $this->create(array_merge($where, $data));
-        }
-
-        return $entity;
-    }
-
     public function findBy($field, $value)
     {
         return $this->first([
@@ -235,6 +220,40 @@ trait EntityControlTrait
         return $this->first([
             $this->primaryKey => $id
         ]);
+    }
+
+    public function firstOrCreate($where, $data = [])
+    {
+        $entity = $this->first($where);
+
+        if (empty($entity)) {
+            return $this->create(array_merge($where, $data));
+        }
+
+        return $entity;
+    }
+
+    /**
+     * Delete rows by condition or primary key
+     *
+     * @param array|integer|string $where
+     */
+    public function delete($where)
+    {
+        if (is_array($where)) {
+            $this->getQuery()
+                ->where(array_only($where, $this->model::getFields()))
+                ->delete();
+        } else {
+            $this->getQuery()
+                ->where($this->primaryKey, $where)
+                ->delete();
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        $this->getQuery()->find($id)->forceDelete();
     }
 
     public function withTrashed($enable = true)
@@ -293,26 +312,5 @@ trait EntityControlTrait
         if (is_null($this->primaryKey)) {
             throw new Exception("Model {$this->model} must have primary key.");
         }
-    }
-
-    protected function getQuery()
-    {
-        $query = (new $this->model)->query();
-
-        if ($this->onlyTrashed) {
-            $query->onlyTrashed();
-
-            $this->withTrashed = false;
-        }
-
-        if ($this->withTrashed && $this->isSoftDelete()) {
-            $query->withTrashed();
-        }
-
-        if (!empty($this->requiredRelations)) {
-            $query->with($this->requiredRelations);
-        }
-
-        return $query;
     }
 }
