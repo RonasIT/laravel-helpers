@@ -76,7 +76,7 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            return $this->paginate();
+            return $this->paginate()->toArray();
         } else {
             return $this->wrapPaginatedData($this->query->get()->toArray());
         }
