@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 trait SearchTrait
 {
@@ -75,12 +76,10 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            $results = $this->paginate();
+            return $this->paginate();
         } else {
-            $results = $this->query->get();
+            return $this->wrapPaginatedData($this->query->get()->toArray());
         }
-
-        return $results->toArray();
     }
 
     public function orderBy($default = null, $defaultDesc = false) {
@@ -165,5 +164,26 @@ trait SearchTrait
 
             $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
+    }
+
+    protected function wrapPaginatedData($data)
+    {
+        $url = Request::path();
+        $total = count($data);
+
+        return [
+            'current_page' => 1,
+            'data' => $data,
+            'first_page_url' => "{$url}?page=1",
+            'from' => 1,
+            'last_page' => 1,
+            'last_page_url' => "{$url}?page=1",
+            'next_page_url' => null,
+            'path' => $url,
+            'per_page' => $total,
+            'prev_page_url' => null,
+            'to' => $total,
+            'total' => $total
+        ];
     }
 }

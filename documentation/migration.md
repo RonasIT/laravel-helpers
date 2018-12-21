@@ -117,7 +117,7 @@ getSearchResults now will always return all responses in one format
     "last_page": 1,
     "last_page_url": "https:\/\/localhost\/\/entities?page=1",
     "next_page_url": null,
-    "path": "https:\/\/localhost\/\/picks",
+    "path": "https:\/\/localhost\/\/entities",
     "per_page": 10,
     "prev_page_url": null,
     "to": 1,
