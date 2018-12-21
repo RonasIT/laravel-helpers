@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Traits;
 
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\PostValidationException;
 
@@ -34,20 +33,18 @@ trait EntityControlTrait
     {
         $this->model = $model;
 
-        $model = new $this->model;
+        $modelInstance = new $this->model;
 
-        $this->fields = $model::getFields();
+        $this->fields = $modelInstance::getFields();
 
-        $this->primaryKey = $model->getKeyName();
+        $this->primaryKey = $modelInstance->getKeyName();
 
         $this->checkPrimaryKey();
     }
 
     protected function getQuery()
     {
-        $model = new $this->model;
-
-        $query = $model->query();
+        $query = (new $this->model)->query();
 
         if ($this->onlyTrashed) {
             $query->onlyTrashed();
@@ -110,7 +107,7 @@ trait EntityControlTrait
     {
         $model = $this->model;
 
-        $newEntity = $model::create(array_only($data, $model::getFields()));
+        $newEntity = $model::create(array_only($data, $this->fields));
 
         if (!empty($this->requiredRelations)) {
             $newEntity->load($this->requiredRelations);
@@ -246,13 +243,14 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        $model = new $this->model;
-
         if (is_array($where)) {
-            $model::where(array_only($where, $model::getFields()))
+            $this->getQuery()
+                ->where(array_only($where, $this->fields))
                 ->delete();
         } else {
-            $model::where($this->primaryKey, $where)->delete();
+            $this->getQuery()
+                ->where($this->primaryKey, $where)
+                ->delete();
         }
     }
 
@@ -277,7 +275,10 @@ trait EntityControlTrait
 
     public function restore($id)
     {
-        $this->getQuery()->withTrashed()->find($id)->restore();
+        $this->getQuery()
+            ->withTrashed()
+            ->find($id)
+            ->restore();
     }
 
     public function validateField($id, $field, $value)

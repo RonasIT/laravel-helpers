@@ -13,4 +13,4 @@ This plugin provide set of helpers functions, services and traits.
  - [Traits](./documentation/traits.md)
  - [Services](./documentation/services.md)
  - [Iterators](./documentation/iterators.md)
- - [Release notes](./documentation/releases.md)
+ - [Migration guide](./documentation/migration.md)
