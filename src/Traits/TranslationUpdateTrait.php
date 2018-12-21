@@ -25,6 +25,7 @@ trait TranslationUpdateTrait
             ])->update($translation);
         }
 
-        return $this->firstWithRelations(['id' => $id], ['allTranslations']);
+        return $this->withRelations(['allTranslations'])
+            ->find($id);
     }
 }

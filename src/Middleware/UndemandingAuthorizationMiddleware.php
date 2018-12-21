@@ -10,6 +10,9 @@ use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Middleware\BaseMiddleware;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
+/**
+ * @deprecated
+ */
 class UndemandingAuthorizationMiddleware extends BaseMiddleware
 {
     protected $auth;

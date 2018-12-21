@@ -83,6 +83,25 @@ $repository->firstOrCreate([
 ]);
 ```
 
+Methods `find` and `findBy` don't contains relations in arguments.  
+Before:
+```php
+$this->find(1, ['relation']);
+``` 
+After: 
+```php
+$this->withRelations(['relation'])->find(1);
+```
+
+Before:
+```php
+$this->findBy('email', 'test@test.com', ['relation']);
+``` 
+After: 
+```php
+$this->withRelations(['relation'])->findBy('email', 'test@test.com');
+```
+
 #### FilesUploadTrait 
 
 This class is now used to upload files, all other classes is now @deprecated.
@@ -100,8 +119,6 @@ After:
 ```php
 $this->exportJson($fixture, $data)
 ```
-
-## New features
 
 #### SearchTrait
 
@@ -126,3 +143,7 @@ getSearchResults now will always return all responses in one format
 ```
 
 If you will send flag `all` then you will get all entities in field `data` and field `per_page` will equals to field `total`
+
+#### Others
+
+`UndemandingAuthorizationMiddleware` will be deprecated if you want to upgrade jwt to 1.0 version. Use `'check'` instead.
