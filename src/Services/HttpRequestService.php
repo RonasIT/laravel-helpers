@@ -47,6 +47,11 @@ class HttpRequestService
         return $this->send('put', $url, $data, $headers);
     }
 
+    public function sendPatch($url, $data, $headers = [])
+    {
+        return $this->send('patch', $url, $data, $headers);
+    }
+
     protected function send($method, $url, $data = [], $headers = [])
     {
         $client = new Client();
@@ -66,6 +71,9 @@ class HttpRequestService
                 break;
             case 'put' :
                 $response = $client->put($url, $this->options);
+                break;
+            case 'patch' :
+                $response = $client->patch($url, $this->options);
                 break;
             case 'delete' :
                 $response = $client->delete($url, $this->options)->send();
