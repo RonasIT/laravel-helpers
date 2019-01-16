@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
@@ -33,20 +34,18 @@ trait EntityControlTrait
     {
         $this->model = $newModel;
 
-        $newModel = new $this->model;
+        $modelInstance = new $this->model;
 
-        $this->fields = $newModel::getFields();
+        $this->fields = $modelInstance::getFields();
 
-        $this->primaryKey = $newModel->getKeyName();
+        $this->primaryKey = $modelInstance->getKeyName();
 
         $this->checkPrimaryKey();
     }
 
     protected function getQuery()
     {
-        $modelLink = new $this->model;
-
-        $query = $modelLink->query();
+        $query = (new $this->model)->query();
 
         if ($this->onlyTrashed) {
             $query->onlyTrashed();
@@ -107,9 +106,9 @@ trait EntityControlTrait
 
     public function create($data)
     {
-        $modelLink = $this->model;
+        $modelInstance = $this->model;
 
-        $newEntity = $modelLink::create(array_only($data, $modelLink::getFields()));
+        $newEntity = $modelInstance::create(array_only($data, $this->fields));
 
         if (!empty($this->requiredRelations)) {
             $newEntity->load($this->requiredRelations);
@@ -245,13 +244,14 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        $modelLink = new $this->model;
-
         if (is_array($where)) {
-            $modelLink::where(array_only($where, $modelLink::getFields()))
+            $this->getQuery()
+                ->where(array_only($where, $this->fields))
                 ->delete();
         } else {
-            $modelLink::where($this->primaryKey, $where)->delete();
+            $this->getQuery()
+                ->where($this->primaryKey, $where)
+                ->delete();
         }
     }
 
@@ -276,7 +276,10 @@ trait EntityControlTrait
 
     public function restore($id)
     {
-        $this->getQuery()->withTrashed()->find($id)->restore();
+        $this->getQuery()
+            ->withTrashed()
+            ->find($id)
+            ->restore();
     }
 
     public function validateField($id, $field, $value)

@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 trait SearchTrait
 {
@@ -31,7 +32,7 @@ trait SearchTrait
         return $this;
     }
 
-    protected function filterByQuery($fields)
+    public function filterByQuery($fields)
     {
         if (!empty($this->filter['query'])) {
             $this->query->where(function ($query) use ($fields) {
@@ -78,7 +79,7 @@ trait SearchTrait
         return $this;
     }
 
-    protected function searchQuery($filter)
+    public function searchQuery($filter)
     {
         if (!empty($filter['with_trashed'])) {
             $this->withTrashed();
@@ -91,20 +92,18 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getSearchResults()
+    public function getSearchResults()
     {
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            $results = $this->paginate();
-        } else {
-            $results = $this->query->get();
+            return $this->paginate()->toArray();
         }
 
-        return $results->toArray();
+        return $this->wrapPaginatedData($this->query->get()->toArray());
     }
 
-    protected function orderBy($default = null, $defaultDesc = false) {
+    public function orderBy($default = null, $defaultDesc = false) {
         $default = (empty($default)) ? $this->primaryKey : $default;
         $orderBy = array_get($this->filter, 'order_by', $default);
         $isDesc = array_get($this->filter, 'desc', $defaultDesc);
@@ -123,7 +122,7 @@ trait SearchTrait
         return $isDesc ? 'DESC' : 'ASC';
     }
 
-    protected function filterByRelationField($relation, $field, $filterName = null)
+    public function filterByRelationField($relation, $field, $filterName = null)
     {
         if (empty($filterName)) {
             $filterName = $field;
@@ -160,7 +159,7 @@ trait SearchTrait
         return $this->filterValue($field, '<=', $value);
     }
 
-    protected function filterValue($field, $sign, $value)
+    public function filterValue($field, $sign, $value)
     {
         if (!empty($value)) {
             $this->query->where($field, $sign, $value);
@@ -169,7 +168,7 @@ trait SearchTrait
         return $this;
     }
 
-    protected function with()
+    public function with()
     {
         if (!empty($this->filter['with'])) {
             $this->query->with($this->filter['with']);
@@ -186,5 +185,26 @@ trait SearchTrait
 
             $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
+    }
+
+    protected function wrapPaginatedData($data)
+    {
+        $url = Request::path();
+        $total = count($data);
+
+        return [
+            'current_page' => 1,
+            'data' => $data,
+            'first_page_url' => "{$url}?page=1",
+            'from' => 1,
+            'last_page' => 1,
+            'last_page_url' => "{$url}?page=1",
+            'next_page_url' => null,
+            'path' => $url,
+            'per_page' => $total,
+            'prev_page_url' => null,
+            'to' => $total,
+            'total' => $total
+        ];
     }
 }

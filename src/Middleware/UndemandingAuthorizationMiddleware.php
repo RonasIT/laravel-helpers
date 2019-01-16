@@ -10,6 +10,9 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Middleware\BaseMiddleware;
 
+/**
+ * @deprecated
+ */
 class UndemandingAuthorizationMiddleware extends BaseMiddleware
 {
     protected $auth;
