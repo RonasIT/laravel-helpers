@@ -8,18 +8,26 @@ use RonasIT\Support\Iterators\CsvIterator;
 
 class Importer
 {
+    const DELETED_AT_FIELD = 'deleted_at';
+
+    const ITEMS_TO_CREATE = 'create';
+    const ITEMS_TO_UPDATE = 'update';
+
+    const CREATED_REPORTS = 'created';
+    const UPDATED_REPORTS = 'updated';
+
     protected $input;
 
     protected $service;
     protected $iterator;
     protected $exporter;
     protected $items = [
-        'create' => [],
-        'update' => []
+        self::ITEMS_TO_CREATE => [],
+        self::ITEMS_TO_UPDATE => []
     ];
     protected $report = [
-        'updated' => 0,
-        'created' => 0,
+        self::UPDATED_REPORTS => 0,
+        self::CREATED_REPORTS => 0,
         'errors' => []
     ];
     protected $mandatoryFields = [];
@@ -114,8 +122,8 @@ class Importer
             $line['id'] = null;
         }
 
-        if (array_has($line, 'deleted_at') && empty($line['deleted_at'])) {
-            $line['deleted_at'] = null;
+        if (array_has($line, self::DELETED_AT_FIELD) && empty($line[self::DELETED_AT_FIELD])) {
+            $line[self::DELETED_AT_FIELD] = null;
         }
 
         return $line;
@@ -127,7 +135,7 @@ class Importer
             return;
         }
 
-        $this->items['create'][] = $line;
+        $this->items[self::ITEMS_TO_CREATE][] = $line;
     }
 
     protected function isValidForCreation($line)
@@ -142,13 +150,13 @@ class Importer
     protected function markForUpdate($line)
     {
         if ($this->isValidForUpdating($line)) {
-            $this->items['update'][$line['id']] = $line;
+            $this->items[self::ITEMS_TO_UPDATE][$line['id']] = $line;
         }
     }
 
     protected function isValidForUpdating($line)
     {
-        if (empty($line['id']) || in_array($line, $this->items['create'])) {
+        if (empty($line['id']) || in_array($line, $this->items[self::ITEMS_TO_UPDATE])) {
             return false;
         }
 
@@ -182,19 +190,19 @@ class Importer
 
     protected function createAllMarked()
     {
-        foreach ($this->items['create'] as $item) {
+        foreach ($this->items[self::ITEMS_TO_CREATE] as $item) {
             $this->service->create($item);
 
-            $this->report['created']++;
+            $this->report[self::CREATED_REPORTS]++;
         }
     }
 
     protected function updateAllMarked()
     {
-        foreach ($this->items['update'] as $id => $item) {
+        foreach ($this->items[self::ITEMS_TO_UPDATE] as $id => $item) {
             $this->service->update(['id' => $id], $item);
 
-            $this->report['updated']++;
+            $this->report[self::UPDATED_REPORTS]++;
         }
     }
 

@@ -44,7 +44,7 @@ trait MigrationTrait
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
-        Schema::create($bridgeTableName, function (Blueprint $table) use ($fromEntity, $toEntity) {
+        Schema::create($bridgeTableName, function (Blueprint $table) {
             $table->increments('id');
         });
 

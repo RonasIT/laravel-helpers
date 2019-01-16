@@ -126,7 +126,11 @@ function isAssociative($array)
  */
 function is_associative($array)
 {
-    return $array !== array_values($array);
+    if (array() === $array) {
+        return false;
+    }
+
+    return array_keys($array) !== range(0, count($array) - 1);
 }
 
 /**
@@ -227,7 +231,7 @@ function rmdir_recursively($dir)
 
 function fPutQuotedCsv($handle, $row, $fd = ',', $quot = '"')
 {
-    $cells = array_map(function ($cell) use ($fd, $quot) {
+    $cells = array_map(function ($cell) use ($quot) {
         if (preg_match("/[;.\",\n]/", $cell)) {
             $cell = $quot . str_replace($quot, "{$quot}{$quot}", $cell) . $quot;
         }
