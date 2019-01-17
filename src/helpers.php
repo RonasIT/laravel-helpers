@@ -109,20 +109,6 @@ function array_get_list($array, $path)
  * @param array $array
  *
  * @return boolean
- *
- * @deprecated
- */
-function isAssociative($array)
-{
-    return $array !== array_values($array);
-}
-
-/**
- * Verifies whether an associative array or a list
- *
- * @param array $array
- *
- * @return boolean
  */
 function is_associative($array)
 {

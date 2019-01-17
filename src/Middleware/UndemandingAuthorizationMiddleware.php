@@ -39,16 +39,13 @@ class UndemandingAuthorizationMiddleware extends BaseMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $response = null;
         try {
-            $response = $this->authenticate($request, $next);
+            return $this->authenticate($request, $next);
         } catch (TokenExpiredException $e) {
-            $response = $this->respond('tymon.jwt.expired', 'token_expired', $e->getStatusCode(), [$e]);
+            return $this->respond('tymon.jwt.expired', 'token_expired', $e->getStatusCode(), [$e]);
         } catch (JWTException $e) {
-            $response = $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
+            return $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
         }
-
-        return $response;
     }
 
     private function authenticate($request, $next)
