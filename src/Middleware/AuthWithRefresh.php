@@ -21,17 +21,13 @@ class AuthWithRefresh extends GetUserFromToken
      */
     public function handle($request, Closure $next)
     {
-        $response = null;
-
         try {
-            $response = $this->authenticate($request, $next);
+            return $this->authenticate($request, $next);
         } catch (TokenExpiredException $e) {
-            $response = $this->refreshToken($request, $next);
+            return $this->refreshToken($request, $next);
         } catch (JWTException $e) {
-            $response = $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
+            return $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
         }
-
-        return $response;
     }
 
     private function authenticate($request, $next)
@@ -43,13 +39,12 @@ class AuthWithRefresh extends GetUserFromToken
         $user = $this->auth->authenticate($token);
 
         if (!$user) {
-            $response = $this->respond('tymon.jwt.user_not_found', 'user_not_found', Response::HTTP_NOT_FOUND);
-        } else {
-            $this->events->fire('tymon.jwt.valid', $user);
-            $response = $next($request);
+            return $this->respond('tymon.jwt.user_not_found', 'user_not_found', Response::HTTP_NOT_FOUND);
         }
 
-        return $response;
+        $this->events->fire('tymon.jwt.valid', $user);
+
+        return $next($request);
     }
 
     /**
@@ -62,7 +57,6 @@ class AuthWithRefresh extends GetUserFromToken
      */
     private function refreshToken($request, Closure $next)
     {
-
         try {
             $newToken = $this->auth->setRequest($request)->parseToken()->refresh();
         } catch (TokenExpiredException $e) {
