@@ -3,12 +3,12 @@
 namespace RonasIT\Support\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Events\Dispatcher;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Middleware\BaseMiddleware;
-use Illuminate\Contracts\Routing\ResponseFactory;
 
 /**
  * @deprecated
@@ -39,17 +39,22 @@ class UndemandingAuthorizationMiddleware extends BaseMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if (!$token = $this->auth->setRequest($request)->getToken()) {
-            return $next($request);
-        }
-
         try {
-            $user = $this->auth->authenticate($token);
+            return $this->authenticate($request, $next);
         } catch (TokenExpiredException $e) {
             return $this->respond('tymon.jwt.expired', 'token_expired', $e->getStatusCode(), [$e]);
         } catch (JWTException $e) {
             return $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
         }
+    }
+
+    private function authenticate($request, $next)
+    {
+        if (!$token = $this->auth->setRequest($request)->getToken()) {
+            return $next($request);
+        }
+
+        $user = $this->auth->authenticate($token);
 
         if (!$user) {
             return $this->respond('tymon.jwt.user_not_found', 'user_not_found', 404);

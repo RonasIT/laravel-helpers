@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: roman
- * Date: 02.07.17
- * Time: 22:06
- */
 
 namespace RonasIT\Support\Traits;
 
@@ -50,7 +44,7 @@ trait MigrationTrait
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
-        Schema::create($bridgeTableName, function (Blueprint $table) use ($fromEntity, $toEntity) {
+        Schema::create($bridgeTableName, function (Blueprint $table) {
             $table->increments('id');
         });
 
@@ -72,9 +66,8 @@ trait MigrationTrait
     {
         $entities = [snake_case($fromEntity), snake_case($toEntity)];
         sort($entities, SORT_STRING);
-        $tableName = implode('_', $entities);
 
-        return $tableName;
+        return implode('_', $entities);
     }
 
     protected function getTableName($entityName)

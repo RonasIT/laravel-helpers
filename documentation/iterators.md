@@ -12,7 +12,7 @@ Get csv line as associative array.
 - $columns - array with csv file's columns;
 
 ####getGenerator()
-Return iteratable object for foreach.
+Return iterable object for foreach.
 
 Example: 
 ````

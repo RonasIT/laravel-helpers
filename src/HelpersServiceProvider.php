@@ -18,7 +18,7 @@ class HelpersServiceProvider extends ServiceProvider
         $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
         $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
 
-        Validator::extend('unique_except_of_current_user', function ($attribute, $value, $parameters, $validator) {
+        Validator::extend('unique_except_of_current_user', function ($attribute, $value) {
             $userId = app(JWTAuth::class)->toUser()->id;
             $result = DB::select("select count(*) as entities_count from users where id <> {$userId} and {$attribute} = '{$value}';");
 

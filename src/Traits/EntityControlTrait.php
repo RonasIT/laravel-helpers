@@ -2,8 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
-use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
 
 trait EntityControlTrait
@@ -24,14 +25,14 @@ trait EntityControlTrait
 
     public function truncate()
     {
-        $model = $this->model;
+        $modelInstance = $this->model;
 
-        $model::truncate();
+        $modelInstance::truncate();
     }
 
-    public function setModel($model)
+    public function setModel($newModel)
     {
-        $this->model = $model;
+        $this->model = $newModel;
 
         $modelInstance = new $this->model;
 
@@ -105,9 +106,9 @@ trait EntityControlTrait
 
     public function create($data)
     {
-        $model = $this->model;
+        $modelInstance = $this->model;
 
-        $newEntity = $model::create(array_only($data, $this->fields));
+        $newEntity = $modelInstance::create(array_only($data, $this->fields));
 
         if (!empty($this->requiredRelations)) {
             $newEntity->load($this->requiredRelations);
@@ -313,7 +314,7 @@ trait EntityControlTrait
     protected function checkPrimaryKey()
     {
         if (is_null($this->primaryKey)) {
-            throw new Exception("Model {$this->model} must have primary key.");
+            throw new InvalidModelException("Model {$this->model} must have primary key.");
         }
     }
 }

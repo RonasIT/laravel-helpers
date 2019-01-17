@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use RonasIT\Support\Traits\FixturesTrait;
 
@@ -24,8 +23,6 @@ class TestCase extends BaseTest
      */
     public function createApplication()
     {
-        $app = require __DIR__ . '/../bootstrap/app.php';
-
-        return $app;
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 }

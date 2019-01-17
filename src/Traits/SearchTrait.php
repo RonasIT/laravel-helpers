@@ -41,14 +41,14 @@ trait SearchTrait
                         $entities = explode('.', $field);
                         $fieldName = array_pop($entities);
 
-                        $query->orWhereHas(implode('.', $entities), function ($query) use ($fieldName, $entities) {
+                        $query->orWhereHas(implode('.', $entities), function ($query) use ($fieldName) {
                             $query->where(
-                                $this->getQuerySearchCallback($this->query, $fieldName)
+                                $this->getQuerySearchCallback($fieldName)
                             );
                         });
                     } else {
                         $query->orWhere(
-                            $this->getQuerySearchCallback($this->query, $field)
+                            $this->getQuerySearchCallback($field)
                         );
                     }
                 }
@@ -77,9 +77,9 @@ trait SearchTrait
 
         if (empty($this->filter['all'])) {
             return $this->paginate()->toArray();
-        } else {
-            return $this->wrapPaginatedData($this->query->get()->toArray());
         }
+
+        return $this->wrapPaginatedData($this->query->get()->toArray());
     }
 
     public function orderBy($default = null, $defaultDesc = false) {
@@ -156,7 +156,7 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getQuerySearchCallback($query, $field)
+    protected function getQuerySearchCallback($field)
     {
         return function ($query) use ($field) {
             $loweredQuery = mb_strtolower($this->filter['query']);
