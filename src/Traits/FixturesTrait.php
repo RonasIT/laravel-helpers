@@ -136,7 +136,7 @@ trait FixturesTrait
             }
         });
 
-        return $query ."SET FOREIGN_KEY_CHECKS = 1;\n";
+        return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
     public function prepareSequences($tables, $except)

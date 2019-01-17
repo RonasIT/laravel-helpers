@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Middleware;
 
 use Closure;
+use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Middleware\GetUserFromToken;
@@ -36,13 +37,13 @@ class AuthWithRefresh extends GetUserFromToken
     private function authenticate($request, $next)
     {
         if (!$token = $this->auth->setRequest($request)->getToken()) {
-            return $this->respond('tymon.jwt.absent', 'token_not_provided', 400);
+            return $this->respond('tymon.jwt.absent', 'token_not_provided', Response::HTTP_BAD_REQUEST);
         }
 
         $user = $this->auth->authenticate($token);
 
         if (!$user) {
-            $response = $this->respond('tymon.jwt.user_not_found', 'user_not_found', 404);
+            $response = $this->respond('tymon.jwt.user_not_found', 'user_not_found', Response::HTTP_NOT_FOUND);
         } else {
             $this->events->fire('tymon.jwt.valid', $user);
             $response = $next($request);

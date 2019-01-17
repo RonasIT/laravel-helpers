@@ -126,11 +126,7 @@ function isAssociative($array)
  */
 function is_associative($array)
 {
-    if (array() === $array) {
-        return false;
-    }
-
-    return array_keys($array) !== range(0, count($array) - 1);
+    return $array !== array_values($array);
 }
 
 /**

@@ -58,27 +58,6 @@ trait SearchTrait
         return $this;
     }
 
-    /**
-     * @deprecated
-     * @param $relation
-     * @param $fields
-     * @return SearchTrait
-     */
-    protected function filterByQueryOnRelation($relation, $fields)
-    {
-        if (!empty($this->filter['query'])) {
-            $this->query->whereHas($relation, function ($query) use ($fields) {
-                foreach ($fields as $field) {
-                    $query->orWhere(
-                        $this->getQuerySearchCallback($field)
-                    );
-                }
-            });
-        }
-
-        return $this;
-    }
-
     public function searchQuery($filter)
     {
         if (!empty($filter['with_trashed'])) {
