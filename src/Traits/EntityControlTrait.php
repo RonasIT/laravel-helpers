@@ -25,9 +25,9 @@ trait EntityControlTrait
 
     public function truncate()
     {
-        $modelLink = $this->model;
+        $modelInstance = $this->model;
 
-        $modelLink::truncate();
+        $modelInstance::truncate();
     }
 
     public function setModel($newModel)
