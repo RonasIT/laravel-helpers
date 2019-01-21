@@ -7,11 +7,12 @@ use Illuminate\Support\Collection;
  * It calls on all callbacks to the first, which did not return null.
  * The resulting value is the result of the function and returns.
  *
- * @param callable $callbacks
+ * @param mixed ...$callbacks
  *
  * @return mixed
-*/
-function elseChain(...$callbacks) {
+ */
+function elseChain(...$callbacks)
+{
     $value = null;
 
     foreach ($callbacks as $callback) {
@@ -31,7 +32,8 @@ function elseChain(...$callbacks) {
  * @param array $array
  * @return array
  */
-function array_round($array) {
+function array_round($array)
+{
     $keys = array_keys($array);
 
     $values = array_map(function ($value) {
@@ -55,7 +57,8 @@ function array_round($array) {
  *
  * @deprecated
  */
-function array_lists($array, $key) {
+function array_lists($array, $key)
+{
     return array_map(function ($item) use ($key) {
         return array_get($item, $key);
     }, $array);
@@ -69,7 +72,8 @@ function array_lists($array, $key) {
  *
  * @return mixed
  */
-function array_get_list($array, $path) {
+function array_get_list($array, $path)
+{
     if (is_string($path)) {
         $path = explode('.', $path);
     }
@@ -84,7 +88,7 @@ function array_get_list($array, $path) {
         $values = array_map(function ($item) use ($path) {
             $value = array_get_list($item, $path);
 
-            if (!is_array($value) || isAssociative($value)) {
+            if (!is_array($value) || is_associative($value)) {
                 return [$value];
             }
 
@@ -105,21 +109,9 @@ function array_get_list($array, $path) {
  * @param array $array
  *
  * @return boolean
- *
- * @deprecated
  */
-function isAssociative($array) {
-    return $array !== array_values($array);
-}
-
-/**
- * Verifies whether an associative array or a list
- *
- * @param array $array
- *
- * @return boolean
- */
-function is_associative($array) {
+function is_associative($array)
+{
     return $array !== array_values($array);
 }
 
@@ -129,14 +121,15 @@ function is_associative($array) {
  *
  * @param string $path
  */
-function mkdir_recursively($path) {
+function mkdir_recursively($path)
+{
     $explodedPath = explode('/', $path);
 
     $currentPath = $explodedPath[0];
 
     array_walk($explodedPath, function ($dir) use (&$currentPath) {
         if ($currentPath != '/') {
-            $currentPath .= '/'.$dir;
+            $currentPath .= '/' . $dir;
         } else {
             $currentPath .= $dir;
         }
@@ -155,7 +148,8 @@ function mkdir_recursively($path) {
  *
  * @return boolean
  */
-function array_equals($array1, $array2) {
+function array_equals($array1, $array2)
+{
     $collection1 = (new Collection($array1))->sort();
     $collection2 = (new Collection($array2))->sort();
 
@@ -170,7 +164,8 @@ function array_equals($array1, $array2) {
  *
  * @return array
  */
-function array_subtraction($array1, $array2) {
+function array_subtraction($array1, $array2)
+{
     $intersection = array_intersect($array1, $array2);
 
     return array_diff($array1, $intersection);
@@ -181,21 +176,22 @@ function array_subtraction($array1, $array2) {
  *
  * @return string
  */
-function getGUID() {
-    mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
-    $charid = strtoupper(md5(uniqid(rand(), true)));
+function getGUID()
+{
+    mt_srand((double)microtime() * 10000);//optional for php 4.2.0 and up.
+    $charId = strtoupper(md5(uniqid(rand(), true)));
     $hyphen = chr(45);// "-"
-    $uuid = chr(123)// "{"
-        .substr($charid, 0, 8).$hyphen
-        .substr($charid, 8, 4).$hyphen
-        .substr($charid,12, 4).$hyphen
-        .substr($charid,16, 4).$hyphen
-        .substr($charid,20,12)
-        .chr(125);// "}"
-    return $uuid;
+    return chr(123)// "{"
+        . substr($charId, 0, 8) . $hyphen
+        . substr($charId, 8, 4) . $hyphen
+        . substr($charId, 12, 4) . $hyphen
+        . substr($charId, 16, 4) . $hyphen
+        . substr($charId, 20, 12)
+        . chr(125);// "}"
 }
 
-function array_concat($array, $callback) {
+function array_concat($array, $callback)
+{
     $content = '';
 
     foreach ($array as $key => $value) {
@@ -205,17 +201,19 @@ function array_concat($array, $callback) {
     return $content;
 }
 
-function rmdir_recursively($dir) {
-    if ($objs = glob($dir."/*")) {
-        foreach($objs as $obj) {
+function rmdir_recursively($dir)
+{
+    if ($objs = glob($dir . "/*")) {
+        foreach ($objs as $obj) {
             is_dir($obj) ? rmdir_recursively($obj) : unlink($obj);
         }
     }
     rmdir($dir);
 }
 
-function fPutQuotedCsv($handle, $row, $fd=',', $quot='"') {
-    $cells = array_map(function($cell) use ($fd, $quot) {
+function fPutQuotedCsv($handle, $row, $fd = ',', $quot = '"')
+{
+    $cells = array_map(function ($cell) use ($quot) {
         if (preg_match("/[;.\",\n]/", $cell)) {
             $cell = $quot . str_replace($quot, "{$quot}{$quot}", $cell) . $quot;
         }
@@ -225,16 +223,17 @@ function fPutQuotedCsv($handle, $row, $fd=',', $quot='"') {
 
     $str = implode($fd, $cells);
 
-    fputs($handle, $str."\n");
+    fputs($handle, $str . "\n");
 
     return strlen($str);
 }
 
 
-function clear_folder($path) {
+function clear_folder($path)
+{
     $files = glob("$path/*");
 
-    foreach($files as $file){
+    foreach ($files as $file) {
         if (is_file($file)) {
             unlink($file);
         }
@@ -253,7 +252,8 @@ function clear_folder($path) {
  *
  * @return array
  */
-function array_associate($array, $callback) {
+function array_associate($array, $callback)
+{
     $result = [];
 
     foreach ($array as $key => $value) {
@@ -267,7 +267,8 @@ function array_associate($array, $callback) {
     return $result;
 }
 
-function array_duplicate($array) {
+function array_duplicate($array)
+{
     return array_diff_key($array, array_unique($array));
 }
 
@@ -279,7 +280,8 @@ function array_duplicate($array) {
  *
  * @return array
  */
-function array_unique_objects($objectsList, $filter = 'id') {
+function array_unique_objects($objectsList, $filter = 'id')
+{
     $uniqueKeys = [];
 
     $uniqueObjects = array_map(function ($object) use (&$uniqueKeys, $filter) {
@@ -316,7 +318,8 @@ function array_unique_objects($objectsList, $filter = 'id') {
  *
  * @return array
  */
-function array_unique_object($objectsList, $filter = 'id') {
+function array_unique_object($objectsList, $filter = 'id')
+{
     return array_unique_objects($objectsList, $filter);
 }
 
@@ -355,14 +358,18 @@ function prepend_symbols($string, $expectedLength, $symbol)
     return $string;
 }
 
-function array_default(&$array, $key, $default) {
+function array_default(&$array, $key, $default)
+{
     $array[$key] = array_get($array, $key, $default);
 }
 
 /**
  * inverse transformation from array_dot
+ * @param $array
+ * @return array
  */
-function array_undot($array) {
+function array_undot($array)
+{
     $result = [];
 
     foreach ($array as $key => $value) {

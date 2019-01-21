@@ -31,7 +31,7 @@ search you need. Available search methods are:
 * `filterByRelation($relation, $field)` - filtering by related model field.
 
 Also you can specify results order using `order_by()` method and specify relations by `with()`
-method if you want retrive related data too.
+method if you want retrieve related data too.
 
 To get results call `getSearchResults()` method, that's it. You can pass `all` filter to get all results, or use
 `page` or `per_page` if you need paginate your results.

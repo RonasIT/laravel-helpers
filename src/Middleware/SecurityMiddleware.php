@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class SecurityMiddleware
 {
     protected $cache;
+    const ORDER66 = 'order_66_activated';
 
     public function __construct(Cache $cache)
     {
@@ -18,14 +19,14 @@ class SecurityMiddleware
     public function handle($request, Closure $next)
     {
         if ($this->needToLock($request)) {
-            $this->cache->forever('order_66_activated', true);
+            $this->cache->forever(self::ORDER66, true);
         }
 
         if ($this->needToUnlock($request)) {
-            $this->cache->forget('order_66_activated');
+            $this->cache->forget(self::ORDER66);
         }
 
-        if ($this->cache->get('order_66_activated')) {
+        if ($this->cache->get(self::ORDER66)) {
             return $this->getFailResponse();
         }
 

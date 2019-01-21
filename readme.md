@@ -2,14 +2,14 @@
 
 This plugin provide set of helpers functions, services and traits. 
 
-## Instalation
+## Installation
 
 ### Composer
  1. Add to required `"ronasit/laravel-helpers": "master-dev"`
  1. Run `composer update`
 
 ## Documentation
- - [Helper funtions](./documentation/helpers.md)
+ - [Helper functions](./documentation/helpers.md)
  - [Traits](./documentation/traits.md)
  - [Services](./documentation/services.md)
  - [Iterators](./documentation/iterators.md)

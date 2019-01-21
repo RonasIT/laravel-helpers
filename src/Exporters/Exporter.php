@@ -46,9 +46,7 @@ class Exporter
 
     public function export()
     {
-        $fileName = $this->fileName ?? uniqid();
-
-        $info = Excel::create($fileName, function ($excel) {
+        $info = Excel::create($this->getFileName(), function ($excel) {
             $excel->sheet('export', function ($sheet) {
                 $this->exportFilters($sheet);
 
@@ -61,6 +59,11 @@ class Exporter
         })->store($this->type, false, true);
 
         return $info['full'];
+    }
+
+    private function getFileName()
+    {
+        return $this->fileName ?? uniqid();
     }
 
     public function getLine($item)

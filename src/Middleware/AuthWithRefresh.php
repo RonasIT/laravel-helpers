@@ -2,42 +2,44 @@
 
 namespace RonasIT\Support\Middleware;
 
-use Symfony\Component\HttpFoundation\Response;
 use Closure;
-
+use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Middleware\GetUserFromToken;
 
 class AuthWithRefresh extends GetUserFromToken
 {
-
-
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request $request
      * @param  \Closure $next
      * @return mixed
+     * @throws JWTException
+     * @throws JWTException
      */
     public function handle($request, Closure $next)
     {
-        if (!$token = $this->auth->setRequest($request)->getToken()) {
-            return $this->respond('tymon.jwt.absent', 'token_not_provided', 400);
-        }
-
         try {
-            $user = $this->auth->authenticate($token);
+            return $this->authenticate($request, $next);
         } catch (TokenExpiredException $e) {
-
             return $this->refreshToken($request, $next);
-
         } catch (JWTException $e) {
             return $this->respond('tymon.jwt.invalid', 'token_invalid', $e->getStatusCode(), [$e]);
         }
+    }
+
+    private function authenticate($request, $next)
+    {
+        if (!$token = $this->auth->setRequest($request)->getToken()) {
+            return $this->respond('tymon.jwt.absent', 'token_not_provided', Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $this->auth->authenticate($token);
 
         if (!$user) {
-            return $this->respond('tymon.jwt.user_not_found', 'user_not_found', 404);
+            return $this->respond('tymon.jwt.user_not_found', 'user_not_found', Response::HTTP_NOT_FOUND);
         }
 
         $this->events->fire('tymon.jwt.valid', $user);
@@ -51,10 +53,10 @@ class AuthWithRefresh extends GetUserFromToken
      * @param  \Illuminate\Http\Request $request
      * @param  \Closure $next
      * @return mixed
+     * @throws JWTException
      */
     private function refreshToken($request, Closure $next)
     {
-
         try {
             $newToken = $this->auth->setRequest($request)->parseToken()->refresh();
         } catch (TokenExpiredException $e) {

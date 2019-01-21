@@ -18,15 +18,15 @@ trait FixturesTrait
             return;
         }
 
-        $tables = $this->getTables();
+        $databaseTables = $this->getTables();
         $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $tables, $truncateExcept);
+        $this->clearDatabase($scheme, $databaseTables, $truncateExcept);
 
         DB::unprepared($dump);
 
         if ($scheme === 'pgsql') {
-            $this->prepareSequences($tables, $prepareSequencesExcept);
+            $this->prepareSequences($databaseTables, $prepareSequencesExcept);
         }
     }
 
@@ -136,9 +136,7 @@ trait FixturesTrait
             }
         });
 
-        $query .= "SET FOREIGN_KEY_CHECKS = 1;\n";
-
-        return $query;
+        return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
     public function prepareSequences($tables, $except)
