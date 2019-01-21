@@ -2,6 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
+/**
+ * @deprecated
+ */
 trait ImageTestTrait
 {
     use ImagesTrait;

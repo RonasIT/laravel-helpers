@@ -4,6 +4,9 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @deprecated
+ */
 trait FilesTestTrait
 {
     use FilesTrait;

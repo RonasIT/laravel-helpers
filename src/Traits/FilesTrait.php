@@ -5,6 +5,9 @@ namespace RonasIT\Support\Traits;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @deprecated
+ */
 trait FilesTrait
 {
     public function saveFile($name, $content, $returnUrl = false)

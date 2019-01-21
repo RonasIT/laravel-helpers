@@ -8,6 +8,9 @@
 
 namespace RonasIT\Support\Traits;
 
+/**
+ * @deprecated
+ */
 trait ImagesTrait
 {
     public function saveImage($folder, $name, $image)
