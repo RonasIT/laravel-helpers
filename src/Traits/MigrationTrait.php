@@ -19,8 +19,7 @@ trait MigrationTrait
 
             $table->foreign($fieldName)
                 ->references('id')
-                ->on($this->getTableName($toEntity))
-                ->onDelete('cascade');
+                ->on($this->getTableName($toEntity));
         });
     }
 
