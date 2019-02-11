@@ -42,15 +42,15 @@ trait ModelTrait
      */
     public function scopeAddFieldsToSelect($query, $fields)
     {
-        if (empty($this->selectedFields)) {
-            $this->selectedFields = $this->getAllFieldsWithTable();
+        if (is_null($query->getQuery()->columns)) {
+            $query->addSelect("{$this->getTable()}.*");
         }
 
-        $fields = array_merge($this->selectedFields, $fields);
+        if (empty($fields)) {
+            return $query;
+        }
 
-        $query->addSelect($fields);
-
-        return $query;
+        return $query->addSelect($fields);
     }
 
     public function withCount($query, $target, $as = 'count')
@@ -71,24 +71,95 @@ trait ModelTrait
             ->groupBy($fields);
     }
 
-    public function scopeOrderByRelated($query, $orderField, $desc = 'DESC')
+    /**
+     * Add orderBy By related field,
+     * $manyToManyStrategy is affect oneToMany and ManyToMany Relations make orderBy('id', ASC/DESC)
+     *
+     * @param $query
+     * @param $relations
+     * @param $orderField
+     * @param string $desc
+     * @param string $asField
+     * @param string $manyToManyStrategy
+     *
+     * @return QueryBuilder
+     */
+    public function scopeOrderByRelated($query, $relations, $orderField, $desc = 'DESC', $asField = null, $manyToManyStrategy = 'max')
     {
-        $entities = explode('.', $orderField);
+        if (!empty($relations)) {
+            $relations = $this->prepareRelations($relations);
+            $columns = $query->getQuery()->columns;
 
-        $fieldName = array_pop($entities);
-        $relationName = array_shift($entities);
+            $builders = $this->getBuildersCollection($relations, $query, $manyToManyStrategy);
+            $prevBuilder = array_shift($builders);
+            array_pop($builders);
 
-        if (Str::plural($relationName) !== $relationName) {
-            $table = $this->getTable();
-            $relation = $this->__callStatic($relationName, []);
+            $this->applyManyToManyStrategy($prevBuilder, $manyToManyStrategy)
+                ->select($orderField)
+                ->limit(1);
 
-            $relatedTable = $relation->getRelated()->getTable();
-            $foreignKey = $relation->getForeignKey();
-            $ownerKey = $relation->getOwnerKey();
+            foreach ($builders as $builder) {
+                $prevBuilder = $this->applyManyToManyStrategy($builder, $manyToManyStrategy)
+                    ->selectSub($prevBuilder, $asField)
+                    ->limit(1);
+            }
 
-            $query
-                ->addSelect("{$table}.*", DB::raw("(SELECT {$fieldName} FROM {$relatedTable} WHERE {$foreignKey} = {$relatedTable}.{$ownerKey} ) as orderedField"))
-                ->orderBy('orderedField', $desc);
+            $query->addFieldsToSelect($columns);
+            $query->selectSub($prevBuilder, $asField);
         }
+
+        return $query->orderBy($asField ?? $orderField, $desc);
+    }
+
+    protected function getRelationWithoutConstraints($query, $relation)
+    {
+        return Relation::noConstraints(function () use ($query, $relation) {
+            return $query->getModel()->{$relation}();
+        });
+    }
+
+    private function prepareRelations($relations)
+    {
+        if (str_contains($relations, '.')) {
+            return explode('.', $relations);
+        } else {
+            return [
+                $relations
+            ];
+        }
+    }
+
+    private function getBuildersCollection($relations, $query)
+    {
+        $requiredColumns = [];
+        $buildersCollection = [
+            $query
+        ];
+
+        foreach ($relations as $relationString) {
+            $query = array_last($buildersCollection);
+
+            $relation = $this->getRelationWithoutConstraints($query, $relationString);
+            $subQuery = $relation->getRelationExistenceQuery(
+                $relation->getRelated()->newQueryWithoutRelationships(),
+                $query,
+                $requiredColumns
+            );
+
+            $buildersCollection[] = $subQuery;
+        }
+
+        return array_reverse($buildersCollection);
+    }
+
+    private function applyManyToManyStrategy($query, $strategy)
+    {
+        if ($strategy === 'max') {
+            $query->orderBy('id', 'ASC');
+        } else {
+            $query->orderBy('id', 'DESC');
+        }
+
+        return $query;
     }
 }
