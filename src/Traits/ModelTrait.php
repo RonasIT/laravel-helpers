@@ -2,14 +2,14 @@
 
 namespace RonasIT\Support\Traits;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Schema;
 
 trait ModelTrait
 {
-    protected $selectedFields;
-
     public static function getFields()
     {
         $model = (new static);
@@ -22,15 +22,6 @@ trait ModelTrait
         array_unshift($fillable, $keyName);
 
         return array_merge($fillable, $guarded, $timeStamps);
-    }
-
-    public function getAllFieldsWithTable()
-    {
-        $fields = Schema::getColumnListing($this->getTable());
-
-        return array_map(function ($field) {
-            return "{$this->getTable()}.{$field}";
-        }, $fields);
     }
 
     /**
@@ -53,24 +44,6 @@ trait ModelTrait
         return $query->addSelect($fields);
     }
 
-    public function withCount($query, $target, $as = 'count')
-    {
-        $targetTable = (new $target)->getTable();
-        $fields = $this->getAllFieldsWithTable();
-        $currentTable = $this->getTable();
-        $relationFieldName = Str::singular($currentTable) . '_id';
-
-        if (empty($this->selectedFields)) {
-            $this->selectedFields = $fields;
-
-            $query->select($fields);
-        }
-
-        $query->leftJoin($targetTable, "{$targetTable}.{$relationFieldName}", '=', "{$currentTable}.id")
-            ->addSelect(DB::raw("count({$targetTable}.id) as {$as}"))
-            ->groupBy($fields);
-    }
-
     /**
      * Add orderBy By related field,
      * $manyToManyStrategy is affect oneToMany and ManyToMany Relations make orderBy('id', ASC/DESC)
@@ -84,12 +57,12 @@ trait ModelTrait
      *
      * @return QueryBuilder
      */
-    public function scopeOrderByRelated($query, $relations, $orderField, $desc = 'DESC', $asField = null, $manyToManyStrategy = 'max')
+    public function scopeOrderByRelated($query, $relations, $desc = 'DESC', $asField = null, $manyToManyStrategy = 'max')
     {
-        if (!empty($relations)) {
-            $relations = $this->prepareRelations($relations);
-            $columns = $query->getQuery()->columns;
+        $relations = $this->prepareRelations($relations);
+        $orderField = $this->getOrderedField($relations);
 
+        if (!empty($relations)) {
             $builders = $this->getBuildersCollection($relations, $query, $manyToManyStrategy);
             $prevBuilder = array_shift($builders);
             array_pop($builders);
@@ -104,7 +77,7 @@ trait ModelTrait
                     ->limit(1);
             }
 
-            $query->addFieldsToSelect($columns);
+            $query->addFieldsToSelect($query->getQuery()->columns);
             $query->selectSub($prevBuilder, $asField);
         }
 
@@ -127,6 +100,15 @@ trait ModelTrait
                 $relations
             ];
         }
+    }
+
+    private function getOrderedField(&$relations)
+    {
+        if (is_array($relations)) {
+            return array_pop($relations);
+        }
+
+        return $relations;
     }
 
     private function getBuildersCollection($relations, $query)
