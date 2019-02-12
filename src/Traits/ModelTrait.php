@@ -2,14 +2,14 @@
 
 namespace RonasIT\Support\Traits;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Schema;
 
 trait ModelTrait
 {
-    protected $selectedFields;
-
     public static function getFields()
     {
         $model = (new static);
@@ -40,55 +40,114 @@ trait ModelTrait
      * @param $fields
      * @return mixed
      */
-    public function scopeAddFieldsToSelect($query, $fields)
+    public function scopeAddFieldsToSelect($query, $fields = null)
     {
-        if (empty($this->selectedFields)) {
-            $this->selectedFields = $this->getAllFieldsWithTable();
+        if (is_null($query->getQuery()->columns)) {
+            $query->addSelect("{$this->getTable()}.*");
         }
 
-        $fields = array_merge($this->selectedFields, $fields);
+        if (empty($fields)) {
+            return $query;
+        }
 
-        $query->addSelect($fields);
+        return $query->addSelect($fields);
+    }
+
+    /**
+     * Add orderBy By related field,
+     * $manyToManyStrategy is affect oneToMany and ManyToMany Relations make orderBy('id', ASC/DESC)
+     *
+     * @param $query
+     * @param $relations
+     * @param string $desc
+     * @param string $asField
+     * @param string $manyToManyStrategy
+     *
+     * @return QueryBuilder
+     */
+    public function scopeOrderByRelated($query, $relations, $desc = 'DESC', $asField = null, $manyToManyStrategy = 'max')
+    {
+        $relations = $this->prepareRelations($relations);
+        $orderField = $this->getOrderedField($relations);
+
+        if (!empty($relations)) {
+            $queries = $this->getQueriesList($query, $relations);
+            $prevQuery = array_shift($queries);
+            array_pop($queries);
+
+            $this->applyManyToManyStrategy($prevQuery, $manyToManyStrategy)
+                ->select($orderField);
+
+            foreach ($queries as $queryInCollection) {
+                $prevQuery = $this->applyManyToManyStrategy($queryInCollection, $manyToManyStrategy)
+                    ->selectSub($prevQuery, $asField);
+            }
+
+            $query->addFieldsToSelect();
+            $query->selectSub($prevQuery, $asField);
+        }
+
+        return $query->orderBy($asField ?? $orderField, $desc);
+    }
+
+    protected function getRelationWithoutConstraints($query, $relation)
+    {
+        return Relation::noConstraints(function () use ($query, $relation) {
+            return $query->getModel()->{$relation}();
+        });
+    }
+
+    protected function prepareRelations($relations)
+    {
+        if (str_contains($relations, '.')) {
+            return explode('.', $relations);
+        } else {
+            return [
+                $relations
+            ];
+        }
+    }
+
+    private function getOrderedField(&$relations)
+    {
+        if (is_array($relations)) {
+            return array_pop($relations);
+        }
+
+        return $relations;
+    }
+
+    protected function getQueriesList($query, $relations)
+    {
+        $requiredColumns = [];
+        $queryCollection = [
+            $query
+        ];
+
+        foreach ($relations as $relationString) {
+            $query = array_last($queryCollection);
+
+            $relation = $this->getRelationWithoutConstraints($query, $relationString);
+            $subQuery = $relation->getRelationExistenceQuery(
+                $relation->getRelated()->newQueryWithoutRelationships(),
+                $query,
+                $requiredColumns
+            );
+
+            $queryCollection[] = $subQuery;
+        }
+
+        return array_reverse($queryCollection);
+    }
+
+    protected function applyManyToManyStrategy($query, $strategy)
+    {
+        if ($strategy === 'max') {
+            $query->orderBy('id', 'ASC')->limit(1);
+        } else {
+            $query->orderBy('id', 'DESC')->limit(1);
+        }
 
         return $query;
-    }
-
-    public function withCount($query, $target, $as = 'count')
-    {
-        $targetTable = (new $target)->getTable();
-        $fields = $this->getAllFieldsWithTable();
-        $currentTable = $this->getTable();
-        $relationFieldName = Str::singular($currentTable) . '_id';
-
-        if (empty($this->selectedFields)) {
-            $this->selectedFields = $fields;
-
-            $query->select($fields);
-        }
-
-        $query->leftJoin($targetTable, "{$targetTable}.{$relationFieldName}", '=', "{$currentTable}.id")
-            ->addSelect(DB::raw("count({$targetTable}.id) as {$as}"))
-            ->groupBy($fields);
-    }
-
-    public function scopeOrderByRelated($query, $orderField, $desc = 'DESC')
-    {
-        $entities = explode('.', $orderField);
-
-        $fieldName = array_pop($entities);
-        $relationName = array_shift($entities);
-
-        if (Str::plural($relationName) !== $relationName) {
-            $table = $this->getTable();
-            $relation = $this->__callStatic($relationName, []);
-
-            $relatedTable = $relation->getRelated()->getTable();
-            $foreignKey = $relation->getForeignKey();
-            $ownerKey = $relation->getOwnerKey();
-
-            $query
-                ->addSelect("{$table}.*", DB::raw("(SELECT {$fieldName} FROM {$relatedTable} WHERE {$foreignKey} = {$relatedTable}.{$ownerKey} ) as orderedField"))
-                ->orderBy('orderedField', $desc);
-        }
     }
 }
