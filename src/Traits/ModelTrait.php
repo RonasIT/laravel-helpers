@@ -50,7 +50,6 @@ trait ModelTrait
      *
      * @param $query
      * @param $relations
-     * @param $orderField
      * @param string $desc
      * @param string $asField
      * @param string $manyToManyStrategy
@@ -63,22 +62,20 @@ trait ModelTrait
         $orderField = $this->getOrderedField($relations);
 
         if (!empty($relations)) {
-            $builders = $this->getBuildersCollection($relations, $query, $manyToManyStrategy);
-            $prevBuilder = array_shift($builders);
-            array_pop($builders);
+            $queries = $this->getQueriesCollection($query, $relations);
+            $prevQuery = array_shift($queries);
+            array_pop($queries);
 
-            $this->applyManyToManyStrategy($prevBuilder, $manyToManyStrategy)
-                ->select($orderField)
-                ->limit(1);
+            $this->applyManyToManyStrategy($prevQuery, $manyToManyStrategy)
+                ->select($orderField);
 
-            foreach ($builders as $builder) {
-                $prevBuilder = $this->applyManyToManyStrategy($builder, $manyToManyStrategy)
-                    ->selectSub($prevBuilder, $asField)
-                    ->limit(1);
+            foreach ($queries as $queryInCollection) {
+                $prevQuery = $this->applyManyToManyStrategy($queryInCollection, $manyToManyStrategy)
+                    ->selectSub($prevQuery, $asField);
             }
 
             $query->addFieldsToSelect();
-            $query->selectSub($prevBuilder, $asField);
+            $query->selectSub($prevQuery, $asField);
         }
 
         return $query->orderBy($asField ?? $orderField, $desc);
@@ -91,7 +88,7 @@ trait ModelTrait
         });
     }
 
-    private function prepareRelations($relations)
+    protected function prepareRelations($relations)
     {
         if (str_contains($relations, '.')) {
             return explode('.', $relations);
@@ -111,15 +108,15 @@ trait ModelTrait
         return $relations;
     }
 
-    private function getBuildersCollection($relations, $query)
+    protected function getQueriesCollection($query, $relations)
     {
         $requiredColumns = [];
-        $buildersCollection = [
+        $queryCollection = [
             $query
         ];
 
         foreach ($relations as $relationString) {
-            $query = array_last($buildersCollection);
+            $query = array_last($queryCollection);
 
             $relation = $this->getRelationWithoutConstraints($query, $relationString);
             $subQuery = $relation->getRelationExistenceQuery(
@@ -128,18 +125,18 @@ trait ModelTrait
                 $requiredColumns
             );
 
-            $buildersCollection[] = $subQuery;
+            $queryCollection[] = $subQuery;
         }
 
-        return array_reverse($buildersCollection);
+        return array_reverse($queryCollection);
     }
 
-    private function applyManyToManyStrategy($query, $strategy)
+    protected function applyManyToManyStrategy($query, $strategy)
     {
         if ($strategy === 'max') {
-            $query->orderBy('id', 'ASC');
+            $query->orderBy('id', 'ASC')->limit(1);
         } else {
-            $query->orderBy('id', 'DESC');
+            $query->orderBy('id', 'DESC')->limit(1);
         }
 
         return $query;
