@@ -31,7 +31,7 @@ trait ModelTrait
      * @param $fields
      * @return mixed
      */
-    public function scopeAddFieldsToSelect($query, $fields)
+    public function scopeAddFieldsToSelect($query, $fields = null)
     {
         if (is_null($query->getQuery()->columns)) {
             $query->addSelect("{$this->getTable()}.*");
@@ -77,7 +77,7 @@ trait ModelTrait
                     ->limit(1);
             }
 
-            $query->addFieldsToSelect($query->getQuery()->columns);
+            $query->addFieldsToSelect();
             $query->selectSub($prevBuilder, $asField);
         }
 
