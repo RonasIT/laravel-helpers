@@ -24,6 +24,15 @@ trait ModelTrait
         return array_merge($fillable, $guarded, $timeStamps);
     }
 
+    public function getAllFieldsWithTable()
+    {
+        $fields = Schema::getColumnListing($this->getTable());
+
+        return array_map(function ($field) {
+            return "{$this->getTable()}.{$field}";
+        }, $fields);
+    }
+
     /**
      * This method was added, because native laravel's method addSelect
      * overwrites existed select clause
@@ -62,7 +71,7 @@ trait ModelTrait
         $orderField = $this->getOrderedField($relations);
 
         if (!empty($relations)) {
-            $queries = $this->getQueriesCollection($query, $relations);
+            $queries = $this->getQueriesList($query, $relations);
             $prevQuery = array_shift($queries);
             array_pop($queries);
 
@@ -108,7 +117,7 @@ trait ModelTrait
         return $relations;
     }
 
-    protected function getQueriesCollection($query, $relations)
+    protected function getQueriesList($query, $relations)
     {
         $requiredColumns = [];
         $queryCollection = [
