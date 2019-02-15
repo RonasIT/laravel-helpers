@@ -39,7 +39,7 @@ class HttpRequestService
 
     public function sendDelete($url, $headers = [])
     {
-        return $this->send('delete', $url, $headers);
+        return $this->send('delete', $url, [], $headers);
     }
 
     public function sendPut($url, $data, $headers = [])
@@ -76,7 +76,7 @@ class HttpRequestService
                 $response = $client->patch($url, $this->options);
                 break;
             case 'delete' :
-                $response = $client->delete($url, $this->options)->send();
+                $response = $client->delete($url, $this->options);
                 break;
             default :
                 throw app(UnknownRequestMethodException::class)->setMethod($method);
