@@ -67,6 +67,14 @@ trait ModelTrait
      */
     public function scopeOrderByRelated($query, $relations, $desc = 'DESC', $asField = null, $manyToManyStrategy = 'max')
     {
+        if (version_compare(app()::VERSION, '5.5') <= 0) {
+            return $query->legacyOrderByRelated($relations, $desc);
+        }
+
+        if (empty($asField)) {
+            $asField = str_replace('.', '_', $relations);
+        }
+
         $relations = $this->prepareRelations($relations);
         $orderField = $this->getOrderedField($relations);
 
@@ -150,4 +158,31 @@ trait ModelTrait
 
         return $query;
     }
+
+    /*
+     * Unfortunately, Laravel older than 5.5 does not support Relation::noConstraints so for such versions we
+     * have to use simplified version of orderByRelated which does not support nesting relations.
+     */
+    public function scopeLegacyOrderByRelated($query, $orderField, $desc = 'DESC')
+    {
+        $entities = explode('.', $orderField);
+
+        $fieldName = array_pop($entities);
+        $relationName = array_shift($entities);
+
+        if (Str::plural($relationName) !== $relationName) {
+            $table = $this->getTable();
+            $relation = $this->__callStatic($relationName, []);
+
+            $relatedTable = $relation->getRelated()->getTable();
+            $foreignKey = $relation->getForeignKey();
+            $ownerKey = $relation->getOwnerKey();
+
+            $rawQuery = DB::raw("(SELECT {$fieldName} FROM {$relatedTable} WHERE {$foreignKey} = {$relatedTable}.{$ownerKey} ) as orderedField");
+            $query
+                ->addSelect("{$table}.*", $rawQuery)
+                ->orderBy('orderedField', $desc);
+        }
+    }
+
 }

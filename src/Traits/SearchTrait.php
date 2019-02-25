@@ -4,7 +4,11 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Database\Eloquent\Builder as Query;
 
+/**
+ * @property Query query 
+ */
 trait SearchTrait
 {
     protected $query;
@@ -87,10 +91,10 @@ trait SearchTrait
         $orderBy = array_get($this->filter, 'order_by', $default);
         $isDesc = array_get($this->filter, 'desc', $defaultDesc);
 
-        $this->query->orderBy($orderBy, $this->getDesc($isDesc));
+        $this->query->orderByRelated($orderBy, $this->getDesc($isDesc));
 
         if ($orderBy != $default) {
-            $this->query->orderBy($default, $this->getDesc($defaultDesc));
+            $this->query->orderByRelated($default, $this->getDesc($defaultDesc));
         }
 
         return $this;
