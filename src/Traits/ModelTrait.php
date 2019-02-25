@@ -4,8 +4,6 @@ namespace RonasIT\Support\Traits;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Schema;
 
 trait ModelTrait
@@ -67,6 +65,10 @@ trait ModelTrait
      */
     public function scopeOrderByRelated($query, $relations, $desc = 'DESC', $asField = null, $manyToManyStrategy = 'max')
     {
+        if (empty($asField)) {
+            $asField = str_replace('.', '_', $relations);
+        }
+
         $relations = $this->prepareRelations($relations);
         $orderField = $this->getOrderedField($relations);
 
