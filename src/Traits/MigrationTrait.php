@@ -14,7 +14,7 @@ trait MigrationTrait
             $fieldName = snake_case($toEntity) . '_id';
 
             if ($needAddField) {
-                $table->unsigned($fieldName);
+                $table->unsignedInteger($fieldName);
             }
 
             $table->foreign($fieldName)
