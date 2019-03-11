@@ -40,7 +40,7 @@ trait FilesUploadTrait
         $explodedName = explode('.', $name);
         $extension = array_pop($explodedName);
         $hash = md5(uniqid());
-        $timestamp = str_replace(' ', '_', microtime());
+        $timestamp = str_replace(['.', ' '], '_', microtime());
 
         return "{$timestamp}_{$hash}.{$extension}";
     }
