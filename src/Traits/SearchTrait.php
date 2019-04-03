@@ -190,4 +190,52 @@ trait SearchTrait
             'total' => $total
         ];
     }
+
+    public function filterByList($filterName, $field)
+    {
+        if (array_has($this->filter, $filterName)) {
+            if (str_contains($field, '.')) {
+                $entities = explode('.', $field);
+                $fieldName = array_pop($entities);
+                $relation = implode('.', $entities);
+
+                $this->query->whereHas($relation, function ($query) use ($fieldName, $filterName) {
+                    $query->whereIn($fieldName, $this->filter[$filterName]);
+                });
+            } else {
+                $this->query->whereIn($field, $this->filter[$filterName]);
+            }
+        }
+
+        return $this;
+    }
+
+    public function withCount()
+    {
+        if (!empty($this->filter['with_count'])) {
+            foreach ($this->filter['with_count'] as $requestedRelations) {
+                $explodedRelation = explode('.', $requestedRelations);
+
+                $countRelation = array_pop($explodedRelation);
+                $relation = implode($explodedRelation);
+
+                if (empty($relation)) {
+                    $this->query->withCount($countRelation);
+                } else {
+                    $this->query->with([
+                        $relation => function ($query) use ($countRelation) {
+                            $query->withCount($countRelation);
+                        }
+                    ]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSearchQuery()
+    {
+        return $this->query;
+    }
 }

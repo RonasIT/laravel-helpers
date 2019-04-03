@@ -21,7 +21,13 @@ class EntityService
     public function __call($name, $arguments)
     {
         if (method_exists($this->repository, $name)) {
-            return call_user_func_array([$this->repository, $name], $arguments);
+            $result = call_user_func_array([$this->repository, $name], $arguments);
+
+            if ($result === $this->repository) {
+                return $this;
+            }
+
+            return $result;
         }
 
         throw new BadMethodCallException();

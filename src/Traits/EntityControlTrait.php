@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
@@ -12,6 +11,7 @@ trait EntityControlTrait
     use SearchTrait;
 
     protected $requiredRelations = [];
+    protected $requiredRelationsCount = [];
     protected $model;
     protected $withTrashed = false;
     protected $onlyTrashed = false;
@@ -61,12 +61,23 @@ trait EntityControlTrait
             $query->with($this->requiredRelations);
         }
 
+        if (!empty($this->requiredRelationsCount)) {
+            $query->withCount($this->requiredRelationsCount);
+        }
+
         return $query;
     }
 
     public function withRelations(array $relations)
     {
         $this->requiredRelations = $relations;
+
+        return $this;
+    }
+
+    public function setWithCount($withCount)
+    {
+        $this->requiredRelationsCount = $withCount;
 
         return $this;
     }
