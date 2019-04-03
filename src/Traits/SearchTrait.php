@@ -46,9 +46,22 @@ trait SearchTrait
         if (!empty($this->filter['query'])) {
             $this->query->where(function ($query) use ($fields) {
                 foreach ($fields as $field) {
-                    $this->applyWhereCallback($query, $field, function ($q, $conditionField) {
-                        $q->orWhere($this->getQuerySearchCallback($conditionField));
-                    });
+                    if (str_contains($field, '.')) {
+                        $entities = explode('.', $field);
+                        $fieldName = array_pop($entities);
+                        $relations = implode('.', $entities);
+
+                        $query->orWhereHas($relations, function ($query) use ($fieldName) {
+                            $query->where(
+                                $this->getQuerySearchCallback($fieldName)
+                            );
+                        });
+                    } else {
+                        $query->orWhere(
+                            $this->getQuerySearchCallback($field)
+                        );
+                    }
+
                 }
             });
         }
@@ -99,6 +112,7 @@ trait SearchTrait
         return $isDesc ? 'DESC' : 'ASC';
     }
 
+    /** deprecated */
     public function filterByRelationField($relation, $field, $filterName = null)
     {
         if (empty($filterName)) {

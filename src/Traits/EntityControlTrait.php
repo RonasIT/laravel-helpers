@@ -132,6 +132,8 @@ trait EntityControlTrait
         if (!empty($this->requiredRelations)) {
             $this->model->load($this->requiredRelations);
         }
+        
+        $this->afterCreateHook($this->model,$data);
 
         return $this->model->refresh()->toArray();
     }
@@ -166,7 +168,9 @@ trait EntityControlTrait
             return [];
         }
 
-        $item->fill($data)->save();
+        $item->fill(array_only($data, $item->getFillable()))->save();
+
+        $this->afterUpdateHook($item, $data);
 
         return $item->refresh()->toArray();
     }
@@ -175,6 +179,10 @@ trait EntityControlTrait
     {
         if ($this->exists($where)) {
             return $this->update($where, $data);
+        }
+
+        if (!is_array($where)) {
+            $where = [$this->primaryKey => $where];
         }
 
         return $this->create(array_merge($where, $data));
@@ -241,9 +249,7 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        $query = $this
-            ->getQuery($where)
-            ->where(array_only($where, $this->fields));
+        $query = $this->getQuery($where);
 
         if ($this->forceMode) {
             $query->forceDelete();
@@ -368,5 +374,15 @@ trait EntityControlTrait
 
             throw new InvalidModelException("Model {$modelClass} must have primary key.");
         }
+    }
+    
+    protected function afterUpdateHook($entity, $data)
+    {
+        // implement it yourself if you need it
+    }
+    
+    protected function afterCreateHook($entity, $data)
+    {
+        // implement it yourself if you need it
     }
 }
