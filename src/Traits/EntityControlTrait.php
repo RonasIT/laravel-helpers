@@ -2,10 +2,14 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
 
+/**
+ * @property Model model
+ */
 trait EntityControlTrait
 {
     use SearchTrait;
@@ -17,6 +21,7 @@ trait EntityControlTrait
     protected $onlyTrashed = false;
     protected $fields;
     protected $primaryKey;
+    protected $forceMode;
 
     public function all()
     {
@@ -30,22 +35,27 @@ trait EntityControlTrait
         $modelInstance::truncate();
     }
 
-    public function setModel($newModel)
+    public function force($value = true)
     {
-        $this->model = $newModel;
+        $this->forceMode = $value;
 
-        $modelInstance = new $this->model;
+        return $this;
+    }
 
-        $this->fields = $modelInstance::getFields();
+    public function setModel($modelClass)
+    {
+        $this->model = new $modelClass();
 
-        $this->primaryKey = $modelInstance->getKeyName();
+        $this->fields = $modelClass::getFields();
+
+        $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
     }
 
     protected function getQuery()
     {
-        $query = (new $this->model)->query();
+        $query = $this->model->query();
 
         if ($this->onlyTrashed) {
             $query->onlyTrashed();
@@ -117,15 +127,21 @@ trait EntityControlTrait
 
     public function create($data)
     {
-        $modelInstance = $this->model;
+        $entityData = array_only($data, $this->fields);
 
-        $newEntity = $modelInstance::create(array_only($data, $this->fields));
-
-        if (!empty($this->requiredRelations)) {
-            $newEntity->load($this->requiredRelations);
+        if ($this->forceMode) {
+            $this->model->forceFill($entityData);
+        } else {
+            $this->model->fill($entityData);
         }
 
-        return $newEntity->refresh()->toArray();
+        $this->model->save();
+
+        if (!empty($this->requiredRelations)) {
+            $this->model->load($this->requiredRelations);
+        }
+
+        return $this->model->refresh()->toArray();
     }
 
     /**
@@ -138,16 +154,16 @@ trait EntityControlTrait
      */
     public function updateMany($where, $data)
     {
-        $query = $this->getQuery();
+        $modelClass = get_class($this->model);
+        $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
+        $entityData = array_only($data, $fields);
 
-        $query->where($where)
-            ->update(
-                array_only($data, $this->fields)
-            );
+        $this
+            ->getQuery()
+            ->where($where)
+            ->update($entityData);
 
-        $where = array_merge($where, $data);
-
-        return $this->get($where);
+        return $this->get(array_merge($where, $entityData));
     }
 
     public function update($where, $data = [])
@@ -255,17 +271,22 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        if (is_array($where)) {
-            $this->getQuery()
-                ->where(array_only($where, $this->fields))
-                ->delete();
+        if (!is_array($where)) {
+            $where = [$this->primaryKey => $where];
+        }
+
+        $query = $this
+            ->getQuery()
+            ->where(array_only($where, $this->fields));
+
+        if ($this->forceMode) {
+            $query->forceDelete();
         } else {
-            $this->getQuery()
-                ->where($this->primaryKey, $where)
-                ->delete();
+            $query->delete();
         }
     }
 
+    /** @deprecated */
     public function forceDelete($id)
     {
         $this->getQuery()->find($id)->forceDelete();
@@ -310,14 +331,14 @@ trait EntityControlTrait
 
     protected function getEntityName()
     {
-        $explodedModel = explode('\\', $this->model);
+        $explodedModel = explode('\\', get_class($this->model));
 
         return end($explodedModel);
     }
 
     protected function isSoftDelete()
     {
-        $traits = class_uses($this->model);
+        $traits = class_uses(get_class($this->model));
 
         return in_array(SoftDeletes::class, $traits);
     }
@@ -325,7 +346,9 @@ trait EntityControlTrait
     protected function checkPrimaryKey()
     {
         if (is_null($this->primaryKey)) {
-            throw new InvalidModelException("Model {$this->model} must have primary key.");
+            $modelClass = get_class($this->model);
+
+            throw new InvalidModelException("Model {$modelClass} must have primary key.");
         }
     }
 }
