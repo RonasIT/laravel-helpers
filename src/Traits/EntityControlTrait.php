@@ -101,13 +101,7 @@ trait EntityControlTrait
      */
     public function exists($where)
     {
-        $query = $this->getQuery();
-
-        if (is_array($where)) {
-            return $query->where($where)->exists();
-        }
-
-        return $query->where($this->primaryKey, $where)->exists();
+        return $this->getQuery($where)->exists();
     }
 
     /**
@@ -120,9 +114,7 @@ trait EntityControlTrait
      */
     public function existsBy($field, $value)
     {
-        return $this->getQuery()
-            ->where($field, $value)
-            ->exists();
+        return $this->getQuery([$field => $value])->exists();
     }
 
     public function create($data)
@@ -168,15 +160,7 @@ trait EntityControlTrait
 
     public function update($where, $data = [])
     {
-        $query = $this->getQuery();
-
-        if (!is_array($where)) {
-            $where = [
-                $this->primaryKey => $where
-            ];
-        }
-
-        $item = $query->where($where)->first();
+        $item = $this->getQuery($where)->first();
 
         if (empty($item)) {
             return [];
@@ -198,9 +182,7 @@ trait EntityControlTrait
 
     public function count($where = [])
     {
-        return $this->getQuery()
-            ->where($where)
-            ->count();
+        return $this->getQuery($where)->count();
     }
 
     /**
@@ -210,47 +192,35 @@ trait EntityControlTrait
      */
     public function get($where = [])
     {
-        $query = $this->getQuery()->where(array_only(
-            $where, $this->fields
-        ));
-
-        $entity = $query->get();
-
-        return empty($entity) ? [] : $entity->toArray();
+        return $this->getQuery($where)->get()->toArray();
     }
 
     public function getOrCreate($data)
     {
-        if ($this->exists($data)) {
-            return $this->get($data);
+        $entities = $this->get($data);
+
+        if (empty($entities)) {
+            return $this->create($data);
         }
 
-        return $this->create($data);
+        return $entities;
     }
 
-    public function first($data)
+    public function first($where)
     {
-        $query = $this->getQuery()->where(array_only(
-            $data, $this->fields
-        ));
-
-        $entity = $query->first();
+        $entity = $this->getQuery($where)->first();
 
         return empty($entity) ? [] : $entity->toArray();
     }
 
     public function findBy($field, $value)
     {
-        return $this->first([
-            $field => $value
-        ]);
+        return $this->first([$field => $value]);
     }
 
     public function find($id)
     {
-        return $this->first([
-            $this->primaryKey => $id
-        ]);
+        return $this->first([$this->primaryKey => $id]);
     }
 
     public function firstOrCreate($where, $data = [])
@@ -271,12 +241,8 @@ trait EntityControlTrait
      */
     public function delete($where)
     {
-        if (!is_array($where)) {
-            $where = [$this->primaryKey => $where];
-        }
-
         $query = $this
-            ->getQuery()
+            ->getQuery($where)
             ->where(array_only($where, $this->fields));
 
         if ($this->forceMode) {
@@ -287,9 +253,9 @@ trait EntityControlTrait
     }
 
     /** @deprecated */
-    public function forceDelete($id)
+    public function forceDelete($where)
     {
-        $this->getQuery()->find($id)->forceDelete();
+        $this->getQuery($where)->forceDelete();
     }
 
     public function withTrashed($enable = true)
@@ -308,14 +274,7 @@ trait EntityControlTrait
 
     public function restore($where)
     {
-        if (!is_array($where)) {
-            $where = [ $this->primaryKey => $where ];
-        }
-
-        return $this->getQuery()
-            ->onlyTrashed()
-            ->where($where)
-            ->restore();
+        return $this->getQuery($where)->onlyTrashed()->restore();
     }
 
     public function validateField($id, $field, $value)

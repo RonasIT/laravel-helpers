@@ -23,14 +23,19 @@ trait SearchTrait
         return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function filterBy($field, $default = null)
+    public function filterBy($field, $filterName = null)
     {
-        if (!empty($default)) {
-            $this->filter[$field] = array_get($this->filter, $field, $default);
+        if (empty($filterName)) {
+            if (str_contains($field, '.')) {
+                $entities = explode('.', $field);
+                $filterName = array_last($entities);
+            } else {
+                $filterName = $field;
+            }
         }
 
-        if (array_has($this->filter, $field)) {
-            $this->query->where($field, $this->filter[$field]);
+        if (array_has($this->filter, $filterName)) {
+            $this->addWhere($this->query, $field, $this->filter[$filterName]);
         }
 
         return $this;
@@ -41,20 +46,9 @@ trait SearchTrait
         if (!empty($this->filter['query'])) {
             $this->query->where(function ($query) use ($fields) {
                 foreach ($fields as $field) {
-                    if (str_contains($field, '.')) {
-                        $entities = explode('.', $field);
-                        $fieldName = array_pop($entities);
-
-                        $query->orWhereHas(implode('.', $entities), function ($query) use ($fieldName) {
-                            $query->where(
-                                $this->getQuerySearchCallback($fieldName)
-                            );
-                        });
-                    } else {
-                        $query->orWhere(
-                            $this->getQuerySearchCallback($field)
-                        );
-                    }
+                    $this->applyWhereCallback($query, $field, function ($q, $conditionField) {
+                        $q->orWhere($this->getQuerySearchCallback($conditionField));
+                    });
                 }
             });
         }
@@ -194,17 +188,9 @@ trait SearchTrait
     public function filterByList($filterName, $field)
     {
         if (array_has($this->filter, $filterName)) {
-            if (str_contains($field, '.')) {
-                $entities = explode('.', $field);
-                $fieldName = array_pop($entities);
-                $relation = implode('.', $entities);
-
-                $this->query->whereHas($relation, function ($query) use ($fieldName, $filterName) {
-                    $query->whereIn($fieldName, $this->filter[$filterName]);
-                });
-            } else {
-                $this->query->whereIn($field, $this->filter[$filterName]);
-            }
+            $this->applyWhereCallback($this->query, $field, function ($q, $conditionField) use ($filterName) {
+                $q->whereIn($conditionField, $this->filter[$filterName]);
+            });
         }
 
         return $this;
@@ -215,7 +201,6 @@ trait SearchTrait
         if (!empty($this->filter['with_count'])) {
             foreach ($this->filter['with_count'] as $requestedRelations) {
                 $explodedRelation = explode('.', $requestedRelations);
-
                 $countRelation = array_pop($explodedRelation);
                 $relation = implode($explodedRelation);
 
@@ -241,17 +226,9 @@ trait SearchTrait
 
     protected function addWhere(&$query, $field, $value, $sign = '=')
     {
-        if (str_contains($field, '.')) {
-            $entities = explode('.', $field);
-            $conditionField = array_pop($entities);
-            $relations = implode('.', $entities);
-
-            $query->whereHas($relations, function ($q) use ($conditionField, $value, $sign) {
-                $q->where($conditionField, $sign, $value);
-            });
-        } else {
-            $query->where($field, $sign, $value);
-        }
+        $this->applyWhereCallback($query, $field, function ($q, $field) use ($sign, $value) {
+            $q->where($field, $sign, $value);
+        });
     }
 
     protected function constructWhere($query, $where = [], $field = null)
@@ -269,5 +246,19 @@ trait SearchTrait
         }
 
         return $query;
+    }
+
+    protected function applyWhereCallback($query, $field, $callback) {
+        if (str_contains($field, '.')) {
+            $entities = explode('.', $field);
+            $conditionField = array_pop($entities);
+            $relations = implode('.', $entities);
+
+            $query->whereHas($relations, function ($q) use ($callback, $conditionField) {
+                $callback($q, $conditionField);
+            });
+        } else {
+            $callback($query, $field);
+        }
     }
 }
