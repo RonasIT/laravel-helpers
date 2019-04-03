@@ -53,7 +53,7 @@ trait EntityControlTrait
         $this->checkPrimaryKey();
     }
 
-    protected function getQuery()
+    protected function getQuery($where = [], $field = null)
     {
         $query = $this->model->query();
 
@@ -75,7 +75,7 @@ trait EntityControlTrait
             $query->withCount($this->requiredRelationsCount);
         }
 
-        return $query;
+        return $this->constructWhere($query, $where, $field);
     }
 
     public function withRelations(array $relations)
@@ -306,11 +306,15 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function restore($id)
+    public function restore($where)
     {
-        $this->getQuery()
-            ->withTrashed()
-            ->find($id)
+        if (!is_array($where)) {
+            $where = [ $this->primaryKey => $where ];
+        }
+
+        return $this->getQuery()
+            ->onlyTrashed()
+            ->where($where)
             ->restore();
     }
 
@@ -327,6 +331,61 @@ trait EntityControlTrait
                 $field => [$message]
             ]);
         }
+    }
+
+    public function deleteByList($values, $field = null)
+    {
+        $field = (empty($field)) ? $this->primaryKey : $field;
+
+        $query = $this
+            ->getQuery()
+            ->whereIn($field, $values);
+
+        if ($this->forceMode && $this->isSoftDelete()) {
+            $query->forceDelete();
+        } else {
+            $query->delete();
+        }
+    }
+
+    public function restoreByList($values, $field = null)
+    {
+        $field = (empty($field)) ? $this->primaryKey : $field;
+
+        $query = $this->getQuery()
+            ->onlyTrashed()
+            ->whereIn($field, $values);
+
+        $entities = $query->get()->toArray();
+
+        $query->restore();
+
+        return $entities;
+    }
+
+    public function getByList(array $values, $field = null)
+    {
+        $field = (empty($field)) ? $this->primaryKey : $field;
+
+        return $this->getQuery()->whereIn($field, $values)->get()->toArray();
+    }
+
+    public function countByList(array $values, $field = null)
+    {
+        $field = (empty($field)) ? $this->primaryKey : $field;
+
+        return $this->getQuery()->whereIn($field, $values)->count();
+    }
+
+    public function updateByList(array $values, $data, $field = null)
+    {
+        $field = (empty($field)) ? $this->primaryKey : $field;
+
+        $query = $this->getQuery()->whereIn($field, $values);
+
+        $fields = $this->forceMode ? $this->fields : $this->model->getFillable();
+
+        return $query->update(array_only($data, $fields));
     }
 
     protected function getEntityName()

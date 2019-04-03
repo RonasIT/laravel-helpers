@@ -238,4 +238,36 @@ trait SearchTrait
     {
         return $this->query;
     }
+
+    protected function addWhere(&$query, $field, $value, $sign = '=')
+    {
+        if (str_contains($field, '.')) {
+            $entities = explode('.', $field);
+            $conditionField = array_pop($entities);
+            $relations = implode('.', $entities);
+
+            $query->whereHas($relations, function ($q) use ($conditionField, $value, $sign) {
+                $q->where($conditionField, $sign, $value);
+            });
+        } else {
+            $query->where($field, $sign, $value);
+        }
+    }
+
+    protected function constructWhere($query, $where = [], $field = null)
+    {
+        if (!is_array($where)) {
+            $field = (empty($field)) ? $this->primaryKey : $field;
+
+            $where = [
+                $field => $where
+            ];
+        }
+
+        foreach ($where as $field => $value) {
+            $this->addWhere($query, $field, $value);
+        }
+
+        return $query;
+    }
 }
