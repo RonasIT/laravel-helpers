@@ -162,7 +162,7 @@ trait EntityControlTrait
         return $this->get(array_merge($where, $entityData));
     }
 
-    public function update($where, $data = [])
+    public function update($where, $data)
     {
         $item = $this->getQuery($where)->first();
 
