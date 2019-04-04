@@ -23,14 +23,19 @@ trait SearchTrait
         return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function filterBy($field, $default = null)
+    public function filterBy($field, $filterName = null)
     {
-        if (!empty($default)) {
-            $this->filter[$field] = array_get($this->filter, $field, $default);
+        if (empty($filterName)) {
+            if (str_contains($field, '.')) {
+                $entities = explode('.', $field);
+                $filterName = array_last($entities);
+            } else {
+                $filterName = $field;
+            }
         }
 
-        if (array_has($this->filter, $field)) {
-            $this->query->where($field, $this->filter[$field]);
+        if (array_has($this->filter, $filterName)) {
+            $this->addWhere($this->query, $field, $this->filter[$filterName]);
         }
 
         return $this;
@@ -44,8 +49,9 @@ trait SearchTrait
                     if (str_contains($field, '.')) {
                         $entities = explode('.', $field);
                         $fieldName = array_pop($entities);
+                        $relations = implode('.', $entities);
 
-                        $query->orWhereHas(implode('.', $entities), function ($query) use ($fieldName) {
+                        $query->orWhereHas($relations, function ($query) use ($fieldName) {
                             $query->where(
                                 $this->getQuerySearchCallback($fieldName)
                             );
@@ -105,6 +111,7 @@ trait SearchTrait
         return $isDesc ? 'DESC' : 'ASC';
     }
 
+    /** deprecated */
     public function filterByRelationField($relation, $field, $filterName = null)
     {
         if (empty($filterName)) {
@@ -189,5 +196,82 @@ trait SearchTrait
             'to' => $total,
             'total' => $total
         ];
+    }
+
+    public function filterByList($field, $filterName)
+    {
+        if (array_has($this->filter, $filterName)) {
+            $this->applyWhereCallback($this->query, $field, function (&$q, $conditionField) use ($filterName) {
+                $q->whereIn($conditionField, $this->filter[$filterName]);
+            });
+        }
+
+        return $this;
+    }
+
+    public function withCount()
+    {
+        if (!empty($this->filter['with_count'])) {
+            foreach ($this->filter['with_count'] as $requestedRelations) {
+                $explodedRelation = explode('.', $requestedRelations);
+                $countRelation = array_pop($explodedRelation);
+                $relation = implode($explodedRelation);
+
+                if (empty($relation)) {
+                    $this->query->withCount($countRelation);
+                } else {
+                    $this->query->with([
+                        $relation => function ($query) use ($countRelation) {
+                            $query->withCount($countRelation);
+                        }
+                    ]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSearchQuery()
+    {
+        return $this->query;
+    }
+
+    protected function addWhere(&$query, $field, $value, $sign = '=')
+    {
+        $this->applyWhereCallback($query, $field, function (&$q, $field) use ($sign, $value) {
+            $q->where($field, $sign, $value);
+        });
+    }
+
+    protected function constructWhere($query, $where = [], $field = null)
+    {
+        if (!is_array($where)) {
+            $field = (empty($field)) ? $this->primaryKey : $field;
+
+            $where = [
+                $field => $where
+            ];
+        }
+
+        foreach ($where as $field => $value) {
+            $this->addWhere($query, $field, $value);
+        }
+
+        return $query;
+    }
+
+    protected function applyWhereCallback($query, $field, $callback) {
+        if (str_contains($field, '.')) {
+            $entities = explode('.', $field);
+            $conditionField = array_pop($entities);
+            $relations = implode('.', $entities);
+
+            $query->whereHas($relations, function ($q) use ($callback, $conditionField) {
+                $callback($q, $conditionField);
+            });
+        } else {
+            $callback($query, $field);
+        }
     }
 }

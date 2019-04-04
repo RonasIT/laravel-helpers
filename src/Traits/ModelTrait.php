@@ -10,6 +10,13 @@ use Schema;
 
 trait ModelTrait
 {
+    protected static $forceVisible = [];
+
+    public static function setForceVisibleFields($fields)
+    {
+        self::$forceVisible = $fields;
+    }
+
     public static function getFields()
     {
         $model = (new static);
@@ -22,6 +29,13 @@ trait ModelTrait
         array_unshift($fillable, $keyName);
 
         return array_merge($fillable, $guarded, $timeStamps);
+    }
+
+    public function toArray()
+    {
+        $this->setHidden(array_subtraction($this->hidden, self::$forceVisible));
+
+        return parent::toArray();
     }
 
     public function getAllFieldsWithTable()
