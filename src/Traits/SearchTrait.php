@@ -202,7 +202,7 @@ trait SearchTrait
     public function filterByList($filterName, $field)
     {
         if (array_has($this->filter, $filterName)) {
-            $this->applyWhereCallback($this->query, $field, function ($q, $conditionField) use ($filterName) {
+            $this->applyWhereCallback($this->query, $field, function (&$q, $conditionField) use ($filterName) {
                 $q->whereIn($conditionField, $this->filter[$filterName]);
             });
         }
@@ -240,7 +240,7 @@ trait SearchTrait
 
     protected function addWhere(&$query, $field, $value, $sign = '=')
     {
-        $this->applyWhereCallback($query, $field, function ($q, $field) use ($sign, $value) {
+        $this->applyWhereCallback($query, $field, function (&$q, $field) use ($sign, $value) {
             $q->where($field, $sign, $value);
         });
     }

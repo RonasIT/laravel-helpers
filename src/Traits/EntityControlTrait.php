@@ -53,7 +53,7 @@ trait EntityControlTrait
         $this->checkPrimaryKey();
     }
 
-    protected function getQuery($where = [], $field = null)
+    protected function getQuery($where = [])
     {
         $query = $this->model->query();
 
@@ -75,7 +75,7 @@ trait EntityControlTrait
             $query->withCount($this->requiredRelationsCount);
         }
 
-        return $this->constructWhere($query, $where, $field);
+        return $this->constructWhere($query, $where);
     }
 
     public function withRelations(array $relations)
@@ -120,22 +120,24 @@ trait EntityControlTrait
     public function create($data)
     {
         $entityData = array_only($data, $this->fields);
+        $modelClass = get_class($this->model);
+        $model = new $modelClass();
 
         if ($this->forceMode) {
-            $this->model->forceFill($entityData);
+            $model->forceFill($entityData);
         } else {
-            $this->model->fill($entityData);
+            $model->fill($entityData);
         }
 
-        $this->model->save();
+        $model->save();
 
         if (!empty($this->requiredRelations)) {
-            $this->model->load($this->requiredRelations);
+            $model->load($this->requiredRelations);
         }
         
-        $this->afterCreateHook($this->model,$data);
+        $this->afterCreateHook($model,$data);
 
-        return $this->model->refresh()->toArray();
+        return $model->refresh()->toArray();
     }
 
     /**
@@ -285,7 +287,8 @@ trait EntityControlTrait
 
     public function validateField($id, $field, $value)
     {
-        $query = $this->getQuery()
+        $query = $this
+            ->getQuery()
             ->where('id', '<>', $id)
             ->where($field, $value);
 
@@ -317,7 +320,8 @@ trait EntityControlTrait
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        $query = $this->getQuery()
+        $query = $this
+            ->getQuery()
             ->onlyTrashed()
             ->whereIn($field, $values);
 
