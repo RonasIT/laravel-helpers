@@ -209,6 +209,30 @@ trait SearchTrait
         return $this;
     }
 
+    public function filterFrom($field, $strict = true, $filterName = null)
+    {
+        $filterName = empty($filterName) ? 'from' : $filterName;
+        $sign = $strict ? '>=' : '>';
+        
+        if (!empty($this->filter[$filterName])) {
+            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
+        }
+
+        return $this;
+    }
+
+    public function filterTo($field, $strict = true, $filterName = null)
+    {
+        $filterName = empty($filterName) ? 'to' : $filterName;
+        $sign = $strict ? '<=' : '<';
+        
+        if (!empty($this->filter[$filterName])) {
+            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
+        }
+
+        return $this;
+    }
+
     public function withCount()
     {
         if (!empty($this->filter['with_count'])) {
