@@ -85,7 +85,7 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function setWithCount($withCount)
+    public function withRelationsCount($withCount)
     {
         $this->requiredRelationsCount = $withCount;
 
@@ -135,7 +135,7 @@ trait EntityControlTrait
             $model->load($this->requiredRelations);
         }
         
-        $this->afterCreateHook($model,$data);
+        $this->afterCreateHook($model, $data);
 
         return $model->refresh()->toArray();
     }
@@ -170,7 +170,11 @@ trait EntityControlTrait
             return [];
         }
 
-        $item->fill(array_only($data, $item->getFillable()))->save();
+        if ($this->forceMode) {
+            $item->forceFill(array_only($data, $this->fields))->save();
+        } else {
+            $item->fill(array_only($data, $item->getFillable()))->save();
+        }
 
         $this->afterUpdateHook($item, $data);
 
@@ -205,6 +209,9 @@ trait EntityControlTrait
         return $this->getQuery($where)->get()->toArray();
     }
 
+    /**
+     * @deprecated
+     */
     public function getOrCreate($data)
     {
         $entities = $this->get($data);
@@ -260,7 +267,9 @@ trait EntityControlTrait
         }
     }
 
-    /** @deprecated */
+    /**
+     * @deprecated
+     */
     public function forceDelete($where)
     {
         $this->getQuery($where)->forceDelete();

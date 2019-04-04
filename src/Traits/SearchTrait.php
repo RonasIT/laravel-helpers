@@ -61,7 +61,6 @@ trait SearchTrait
                             $this->getQuerySearchCallback($field)
                         );
                     }
-
                 }
             });
         }
@@ -199,8 +198,12 @@ trait SearchTrait
         ];
     }
 
-    public function filterByList($filterName, $field)
+    public function filterByList($field, $filterName = null)
     {
+        if (empty($filterName)) {
+            $filterName = $field;
+        }
+
         if (array_has($this->filter, $filterName)) {
             $this->applyWhereCallback($this->query, $field, function (&$q, $conditionField) use ($filterName) {
                 $q->whereIn($conditionField, $this->filter[$filterName]);
