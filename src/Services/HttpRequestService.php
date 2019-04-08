@@ -10,6 +10,7 @@ class HttpRequestService
 {
     protected $debug;
 
+    protected $connectTimeout = 0;
     protected $allowRedirects = true;
 
     protected $options = [];
@@ -145,6 +146,13 @@ class HttpRequestService
         return $this;
     }
 
+    public function setConnectTimeout($seconds = 0)
+    {
+        $this->connectTimeout = $seconds;
+
+        return $this;
+    }
+
     private function setOptions($headers)
     {
         $this->options = [];
@@ -152,6 +160,7 @@ class HttpRequestService
         $this->options['headers'] = $headers;
         $this->options['cookies'] = $this->cookies;
         $this->options['allow_redirects'] = $this->allowRedirects;
+        $this->options['connect_timeout'] = $this->connectTimeout;
     }
 
     private function setData($method, $headers, $data = [])
