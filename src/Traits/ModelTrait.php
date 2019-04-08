@@ -11,10 +11,16 @@ use Schema;
 trait ModelTrait
 {
     protected static $forceVisible = [];
+    protected static $forceHidden = [];
 
     public static function setForceVisibleFields($fields)
     {
         self::$forceVisible = $fields;
+    }
+
+    public static function setForceHiddenFields($fields)
+    {
+        self::$forceHidden = $fields;
     }
 
     public static function getFields()
@@ -33,7 +39,8 @@ trait ModelTrait
 
     public function toArray()
     {
-        $this->setHidden(array_subtraction($this->hidden, self::$forceVisible));
+        $hidden = array_merge($this->hidden, self::$forceHidden);
+        $this->setHidden(array_subtraction($hidden, self::$forceVisible));
 
         return parent::toArray();
     }
