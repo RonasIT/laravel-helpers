@@ -212,7 +212,7 @@ trait SearchTrait
     public function filterFrom($field, $strict = true, $filterName = null)
     {
         $filterName = empty($filterName) ? 'from' : $filterName;
-        $sign = $strict ? '>=' : '>';
+        $sign = $strict ? '>' : '>=';
         
         if (!empty($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
@@ -224,7 +224,7 @@ trait SearchTrait
     public function filterTo($field, $strict = true, $filterName = null)
     {
         $filterName = empty($filterName) ? 'to' : $filterName;
-        $sign = $strict ? '<=' : '<';
+        $sign = $strict ? '<' : '<=';
         
         if (!empty($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
