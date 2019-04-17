@@ -29,8 +29,12 @@
       "RonasIT\\Support\\": "src/"
     },
     "files": [
-      "tests/TestCase.php",
       "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "files": [
+      "tests/TestCase.php"
     ]
   },
   "minimum-stability": "stable",
