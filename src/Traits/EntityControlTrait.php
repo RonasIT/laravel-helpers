@@ -126,7 +126,7 @@ trait EntityControlTrait
         if ($this->forceMode) {
             $model->forceFill($entityData);
         } else {
-            $model->fill($entityData);
+            $model->fill(array_only($entityData, $model->getFillable()));
         }
 
         $model->save();
