@@ -53,7 +53,7 @@ class Exporter implements FromQuery, WithHeadings
 
         $this->store($filename, null, ucfirst($this->type));
 
-        return Storage::filePath($filename);
+        return Storage::path($filename);
     }
 
     private function getFileName()
