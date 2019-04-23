@@ -2,25 +2,30 @@
 
 namespace RonasIT\Support\Exporters;
 
-use Maatwebsite\Excel\Facades\Excel;
-use RonasIT\Support\Iterators\DBIterator;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-/**
- * @property DBIterator $iterator
- */
-class Exporter
+class Exporter implements FromQuery, WithHeadings
 {
-    protected $iterator;
+    use Exportable;
+
+    protected $query;
     protected $fileName;
-    protected $filters;
-    protected $type = 'csv';
     protected $fields = [];
+    protected $type = 'csv';
 
     public function setQuery($query)
     {
-        $this->iterator = new DBIterator($query);
+        $this->query = $query->select($this->fields);
 
         return $this;
+    }
+
+    public function query()
+    {
+        return $this->query;
     }
 
     public function setFileName($fileName)
@@ -30,13 +35,11 @@ class Exporter
         return $this;
     }
 
-    public function setFilters($filters)
-    {
-        $this->filters = array_except($filters, ['token', 'export_type']);
-
-        return $this;
-    }
-
+    /**
+     * @param $type string should be one of presented here https://docs.laravel-excel.com/3.0/exports/export-formats.html
+     *
+     * @return $this
+     */
     public function setType($type)
     {
         $this->type = $type;
@@ -46,54 +49,22 @@ class Exporter
 
     public function export()
     {
-        $info = Excel::create($this->getFileName(), function ($excel) {
-            $excel->sheet('export', function ($sheet) {
-                $this->exportFilters($sheet);
+        $filename = $this->getFileName();
 
-                $sheet->appendRow($this->fields);
+        $this->store($filename, null, ucfirst($this->type));
 
-                foreach ($this->iterator->getGenerator() as $line) {
-                    $sheet->appendRow($this->getLine($line));
-                }
-            });
-        })->store($this->type, false, true);
-
-        return $info['full'];
+        return Storage::filePath($filename);
     }
 
     private function getFileName()
     {
-        return $this->fileName ?? uniqid();
+        $this->fileName = empty($this->fileName) ? uniqid() : $this->fileName;
+
+        return $this->fileName . '.' . $this->type;
     }
 
-    public function getLine($item)
+    public function headings(): array
     {
-        return array_map(function ($field) use ($item) {
-            $value = array_get($item, $field);
-
-            if (is_array($value)) {
-                return json_encode($item[$field]);
-            }
-
-            return $value;
-        }, $this->fields);
-    }
-
-    protected function exportFilters($sheet)
-    {
-        $sheet->appendRow(['Filters:']);
-
-        foreach ($this->filters as $key => $value) {
-            $line = [$key];
-
-            if (is_array($value)) {
-                $line = array_merge($line, $value);
-            } else {
-                $line[] = $value;
-            }
-            $sheet->appendRow($line);
-        }
-
-        $sheet->appendRow(['']);
+        return $this->fields;
     }
 }
