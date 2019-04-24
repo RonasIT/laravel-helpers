@@ -5,20 +5,21 @@ namespace RonasIT\Support\Exporters;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use RonasIT\Support\Interfaces\ExporterInterface;
 
-class Exporter implements FromQuery, WithHeadings
+abstract class Exporter implements FromQuery, WithHeadings, WithMapping, ExporterInterface
 {
     use Exportable;
 
     protected $query;
     protected $fileName;
-    protected $fields = [];
     protected $type = 'csv';
 
     public function setQuery($query)
     {
-        $this->query = $query->select($this->fields);
+        $this->query = $query;
 
         return $this;
     }
@@ -51,6 +52,8 @@ class Exporter implements FromQuery, WithHeadings
     {
         $filename = $this->getFileName();
 
+        $this->query->select($this->getFields());
+
         $this->store($filename, null, ucfirst($this->type));
 
         return Storage::path($filename);
@@ -65,6 +68,13 @@ class Exporter implements FromQuery, WithHeadings
 
     public function headings(): array
     {
-        return $this->fields;
+        return $this->getFields();
     }
+
+    public function map($row): array
+    {
+        return $row->toArray();
+    }
+
+    abstract public function getFields();
 }
