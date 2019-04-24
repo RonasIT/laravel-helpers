@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Exporters;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -64,7 +65,9 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
 
     public function map($row): array
     {
-        return $row->only($this->getFields());
+        return array_map(function ($fieldName) use ($row) {
+            return Arr::get($row, $fieldName);
+        }, $this->getFields());
     }
 
     abstract public function getFields(): array;
