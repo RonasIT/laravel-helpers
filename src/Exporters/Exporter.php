@@ -17,7 +17,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
     protected $fileName;
     protected $type = 'csv';
 
-    public function setQuery($query)
+    public function setQuery($query): self
     {
         $this->query = $query;
 
@@ -29,7 +29,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
         return $this->query;
     }
 
-    public function setFileName($fileName)
+    public function setFileName($fileName): self
     {
         $this->fileName = $fileName;
 
@@ -41,29 +41,20 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    public function export()
+    public function export(): string
     {
         $filename = $this->getFileName();
-
-        $this->query->select($this->getFields());
 
         $this->store($filename, null, ucfirst($this->type));
 
         return Storage::path($filename);
-    }
-
-    private function getFileName()
-    {
-        $this->fileName = empty($this->fileName) ? uniqid() : $this->fileName;
-
-        return $this->fileName . '.' . $this->type;
     }
 
     public function headings(): array
@@ -73,8 +64,15 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
 
     public function map($row): array
     {
-        return $row->toArray();
+        return $row->only($this->getFields());
     }
 
-    abstract public function getFields();
+    abstract public function getFields(): array;
+
+    protected function getFileName(): string
+    {
+        $this->fileName = empty($this->fileName) ? uniqid() : $this->fileName;
+
+        return $this->fileName . '.' . $this->type;
+    }
 }
