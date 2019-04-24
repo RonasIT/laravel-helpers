@@ -7,6 +7,8 @@ interface ExporterInterface
     /**
      * Set fields to export
      *
+     * Use associative array to use keys as headings
+     *
      * @return array
      */
     public function getFields();

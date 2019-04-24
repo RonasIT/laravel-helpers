@@ -60,7 +60,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
 
     public function headings(): array
     {
-        return $this->getFields();
+        return is_associative($this->getFields()) ? array_keys($this->getFields()) : $this->getFields();
     }
 
     public function map($row): array
