@@ -23,6 +23,11 @@ trait SearchTrait
         return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
 
+    /**
+     * @param $field string, filtered field, you can pass field name with dots to filter by field of relation
+     * @param $filterName string|null, key from filters which contains filter value
+     * @return $this
+     */
     public function filterBy($field, $filterName = null)
     {
         if (empty($filterName)) {
@@ -111,7 +116,11 @@ trait SearchTrait
         return $isDesc ? 'DESC' : 'ASC';
     }
 
-    /** deprecated */
+    /**
+     * @deprecated
+     *
+     * Use filterBy() with dot notation instead
+     */
     public function filterByRelationField($relation, $field, $filterName = null)
     {
         if (empty($filterName)) {
