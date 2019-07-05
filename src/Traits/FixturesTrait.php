@@ -8,6 +8,43 @@ use Illuminate\Support\Facades\DB;
 trait FixturesTrait
 {
     protected static $tables;
+    protected $postgisTables = [
+        'tiger.addrfeat',
+        'tiger.edges',
+        'tiger.faces',
+        'topology.topology',
+        'tiger.place_lookup',
+        'topology.layer',
+        'tiger.geocode_settings',
+        'tiger.geocode_settings_default',
+        'tiger.direction_lookup',
+        'tiger.secondary_unit_lookup',
+        'tiger.state_lookup',
+        'tiger.street_type_lookup',
+        'tiger.county_lookup',
+        'tiger.countysub_lookup',
+        'tiger.zip_lookup_all',
+        'tiger.zip_lookup_base',
+        'tiger.zip_lookup',
+        'tiger.county',
+        'tiger.state',
+        'tiger.place',
+        'tiger.zip_state',
+        'tiger.zip_state_loc',
+        'tiger.cousub',
+        'tiger.featnames',
+        'tiger.addr',
+        'tiger.zcta5',
+        'tiger.loader_platform',
+        'tiger.loader_variables',
+        'tiger.loader_lookuptables',
+        'tiger.tract',
+        'tiger.tabblock',
+        'tiger.bg',
+        'tiger.pagc_gaz',
+        'tiger.pagc_lex',
+        'tiger.pagc_rules',
+    ];
 
     protected function loadTestDump($truncateExcept = ['migrations', 'password_resets'],
                                     $prepareSequencesExcept = ['migrations', 'password_resets', 'settings'])
@@ -21,12 +58,12 @@ trait FixturesTrait
         $databaseTables = $this->getTables();
         $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $databaseTables, $truncateExcept);
+        $this->clearDatabase($scheme, $databaseTables,  array_merge($this->postgisTables, $truncateExcept));
 
         DB::unprepared($dump);
 
         if ($scheme === 'pgsql') {
-            $this->prepareSequences($databaseTables, $prepareSequencesExcept);
+            $this->prepareSequences($databaseTables, array_merge($this->postgisTables, $prepareSequencesExcept));
         }
     }
 
