@@ -58,7 +58,7 @@ trait FixturesTrait
         $databaseTables = $this->getTables();
         $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $databaseTables,  array_merge($this->postgisTables, $truncateExcept));
+        $this->clearDatabase($scheme, $databaseTables, array_merge($this->postgisTables, $truncateExcept));
 
         DB::unprepared($dump);
 
