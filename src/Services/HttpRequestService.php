@@ -2,8 +2,8 @@
 
 namespace RonasIT\Support\Services;
 
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
 class HttpRequestService
@@ -85,6 +85,8 @@ class HttpRequestService
 
         $this->logResponse($response, $time);
 
+        $this->options = [];
+
         return $response;
     }
 
@@ -155,8 +157,6 @@ class HttpRequestService
 
     private function setOptions($headers)
     {
-        $this->options = [];
-
         $this->options['headers'] = $headers;
         $this->options['cookies'] = $this->cookies;
         $this->options['allow_redirects'] = $this->allowRedirects;
