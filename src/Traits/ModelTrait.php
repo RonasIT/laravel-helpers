@@ -158,7 +158,7 @@ trait ModelTrait
 
             $relation = $this->getRelationWithoutConstraints($query, $relationString);
             $subQuery = $relation->getRelationExistenceQuery(
-                $relation->getRelated()->newQueryWithoutRelationships(),
+                $relation->getQuery(),
                 $query,
                 $requiredColumns
             );
