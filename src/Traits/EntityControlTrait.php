@@ -310,6 +310,16 @@ trait EntityControlTrait
         }
     }
 
+    public function chunk($limit, $callback, $where = [])
+    {
+        $this
+            ->getQuery($where)
+            ->orderBy($this->primaryKey)
+            ->chunk($limit, function ($items) use ($callback) {
+                $callback($items->toArray());
+            });
+    }
+
     public function deleteByList($values, $field = null)
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
