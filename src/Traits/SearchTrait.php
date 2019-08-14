@@ -188,7 +188,8 @@ trait SearchTrait
 
     protected function wrapPaginatedData($data)
     {
-        $url = Request::path();
+        $url = Request::url();
+        $path = Request::path();
         $total = count($data);
 
         return [
@@ -199,7 +200,7 @@ trait SearchTrait
             'last_page' => 1,
             'last_page_url' => "{$url}?page=1",
             'next_page_url' => null,
-            'path' => $url,
+            'path' => $path,
             'per_page' => $total,
             'prev_page_url' => null,
             'to' => $total,
