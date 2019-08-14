@@ -249,7 +249,7 @@ trait SearchTrait
             foreach ($this->filter['with_count'] as $requestedRelations) {
                 $explodedRelation = explode('.', $requestedRelations);
                 $countRelation = array_pop($explodedRelation);
-                $relation = implode($explodedRelation);
+                $relation = implode('.', $explodedRelation);
 
                 if (empty($relation)) {
                     $this->query->withCount($countRelation);
