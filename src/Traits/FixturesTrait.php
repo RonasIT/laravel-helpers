@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 trait FixturesTrait
 {
@@ -71,7 +72,7 @@ trait FixturesTrait
     {
         $class = get_class($this);
         $explodedClass = explode('\\', $class);
-        $className = array_last($explodedClass);
+        $className = Arr::last($explodedClass);
 
         return base_path("tests/fixtures/{$className}/{$fn}");
     }
