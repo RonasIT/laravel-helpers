@@ -6,6 +6,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use Schema;
 
 trait ModelTrait
@@ -128,7 +129,7 @@ trait ModelTrait
 
     protected function prepareRelations($relations)
     {
-        if (str_contains($relations, '.')) {
+        if (Str::contains($relations, '.')) {
             return explode('.', $relations);
         } else {
             return [
@@ -154,7 +155,7 @@ trait ModelTrait
         ];
 
         foreach ($relations as $relationString) {
-            $query = array_last($queryCollection);
+            $query = Arr::last($queryCollection);
 
             $relation = $this->getRelationWithoutConstraints($query, $relationString);
             $subQuery = $relation->getRelationExistenceQuery(

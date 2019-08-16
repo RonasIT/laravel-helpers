@@ -5,6 +5,7 @@ namespace RonasIT\Support\Services;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
+use Illuminate\Support\Arr;
 
 class HttpRequestService
 {
@@ -176,13 +177,13 @@ class HttpRequestService
 
         $contentType = elseChain(
             function () use ($headers) {
-                return array_get($headers, 'Content-Type');
+                return Arr::get($headers, 'Content-Type');
             },
             function () use ($headers) {
-                return array_get($headers, 'content-type');
+                return Arr::get($headers, 'content-type');
             },
             function () use ($headers) {
-                return array_get($headers, 'CONTENT-TYPE');
+                return Arr::get($headers, 'CONTENT-TYPE');
             }
         );
 

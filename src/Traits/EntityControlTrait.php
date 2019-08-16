@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
+use Illuminate\Support\Arr;
 
 /**
  * @property Model model
@@ -119,14 +120,14 @@ trait EntityControlTrait
 
     public function create($data)
     {
-        $entityData = array_only($data, $this->fields);
+        $entityData = Arr::only($data, $this->fields);
         $modelClass = get_class($this->model);
         $model = new $modelClass();
 
         if ($this->forceMode) {
             $model->forceFill($entityData);
         } else {
-            $model->fill(array_only($entityData, $model->getFillable()));
+            $model->fill(Arr::only($entityData, $model->getFillable()));
         }
 
         $model->save();
@@ -152,7 +153,7 @@ trait EntityControlTrait
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
-        $entityData = array_only($data, $fields);
+        $entityData = Arr::only($data, $fields);
 
         $this
             ->getQuery()
@@ -171,9 +172,9 @@ trait EntityControlTrait
         }
 
         if ($this->forceMode) {
-            $item->forceFill(array_only($data, $this->fields))->save();
+            $item->forceFill(Arr::only($data, $this->fields))->save();
         } else {
-            $item->fill(array_only($data, $item->getFillable()))->save();
+            $item->fill(Arr::only($data, $item->getFillable()))->save();
         }
 
         $this->afterUpdateHook($item, $data);
@@ -373,7 +374,7 @@ trait EntityControlTrait
 
         $fields = $this->forceMode ? $this->fields : $this->model->getFillable();
 
-        return $query->update(array_only($data, $fields));
+        return $query->update(Arr::only($data, $fields));
     }
 
     protected function getEntityName()

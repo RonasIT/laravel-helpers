@@ -5,6 +5,7 @@ namespace RonasIT\Support\Importers;
 use RonasIT\Support\Exceptions\IncorrectImportFileException;
 use RonasIT\Support\Exceptions\IncorrectImportLineException;
 use RonasIT\Support\Iterators\CsvIterator;
+use Illuminate\Support\Arr;
 
 class Importer
 {
@@ -122,7 +123,7 @@ class Importer
             $line['id'] = null;
         }
 
-        if (array_has($line, self::DELETED_AT_FIELD) && empty($line[self::DELETED_AT_FIELD])) {
+        if (Arr::has($line, self::DELETED_AT_FIELD) && empty($line[self::DELETED_AT_FIELD])) {
             $line[self::DELETED_AT_FIELD] = null;
         }
 
@@ -220,11 +221,11 @@ class Importer
     {
         $line = $this->iterator->current();
 
-        $mandatoryValues = array_only($line, $this->mandatoryFields);
+        $mandatoryValues = Arr::only($line, $this->mandatoryFields);
 
         if (count($mandatoryValues) != count($this->mandatoryFields)) {
             $notExistedFields = array_filter($this->mandatoryFields, function ($field) use ($line) {
-                return !array_has($line, $field);
+                return !Arr::has($line, $field);
             });
 
             if (count($notExistedFields) == 1) {

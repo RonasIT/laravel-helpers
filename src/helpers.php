@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Collection;
-
+use Illuminate\Support\Arr;
 
 /**
  * It calls on all callbacks to the first, which did not return null.
@@ -60,7 +60,7 @@ function array_round($array)
 function array_lists($array, $key)
 {
     return array_map(function ($item) use ($key) {
-        return array_get($item, $key);
+        return Arr::get($item, $key);
     }, $array);
 }
 
@@ -81,7 +81,7 @@ function array_get_list($array, $path)
     $key = array_shift($path);
 
     if (empty($path)) {
-        return array_get($array, $key);
+        return Arr::get($array, $key);
     }
 
     if ($key == '*') {
@@ -97,7 +97,7 @@ function array_get_list($array, $path)
 
         return array_collapse($values);
     } else {
-        $value = array_get($array, $key);
+        $value = Arr::get($array, $key);
 
         return array_get_list($value, $path);
     }
@@ -294,7 +294,7 @@ function array_unique_objects($objectsList, $filter = 'id')
         }
 
         if (is_array($filter)) {
-            $value = array_only($object, $filter);
+            $value = Arr::only($object, $filter);
         }
 
         if (in_array($value, $uniqueKeys)) {
@@ -360,7 +360,7 @@ function prepend_symbols($string, $expectedLength, $symbol)
 
 function array_default(&$array, $key, $default)
 {
-    $array[$key] = array_get($array, $key, $default);
+    $array[$key] = Arr::get($array, $key, $default);
 }
 
 /**
@@ -373,7 +373,7 @@ function array_undot($array)
     $result = [];
 
     foreach ($array as $key => $value) {
-        array_set($result, $key, $value);
+        Arr::set($result, $key, $value);
     }
 
     return $result;
