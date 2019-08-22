@@ -149,7 +149,7 @@ trait EntityControlTrait
      *
      * @return array
      */
-    public function updateMany($where, $data)
+    public function updateMany($where, array $data)
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
@@ -163,7 +163,15 @@ trait EntityControlTrait
         return $this->get(array_merge($where, $entityData));
     }
 
-    public function update($where, $data)
+    /**
+     * Update only one row by condition or primary key value
+     *
+     * @param array|integer $where
+     * @param array $data
+     *
+     * @return array
+     */
+    public function update($where, array $data)
     {
         $item = $this->getQuery($where)->first();
 
@@ -256,15 +264,16 @@ trait EntityControlTrait
      * Delete rows by condition or primary key
      *
      * @param array|integer|string $where
+     * @return integer count of deleted rows
      */
-    public function delete($where)
+    public function delete($where): int
     {
         $query = $this->getQuery($where);
 
         if ($this->forceMode) {
-            $query->forceDelete();
+            return $query->forceDelete();
         } else {
-            $query->delete();
+            return $query->delete();
         }
     }
 
@@ -321,7 +330,14 @@ trait EntityControlTrait
             });
     }
 
-    public function deleteByList($values, $field = null)
+    /**
+     * Delete rows by list of values a particular field or primary key
+     *
+     * @param array $values
+     * @param string|null $field condition field, primary key is default value
+     * @return integer count of deleted rows
+     */
+    public function deleteByList(array $values, $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -330,9 +346,9 @@ trait EntityControlTrait
             ->whereIn($field, $values);
 
         if ($this->forceMode && $this->isSoftDelete()) {
-            $query->forceDelete();
+            return $query->forceDelete();
         } else {
-            $query->delete();
+            return $query->delete();
         }
     }
 
