@@ -2,11 +2,13 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Support\Arr; 
+
 trait TranslationUpdateTrait
 {
     public function updateWithTranslations($id, $data)
     {
-        $translations = array_pull($data, 'translations');
+        $translations = Arr::pull($data, 'translations');
 
         if (empty($translations)) {
             return $this->update(['id' => $id], $data);
