@@ -264,7 +264,7 @@ trait EntityControlTrait
      * Delete rows by condition or primary key
      *
      * @param array|integer|string $where
-     * @return integer
+     * @return integer count of deleted rows
      */
     public function delete($where): int
     {
@@ -330,7 +330,14 @@ trait EntityControlTrait
             });
     }
 
-    public function deleteByList($values, $field = null): int
+    /**
+     * Delete rows by list of values a particular field or primary key
+     *
+     * @param array $values
+     * @param string|null $field condition field, primary key is default value
+     * @return integer count of deleted rows
+     */
+    public function deleteByList(array $values, $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
