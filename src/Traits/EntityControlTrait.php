@@ -2,11 +2,11 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
-use Illuminate\Support\Arr;
 
 /**
  * @property Model model
@@ -135,7 +135,7 @@ trait EntityControlTrait
         if (!empty($this->requiredRelations)) {
             $model->load($this->requiredRelations);
         }
-        
+
         $this->afterCreateHook($model, $data);
 
         return $model->refresh()->toArray();
@@ -156,8 +156,7 @@ trait EntityControlTrait
         $entityData = Arr::only($data, $fields);
 
         $this
-            ->getQuery()
-            ->where($where)
+            ->getQuery($where)
             ->update($entityData);
 
         return $this->get(array_merge($where, $entityData));
@@ -415,12 +414,12 @@ trait EntityControlTrait
             throw new InvalidModelException("Model {$modelClass} must have primary key.");
         }
     }
-    
+
     protected function afterUpdateHook($entity, $data)
     {
         // implement it yourself if you need it
     }
-    
+
     protected function afterCreateHook($entity, $data)
     {
         // implement it yourself if you need it
