@@ -99,15 +99,21 @@ trait SearchTrait
         return $this->wrapPaginatedData($this->query->get()->toArray());
     }
 
-    public function orderBy($default = null, $defaultDesc = false) {
+    public function orderBy($default = null, $defaultDesc = false)
+    {
         $default = (empty($default)) ? $this->primaryKey : $default;
-        $orderBy = Arr::get($this->filter, 'order_by', $default);
+
+        $orderField = Arr::get($this->filter, 'order_by', $default);
         $isDesc = Arr::get($this->filter, 'desc', $defaultDesc);
 
-        $this->query->orderByRelated($orderBy, $this->getDesc($isDesc));
+        if (Str::contains($orderField, '.')) {
+            $this->query->orderByRelated($orderField, $this->getDesc($isDesc));
+        } else {
+            $this->query->orderBy($orderField, $this->getDesc($isDesc));
+        }
 
-        if ($orderBy != $default) {
-            $this->query->orderByRelated($default, $this->getDesc($defaultDesc));
+        if ($orderField != $default) {
+            $this->query->orderBy($default, $this->getDesc($defaultDesc));
         }
 
         return $this;
