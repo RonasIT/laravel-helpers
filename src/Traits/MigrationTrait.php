@@ -11,7 +11,7 @@ trait MigrationTrait
     public function addForeignKey($fromEntity, $toEntity, $needAddField = false)
     {
         Schema::table($this->getTableName($fromEntity), function (Blueprint $table) use ($toEntity, $needAddField) {
-            $fieldName = snake_case($toEntity) . '_id';
+            $fieldName = Str::snake($toEntity) . '_id';
 
             if ($needAddField) {
                 $table->unsignedInteger($fieldName);
@@ -25,7 +25,7 @@ trait MigrationTrait
 
     public function dropForeignKey($fromEntity, $toEntity, $needDropField = false)
     {
-        $field = snake_case($toEntity) . '_id';
+        $field = Str::snake($toEntity) . '_id';
         $table = $this->getTableName($fromEntity);
 
         if (Schema::hasColumn($table, $field)) {
@@ -63,7 +63,7 @@ trait MigrationTrait
 
     protected function getBridgeTable($fromEntity, $toEntity)
     {
-        $entities = [snake_case($fromEntity), snake_case($toEntity)];
+        $entities = [Str::snake($fromEntity), Str::snake($toEntity)];
         sort($entities, SORT_STRING);
 
         return implode('_', $entities);
@@ -74,7 +74,7 @@ trait MigrationTrait
         if (Schema::hasTable($entityName)) {
             return $entityName;
         }
-        $entityName = snake_case($entityName);
+        $entityName = Str::snake($entityName);
 
         return Str::plural($entityName);
     }

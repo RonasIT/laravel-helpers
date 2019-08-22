@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Exceptions\PostValidationException;
+use Illuminate\Support\Arr;
 
 /**
  * @property Model model
@@ -119,14 +120,14 @@ trait EntityControlTrait
 
     public function create($data)
     {
-        $entityData = array_only($data, $this->fields);
+        $entityData = Arr::only($data, $this->fields);
         $modelClass = get_class($this->model);
         $model = new $modelClass();
 
         if ($this->forceMode) {
             $model->forceFill($entityData);
         } else {
-            $model->fill(array_only($entityData, $model->getFillable()));
+            $model->fill(Arr::only($entityData, $model->getFillable()));
         }
 
         $model->save();
@@ -148,11 +149,11 @@ trait EntityControlTrait
      *
      * @return array
      */
-    public function updateMany($where, $data)
+    public function updateMany($where, array $data)
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
-        $entityData = array_only($data, $fields);
+        $entityData = Arr::only($data, $fields);
 
         $this
             ->getQuery()
@@ -162,7 +163,15 @@ trait EntityControlTrait
         return $this->get(array_merge($where, $entityData));
     }
 
-    public function update($where, $data)
+    /**
+     * Update only one row by condition or primary key value
+     *
+     * @param array|integer $where
+     * @param array $data
+     *
+     * @return array
+     */
+    public function update($where, array $data)
     {
         $item = $this->getQuery($where)->first();
 
@@ -171,9 +180,9 @@ trait EntityControlTrait
         }
 
         if ($this->forceMode) {
-            $item->forceFill(array_only($data, $this->fields))->save();
+            $item->forceFill(Arr::only($data, $this->fields))->save();
         } else {
-            $item->fill(array_only($data, $item->getFillable()))->save();
+            $item->fill(Arr::only($data, $item->getFillable()))->save();
         }
 
         $this->afterUpdateHook($item, $data);
@@ -255,15 +264,16 @@ trait EntityControlTrait
      * Delete rows by condition or primary key
      *
      * @param array|integer|string $where
+     * @return integer count of deleted rows
      */
-    public function delete($where)
+    public function delete($where): int
     {
         $query = $this->getQuery($where);
 
         if ($this->forceMode) {
-            $query->forceDelete();
+            return $query->forceDelete();
         } else {
-            $query->delete();
+            return $query->delete();
         }
     }
 
@@ -310,7 +320,24 @@ trait EntityControlTrait
         }
     }
 
-    public function deleteByList($values, $field = null)
+    public function chunk($limit, $callback, $where = [])
+    {
+        $this
+            ->getQuery($where)
+            ->orderBy($this->primaryKey)
+            ->chunk($limit, function ($items) use ($callback) {
+                $callback($items->toArray());
+            });
+    }
+
+    /**
+     * Delete rows by list of values a particular field or primary key
+     *
+     * @param array $values
+     * @param string|null $field condition field, primary key is default value
+     * @return integer count of deleted rows
+     */
+    public function deleteByList(array $values, $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -319,9 +346,9 @@ trait EntityControlTrait
             ->whereIn($field, $values);
 
         if ($this->forceMode && $this->isSoftDelete()) {
-            $query->forceDelete();
+            return $query->forceDelete();
         } else {
-            $query->delete();
+            return $query->delete();
         }
     }
 
@@ -363,7 +390,7 @@ trait EntityControlTrait
 
         $fields = $this->forceMode ? $this->fields : $this->model->getFillable();
 
-        return $query->update(array_only($data, $fields));
+        return $query->update(Arr::only($data, $fields));
     }
 
     protected function getEntityName()

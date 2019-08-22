@@ -5,6 +5,8 @@ namespace RonasIT\Support\Traits;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @property Query query 
@@ -17,8 +19,8 @@ trait SearchTrait
     public function paginate()
     {
         $defaultPerPage = config('defaults.items_per_page');
-        $perPage = array_get($this->filter, 'per_page', $defaultPerPage );
-        $page = array_get($this->filter, 'page', 1);
+        $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage );
+        $page = Arr::get($this->filter, 'page', 1);
 
         return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
@@ -31,15 +33,15 @@ trait SearchTrait
     public function filterBy($field, $filterName = null)
     {
         if (empty($filterName)) {
-            if (str_contains($field, '.')) {
+            if (Str::contains($field, '.')) {
                 $entities = explode('.', $field);
-                $filterName = array_last($entities);
+                $filterName = Arr::last($entities);
             } else {
                 $filterName = $field;
             }
         }
 
-        if (array_has($this->filter, $filterName)) {
+        if (Arr::has($this->filter, $filterName)) {
             $this->addWhere($this->query, $field, $this->filter[$filterName]);
         }
 
@@ -51,7 +53,7 @@ trait SearchTrait
         if (!empty($this->filter['query'])) {
             $this->query->where(function ($query) use ($fields) {
                 foreach ($fields as $field) {
-                    if (str_contains($field, '.')) {
+                    if (Str::contains($field, '.')) {
                         $entities = explode('.', $field);
                         $fieldName = array_pop($entities);
                         $relations = implode('.', $entities);
@@ -97,15 +99,21 @@ trait SearchTrait
         return $this->wrapPaginatedData($this->query->get()->toArray());
     }
 
-    public function orderBy($default = null, $defaultDesc = false) {
+    public function orderBy($default = null, $defaultDesc = false)
+    {
         $default = (empty($default)) ? $this->primaryKey : $default;
-        $orderBy = array_get($this->filter, 'order_by', $default);
-        $isDesc = array_get($this->filter, 'desc', $defaultDesc);
 
-        $this->query->orderByRelated($orderBy, $this->getDesc($isDesc));
+        $orderField = Arr::get($this->filter, 'order_by', $default);
+        $isDesc = Arr::get($this->filter, 'desc', $defaultDesc);
 
-        if ($orderBy != $default) {
-            $this->query->orderByRelated($default, $this->getDesc($defaultDesc));
+        if (Str::contains($orderField, '.')) {
+            $this->query->orderByRelated($orderField, $this->getDesc($isDesc));
+        } else {
+            $this->query->orderBy($orderField, $this->getDesc($isDesc));
+        }
+
+        if ($orderField != $default) {
+            $this->query->orderBy($default, $this->getDesc($defaultDesc));
         }
 
         return $this;
@@ -127,7 +135,7 @@ trait SearchTrait
             $filterName = $field;
         }
 
-        if (array_has($this->filter, $filterName)) {
+        if (Arr::has($this->filter, $filterName)) {
             $this->query->whereHas($relation, function ($query) use ($field, $filterName) {
                 $query->where(
                     $field, $this->filter[$filterName]
@@ -188,7 +196,8 @@ trait SearchTrait
 
     protected function wrapPaginatedData($data)
     {
-        $url = Request::path();
+        $url = Request::url();
+        $path = Request::path();
         $total = count($data);
 
         return [
@@ -199,7 +208,7 @@ trait SearchTrait
             'last_page' => 1,
             'last_page_url' => "{$url}?page=1",
             'next_page_url' => null,
-            'path' => $url,
+            'path' => $path,
             'per_page' => $total,
             'prev_page_url' => null,
             'to' => $total,
@@ -209,7 +218,7 @@ trait SearchTrait
 
     public function filterByList($field, $filterName)
     {
-        if (array_has($this->filter, $filterName)) {
+        if (Arr::has($this->filter, $filterName)) {
             $this->applyWhereCallback($this->query, $field, function (&$q, $conditionField) use ($filterName) {
                 $q->whereIn($conditionField, $this->filter[$filterName]);
             });
@@ -248,7 +257,7 @@ trait SearchTrait
             foreach ($this->filter['with_count'] as $requestedRelations) {
                 $explodedRelation = explode('.', $requestedRelations);
                 $countRelation = array_pop($explodedRelation);
-                $relation = implode($explodedRelation);
+                $relation = implode('.', $explodedRelation);
 
                 if (empty($relation)) {
                     $this->query->withCount($countRelation);
@@ -295,7 +304,7 @@ trait SearchTrait
     }
 
     protected function applyWhereCallback($query, $field, $callback) {
-        if (str_contains($field, '.')) {
+        if (Str::contains($field, '.')) {
             $entities = explode('.', $field);
             $conditionField = array_pop($entities);
             $relations = implode('.', $entities);
