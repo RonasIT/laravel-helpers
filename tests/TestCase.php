@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace RonasIT\Support\Tests;
 
 use Carbon\Carbon;
 use App\Models\JobUser;
@@ -28,8 +28,7 @@ abstract class TestCase extends AutoDocTestCase
         $this->artisan('cache:clear');
         $this->artisan('migrate');
 
-        $this->loadTestDump(['migrations', 'password_resets', 'interview_types', 'questions', 'answers', 'character_types', 'adaptation_map'],
-            ['migrations', 'password_resets', 'settings', 'questions', 'answers']);
+        $this->loadTestDump();
 
         $this->auth = app(JWTAuth::class);
 
