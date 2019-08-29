@@ -109,6 +109,11 @@ trait FixturesTrait
         $this->assertEquals($this->getJsonFixture($fixture), $data);
     }
 
+    /**
+     * This method is actual only for Laravel 5.3 and lower
+     *
+     * @deprecated
+     */
     public function exportJsonResponse($fixture)
     {
         $response = $this->getJsonResponse();
@@ -128,6 +133,14 @@ trait FixturesTrait
 
     public function exportJson($fixture, $data)
     {
+        if (env('FAIL_EXPORT_JSON', true)) {
+            $this->fail(preg_replace('/[ ]+/mu', ' ',
+                ' Looks like you forget to remove exportJson. If it is your local envoronment add 
+                FAIL_EXPORT_JSON=false to .env.testing.
+                If it is dev.testing environment then remove it.'
+            ));
+        }
+
         if ($data instanceof TestResponse) {
             $data = $data->json();
         }
