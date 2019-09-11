@@ -2,26 +2,23 @@
 
 namespace RonasIT\Support\Tests;
 
-use Carbon\Carbon;
-use App\Models\JobUser;
 use Tymon\JWTAuth\JWTAuth;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Contracts\Console\Kernel;
 use RonasIT\Support\Traits\FixturesTrait;
 use Illuminate\Contracts\Auth\Authenticatable;
-use RonasIT\Support\AutoDoc\Tests\AutoDocTestCase;
+use Illuminate\Foundation\Testing\TestCase as BaseTest;
 
-abstract class TestCase extends AutoDocTestCase
+abstract class TestCase extends BaseTest
 {
     use FixturesTrait;
 
     protected $jwt;
     protected $auth;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +57,7 @@ abstract class TestCase extends AutoDocTestCase
         return parent::call($method, $uri, $parameters, $cookies, $files, $server, $content);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->beforeApplicationDestroyed(function () {
             DB::disconnect();
