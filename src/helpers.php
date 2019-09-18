@@ -81,7 +81,7 @@ function array_get_list($array, $path)
     $key = array_shift($path);
 
     if (empty($path)) {
-        return Arr::get($array, $key);
+        return ($key == '*') ? $array : Arr::get($array, $key);
     }
 
     if ($key == '*') {
