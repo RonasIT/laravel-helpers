@@ -131,6 +131,7 @@ trait EntityControlTrait
         }
 
         $model->save();
+        $model->refresh();
 
         if (!empty($this->requiredRelations)) {
             $model->load($this->requiredRelations);
@@ -138,7 +139,7 @@ trait EntityControlTrait
 
         $this->afterCreateHook($model, $data);
 
-        return $model->refresh()->toArray();
+        return $model->toArray();
     }
 
     /**
