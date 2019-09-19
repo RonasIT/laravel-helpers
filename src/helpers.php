@@ -81,10 +81,10 @@ function array_get_list($array, $path)
     $key = array_shift($path);
 
     if (empty($path)) {
-        return ($key == '*') ? $array : Arr::get($array, $key);
+        return ($key === '*') ? $array : Arr::get($array, $key);
     }
 
-    if ($key == '*') {
+    if ($key === '*') {
         $values = array_map(function ($item) use ($path) {
             $value = array_get_list($item, $path);
 
