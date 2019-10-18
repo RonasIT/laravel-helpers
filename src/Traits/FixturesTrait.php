@@ -47,8 +47,7 @@ trait FixturesTrait
         'tiger.pagc_rules',
     ];
 
-    protected function loadTestDump($truncateExcept = ['migrations', 'password_resets'],
-                                    $prepareSequencesExcept = ['migrations', 'password_resets', 'settings'])
+    protected function loadTestDump($truncateExcept = ['migrations', 'password_resets'])
     {
         $dump = $this->getFixture('dump.sql', false);
 
@@ -62,10 +61,6 @@ trait FixturesTrait
         $this->clearDatabase($scheme, $databaseTables, array_merge($this->postgisTables, $truncateExcept));
 
         DB::unprepared($dump);
-
-        if ($scheme === 'pgsql') {
-            $this->prepareSequences($databaseTables, array_merge($this->postgisTables, $prepareSequencesExcept));
-        }
     }
 
     public function getFixturePath($fn)
@@ -192,6 +187,8 @@ trait FixturesTrait
 
     public function prepareSequences($tables, $except)
     {
+        $except = array_merge($this->postgisTables, $except);
+
         $query = array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {
                 return '';

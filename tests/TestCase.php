@@ -6,10 +6,10 @@ use Tymon\JWTAuth\JWTAuth;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Contracts\Console\Kernel;
 use RonasIT\Support\Traits\FixturesTrait;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
+use Carbon\Carbon;
 
 abstract class TestCase extends BaseTest
 {
@@ -17,28 +17,36 @@ abstract class TestCase extends BaseTest
 
     protected $jwt;
     protected $auth;
+    protected $testNow = '2018-11-11 11:11:11';
+
+    protected static $startedTestSuite;
+    protected static $isWrappedIntoTransaction = true;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->artisan('cache:clear');
-        $this->artisan('migrate');
 
-        $this->loadTestDump();
+        if ((static::$startedTestSuite !== static::class) || !self::$isWrappedIntoTransaction) {
+            $this->artisan('migrate');
+
+            $this->loadTestDump();
+
+            static::$startedTestSuite = static::class;
+        }
+
+        if (config('database.default') === 'pgsql') {
+            $this->prepareSequences($this->getTables(), ['migrations', 'password_resets', 'settings']);
+        }
 
         $this->auth = app(JWTAuth::class);
 
+        Carbon::setTestNow(Carbon::parse($this->testNow));
+
         Mail::fake();
-    }
 
-    public function createApplication()
-    {
-        $app = require __DIR__ . '/../bootstrap/app.php';
-
-        $app->make(Kernel::class)->bootstrap();
-
-        return $app;
+        $this->beginDatabaseTransaction();
     }
 
     public function actingAs(Authenticatable $user, $driver = null)
@@ -111,5 +119,50 @@ abstract class TestCase extends BaseTest
 
             return true;
         });
+    }
+
+    protected function dontWrapIntoTransaction()
+    {
+        $this->rollbackTransaction();
+
+        self::$isWrappedIntoTransaction = false;
+    }
+
+    protected function beginDatabaseTransaction()
+    {
+        $database = $this->app->make('db');
+
+        foreach ($this->connectionsToTransact() as $name) {
+            $connection = $database->connection($name);
+            $dispatcher = $connection->getEventDispatcher();
+
+            $connection->unsetEventDispatcher();
+            $connection->beginTransaction();
+            $connection->setEventDispatcher($dispatcher);
+        }
+
+        $this->beforeApplicationDestroyed(function () {
+            $this->rollbackTransaction();
+        });
+    }
+
+    protected function connectionsToTransact()
+    {
+        return property_exists($this, 'connectionsToTransact') ? $this->connectionsToTransact : [null];
+    }
+
+    protected function rollbackTransaction()
+    {
+        $database = $this->app->make('db');
+
+        foreach ($this->connectionsToTransact() as $name) {
+            $connection = $database->connection($name);
+            $dispatcher = $connection->getEventDispatcher();
+
+            $connection->unsetEventDispatcher();
+            $connection->rollback();
+            $connection->setEventDispatcher($dispatcher);
+            $connection->disconnect();
+        }
     }
 }
