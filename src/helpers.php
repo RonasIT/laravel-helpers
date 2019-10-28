@@ -95,7 +95,7 @@ function array_get_list($array, $path)
             return $value;
         }, $array);
 
-        return array_collapse($values);
+        return Arr::collapse($values);
     } else {
         $value = Arr::get($array, $key);
 
