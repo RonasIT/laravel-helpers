@@ -8,19 +8,22 @@ use Illuminate\Support\Str;
 
 trait MigrationTrait
 {
-    public function addForeignKey($fromEntity, $toEntity, $needAddField = false)
+    public function addForeignKey($fromEntity, $toEntity, $needAddField = false, $onDelete = 'cascade')
     {
-        Schema::table($this->getTableName($fromEntity), function (Blueprint $table) use ($toEntity, $needAddField) {
-            $fieldName = Str::snake($toEntity) . '_id';
+        Schema::table(
+            $this->getTableName($fromEntity),
+            function (Blueprint $table) use ($toEntity, $needAddField, $onDelete) {
+                $fieldName = Str::snake($toEntity) . '_id';
 
-            if ($needAddField) {
-                $table->unsignedInteger($fieldName);
-            }
+                if ($needAddField) {
+                    $table->unsignedInteger($fieldName);
+                }
 
-            $table->foreign($fieldName)
-                ->references('id')
-                ->on($this->getTableName($toEntity));
-        });
+                $table->foreign($fieldName)
+                    ->references('id')
+                    ->on($this->getTableName($toEntity))
+                    ->onDelete($onDelete);
+            });
     }
 
     public function dropForeignKey($fromEntity, $toEntity, $needDropField = false)
