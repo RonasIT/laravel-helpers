@@ -48,7 +48,7 @@ trait FixturesTrait
     ];
     protected $truncateExceptTables = ['migrations', 'password_resets'];
 
-    protected function loadTestDump($truncateExcept = ['migrations', 'password_resets'])
+    protected function loadTestDump()
     {
         $dump = $this->getFixture('dump.sql', false);
 
