@@ -46,6 +46,7 @@ trait FixturesTrait
         'tiger.pagc_lex',
         'tiger.pagc_rules',
     ];
+    protected $truncateExceptTables = ['migrations', 'password_resets'];
 
     protected function loadTestDump($truncateExcept = ['migrations', 'password_resets'])
     {
@@ -58,7 +59,7 @@ trait FixturesTrait
         $databaseTables = $this->getTables();
         $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $databaseTables, array_merge($this->postgisTables, $truncateExcept));
+        $this->clearDatabase($scheme, $databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
         DB::unprepared($dump);
     }
