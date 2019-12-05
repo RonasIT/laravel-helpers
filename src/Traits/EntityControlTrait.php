@@ -133,11 +133,11 @@ trait EntityControlTrait
         $model->save();
         $model->refresh();
 
+        $this->afterCreateHook($model, $data);
+
         if (!empty($this->requiredRelations)) {
             $model->load($this->requiredRelations);
         }
-
-        $this->afterCreateHook($model, $data);
 
         return $model->toArray();
     }
@@ -180,14 +180,21 @@ trait EntityControlTrait
         }
 
         if ($this->forceMode) {
-            $item->forceFill(Arr::only($data, $this->fields))->save();
+            $item->forceFill(Arr::only($data, $this->fields));
         } else {
-            $item->fill(Arr::only($data, $item->getFillable()))->save();
+            $item->fill(Arr::only($data, $item->getFillable()));
         }
+
+        $item->save();
+        $item->refresh();
 
         $this->afterUpdateHook($item, $data);
 
-        return $item->refresh()->toArray();
+        if (!empty($this->requiredRelations)) {
+            $item->load($this->requiredRelations);
+        }
+
+        return $item->toArray();
     }
 
     public function updateOrCreate($where, $data)
