@@ -46,7 +46,9 @@ trait FixturesTrait
         'tiger.pagc_lex',
         'tiger.pagc_rules',
     ];
+
     protected $truncateExceptTables = ['migrations', 'password_resets'];
+    protected $prepareSequencesExceptTables = ['migrations', 'password_resets', 'settings'];
 
     protected function loadTestDump()
     {
@@ -186,9 +188,9 @@ trait FixturesTrait
         return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
-    public function prepareSequences($tables, $except)
+    public function prepareSequences($tables, $except = [])
     {
-        $except = array_merge($this->postgisTables, $except);
+        $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
         $query = array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {

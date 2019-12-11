@@ -37,7 +37,7 @@ abstract class TestCase extends BaseTest
         }
 
         if (config('database.default') === 'pgsql') {
-            $this->prepareSequences($this->getTables(), ['migrations', 'password_resets', 'settings']);
+            $this->prepareSequences($this->getTables());
         }
 
         $this->auth = app(JWTAuth::class);
