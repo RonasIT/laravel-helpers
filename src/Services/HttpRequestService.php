@@ -2,10 +2,11 @@
 
 namespace RonasIT\Support\Services;
 
+use Exception;
 use GuzzleHttp\Client;
+use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
-use Illuminate\Support\Arr;
 
 class HttpRequestService
 {
@@ -27,96 +28,6 @@ class HttpRequestService
         $this->options[$key] = $value;
 
         return $this;
-    }
-
-    public function sendGet($url, $data = null, $headers = [])
-    {
-        return $this->send('get', $url, $data, $headers);
-    }
-
-    public function sendPost($url, $data, $headers = [])
-    {
-        return $this->send('post', $url, $data, $headers);
-    }
-
-    public function sendDelete($url, $headers = [])
-    {
-        return $this->send('delete', $url, [], $headers);
-    }
-
-    public function sendPut($url, $data, $headers = [])
-    {
-        return $this->send('put', $url, $data, $headers);
-    }
-
-    public function sendPatch($url, $data, $headers = [])
-    {
-        return $this->send('patch', $url, $data, $headers);
-    }
-
-    protected function send($method, $url, $data = [], $headers = [])
-    {
-        $client = new Client();
-
-        $time = microtime(true);
-
-        $this->logRequest($method, $url, $data);
-        $this->setOptions($headers);
-        $this->setData($method, $headers, $data);
-
-        switch ($method) {
-            case 'get' :
-                $response = $client->get($url, $this->options);
-                break;
-            case 'post' :
-                $response = $client->post($url, $this->options);
-                break;
-            case 'put' :
-                $response = $client->put($url, $this->options);
-                break;
-            case 'patch' :
-                $response = $client->patch($url, $this->options);
-                break;
-            case 'delete' :
-                $response = $client->delete($url, $this->options);
-                break;
-            default :
-                throw app(UnknownRequestMethodException::class)->setMethod($method);
-        }
-
-        $this->logResponse($response, $time);
-
-        $this->options = [];
-
-        return $response;
-    }
-
-    protected function logRequest($typeOfRequest, $url, $data)
-    {
-        if ($this->debug) {
-            logger('');
-            logger('-------------------------------------');
-            logger('');
-            logger("sending {$typeOfRequest} request:", [
-                'url' => $url,
-                'data' => $data
-            ]);
-            logger('');
-        }
-    }
-
-    protected function logResponse($response, $time = null)
-    {
-        if ($this->debug) {
-            logger('');
-            logger('-------------------------------------');
-            logger('');
-            logger('getting response: ');
-            logger('code', ["<{$response->getStatusCode()}>"]);
-            logger('body', ["<{$response->getBody(true)}>"]);
-            logger('time', [!empty($time) ? (microtime(true) - $time) : null]);
-            logger('');
-        }
     }
 
     public function parseJsonResponse($response)
@@ -154,6 +65,107 @@ class HttpRequestService
         $this->connectTimeout = $seconds;
 
         return $this;
+    }
+
+    public function sendGet($url, $data = null, $headers = [])
+    {
+        return $this->send('get', $url, $data, $headers);
+    }
+
+    public function sendPost($url, $data, $headers = [])
+    {
+        return $this->send('post', $url, $data, $headers);
+    }
+
+    public function sendDelete($url, $headers = [])
+    {
+        return $this->send('delete', $url, [], $headers);
+    }
+
+    public function sendPut($url, $data, $headers = [])
+    {
+        return $this->send('put', $url, $data, $headers);
+    }
+
+    public function sendPatch($url, $data, $headers = [])
+    {
+        return $this->send('patch', $url, $data, $headers);
+    }
+
+    protected function send($method, $url, $data = [], $headers = [])
+    {
+        $time = microtime(true);
+
+        $this->logRequest($method, $url, $data, $headers);
+        $this->setOptions($headers);
+        $this->setData($method, $headers, $data);
+
+        try {
+            $response = $this->sendRequest($method, $url);
+            $this->logResponse($response, $time);
+
+            return $response;
+        } catch (Exception $exception) {
+            throw $exception;
+        } finally {
+            $this->options = [];
+        }
+    }
+
+    protected function sendRequest($method, $url)
+    {
+        $client = new Client();
+
+        switch ($method) {
+            case 'get' :
+                $response = $client->get($url, $this->options);
+                break;
+            case 'post' :
+                $response = $client->post($url, $this->options);
+                break;
+            case 'put' :
+                $response = $client->put($url, $this->options);
+                break;
+            case 'patch' :
+                $response = $client->patch($url, $this->options);
+                break;
+            case 'delete' :
+                $response = $client->delete($url, $this->options);
+                break;
+            default :
+                throw app(UnknownRequestMethodException::class)->setMethod($method);
+        }
+
+        return $response;
+    }
+
+    protected function logRequest($typeOfRequest, $url, $data, $headers)
+    {
+        if ($this->debug) {
+            logger('');
+            logger('-------------------------------------');
+            logger('');
+            logger("sending {$typeOfRequest} request:", [
+                'url' => $url,
+                'data' => $data,
+                'headers' => $headers
+            ]);
+            logger('');
+        }
+    }
+
+    protected function logResponse($response, $time = null)
+    {
+        if ($this->debug) {
+            logger('');
+            logger('-------------------------------------');
+            logger('');
+            logger('getting response: ');
+            logger('code', ["<{$response->getStatusCode()}>"]);
+            logger('body', ["<{$response->getBody(true)}>"]);
+            logger('time', [!empty($time) ? (microtime(true) - $time) : null]);
+            logger('');
+        }
     }
 
     private function setOptions($headers)
