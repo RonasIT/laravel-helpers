@@ -2,10 +2,10 @@
 
 namespace RonasIT\Support\Services;
 
-use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\RequestException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
 class HttpRequestService
@@ -102,12 +102,14 @@ class HttpRequestService
 
         try {
             $response = $this->sendRequest($method, $url);
-            $this->logResponse($response, $time);
 
             return $response;
-        } catch (Exception $exception) {
+        } catch (RequestException $exception) {
+            $response = $exception->getResponse();
+
             throw $exception;
         } finally {
+            $this->logResponse($response, $time);
             $this->options = [];
         }
     }
