@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support;
 
+use Illuminate\Support\Arr;
 use Illuminate\Foundation\Http\FormRequest;
 use RonasIT\Support\AutoDoc\Traits\AutoDocRequestTrait;
 
@@ -21,7 +22,7 @@ class BaseRequest extends FormRequest
         $validatedFields = $this->filterOnlyValidated(parent::all(), array_undot(array_flip($rules)));
 
         if (!empty($keys)) {
-            return is_array($keys) ? array_only($validatedFields, $keys) : array_get($validatedFields, $keys, $default);
+            return is_array($keys) ? Arr::only($validatedFields, $keys) : Arr::get($validatedFields, $keys, $default);
         }
 
         return $validatedFields;
@@ -32,12 +33,12 @@ class BaseRequest extends FormRequest
         $result = [];
 
         foreach ($validation as $fieldName => $validatedKeys) {
-            if (array_has($fields, $fieldName)) {
-                $validatedItem = array_get($fields, $fieldName);
+            if (Arr::has($fields, $fieldName)) {
+                $validatedItem = Arr::get($fields, $fieldName);
 
                 if ($this->isNotNestedRule($validatedKeys)) {
                     $result[$fieldName] = $validatedItem;
-                } elseif (array_has($validatedKeys, '*')) {
+                } elseif (Arr::has($validatedKeys, '*')) {
                     $result[$fieldName] = $this->processNestedRule($validatedKeys['*'], $validatedItem);
                 } else {
                     $result[$fieldName] = $this->filterOnlyValidated($validatedItem, $validatedKeys);
