@@ -207,7 +207,7 @@ trait EntityControlTrait
             $where = [$this->primaryKey => $where];
         }
 
-        return $this->create(array_merge($where, $data));
+        return $this->create(array_merge($data, $where));
     }
 
     public function count($where = [])
@@ -261,7 +261,7 @@ trait EntityControlTrait
         $entity = $this->first($where);
 
         if (empty($entity)) {
-            return $this->create(array_merge($where, $data));
+            return $this->create(array_merge($data, $where));
         }
 
         return $entity;
