@@ -23,7 +23,6 @@ class BaseRequest extends FormRequest
      *
      * @return array;
      */
-
     public function onlyValidated($keys = null, $default = null)
     {
         $rules = array_keys($this->rules());
