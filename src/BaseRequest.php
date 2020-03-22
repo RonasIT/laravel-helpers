@@ -9,15 +9,27 @@ use RonasIT\Support\AutoDoc\Traits\AutoDocRequestTrait;
 class BaseRequest extends FormRequest
 {
     use AutoDocRequestTrait;
-    
+
     public function authorize()
     {
         return true;
     }
-    
+
+    /**
+     * @param array|string $keys
+     * @param mixed $default
+     *
+     * Sorts and filters request parameters. Returns parameters specified only in the function rules().
+     * It needs to avoid troubles in cases where array-parameter declared in rules below its content.
+     *
+     * @return array;
+     */
+
     public function onlyValidated($keys = null, $default = null)
     {
         $rules = array_keys($this->rules());
+
+        $this->sortByStrlen($rules);
 
         $validatedFields = $this->filterOnlyValidated(parent::all(), array_undot(array_flip($rules)));
 
@@ -65,4 +77,12 @@ class BaseRequest extends FormRequest
         return is_integer($validatedKeys);
     }
 
+    private function sortByStrlen(array &$array)
+    {
+        $collection = collect($array)->sortBy(function ($string) {
+            return strlen($string);
+        });
+
+        $array = $collection->toArray();
+    }
 }
