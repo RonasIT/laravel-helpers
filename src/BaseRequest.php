@@ -19,7 +19,8 @@ class BaseRequest extends FormRequest
      * @param array|string $keys
      * @param mixed $default
      *
-     * Sorts and filters request parameters. Returns parameters specified only in the function rules()
+     * Sorts and filters request parameters. Returns parameters specified only in the function rules().
+     * It needs to avoid troubles in cases where array-parameter declared in rules below its content.
      *
      * @return array;
      */
