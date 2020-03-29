@@ -73,7 +73,21 @@ trait EntityControlTrait
         }
 
         if (!empty($this->requiredRelationsCount)) {
-            $query->withCount($this->requiredRelationsCount);
+            foreach ($this->requiredRelationsCount as $requestedRelations) {
+                $explodedRelation = explode('.', $requestedRelations);
+                $countRelation = array_pop($explodedRelation);
+                $relation = implode('.', $explodedRelation);
+
+                if (empty($relation)) {
+                    $query->withCount($countRelation);
+                } else {
+                    $query->with([
+                        $relation => function ($query) use ($countRelation) {
+                            $query->withCount($countRelation);
+                        }
+                    ]);
+                }
+            }
         }
 
         return $this->constructWhere($query, $where);
