@@ -92,16 +92,19 @@ abstract class TestCase extends BaseTest
         $index = 0;
 
         Mail::assertSent($mailableClass, function ($mail) use ($data, &$index) {
+            if (!Arr::has($data, 'emails') || !Arr::has($data, 'fixture')) {
+                abort(500, 'Data case must have required parameters: emails, fixture. Case index: ' . $index);
+            }
+
             $sentEmails = Arr::pluck($mail->to, 'address');
             $currentMail = Arr::get($data, $index);
             $emails = Arr::wrap($currentMail['emails']);
-            $subject = Arr::get($currentMail, 'subject');
 
-            if (!empty($subject)) {
-                $this->assertEquals($currentMail['subject'], $mail->subject);
+            if (Arr::has($currentMail, 'subject')) {
+                $this->assertEquals(Arr::get($currentMail, 'subject'), $mail->subject);
             }
 
-            $this->assertEquals(count($mail->to), count($emails));
+            $this->assertEquals(count($emails), count($mail->to));
 
             $emailList = implode(',', $sentEmails);
 
@@ -119,6 +122,8 @@ abstract class TestCase extends BaseTest
 
             return true;
         });
+
+        $this->assertEquals(count($data), $index, 'You have a message that was not sent. Case index: ' . $index);
     }
 
     protected function dontWrapIntoTransaction()
