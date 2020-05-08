@@ -94,12 +94,13 @@ abstract class TestCase extends BaseTest
         $index = 0;
 
         Mail::assertSent($mailableClass, function ($mail) use ($data, &$index) {
-            if (!Arr::has($data, 'emails') || !Arr::has($data, 'fixture')) {
+            $sentEmails = Arr::pluck($mail->to, 'address');
+            $currentMail = Arr::get($data, $index);
+
+            if (!Arr::has($currentMail, 'emails') || !Arr::has($currentMail, 'fixture')) {
                 abort(Response::HTTP_INTERNAL_SERVER_ERROR, 'Data case must have required parameters: emails, fixture. Case index: ' . $index);
             }
 
-            $sentEmails = Arr::pluck($mail->to, 'address');
-            $currentMail = Arr::get($data, $index);
             $emails = Arr::wrap($currentMail['emails']);
 
             if (Arr::has($currentMail, 'subject')) {
