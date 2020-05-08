@@ -10,6 +10,8 @@ use RonasIT\Support\Traits\FixturesTrait;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\Response;
+
 
 abstract class TestCase extends BaseTest
 {
@@ -93,7 +95,7 @@ abstract class TestCase extends BaseTest
 
         Mail::assertSent($mailableClass, function ($mail) use ($data, &$index) {
             if (!Arr::has($data, 'emails') || !Arr::has($data, 'fixture')) {
-                abort(500, 'Data case must have required parameters: emails, fixture. Case index: ' . $index);
+                abort(Response::HTTP_INTERNAL_SERVER_ERROR, 'Data case must have required parameters: emails, fixture. Case index: ' . $index);
             }
 
             $sentEmails = Arr::pluck($mail->to, 'address');
