@@ -107,7 +107,10 @@ abstract class TestCase extends BaseTest
                 $this->assertEquals(Arr::get($currentMail, 'subject'), $mail->subject);
             }
 
-            $this->assertEquals(count($emails), count($mail->to));
+            $countEmails = count($emails);
+            $countMailToEmails = count($mail->to);
+
+            $this->assertEquals($countEmails, $countMailToEmails, "At step {$index}, message should be expected to be sent to {$countEmails} emails, was sent to {$countMailToEmails} addresses");
 
             $emailList = implode(',', $sentEmails);
 
@@ -126,7 +129,9 @@ abstract class TestCase extends BaseTest
             return true;
         });
 
-        $this->assertEquals(count($data), $index, 'You have a message that was not sent. Case index: ' . $index);
+        $countData = count($data);
+
+        $this->assertEquals($countData, $index, "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}");
     }
 
     protected function dontWrapIntoTransaction()
