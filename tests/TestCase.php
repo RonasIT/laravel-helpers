@@ -24,6 +24,11 @@ abstract class TestCase extends BaseTest
     protected static $startedTestSuite;
     protected static $isWrappedIntoTransaction = true;
 
+    private $assertMailRequiredParameters = [
+        'emails',
+        'fixture'
+    ];
+
     public function setUp(): void
     {
         parent::setUp();
@@ -89,28 +94,27 @@ abstract class TestCase extends BaseTest
      * @param string $mailableClass
      * @param array $data
      */
-    protected function assertMailEquals($mailableClass, $data)
+    protected function assertMailsEquals($mailableClass, $emailChain)
     {
         $index = 0;
 
-        Mail::assertSent($mailableClass, function ($mail) use ($data, &$index) {
+        Mail::assertSent($mailableClass, function ($mail) use ($emailChain, &$index) {
             $sentEmails = Arr::pluck($mail->to, 'address');
-            $currentMail = Arr::get($data, $index);
+            $currentMail = Arr::get($emailChain, $index);
 
-            if (!Arr::has($currentMail, 'emails') || !Arr::has($currentMail, 'fixture')) {
-                abort(Response::HTTP_INTERNAL_SERVER_ERROR, 'Data case must have required parameters: emails, fixture. Case index: ' . $index);
-            }
+            $this->validateMailParameters($currentMail, $index);
 
             $emails = Arr::wrap($currentMail['emails']);
 
-            if (Arr::has($currentMail, 'subject')) {
-                $this->assertEquals(Arr::get($currentMail, 'subject'), $mail->subject);
+            if (!empty(Arr::get($currentMail, 'subject'))) {
+                $expectedSubject = Arr::get($currentMail, 'subject');
+                $this->assertEquals($expectedSubject, $mail->subject, "Failed assert that the expected subject '{$expectedSubject}' equals to the actual '{$mail->subject}'");
             }
 
-            $countEmails = count($emails);
-            $countMailToEmails = count($mail->to);
+            $expectedAddressesCount = count($emails);
+            $addressesCount = count($mail->to);
 
-            $this->assertEquals($countEmails, $countMailToEmails, "At step {$index}, message should be expected to be sent to {$countEmails} emails, was sent to {$countMailToEmails} addresses");
+            $this->assertEquals($expectedAddressesCount, $addressesCount, "Failed assert that email on the step {$index}, was sent to {$expectedAddressesCount} addresses, actually email had sent to the {$addressesCount} addresses");
 
             $emailList = implode(',', $sentEmails);
 
@@ -129,9 +133,20 @@ abstract class TestCase extends BaseTest
             return true;
         });
 
-        $countData = count($data);
+        $countData = count($emailChain);
 
         $this->assertEquals($countData, $index, "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}");
+    }
+
+    protected function assertMailEquals($mailableClass, $email, $fixture, $subject = null)
+    {
+        $this->assertMailsEquals($mailableClass, [
+            [
+                'emails' => $email,
+                'fixture' => $fixture,
+                'subject' => $subject
+            ]
+        ]);
     }
 
     protected function dontWrapIntoTransaction()
@@ -176,6 +191,15 @@ abstract class TestCase extends BaseTest
             $connection->rollback();
             $connection->setEventDispatcher($dispatcher);
             $connection->disconnect();
+        }
+    }
+
+    private function validateMailParameters($currentMail, $index)
+    {
+        foreach ($this->assertMailRequiredParameters as $parameter) {
+            if (!Arr::has($currentMail, $parameter)) {
+                abort(Response::HTTP_INTERNAL_SERVER_ERROR, "Missing required key '{$parameter}' in the input data set on the step: {$index}");
+            }
         }
     }
 }
