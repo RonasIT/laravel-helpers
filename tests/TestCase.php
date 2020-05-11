@@ -138,7 +138,7 @@ abstract class TestCase extends BaseTest
         $this->assertEquals($countData, $index, "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}");
     }
 
-    protected function assertMailEquals($mailableClass, $email, $fixture, $subject = null)
+    protected function assertMailEquals($mailableClass, $email, $fixture, $subject = '')
     {
         $this->assertMailsEquals($mailableClass, [
             [
