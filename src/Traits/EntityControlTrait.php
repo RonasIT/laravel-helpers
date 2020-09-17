@@ -93,6 +93,10 @@ trait EntityControlTrait
         return $this->constructWhere($query, $where);
     }
 
+    /**
+     * @param $relations array|string
+     * @return $this
+     */
     public function withRelations($relations)
     {
         $this->requiredRelations = Arr::wrap($relations);
@@ -100,9 +104,13 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function withRelationsCount($withCount)
+    /**
+     * @param $relations array|string
+     * @return $this
+     */
+    public function withRelationsCount($relations)
     {
-        $this->requiredRelationsCount = Arr::wrap($withCount);
+        $this->requiredRelationsCount = Arr::wrap($relations);
 
         return $this;
     }
