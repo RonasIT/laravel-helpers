@@ -333,22 +333,6 @@ trait EntityControlTrait
         return $this->getQuery($where)->onlyTrashed()->restore();
     }
 
-    public function validateField($id, $field, $value)
-    {
-        $query = $this
-            ->getQuery()
-            ->where('id', '<>', $id)
-            ->where($field, $value);
-
-        if ($query->exists()) {
-            $message = "{$this->getEntityName()} with {$field} {$value} already exists";
-
-            throw (new PostValidationException())->setData([
-                $field => [$message]
-            ]);
-        }
-    }
-
     public function chunk($limit, $callback, $where = [])
     {
         $this
