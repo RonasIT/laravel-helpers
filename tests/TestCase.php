@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Closure;
 use Tymon\JWTAuth\JWTAuth;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,8 @@ use RonasIT\Support\Traits\FixturesTrait;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\Response;
+
 
 abstract class TestCase extends BaseTest
 {
@@ -21,6 +24,11 @@ abstract class TestCase extends BaseTest
 
     protected static $startedTestSuite;
     protected static $isWrappedIntoTransaction = true;
+
+    private $requiredExpectationParameters = [
+        'emails',
+        'fixture'
+    ];
 
     public function setUp(): void
     {
@@ -75,50 +83,140 @@ abstract class TestCase extends BaseTest
     }
 
     /**
-     * Data should looks like following construction:
+     * Email Chain should looks like following construction:
+     *   [
+     *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
+     *      'fixture' => 'expected_rendered_fixture.html', fixture name  to which send email sexpected to be equal on the step 1
+     *      'subject' => string|null, expected email subject from the step 1
+     *   ]
+     *
+     * or be array, if sent more than 1 email:
+     *
      * [
      *   [
-     *      'emails' => string|array ,
-     *      'fixture' => 'expected_rendered_fixture.html',
-     *      'subject' => string|null
+     *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
+     *      'fixture' => 'expected_rendered_fixture.html', fixture name  to which send email sexpected to be equal on the step 1
+     *      'subject' => string|null, expected email subject from the step 1
+     *   ]
+     * ],
+     * ...
+     * [
+     *   [
+     *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step N
+     *      'fixture' => 'expected_rendered_fixture.html', fixture name  to which send email sexpected to be equal on the step N
+     *      'subject' => string|null, expected email subject from the step N
      *   ]
      * ]
      *
+     * or json fixture filename with data in the formats indicated above:
+     *
+     * fixture_file_name.json
+     *
+     * Export mode will export html to fixture before assert
+     *
      * @param string $mailableClass
-     * @param array $data
+     * @param mixed $emailChain
+     * @param mixed $exportMode
      */
-    protected function assertMailEquals($mailableClass, $data)
+
+    protected function assertMailEquals(string $mailableClass, $emailChain, $exportMode = false)
     {
+        $emailChain = $this->prepareEmailChain($emailChain);
         $index = 0;
 
-        Mail::assertSent($mailableClass, function ($mail) use ($data, &$index) {
-            $sentEmails = Arr::pluck($mail->to, 'address');
-            $currentMail = Arr::get($data, $index);
-            $emails = Arr::wrap($currentMail['emails']);
-            $subject = Arr::get($currentMail, 'subject');
+        Mail::assertSent($mailableClass, $this->assertSentCallback($emailChain, $index, $exportMode));
 
-            if (!empty($subject)) {
-                $this->assertEquals($currentMail['subject'], $mail->subject);
-            }
+        $this->assertCountMails($emailChain, $index);
+    }
 
-            $this->assertEquals(count($mail->to), count($emails));
+    protected function assertSentCallback($emailChain, &$index, $exportMode): Closure
+    {
+        return function ($mail) use ($emailChain, &$index, $exportMode) {
+            $expectedMailData = Arr::get($emailChain, $index);
+            $this->validateExpectationParameters($expectedMailData, $index);
 
-            $emailList = implode(',', $sentEmails);
-
-            foreach ($emails as $email) {
-                $this->assertContains($email, $sentEmails, "Block \"To\" on {$index} step don't contains {$email}. Contains only {$emailList}.");
-            }
-
-            $this->assertEquals(
-                $this->getFixture($currentMail['fixture']),
-                view($mail->view, $mail->getData())->render(),
-                "Fixture {$currentMail['fixture']} does not equals rendered mail."
-            );
+            $this->assertSubject($expectedMailData, $mail);
+            $this->assertEmailsList($expectedMailData, $mail, $index);
+            $this->assertFixture($expectedMailData, $mail, $exportMode);
 
             $index++;
 
             return true;
-        });
+        };
+    }
+
+    protected function validateExpectationParameters($currentMail, $index): void
+    {
+        foreach ($this->requiredExpectationParameters as $parameter) {
+            if (!Arr::has($currentMail, $parameter)) {
+                abort(Response::HTTP_INTERNAL_SERVER_ERROR, "Missing required key '{$parameter}' in the input data set on the step: {$index}");
+            }
+        }
+    }
+
+    protected function assertSubject($currentMail, $mail): void
+    {
+        $expectedSubject = Arr::get($currentMail, 'subject');
+
+        if (!empty($expectedSubject)) {
+            $this->assertEquals($expectedSubject, $mail->subject, "Failed assert that the expected subject '{$expectedSubject}' equals to the actual '{$mail->subject}'");
+        }
+    }
+
+    protected function assertAddressesCount(array $emails, $mail, int $index): void
+    {
+        $expectedAddressesCount = count($emails);
+        $addressesCount = count($mail->to);
+
+        $this->assertEquals($expectedAddressesCount, $addressesCount, "Failed assert that email on the step {$index}, was sent to {$expectedAddressesCount} addresses, actually email had sent to the {$addressesCount} addresses");
+    }
+
+    protected function assertSentToEmailsList(array $sentEmails, array $emails, int $index): void
+    {
+        $emailList = implode(',', $sentEmails);
+
+        foreach ($emails as $email) {
+            $this->assertContains($email, $sentEmails, "Block \"To\" on {$index} step don't contains {$email}. Contains only {$emailList}.");
+        }
+    }
+
+    protected function assertCountMails($emailChain, int $index): void
+    {
+        $countData = count($emailChain);
+
+        $this->assertEquals($countData, $index, "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}");
+    }
+
+    protected function assertEmailsList($expectedMailData, $mail, int $index): void
+    {
+        $sentEmails = Arr::pluck($mail->to, 'address');
+        $emails = Arr::wrap($expectedMailData['emails']);
+        $this->assertAddressesCount($emails, $mail, $index);
+        $this->assertSentToEmailsList($sentEmails, $emails, $index);
+    }
+
+    protected function assertFixture($expectedMailData, $mail, $exportMode): void
+    {
+        $mailContent = view($mail->view, $mail->getData())->render();
+
+        if ($exportMode) {
+            $this->exportContent($mailContent, $expectedMailData['fixture']);
+        }
+
+        $this->assertEquals(
+            $this->getFixture($expectedMailData['fixture']),
+            $mailContent,
+            "Fixture {$expectedMailData['fixture']} does not equals rendered mail."
+        );
+    }
+
+    protected function prepareEmailChain($emailChain): array
+    {
+        if (is_string($emailChain)) {
+            $emailChain = $this->getJsonFixture($emailChain);
+        }
+
+        return is_array(Arr::first($emailChain)) ? $emailChain : [$emailChain];
     }
 
     protected function dontWrapIntoTransaction()
