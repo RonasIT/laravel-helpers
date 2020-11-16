@@ -172,7 +172,7 @@ trait EntityControlTrait
      *
      * @return array
      */
-    public function updateMany($where, array $data)
+    public function updateMany($where, array $data, bool $isResultRequired = true)
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
@@ -182,7 +182,9 @@ trait EntityControlTrait
             ->getQuery($where)
             ->update($entityData);
 
-        return $this->get(array_merge($where, $entityData));
+        if ($isResultRequired) {
+            return $this->get(array_merge($where, $entityData));
+        }
     }
 
     /**
