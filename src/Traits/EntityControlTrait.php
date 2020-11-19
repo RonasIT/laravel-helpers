@@ -184,17 +184,17 @@ trait EntityControlTrait
 
         $updatedRowsCount = $rowsToUpdate->update($entityData);
 
+        if (!$updatedRecordsAsResult) {
+            return $updatedRowsCount;
+        }
+
         $updatedRows = [];
         foreach ($unUpdatedRows as $unUpdatedRow)
         {
             $updatedRows[] = $unUpdatedRow->refresh()->toArray();
         }
 
-        if ($updatedRecordsAsResult) {
-            return $updatedRows;
-        }
-
-        return $updatedRowsCount;
+        return $updatedRows;
     }
 
     /**
