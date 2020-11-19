@@ -178,10 +178,20 @@ trait EntityControlTrait
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
-        $updatedRowsCount = $this->getQuery($where)->update($entityData);
+        $rowsToUpdate = $this->getQuery($where);
+
+        $unUpdatedRows = $rowsToUpdate->get();
+
+        $updatedRowsCount = $rowsToUpdate->update($entityData);
+
+        $updatedRows = [];
+        foreach ($unUpdatedRows as $unUpdatedRow)
+        {
+            $updatedRows[] = $unUpdatedRow->refresh()->toArray();
+        }
 
         if ($updatedRecordsAsResult) {
-            return $this->get($entityData);
+            return $updatedRows;
         }
 
         return $updatedRowsCount;
