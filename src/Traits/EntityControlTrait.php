@@ -73,22 +73,44 @@ trait EntityControlTrait
         }
 
         if (!empty($this->requiredRelationsCount)) {
-            $query->withCount($this->requiredRelationsCount);
+            foreach ($this->requiredRelationsCount as $requestedRelations) {
+                $explodedRelation = explode('.', $requestedRelations);
+                $countRelation = array_pop($explodedRelation);
+                $relation = implode('.', $explodedRelation);
+
+                if (empty($relation)) {
+                    $query->withCount($countRelation);
+                } else {
+                    $query->with([
+                        $relation => function ($query) use ($countRelation) {
+                            $query->withCount($countRelation);
+                        }
+                    ]);
+                }
+            }
         }
 
         return $this->constructWhere($query, $where);
     }
 
-    public function withRelations(array $relations)
+    /**
+     * @param $relations array|string
+     * @return $this
+     */
+    public function withRelations($relations)
     {
-        $this->requiredRelations = $relations;
-
+        $this->requiredRelations = Arr::wrap($relations);
+        
         return $this;
     }
 
-    public function withRelationsCount($withCount)
+    /**
+     * @param $relations array|string
+     * @return $this
+     */
+    public function withRelationsCount($relations)
     {
-        $this->requiredRelationsCount = $withCount;
+        $this->requiredRelationsCount = Arr::wrap($relations);
 
         return $this;
     }
@@ -207,7 +229,7 @@ trait EntityControlTrait
             $where = [$this->primaryKey => $where];
         }
 
-        return $this->create(array_merge($where, $data));
+        return $this->create(array_merge($data, $where));
     }
 
     public function count($where = [])
@@ -261,7 +283,7 @@ trait EntityControlTrait
         $entity = $this->first($where);
 
         if (empty($entity)) {
-            return $this->create(array_merge($where, $data));
+            return $this->create(array_merge($data, $where));
         }
 
         return $entity;
@@ -309,22 +331,6 @@ trait EntityControlTrait
     public function restore($where)
     {
         return $this->getQuery($where)->onlyTrashed()->restore();
-    }
-
-    public function validateField($id, $field, $value)
-    {
-        $query = $this
-            ->getQuery()
-            ->where('id', '<>', $id)
-            ->where($field, $value);
-
-        if ($query->exists()) {
-            $message = "{$this->getEntityName()} with {$field} {$value} already exists";
-
-            throw (new PostValidationException())->setData([
-                $field => [$message]
-            ]);
-        }
     }
 
     public function chunk($limit, $callback, $where = [])

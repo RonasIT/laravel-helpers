@@ -14,9 +14,15 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
 {
     use Exportable;
 
+    protected $disk;
     protected $query;
     protected $fileName;
     protected $type = 'csv';
+
+    public function __construct()
+    {
+        $this->disk = config('filesystems.default', 'local');
+    }
 
     public function setQuery($query): self
     {
@@ -25,9 +31,9 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
         return $this;
     }
 
-    public function query()
+    public function setDisk($disk)
     {
-        return $this->query;
+        $this->disk = $disk;
     }
 
     public function setFileName($fileName): self
@@ -38,7 +44,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
     }
 
     /**
-     * @param $type string should be one of presented here https://docs.laravel-excel.com/3.0/exports/export-formats.html
+     * @param $type string default: csv, should be one of presented here https://docs.laravel-excel.com/3.0/exports/export-formats.html
      *
      * @return $this
      */
@@ -53,9 +59,14 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
     {
         $filename = $this->getFileName();
 
-        $this->store($filename, null, ucfirst($this->type));
+        $this->store($filename, $this->disk, ucfirst($this->type));
 
-        return Storage::path($filename);
+        return Storage::disk($this->disk)->path($filename);
+    }
+
+    public function query()
+    {
+        return $this->query;
     }
 
     public function headings(): array

@@ -124,29 +124,16 @@ trait FixturesTrait
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        $this->call($method, $uri, [], [], [], $server, $content);
-
-        return $this;
+        return $this->call($method, $uri, [], [], [], $server, $content);
     }
 
     public function exportJson($fixture, $data)
     {
-        if (env('FAIL_EXPORT_JSON', true)) {
-            $this->fail(preg_replace('/[ ]+/mu', ' ',
-                ' Looks like you forget to remove exportJson. If it is your local envoronment add 
-                FAIL_EXPORT_JSON=false to .env.testing.
-                If it is dev.testing environment then remove it.'
-            ));
-        }
-
         if ($data instanceof TestResponse) {
             $data = $data->json();
         }
 
-        file_put_contents(
-            $this->getFixturePath($fixture),
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-        );
+        $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
 
     public function clearDatabase($scheme, $tables, $except)
@@ -224,6 +211,14 @@ trait FixturesTrait
 
     protected function exportContent($content, $fixture)
     {
+        if (env('FAIL_EXPORT_JSON', true)) {
+            $this->fail(preg_replace('/[ ]+/mu', ' ',
+                'Looks like you forget to remove exportJson. If it is your local environment add 
+                FAIL_EXPORT_JSON=false to .env.testing.
+                If it is dev.testing environment then remove it.'
+            ));
+        }
+
         file_put_contents(
             $this->getFixturePath($fixture),
             $content
