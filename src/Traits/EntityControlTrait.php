@@ -169,6 +169,7 @@ trait EntityControlTrait
      *
      * @param array|integer $where
      * @param array $data
+     * @param bool $updatedRecordsAsResult
      *
      * @return array
      */
@@ -180,21 +181,14 @@ trait EntityControlTrait
 
         $rowsToUpdate = $this->getQuery($where);
 
-        $unUpdatedRows = $rowsToUpdate->get();
-
-        $updatedRowsCount = $rowsToUpdate->update($entityData);
-
         if (!$updatedRecordsAsResult) {
-            return $updatedRowsCount;
+            return $rowsToUpdate->update($entityData);
         }
 
-        $updatedRows = [];
-        foreach ($unUpdatedRows as $unUpdatedRow)
-        {
-            $updatedRows[] = $unUpdatedRow->refresh()->toArray();
-        }
+        $unUpdatedRows = $rowsToUpdate->get();
+        $rowsToUpdate->update($entityData);
 
-        return $updatedRows;
+        return $unUpdatedRows->toQuery()->get()->toArray();
     }
 
     /**
