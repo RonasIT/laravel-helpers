@@ -170,30 +170,28 @@ trait EntityControlTrait
      * @param array|integer $where
      * @param array $data
      * @param bool $updatedRecordsAsResult
+     * @param int $limit
      *
      * @return array
      */
-    public function updateMany($where, array $data, bool $updatedRecordsAsResult = true, $limit = 50)
+    public function updateMany($where, array $data, bool $updatedRecordsAsResult = true, int $limit = 50)
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
+        $unUpdatedIds = [];
+        $this->chunk($limit, function ($items) use (&$unUpdatedIds) {
+            $unUpdatedIds[] = Arr::pluck($items, 'id');
+        }, $where);
+
+        $updatedRowsCount = $this->updateByList(Arr::collapse($unUpdatedIds), $entityData);
+
         if (!$updatedRecordsAsResult) {
-            return $this->getQuery($where)->update($entityData);
+            return $updatedRowsCount;
         }
 
-        $unUpdatedIds = [];
-        $callback = function ($items) use (&$unUpdatedIds) {
-            foreach ($items as $item) {
-                $unUpdatedIds[] = $item['id'];
-            }
-        };
-
-        $this->chunk($limit, $callback, $where);
-        $this->updateByList($unUpdatedIds, $entityData);
-
-        return $this->getByList($unUpdatedIds);
+        return $this->getByList(Arr::collapse($unUpdatedIds));
     }
 
     /**
