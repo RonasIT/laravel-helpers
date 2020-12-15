@@ -100,7 +100,7 @@ trait EntityControlTrait
     public function withRelations($relations)
     {
         $this->requiredRelations = Arr::wrap($relations);
-        
+
         return $this;
     }
 
@@ -169,20 +169,29 @@ trait EntityControlTrait
      *
      * @param array|integer $where
      * @param array $data
+     * @param bool $updatedRecordsAsResult
+     * @param int $limit
      *
      * @return array
      */
-    public function updateMany($where, array $data)
+    public function updateMany($where, array $data, bool $updatedRecordsAsResult = true, int $limit = 50)
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
-        $this
-            ->getQuery($where)
-            ->update($entityData);
+        $unUpdatedIds = [];
+        $this->chunk($limit, function ($items) use (&$unUpdatedIds) {
+            $unUpdatedIds = array_merge($unUpdatedIds, Arr::pluck($items, 'id'));
+        }, $where);
 
-        return $this->get(array_merge($where, $entityData));
+        $updatedRowsCount = $this->updateByList($unUpdatedIds, $entityData);
+
+        if (!$updatedRecordsAsResult) {
+            return $updatedRowsCount;
+        }
+
+        return $this->getByList($unUpdatedIds);
     }
 
     /**
