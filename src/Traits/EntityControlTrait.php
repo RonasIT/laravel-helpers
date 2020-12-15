@@ -182,16 +182,16 @@ trait EntityControlTrait
 
         $unUpdatedIds = [];
         $this->chunk($limit, function ($items) use (&$unUpdatedIds) {
-            $unUpdatedIds[] = Arr::pluck($items, 'id');
+            $unUpdatedIds = array_merge($unUpdatedIds, Arr::pluck($items, 'id'));
         }, $where);
 
-        $updatedRowsCount = $this->updateByList(Arr::collapse($unUpdatedIds), $entityData);
+        $updatedRowsCount = $this->updateByList($unUpdatedIds, $entityData);
 
         if (!$updatedRecordsAsResult) {
             return $updatedRowsCount;
         }
 
-        return $this->getByList(Arr::collapse($unUpdatedIds));
+        return $this->getByList($unUpdatedIds);
     }
 
     /**
