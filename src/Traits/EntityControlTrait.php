@@ -47,16 +47,50 @@ trait EntityControlTrait
     {
         $this->model = new $modelClass();
 
+        $this->hiddenAttributes = $this->model->getHidden();
+
         $this->fields = $modelClass::getFields();
+
+        $this->visibleAttributes = array_diff($this->fields, $this->hiddenAttributes);
 
         $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
     }
 
+    public function addHidden($hiddenAttributes = [])
+    {
+        foreach ($hiddenAttributes as $hiddenAttribute) {
+            if (!in_array($hiddenAttribute, $this->hiddenAttributes)) {
+                $this->hiddenAttributes[] = $hiddenAttribute;
+
+                $indexToRemove = array_search($hiddenAttribute, $this->visibleAttributes);
+                unset($this->visibleAttributes[$indexToRemove]);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addVisible($visibleAttributes = [])
+    {
+        foreach ($visibleAttributes as $visibleAttribute) {
+            if (!in_array($visibleAttribute, $this->visibleAttributes)) {
+                $this->visibleAttributes[] = $visibleAttribute;
+
+                $indexToRemove = array_search($visibleAttribute, $this->hiddenAttributes);
+                unset($this->hiddenAttributes[$indexToRemove]);
+            }
+        }
+
+        return $this;
+    }
+
     protected function getQuery($where = [])
     {
         $query = $this->model->query();
+
+        $query->addSelect(array_diff($this->visibleAttributes, $this->hiddenAttributes));
 
         if ($this->onlyTrashed) {
             $query->onlyTrashed();
