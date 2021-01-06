@@ -23,6 +23,9 @@ trait EntityControlTrait
     protected $fields;
     protected $primaryKey;
     protected $forceMode;
+    protected $visibleAttributes;
+    protected $hiddenAttributes;
+    protected $customQuery;
 
     public function all()
     {
@@ -47,11 +50,7 @@ trait EntityControlTrait
     {
         $this->model = new $modelClass();
 
-        $this->hiddenAttributes = $this->model->getHidden();
-
         $this->fields = $modelClass::getFields();
-
-        $this->visibleAttributes = array_diff($this->fields, $this->hiddenAttributes);
 
         $this->primaryKey = $this->model->getKeyName();
 
@@ -61,12 +60,7 @@ trait EntityControlTrait
     public function addHidden($hiddenAttributes = [])
     {
         foreach ($hiddenAttributes as $hiddenAttribute) {
-            if (!in_array($hiddenAttribute, $this->hiddenAttributes)) {
-                $this->hiddenAttributes[] = $hiddenAttribute;
-
-                $indexToRemove = array_search($hiddenAttribute, $this->visibleAttributes);
-                unset($this->visibleAttributes[$indexToRemove]);
-            }
+            $this->hiddenAttributes[] = $hiddenAttribute;
         }
 
         return $this;
@@ -75,22 +69,15 @@ trait EntityControlTrait
     public function addVisible($visibleAttributes = [])
     {
         foreach ($visibleAttributes as $visibleAttribute) {
-            if (!in_array($visibleAttribute, $this->visibleAttributes)) {
-                $this->visibleAttributes[] = $visibleAttribute;
-
-                $indexToRemove = array_search($visibleAttribute, $this->hiddenAttributes);
-                unset($this->hiddenAttributes[$indexToRemove]);
-            }
+            $this->visibleAttributes[] = $visibleAttribute;
         }
 
         return $this;
     }
 
-    protected function getQuery($where = [])
+    protected function getQuery($where = [], $isCustom = false)
     {
         $query = $this->model->query();
-
-        $query->addSelect(array_diff($this->visibleAttributes, $this->hiddenAttributes));
 
         if ($this->onlyTrashed) {
             $query->onlyTrashed();
@@ -122,6 +109,12 @@ trait EntityControlTrait
                     ]);
                 }
             }
+        }
+
+        if ($isCustom) {
+            $this->customQuery = $this->constructWhere($query, $where);
+
+            return $this;
         }
 
         return $this->constructWhere($query, $where);
@@ -288,6 +281,23 @@ trait EntityControlTrait
     public function get($where = [])
     {
         return $this->getQuery($where)->get()->toArray();
+    }
+
+    public function customGet($columns = ['*'])
+    {
+        $builder = $this->customQuery->applyScopes();
+
+        // If we actually found models we will also eager load any relationships that
+        // have been specified as needing to be eager loaded, which will solve the
+        // n+1 query issue for the developers to avoid running a lot of queries.
+        if (count($models = $builder->getModels($columns)) > 0) {
+            $models = $builder->eagerLoadRelations($models);
+        }
+
+        return $builder
+            ->getModel()
+            ->newCollection($models)
+            ->makeHidden($this->hiddenAttributes);
     }
 
     /**
