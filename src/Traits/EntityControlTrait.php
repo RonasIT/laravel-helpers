@@ -23,8 +23,8 @@ trait EntityControlTrait
     protected $fields;
     protected $primaryKey;
     protected $forceMode;
-    protected $visibleAttributes;
-    protected $hiddenAttributes;
+    protected $visibleAttributes = [];
+    protected $hiddenAttributes = [];
 
     public function all()
     {
@@ -54,24 +54,6 @@ trait EntityControlTrait
         $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
-    }
-
-    public function addHidden($hiddenAttributes = [])
-    {
-        foreach ($hiddenAttributes as $hiddenAttribute) {
-            $this->hiddenAttributes[] = $hiddenAttribute;
-        }
-
-        return $this;
-    }
-
-    public function addVisible($visibleAttributes = [])
-    {
-        foreach ($visibleAttributes as $visibleAttribute) {
-            $this->visibleAttributes[] = $visibleAttribute;
-        }
-
-        return $this;
     }
 
     protected function getQuery($where = [], $isCustom = false)
@@ -266,41 +248,64 @@ trait EntityControlTrait
         return $this->getQuery($where)->count();
     }
 
+    public function makeHidden($hiddenAttributes = [])
+    {
+        if (!empty($hiddenAttributes)) {
+            foreach ($hiddenAttributes as $hiddenAttribute) {
+                $this->hiddenAttributes[] = $hiddenAttribute;
+            }
+            $this->hiddenAttributes = array_unique($this->hiddenAttributes);
+
+            foreach ($this->hiddenAttributes as $hiddenAttribute) {
+                if (in_array($hiddenAttribute, $this->visibleAttributes)) {
+                    throw new InvalidModelException("Value '{$hiddenAttribute}' already exists as visible attribute. Value can't be hidden and visible at the same time");
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    public function makeVisible($visibleAttributes = [])
+    {
+        if (!empty($visibleAttributes)) {
+            foreach ($visibleAttributes as $visibleAttribute) {
+                $this->visibleAttributes[] = $visibleAttribute;
+            }
+            $this->visibleAttributes = array_unique($this->visibleAttributes);
+
+            foreach ($this->visibleAttributes as $visibleAttribute) {
+                if (in_array($visibleAttribute, $this->hiddenAttributes)) {
+                    throw new InvalidModelException("Value '{$visibleAttribute}' already exists as hidden attribute. Value can't be hidden and visible at the same time");
+                }
+            }
+        }
+
+        return $this;
+    }
+
     /**
-     * @param  array $where
+     * @param array $where
+     * @param array $columns
      *
      * @return array
      */
-    public function get($where = [], $isCustom = false)
+    public function get($where = [], $columns = ['*'])
     {
         $query = $this->getQuery($where);
 
-        if ($isCustom) {
-            return $this->customGet($query)->toArray();
-        }
-
-        return $query->get()->toArray();
-    }
-
-    public function customGet($query, $columns = ['*'])
-    {
         $builder = $query->applyScopes();
 
         if (count($models = $builder->getModels($columns)) > 0) {
             $models = $builder->eagerLoadRelations($models);
         }
 
-        $result = $builder->getModel()->newCollection($models);
-
-        if (!empty($this->visibleAttributes)) {
-            $result->makeVisible($this->visibleAttributes);
-        }
-
-        if (!empty($this->hiddenAttributes)) {
-            $result->makeHidden($this->hiddenAttributes);
-        }
-
-        return $result;
+        return $builder
+            ->getModel()
+            ->newCollection($models)
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     /**
