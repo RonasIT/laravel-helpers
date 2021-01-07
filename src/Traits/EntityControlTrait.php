@@ -25,7 +25,6 @@ trait EntityControlTrait
     protected $forceMode;
     protected $visibleAttributes;
     protected $hiddenAttributes;
-    protected $customQuery;
 
     public function all()
     {
@@ -109,12 +108,6 @@ trait EntityControlTrait
                     ]);
                 }
             }
-        }
-
-        if ($isCustom) {
-            $this->customQuery = $this->constructWhere($query, $where);
-
-            return $this;
         }
 
         return $this->constructWhere($query, $where);
@@ -278,26 +271,36 @@ trait EntityControlTrait
      *
      * @return array
      */
-    public function get($where = [])
+    public function get($where = [], $isCustom = false)
     {
-        return $this->getQuery($where)->get()->toArray();
+        $query = $this->getQuery($where);
+
+        if ($isCustom) {
+            return $this->customGet($query)->toArray();
+        }
+
+        return $query->get()->toArray();
     }
 
-    public function customGet($columns = ['*'])
+    public function customGet($query, $columns = ['*'])
     {
-        $builder = $this->customQuery->applyScopes();
+        $builder = $query->applyScopes();
 
-        // If we actually found models we will also eager load any relationships that
-        // have been specified as needing to be eager loaded, which will solve the
-        // n+1 query issue for the developers to avoid running a lot of queries.
         if (count($models = $builder->getModels($columns)) > 0) {
             $models = $builder->eagerLoadRelations($models);
         }
 
-        return $builder
-            ->getModel()
-            ->newCollection($models)
-            ->makeHidden($this->hiddenAttributes);
+        $result = $builder->getModel()->newCollection($models);
+
+        if (!empty($this->visibleAttributes)) {
+            $result->makeVisible($this->visibleAttributes);
+        }
+
+        if (!empty($this->hiddenAttributes)) {
+            $result->makeHidden($this->hiddenAttributes);
+        }
+
+        return $result;
     }
 
     /**
