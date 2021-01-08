@@ -56,7 +56,43 @@ trait EntityControlTrait
         $this->checkPrimaryKey();
     }
 
-    protected function getQuery($where = [], $isCustom = false)
+    public function makeHidden($hiddenAttributes = [])
+    {
+        if (!empty($hiddenAttributes)) {
+            foreach ($hiddenAttributes as $hiddenAttribute) {
+                $this->hiddenAttributes[] = $hiddenAttribute;
+            }
+            $this->hiddenAttributes = array_unique($this->hiddenAttributes);
+
+            foreach ($this->hiddenAttributes as $hiddenAttribute) {
+                if (in_array($hiddenAttribute, $this->visibleAttributes)) {
+                    throw new InvalidModelException("Value '{$hiddenAttribute}' already exists as visible attribute. Value can't be hidden and visible at the same time");
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    public function makeVisible($visibleAttributes = [])
+    {
+        if (!empty($visibleAttributes)) {
+            foreach ($visibleAttributes as $visibleAttribute) {
+                $this->visibleAttributes[] = $visibleAttribute;
+            }
+            $this->visibleAttributes = array_unique($this->visibleAttributes);
+
+            foreach ($this->visibleAttributes as $visibleAttribute) {
+                if (in_array($visibleAttribute, $this->hiddenAttributes)) {
+                    throw new InvalidModelException("Value '{$visibleAttribute}' already exists as hidden attribute. Value can't be hidden and visible at the same time");
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    protected function getQuery($where = [])
     {
         $query = $this->model->query();
 
@@ -163,7 +199,10 @@ trait EntityControlTrait
             $model->load($this->requiredRelations);
         }
 
-        return $model->toArray();
+        return $model
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     /**
@@ -248,61 +287,16 @@ trait EntityControlTrait
         return $this->getQuery($where)->count();
     }
 
-    public function makeHidden($hiddenAttributes = [])
-    {
-        if (!empty($hiddenAttributes)) {
-            foreach ($hiddenAttributes as $hiddenAttribute) {
-                $this->hiddenAttributes[] = $hiddenAttribute;
-            }
-            $this->hiddenAttributes = array_unique($this->hiddenAttributes);
-
-            foreach ($this->hiddenAttributes as $hiddenAttribute) {
-                if (in_array($hiddenAttribute, $this->visibleAttributes)) {
-                    throw new InvalidModelException("Value '{$hiddenAttribute}' already exists as visible attribute. Value can't be hidden and visible at the same time");
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    public function makeVisible($visibleAttributes = [])
-    {
-        if (!empty($visibleAttributes)) {
-            foreach ($visibleAttributes as $visibleAttribute) {
-                $this->visibleAttributes[] = $visibleAttribute;
-            }
-            $this->visibleAttributes = array_unique($this->visibleAttributes);
-
-            foreach ($this->visibleAttributes as $visibleAttribute) {
-                if (in_array($visibleAttribute, $this->hiddenAttributes)) {
-                    throw new InvalidModelException("Value '{$visibleAttribute}' already exists as hidden attribute. Value can't be hidden and visible at the same time");
-                }
-            }
-        }
-
-        return $this;
-    }
-
     /**
-     * @param array $where
-     * @param array $columns
+     * @param  array $where
      *
      * @return array
      */
-    public function get($where = [], $columns = ['*'])
+    public function get($where = [])
     {
-        $query = $this->getQuery($where);
-
-        $builder = $query->applyScopes();
-
-        if (count($models = $builder->getModels($columns)) > 0) {
-            $models = $builder->eagerLoadRelations($models);
-        }
-
-        return $builder
-            ->getModel()
-            ->newCollection($models)
+        return $this
+            ->getQuery($where)
+            ->get()
             ->makeHidden($this->hiddenAttributes)
             ->makeVisible($this->visibleAttributes)
             ->toArray();
@@ -324,7 +318,11 @@ trait EntityControlTrait
 
     public function first($where)
     {
-        $entity = $this->getQuery($where)->first();
+        $entity = $this
+            ->getQuery($where)
+            ->first()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes);
 
         return empty($entity) ? [] : $entity->toArray();
     }
@@ -400,7 +398,11 @@ trait EntityControlTrait
             ->getQuery($where)
             ->orderBy($this->primaryKey)
             ->chunk($limit, function ($items) use ($callback) {
-                $callback($items->toArray());
+                $callback($items
+                    ->makeHidden($this->hiddenAttributes)
+                    ->makeVisible($this->visibleAttributes)
+                    ->toArray()
+                );
             });
     }
 
@@ -435,7 +437,11 @@ trait EntityControlTrait
             ->onlyTrashed()
             ->whereIn($field, $values);
 
-        $entities = $query->get()->toArray();
+        $entities = $query
+            ->get()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
 
         $query->restore();
 
@@ -446,7 +452,13 @@ trait EntityControlTrait
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        return $this->getQuery()->whereIn($field, $values)->get()->toArray();
+        return $this
+            ->getQuery()
+            ->whereIn($field, $values)
+            ->get()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     public function countByList(array $values, $field = null)
