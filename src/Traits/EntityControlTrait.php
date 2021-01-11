@@ -266,7 +266,10 @@ trait EntityControlTrait
             $item->load($this->requiredRelations);
         }
 
-        return $item->toArray();
+        return $item
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     public function updateOrCreate($where, $data)
@@ -389,7 +392,12 @@ trait EntityControlTrait
 
     public function restore($where)
     {
-        return $this->getQuery($where)->onlyTrashed()->restore();
+        return $this
+            ->getQuery($where)
+            ->onlyTrashed()
+            ->restore()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes);
     }
 
     public function chunk($limit, $callback, $where = [])
