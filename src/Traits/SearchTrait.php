@@ -106,7 +106,7 @@ trait SearchTrait
             return $fullData;
         }
 
-        return $this->wrapPaginatedData($this->query->get()->toArray());
+        return $this->wrapPaginatedData($this->query->get()->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)->toArray());
     }
 
     public function orderBy($default = null, $defaultDesc = false)
