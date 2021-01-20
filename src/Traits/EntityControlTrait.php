@@ -23,6 +23,8 @@ trait EntityControlTrait
     protected $fields;
     protected $primaryKey;
     protected $forceMode;
+    protected $visibleAttributes = [];
+    protected $hiddenAttributes = [];
 
     public function all()
     {
@@ -52,6 +54,20 @@ trait EntityControlTrait
         $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
+    }
+
+    public function makeHidden($hiddenAttributes = [])
+    {
+        $this->hiddenAttributes = $hiddenAttributes;
+
+        return $this;
+    }
+
+    public function makeVisible($visibleAttributes = [])
+    {
+        $this->visibleAttributes = $visibleAttributes;
+
+        return $this;
     }
 
     protected function getQuery($where = [])

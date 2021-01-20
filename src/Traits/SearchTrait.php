@@ -93,7 +93,17 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            return $this->paginate()->toArray();
+            $fullData = $this->paginate()->toArray();
+
+            $fullData['data'] = $this
+                ->query
+                ->getModel()
+                ->hydrate($fullData['data'])
+                ->makeHidden($this->hiddenAttributes)
+                ->makeVisible($this->visibleAttributes)
+                ->toArray();
+
+            return $fullData;
         }
 
         return $this->wrapPaginatedData($this->query->get()->toArray());
