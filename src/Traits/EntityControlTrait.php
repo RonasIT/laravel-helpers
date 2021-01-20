@@ -23,8 +23,6 @@ trait EntityControlTrait
     protected $fields;
     protected $primaryKey;
     protected $forceMode;
-    protected $visibleAttributes = [];
-    protected $hiddenAttributes = [];
 
     public function all()
     {
@@ -54,42 +52,6 @@ trait EntityControlTrait
         $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
-    }
-
-    public function makeHidden($hiddenAttributes = [])
-    {
-        if (!empty($hiddenAttributes)) {
-            foreach ($hiddenAttributes as $hiddenAttribute) {
-                $this->hiddenAttributes[] = $hiddenAttribute;
-            }
-            $this->hiddenAttributes = array_unique($this->hiddenAttributes);
-
-            foreach ($this->hiddenAttributes as $hiddenAttribute) {
-                if (in_array($hiddenAttribute, $this->visibleAttributes)) {
-                    throw new InvalidModelException("Value '{$hiddenAttribute}' already exists as visible attribute. Value can't be hidden and visible at the same time");
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    public function makeVisible($visibleAttributes = [])
-    {
-        if (!empty($visibleAttributes)) {
-            foreach ($visibleAttributes as $visibleAttribute) {
-                $this->visibleAttributes[] = $visibleAttribute;
-            }
-            $this->visibleAttributes = array_unique($this->visibleAttributes);
-
-            foreach ($this->visibleAttributes as $visibleAttribute) {
-                if (in_array($visibleAttribute, $this->hiddenAttributes)) {
-                    throw new InvalidModelException("Value '{$visibleAttribute}' already exists as hidden attribute. Value can't be hidden and visible at the same time");
-                }
-            }
-        }
-
-        return $this;
     }
 
     protected function getQuery($where = [])
@@ -321,13 +283,9 @@ trait EntityControlTrait
 
     public function first($where)
     {
-        $entity = $this
-            ->getQuery($where)
-            ->first()
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        $entity = $this->getQuery($where)->first();
 
-        return empty($entity) ? [] : $entity->toArray();
+        return empty($entity) ? [] : $entity->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)->toArray();
     }
 
     public function findBy($field, $value)
@@ -392,12 +350,7 @@ trait EntityControlTrait
 
     public function restore($where)
     {
-        return $this
-            ->getQuery($where)
-            ->onlyTrashed()
-            ->restore()
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        return $this->getQuery($where)->onlyTrashed()->restore();
     }
 
     public function chunk($limit, $callback, $where = [])
@@ -445,11 +398,7 @@ trait EntityControlTrait
             ->onlyTrashed()
             ->whereIn($field, $values);
 
-        $entities = $query
-            ->get()
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-            ->toArray();
+        $entities = $query->get()->toArray();
 
         $query->restore();
 
