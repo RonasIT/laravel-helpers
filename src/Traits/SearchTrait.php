@@ -2,6 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Container\Container;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
@@ -22,7 +25,30 @@ trait SearchTrait
         $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage );
         $page = Arr::get($this->filter, 'page', 1);
 
-        return $this->query->paginate($perPage, ['*'], 'page', $page);
+        return $this->customPaginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function customPaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    {
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+
+        $perPage = $perPage ?: $this->query->model->getPerPage();
+
+        $results = ($total = $this->query->toBase()->getCountForPagination())
+            ? $this->query->forPage($page, $perPage)->get($columns)->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)
+            : $this->query->model->newCollection();
+
+        return $this->paginator($results, $total, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
+    }
+
+    public function paginator($items, $total, $perPage, $currentPage, $options)
+    {
+        return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
+            'items', 'total', 'perPage', 'currentPage', 'options'
+        ));
     }
 
     /**
@@ -93,17 +119,7 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            $fullData = $this->paginate()->toArray();
-
-            $fullData['data'] = $this
-                ->query
-                ->getModel()
-                ->hydrate($fullData['data'])
-                ->makeHidden($this->hiddenAttributes)
-                ->makeVisible($this->visibleAttributes)
-                ->toArray();
-
-            return $fullData;
+            return $this->paginate()->toArray();
         }
 
         return $this->wrapPaginatedData($this->query->get()->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)->toArray());
