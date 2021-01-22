@@ -56,14 +56,14 @@ trait EntityControlTrait
         $this->checkPrimaryKey();
     }
 
-    public function makeHidden($hiddenAttributes = [])
+    public function makeHidden(array $hiddenAttributes = [])
     {
         $this->hiddenAttributes = $hiddenAttributes;
 
         return $this;
     }
 
-    public function makeVisible($visibleAttributes = [])
+    public function makeVisible(array $visibleAttributes = [])
     {
         $this->visibleAttributes = $visibleAttributes;
 

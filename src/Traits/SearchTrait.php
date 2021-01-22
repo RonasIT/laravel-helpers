@@ -2,9 +2,6 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Container\Container;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
@@ -25,30 +22,7 @@ trait SearchTrait
         $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage );
         $page = Arr::get($this->filter, 'page', 1);
 
-        return $this->customPaginate($perPage, ['*'], 'page', $page);
-    }
-
-    public function customPaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
-    {
-        $page = $page ?: Paginator::resolveCurrentPage($pageName);
-
-        $perPage = $perPage ?: $this->query->model->getPerPage();
-
-        $results = ($total = $this->query->toBase()->getCountForPagination())
-            ? $this->query->forPage($page, $perPage)->get($columns)->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)
-            : $this->query->model->newCollection();
-
-        return $this->paginator($results, $total, $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
-            'pageName' => $pageName,
-        ]);
-    }
-
-    public function paginator($items, $total, $perPage, $currentPage, $options)
-    {
-        return Container::getInstance()->makeWith(LengthAwarePaginator::class, compact(
-            'items', 'total', 'perPage', 'currentPage', 'options'
-        ));
+        return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -119,10 +93,20 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            return $this->paginate()->toArray();
+            return $this->getModifiedPaginator($this->paginate())->toArray();
         }
 
         return $this->wrapPaginatedData($this->query->get()->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)->toArray());
+    }
+
+    public function getModifiedPaginator($paginator)
+    {
+        $modifiedCollection = $paginator
+            ->getCollection()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes);
+
+        return $paginator->setCollection($modifiedCollection);
     }
 
     public function orderBy($default = null, $defaultDesc = false)
