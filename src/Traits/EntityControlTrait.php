@@ -301,7 +301,10 @@ trait EntityControlTrait
     {
         $entity = $this->getQuery($where)->first();
 
-        return empty($entity) ? [] : $entity->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)->toArray();
+        return empty($entity) ? [] : $entity
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     public function findBy($field, $value)

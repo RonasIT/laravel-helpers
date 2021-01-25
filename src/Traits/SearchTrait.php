@@ -96,17 +96,22 @@ trait SearchTrait
             return $this->getModifiedPaginator($this->paginate())->toArray();
         }
 
-        return $this->wrapPaginatedData($this->query->get()->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes)->toArray());
+        return $this->wrapPaginatedData($this
+            ->query
+            ->get()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray()
+        );
     }
 
     public function getModifiedPaginator($paginator)
     {
-        $modifiedCollection = $paginator
+        return $paginator->setCollection($paginator
             ->getCollection()
             ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
-
-        return $paginator->setCollection($modifiedCollection);
+            ->makeVisible($this->visibleAttributes)
+        );
     }
 
     public function orderBy($default = null, $defaultDesc = false)
