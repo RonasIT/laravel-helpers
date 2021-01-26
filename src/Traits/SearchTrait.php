@@ -93,10 +93,25 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            return $this->paginate()->toArray();
+            return $this->getModifiedPaginator($this->paginate())->toArray();
         }
 
-        return $this->wrapPaginatedData($this->query->get()->toArray());
+        return $this->wrapPaginatedData($this
+            ->query
+            ->get()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray()
+        );
+    }
+
+    public function getModifiedPaginator($paginator)
+    {
+        return $paginator->setCollection($paginator
+            ->getCollection()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+        );
     }
 
     public function orderBy($default = null, $defaultDesc = false)
