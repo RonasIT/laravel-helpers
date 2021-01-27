@@ -228,55 +228,6 @@ trait SearchTrait
         };
     }
 
-    protected function wrapPaginatedData($data)
-    {
-        $url = Request::url();
-        $path = Request::path();
-        $total = count($data);
-        $links = [
-            [
-                'url' => null,
-                'label' => "&laquo; Previous",
-                'active' => false
-            ],
-            [
-                'url' => "{$url}?page=1",
-                'label' => 1,
-                'active' => true
-            ],
-            [
-                'url' => null,
-                'label' => "Next &raquo;",
-                'active' => false
-            ]
-        ];
-
-        $wrappedPaginatedData = [
-            'current_page' => 1,
-            'data' => $data,
-            'first_page_url' => "{$url}?page=1",
-            'from' => 1,
-            'last_page' => 1,
-            'last_page_url' => "{$url}?page=1",
-            'next_page_url' => null,
-            'path' => $path,
-            'per_page' => $total,
-            'prev_page_url' => null,
-            'to' => $total,
-            'total' => $total
-        ];
-
-        $currentVersion = explode('.', app()->version())[0];
-
-        if ((int)$currentVersion < 8) {
-            return $wrappedPaginatedData;
-        }
-
-        $wrappedPaginatedData['links'] = $links;
-
-        return $wrappedPaginatedData;
-    }
-
     public function filterByList($field, $filterName)
     {
         if (Arr::has($this->filter, $filterName)) {
