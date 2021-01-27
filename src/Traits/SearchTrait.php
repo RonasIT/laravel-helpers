@@ -16,13 +16,17 @@ trait SearchTrait
     protected $query;
     protected $filter;
 
-    public function paginate()
+    public function paginate($data = [])
     {
-        $defaultPerPage = config('defaults.items_per_page');
-        $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage );
-        $page = Arr::get($this->filter, 'page', 1);
+        if (empty($data)) {
+            $defaultPerPage = config('defaults.items_per_page');
+            $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage);
+            $page = Arr::get($this->filter, 'page', 1);
 
-        return $this->query->paginate($perPage, ['*'], 'page', $page);
+            return $this->query->paginate($perPage, ['*'], 'page', $page);
+        }
+
+        return $this->query->paginate(count($data), ['*'], 'page', 1);
     }
 
     /**
@@ -96,13 +100,17 @@ trait SearchTrait
             return $this->getModifiedPaginator($this->paginate())->toArray();
         }
 
-        return $this->wrapPaginatedData($this
+        $data = $this
             ->query
             ->get()
             ->makeHidden($this->hiddenAttributes)
             ->makeVisible($this->visibleAttributes)
-            ->toArray()
-        );
+            ->toArray();
+
+        $paginatedData = $this->getModifiedPaginator($this->paginate($data))->toArray();
+        $paginatedData['path'] = Request::path();
+
+        return $this->checkVersion($paginatedData);
     }
 
     public function getModifiedPaginator($paginator)
@@ -112,6 +120,17 @@ trait SearchTrait
             ->makeHidden($this->hiddenAttributes)
             ->makeVisible($this->visibleAttributes)
         );
+    }
+
+    public function checkVersion($paginatedData)
+    {
+        $currentVersion = explode('.', app()->version())[0];
+
+        if ((int)$currentVersion < 8) {
+            unset($paginatedData['links']);
+        }
+
+        return $paginatedData;
     }
 
     public function orderBy($default = null, $defaultDesc = false)
