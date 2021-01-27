@@ -247,7 +247,9 @@ trait SearchTrait
             'total' => $total
         ];
 
-        if ((int)app()->version()[0] < 8) {
+        $currentVersion = explode('.', app()->version())[0];
+
+        if ((int)$currentVersion < 8) {
             return $wrappedPaginatedData;
         }
 
