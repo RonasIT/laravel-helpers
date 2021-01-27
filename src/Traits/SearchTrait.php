@@ -214,8 +214,25 @@ trait SearchTrait
         $url = Request::url();
         $path = Request::path();
         $total = count($data);
+        $links = [
+            [
+                'url' => null,
+                'label' => "&laquo; Previous",
+                'active' => false
+            ],
+            [
+                'url' => "{$url}?page=1",
+                'label' => 1,
+                'active' => true
+            ],
+            [
+                'url' => null,
+                'label' => "Next &raquo;",
+                'active' => false
+            ]
+        ];
 
-        return [
+        $wrappedPaginatedData = [
             'current_page' => 1,
             'data' => $data,
             'first_page_url' => "{$url}?page=1",
@@ -229,6 +246,14 @@ trait SearchTrait
             'to' => $total,
             'total' => $total
         ];
+
+        if ((int)app()->version()[0] < 8) {
+            return $wrappedPaginatedData;
+        }
+
+        $wrappedPaginatedData['links'] = $links;
+
+        return $wrappedPaginatedData;
     }
 
     public function filterByList($field, $filterName)
