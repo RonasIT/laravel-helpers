@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
@@ -16,17 +18,13 @@ trait SearchTrait
     protected $query;
     protected $filter;
 
-    public function paginate($amount = null)
+    public function paginate()
     {
-        if (empty($amount)) {
-            $defaultPerPage = config('defaults.items_per_page');
-            $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage);
-            $page = Arr::get($this->filter, 'page', 1);
+        $defaultPerPage = config('defaults.items_per_page');
+        $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage);
+        $page = Arr::get($this->filter, 'page', 1);
 
-            return $this->query->paginate($perPage, ['*'], 'page', $page);
-        }
-
-        return $this->query->paginate($amount, ['*'], 'page', 1);
+        return $this->query->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -100,9 +98,14 @@ trait SearchTrait
             return $this->getModifiedPaginator($this->paginate())->toArray();
         }
 
-        $amount = $this->query->count();
+        $data = $this->query->get();
 
-        $paginatedData = $this->getModifiedPaginator($this->paginate($amount))->toArray();
+        $paginator = new LengthAwarePaginator($data, count($data), count($data), 1, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => 'page'
+        ]);
+
+        $paginatedData = $this->getModifiedPaginator($paginator)->toArray();
         $paginatedData['path'] = Request::path();
 
         return $paginatedData;
