@@ -100,6 +100,11 @@ trait SearchTrait
 
         $data = $this->query->get();
 
+        return $this->wrapPaginatedData($data);
+    }
+
+    public function wrapPaginatedData($data)
+    {
         $paginator = new LengthAwarePaginator($data, count($data), count($data), 1, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => 'page'
