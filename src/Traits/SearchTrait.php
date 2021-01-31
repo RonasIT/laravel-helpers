@@ -110,10 +110,7 @@ trait SearchTrait
             'pageName' => 'page'
         ]);
 
-        $paginatedData = $this->getModifiedPaginator($paginator)->toArray();
-        $paginatedData['path'] = Request::path();
-
-        return $paginatedData;
+        return $this->getModifiedPaginator($paginator)->toArray();
     }
 
     public function getModifiedPaginator($paginator)
