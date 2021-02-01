@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
@@ -19,7 +21,7 @@ trait SearchTrait
     public function paginate()
     {
         $defaultPerPage = config('defaults.items_per_page');
-        $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage );
+        $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage);
         $page = Arr::get($this->filter, 'page', 1);
 
         return $this->query->paginate($perPage, ['*'], 'page', $page);
@@ -96,13 +98,19 @@ trait SearchTrait
             return $this->getModifiedPaginator($this->paginate())->toArray();
         }
 
-        return $this->wrapPaginatedData($this
-            ->query
-            ->get()
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-            ->toArray()
-        );
+        $data = $this->query->get();
+
+        return $this->wrapPaginatedData($data);
+    }
+
+    public function wrapPaginatedData($data)
+    {
+        $paginator = new LengthAwarePaginator($data, count($data), count($data), 1, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => 'page'
+        ]);
+
+        return $this->getModifiedPaginator($paginator)->toArray();
     }
 
     public function getModifiedPaginator($paginator)
@@ -207,28 +215,6 @@ trait SearchTrait
 
             $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
-    }
-
-    protected function wrapPaginatedData($data)
-    {
-        $url = Request::url();
-        $path = Request::path();
-        $total = count($data);
-
-        return [
-            'current_page' => 1,
-            'data' => $data,
-            'first_page_url' => "{$url}?page=1",
-            'from' => 1,
-            'last_page' => 1,
-            'last_page_url' => "{$url}?page=1",
-            'next_page_url' => null,
-            'path' => $path,
-            'per_page' => $total,
-            'prev_page_url' => null,
-            'to' => $total,
-            'total' => $total
-        ];
     }
 
     public function filterByList($field, $filterName)
