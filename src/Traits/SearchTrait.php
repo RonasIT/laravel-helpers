@@ -209,9 +209,20 @@ trait SearchTrait
 
     protected function getQuerySearchCallback($field)
     {
-        return function ($query) use ($field) {
+        $databaseDriver = env('DB_CONNECTION');
+        $dbRawValue = '';
+
+        if ($databaseDriver === 'mysql') {
+            $dbRawValue = "lower({$field})";
+        }
+
+        if ($databaseDriver === 'pgsql') {
+            $dbRawValue = "lower(text({$field}))";
+        }
+
+        return function ($query) use ($dbRawValue) {
             $loweredQuery = mb_strtolower($this->filter['query']);
-            $field = DB::raw("lower({$field})");
+            $field = DB::raw($dbRawValue);
 
             $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
