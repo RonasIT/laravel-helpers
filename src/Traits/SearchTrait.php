@@ -5,7 +5,6 @@ namespace RonasIT\Support\Traits;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -209,7 +208,7 @@ trait SearchTrait
 
     protected function getQuerySearchCallback($field)
     {
-        $databaseDriver = env('DB_CONNECTION');
+        $databaseDriver = config('database.default');
         $dbRawValue = '';
 
         if ($databaseDriver === 'mysql') {
