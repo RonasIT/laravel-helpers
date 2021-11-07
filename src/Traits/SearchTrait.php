@@ -209,11 +209,7 @@ trait SearchTrait
     protected function getQuerySearchCallback($field)
     {
         $databaseDriver = config('database.default');
-        $dbRawValue = '';
-
-        if ($databaseDriver === 'mysql') {
-            $dbRawValue = "lower({$field})";
-        }
+        $dbRawValue = "lower({$field})";
 
         if ($databaseDriver === 'pgsql') {
             $dbRawValue = "lower(text({$field}))";
