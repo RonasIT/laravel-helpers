@@ -5,7 +5,6 @@ namespace RonasIT\Support\Traits;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -209,9 +208,16 @@ trait SearchTrait
 
     protected function getQuerySearchCallback($field)
     {
-        return function ($query) use ($field) {
+        $databaseDriver = config('database.default');
+        $dbRawValue = "lower({$field})";
+
+        if ($databaseDriver === 'pgsql') {
+            $dbRawValue = "lower(text({$field}))";
+        }
+
+        return function ($query) use ($dbRawValue) {
             $loweredQuery = mb_strtolower($this->filter['query']);
-            $field = DB::raw("lower({$field})");
+            $field = DB::raw($dbRawValue);
 
             $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
