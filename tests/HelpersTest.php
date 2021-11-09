@@ -40,7 +40,12 @@ class HelpersTest extends HelpersTestCase
                 'array' => 'neighborhood.json',
                 'key' => 'zips',
                 'expected' => 'neighborhood.zips.json'
-            ]
+            ],
+            [
+                'array' => 'areas.json',
+                'key' => 'zips.*.area.houses.*.number',
+                'expected' => 'areas.houses.json'
+            ],
         ];
     }
 
