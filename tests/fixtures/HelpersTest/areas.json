@@ -1,0 +1,32 @@
+{
+  "id": 2,
+  "zips": [
+    {
+      "id": 1,
+      "area": {
+        "houses": [
+          {
+            "number": 1
+          },
+          {
+            "number": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "area": null
+    },
+    {
+      "id": 1,
+      "area": {
+        "houses": [
+          {
+            "number": 3
+          }
+        ]
+      }
+    }
+  ]
+}

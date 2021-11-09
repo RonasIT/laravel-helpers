@@ -85,6 +85,10 @@ function array_get_list($array, $path)
     }
 
     if ($key === '*') {
+        if (empty($array)) {
+            return [];
+        }
+
         $values = array_map(function ($item) use ($path) {
             $value = array_get_list($item, $path);
 
