@@ -38,7 +38,7 @@ trait EntityControlTrait
         $modelInstance::truncate();
     }
 
-    public function force($value = true)
+    public function force($value = true): self
     {
         $this->forceMode = $value;
 
@@ -56,16 +56,24 @@ trait EntityControlTrait
         $this->checkPrimaryKey();
     }
 
-    public function makeHidden(array $hiddenAttributes = [])
+    /**
+     * @param array|string $hiddenAttributes
+     * @return $this
+     */
+    public function makeHidden($hiddenAttributes = []): self
     {
-        $this->hiddenAttributes = $hiddenAttributes;
+        $this->hiddenAttributes = Arr::wrap($hiddenAttributes);
 
         return $this;
     }
 
-    public function makeVisible(array $visibleAttributes = [])
+    /**
+     * @param array|string $visibleAttributes
+     * @return $this
+     */
+    public function makeVisible($visibleAttributes = []): self
     {
-        $this->visibleAttributes = $visibleAttributes;
+        $this->visibleAttributes = Arr::wrap($visibleAttributes);
 
         return $this;
     }
@@ -111,9 +119,10 @@ trait EntityControlTrait
 
     /**
      * @param $relations array|string
+     *
      * @return $this
      */
-    public function withRelations($relations)
+    public function withRelations($relations): self
     {
         $this->requiredRelations = Arr::wrap($relations);
 
@@ -122,9 +131,10 @@ trait EntityControlTrait
 
     /**
      * @param $relations array|string
+     *
      * @return $this
      */
-    public function withRelationsCount($relations)
+    public function withRelationsCount($relations): self
     {
         $this->requiredRelationsCount = Arr::wrap($relations);
 
@@ -138,7 +148,7 @@ trait EntityControlTrait
      *
      * @return boolean
      */
-    public function exists($where)
+    public function exists($where): bool
     {
         return $this->getQuery($where)->exists();
     }
@@ -151,7 +161,7 @@ trait EntityControlTrait
      *
      * @return boolean
      */
-    public function existsBy($field, $value)
+    public function existsBy($field, $value): bool
     {
         return $this->getQuery([$field => $value])->exists();
     }
@@ -191,7 +201,7 @@ trait EntityControlTrait
      * @param bool $updatedRecordsAsResult
      * @param int $limit
      *
-     * @return array
+     * @return array|int
      */
     public function updateMany($where, array $data, bool $updatedRecordsAsResult = true, int $limit = 50)
     {
@@ -221,7 +231,7 @@ trait EntityControlTrait
      *
      * @return array
      */
-    public function update($where, array $data)
+    public function update($where, array $data): array
     {
         $item = $this->getQuery($where)->first();
 
@@ -268,19 +278,13 @@ trait EntityControlTrait
         return $this->getQuery($where)->count();
     }
 
-    /**
-     * @param  array $where
-     *
-     * @return array
-     */
-    public function get($where = [])
+    public function get(array $where = []): array
     {
-        return $this
-            ->getQuery($where)
-            ->get()
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-            ->toArray();
+        $result = $this->getQuery($where)->get();
+
+        $this->hideUnHideFields($result);
+
+        return $result->toArray();
     }
 
     /**
@@ -297,7 +301,7 @@ trait EntityControlTrait
         return $entities;
     }
 
-    public function first($where)
+    public function first(array $where = []): array
     {
         $entity = $this->getQuery($where)->first();
 
@@ -307,17 +311,23 @@ trait EntityControlTrait
             ->toArray();
     }
 
-    public function findBy($field, $value)
+    public function findBy(string $field, $value): array
     {
         return $this->first([$field => $value]);
     }
 
-    public function find($id)
+    public function find($id): array
     {
         return $this->first([$this->primaryKey => $id]);
     }
 
-    public function firstOrCreate($where, $data = [])
+    /**
+     * @param array|string|int $where array of conditions or primary key value
+     * @param array $data
+     *
+     * @return array|mixed
+     */
+    public function firstOrCreate($where, array $data = [])
     {
         $entity = $this->first($where);
 
@@ -353,21 +363,21 @@ trait EntityControlTrait
         $this->getQuery($where)->forceDelete();
     }
 
-    public function withTrashed($enable = true)
+    public function withTrashed($enable = true): self
     {
         $this->withTrashed = $enable;
 
         return $this;
     }
 
-    public function onlyTrashed($enable = true)
+    public function onlyTrashed($enable = true): self
     {
         $this->onlyTrashed = $enable;
 
         return $this;
     }
 
-    public function restore($where)
+    public function restore($where): int
     {
         return $this->getQuery($where)->onlyTrashed()->restore();
     }
@@ -378,11 +388,9 @@ trait EntityControlTrait
             ->getQuery($where)
             ->orderBy($this->primaryKey)
             ->chunk($limit, function ($items) use ($callback) {
-                $callback($items
-                    ->makeHidden($this->hiddenAttributes)
-                    ->makeVisible($this->visibleAttributes)
-                    ->toArray()
-                );
+                $this->hideUnHideFields($items);
+
+                $callback($items->toArray());
             });
     }
 
@@ -408,7 +416,7 @@ trait EntityControlTrait
         }
     }
 
-    public function restoreByList($values, $field = null)
+    public function restoreByList($values, $field = null): array
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -417,34 +425,37 @@ trait EntityControlTrait
             ->onlyTrashed()
             ->whereIn($field, $values);
 
-        $entities = $query->get()->toArray();
+        $entities = $query->get();
+
+        $this->hideUnHideFields($entities);
 
         $query->restore();
 
-        return $entities;
+        return $entities->toArray();
     }
 
-    public function getByList(array $values, $field = null)
+    public function getByList(array $values, $field = null): array
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        return $this
+        $result = $this
             ->getQuery()
             ->whereIn($field, $values)
-            ->get()
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-            ->toArray();
+            ->get();
+
+        $this->hideUnHideFields($result);
+
+        return $result->toArray();
     }
 
-    public function countByList(array $values, $field = null)
+    public function countByList(array $values, $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
         return $this->getQuery()->whereIn($field, $values)->count();
     }
 
-    public function updateByList(array $values, $data, $field = null)
+    public function updateByList(array $values, $data, $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -462,7 +473,7 @@ trait EntityControlTrait
         return end($explodedModel);
     }
 
-    protected function isSoftDelete()
+    protected function isSoftDelete(): bool
     {
         $traits = class_uses(get_class($this->model));
 
