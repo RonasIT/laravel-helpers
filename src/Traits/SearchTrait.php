@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
- * @property Query query 
+ * @property Query query
  */
 trait SearchTrait
 {
@@ -104,7 +105,10 @@ trait SearchTrait
 
     public function wrapPaginatedData($data)
     {
-        $paginator = new LengthAwarePaginator($data, count($data), count($data), 1, [
+        $total = count($data);
+        $perPage = $this->calculatePerPage($total);
+
+        $paginator = new LengthAwarePaginator($data, count($data), $perPage, 1, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => 'page'
         ]);
@@ -114,11 +118,11 @@ trait SearchTrait
 
     public function getModifiedPaginator($paginator)
     {
-        return $paginator->setCollection($paginator
-            ->getCollection()
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-        );
+        $collection = $paginator->getCollection();
+
+        $this->hideUnHideFields($collection);
+
+        return $paginator->setCollection($collection);
     }
 
     public function orderBy($default = null, $defaultDesc = false)
@@ -238,7 +242,7 @@ trait SearchTrait
     {
         $filterName = empty($filterName) ? 'from' : $filterName;
         $sign = $strict ? '>' : '>=';
-        
+
         if (!empty($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
         }
@@ -250,7 +254,7 @@ trait SearchTrait
     {
         $filterName = empty($filterName) ? 'to' : $filterName;
         $sign = $strict ? '<' : '<=';
-        
+
         if (!empty($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
         }
@@ -321,6 +325,30 @@ trait SearchTrait
             });
         } else {
             $callback($query, $field);
+        }
+    }
+
+    protected function calculatePerPage($total)
+    {
+        if ($total > 0) {
+            return $total;
+        }
+
+        if (!empty($this->filter['per_page'])) {
+            return $this->filter['per_page'];
+        }
+
+        return config('defaults.items_per_page', 1);
+    }
+
+    protected function hideUnHideFields(&$collection)
+    {
+        if (Application::VERSION >= '5.8') {
+            $collection->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes);
+        } else {
+            $collection = $collection->each(function (&$item) {
+                $item->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes);
+            });
         }
     }
 }
