@@ -2,17 +2,20 @@
 
 namespace RonasIT\Support\Traits;
 
+use BadMethodCallException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 use Schema;
 
 trait ModelTrait
 {
     protected static $forceVisible = [];
     protected static $forceHidden = [];
+
+    protected $disableLazyLoading = false;
 
     public static function setForceVisibleFields($fields)
     {
@@ -53,6 +56,19 @@ trait ModelTrait
         return array_map(function ($field) {
             return "{$this->getTable()}.{$field}";
         }, $fields);
+    }
+
+    protected function getRelationshipFromMethod($method)
+    {
+        if ($this->disableLazyLoading) {
+            $modelName = static::class;
+
+            throw new BadMethodCallException(
+                "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. See property \$disableLazyLoading"
+            );
+        }
+
+        return parent::getRelationshipFromMethod($method);
     }
 
     /**

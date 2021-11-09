@@ -23,6 +23,8 @@ trait EntityControlTrait
     protected $fields;
     protected $primaryKey;
     protected $forceMode;
+    protected $visibleAttributes = [];
+    protected $hiddenAttributes = [];
 
     public function all()
     {
@@ -52,6 +54,20 @@ trait EntityControlTrait
         $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
+    }
+
+    public function makeHidden(array $hiddenAttributes = [])
+    {
+        $this->hiddenAttributes = $hiddenAttributes;
+
+        return $this;
+    }
+
+    public function makeVisible(array $visibleAttributes = [])
+    {
+        $this->visibleAttributes = $visibleAttributes;
+
+        return $this;
     }
 
     protected function getQuery($where = [])
@@ -100,7 +116,7 @@ trait EntityControlTrait
     public function withRelations($relations)
     {
         $this->requiredRelations = Arr::wrap($relations);
-        
+
         return $this;
     }
 
@@ -161,7 +177,10 @@ trait EntityControlTrait
             $model->load($this->requiredRelations);
         }
 
-        return $model->toArray();
+        return $model
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     /**
@@ -169,20 +188,29 @@ trait EntityControlTrait
      *
      * @param array|integer $where
      * @param array $data
+     * @param bool $updatedRecordsAsResult
+     * @param int $limit
      *
      * @return array
      */
-    public function updateMany($where, array $data)
+    public function updateMany($where, array $data, bool $updatedRecordsAsResult = true, int $limit = 50)
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
-        $this
-            ->getQuery($where)
-            ->update($entityData);
+        $unUpdatedIds = [];
+        $this->chunk($limit, function ($items) use (&$unUpdatedIds) {
+            $unUpdatedIds = array_merge($unUpdatedIds, Arr::pluck($items, 'id'));
+        }, $where);
 
-        return $this->get(array_merge($where, $entityData));
+        $updatedRowsCount = $this->updateByList($unUpdatedIds, $entityData);
+
+        if (!$updatedRecordsAsResult) {
+            return $updatedRowsCount;
+        }
+
+        return $this->getByList($unUpdatedIds);
     }
 
     /**
@@ -216,7 +244,10 @@ trait EntityControlTrait
             $item->load($this->requiredRelations);
         }
 
-        return $item->toArray();
+        return $item
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     public function updateOrCreate($where, $data)
@@ -244,7 +275,12 @@ trait EntityControlTrait
      */
     public function get($where = [])
     {
-        return $this->getQuery($where)->get()->toArray();
+        return $this
+            ->getQuery($where)
+            ->get()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     /**
@@ -265,7 +301,10 @@ trait EntityControlTrait
     {
         $entity = $this->getQuery($where)->first();
 
-        return empty($entity) ? [] : $entity->toArray();
+        return empty($entity) ? [] : $entity
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     public function findBy($field, $value)
@@ -339,7 +378,11 @@ trait EntityControlTrait
             ->getQuery($where)
             ->orderBy($this->primaryKey)
             ->chunk($limit, function ($items) use ($callback) {
-                $callback($items->toArray());
+                $callback($items
+                    ->makeHidden($this->hiddenAttributes)
+                    ->makeVisible($this->visibleAttributes)
+                    ->toArray()
+                );
             });
     }
 
@@ -385,7 +428,13 @@ trait EntityControlTrait
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        return $this->getQuery()->whereIn($field, $values)->get()->toArray();
+        return $this
+            ->getQuery()
+            ->whereIn($field, $values)
+            ->get()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+            ->toArray();
     }
 
     public function countByList(array $values, $field = null)

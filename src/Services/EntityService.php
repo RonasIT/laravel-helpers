@@ -30,6 +30,8 @@ class EntityService
             return $result;
         }
 
-        throw new BadMethodCallException();
+        $className = get_class($this);
+
+        throw new BadMethodCallException("Method {$name} does not exists in {$className}.");
     }
 }

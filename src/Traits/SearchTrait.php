@@ -2,8 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -19,7 +20,7 @@ trait SearchTrait
     public function paginate()
     {
         $defaultPerPage = config('defaults.items_per_page');
-        $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage );
+        $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage);
         $page = Arr::get($this->filter, 'page', 1);
 
         return $this->query->paginate($perPage, ['*'], 'page', $page);
@@ -93,10 +94,31 @@ trait SearchTrait
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            return $this->paginate()->toArray();
+            return $this->getModifiedPaginator($this->paginate())->toArray();
         }
 
-        return $this->wrapPaginatedData($this->query->get()->toArray());
+        $data = $this->query->get();
+
+        return $this->wrapPaginatedData($data);
+    }
+
+    public function wrapPaginatedData($data)
+    {
+        $paginator = new LengthAwarePaginator($data, count($data), count($data), 1, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => 'page'
+        ]);
+
+        return $this->getModifiedPaginator($paginator)->toArray();
+    }
+
+    public function getModifiedPaginator($paginator)
+    {
+        return $paginator->setCollection($paginator
+            ->getCollection()
+            ->makeHidden($this->hiddenAttributes)
+            ->makeVisible($this->visibleAttributes)
+        );
     }
 
     public function orderBy($default = null, $defaultDesc = false)
@@ -186,34 +208,19 @@ trait SearchTrait
 
     protected function getQuerySearchCallback($field)
     {
-        return function ($query) use ($field) {
+        $databaseDriver = config('database.default');
+        $dbRawValue = "lower({$field})";
+
+        if ($databaseDriver === 'pgsql') {
+            $dbRawValue = "lower(text({$field}))";
+        }
+
+        return function ($query) use ($dbRawValue) {
             $loweredQuery = mb_strtolower($this->filter['query']);
-            $field = DB::raw("lower({$field})");
+            $field = DB::raw($dbRawValue);
 
             $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
-    }
-
-    protected function wrapPaginatedData($data)
-    {
-        $url = Request::url();
-        $path = Request::path();
-        $total = count($data);
-
-        return [
-            'current_page' => 1,
-            'data' => $data,
-            'first_page_url' => "{$url}?page=1",
-            'from' => 1,
-            'last_page' => 1,
-            'last_page_url' => "{$url}?page=1",
-            'next_page_url' => null,
-            'path' => $path,
-            'per_page' => $total,
-            'prev_page_url' => null,
-            'to' => $total,
-            'total' => $total
-        ];
     }
 
     public function filterByList($field, $filterName)
