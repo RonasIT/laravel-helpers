@@ -209,12 +209,13 @@ trait EntityControlTrait
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
-        $unUpdatedIds = [];
-        $this->chunk($limit, function ($items) use (&$unUpdatedIds) {
-            $unUpdatedIds = array_merge($unUpdatedIds, Arr::pluck($items, 'id'));
+        $idsToUpdate = [];
+
+        $this->chunk($limit, function ($items) use (&$idsToUpdate) {
+            $idsToUpdate = array_merge($idsToUpdate, Arr::pluck($items, 'id'));
         }, $where);
 
-        $updatedRowsCount = $this->updateByList($unUpdatedIds, $entityData);
+        $updatedRowsCount = $this->updateByList($idsToUpdate, $entityData);
 
         if (!$updatedRecordsAsResult) {
             return $updatedRowsCount;
@@ -231,7 +232,7 @@ trait EntityControlTrait
      *
      * @return array
      */
-    public function update($where, array $data): array
+    public function update($where, array $data)
     {
         $item = $this->getQuery($where)->first();
 
@@ -278,11 +279,11 @@ trait EntityControlTrait
         return $this->getQuery($where)->count();
     }
 
-    public function get(array $where = []): array
+    public function get(array $where = [])
     {
         $result = $this->getQuery($where)->get();
 
-        $this->hideUnHideFields($result);
+        $this->applyHidingShowingFieldsRules($result);
 
         return $result->toArray();
     }
@@ -301,7 +302,7 @@ trait EntityControlTrait
         return $entities;
     }
 
-    public function first(array $where = []): array
+    public function first($where = [])
     {
         $entity = $this->getQuery($where)->first();
 
@@ -311,12 +312,12 @@ trait EntityControlTrait
             ->toArray();
     }
 
-    public function findBy(string $field, $value): array
+    public function findBy(string $field, $value)
     {
         return $this->first([$field => $value]);
     }
 
-    public function find($id): array
+    public function find($id)
     {
         return $this->first([$this->primaryKey => $id]);
     }
@@ -344,7 +345,7 @@ trait EntityControlTrait
      * @param array|integer|string $where
      * @return integer count of deleted rows
      */
-    public function delete($where): int
+    public function delete($where)
     {
         $query = $this->getQuery($where);
 
@@ -377,7 +378,7 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function restore($where): int
+    public function restore($where)
     {
         return $this->getQuery($where)->onlyTrashed()->restore();
     }
@@ -388,7 +389,7 @@ trait EntityControlTrait
             ->getQuery($where)
             ->orderBy($this->primaryKey)
             ->chunk($limit, function ($items) use ($callback) {
-                $this->hideUnHideFields($items);
+                $this->applyHidingShowingFieldsRules($items);
 
                 $callback($items->toArray());
             });
@@ -401,7 +402,7 @@ trait EntityControlTrait
      * @param string|null $field condition field, primary key is default value
      * @return integer count of deleted rows
      */
-    public function deleteByList(array $values, $field = null): int
+    public function deleteByList(array $values, $field = null)
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -416,7 +417,7 @@ trait EntityControlTrait
         }
     }
 
-    public function restoreByList($values, $field = null): array
+    public function restoreByList($values, $field = null)
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -427,14 +428,14 @@ trait EntityControlTrait
 
         $entities = $query->get();
 
-        $this->hideUnHideFields($entities);
+        $this->applyHidingShowingFieldsRules($entities);
 
         $query->restore();
 
         return $entities->toArray();
     }
 
-    public function getByList(array $values, $field = null): array
+    public function getByList(array $values, $field = null)
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -443,7 +444,7 @@ trait EntityControlTrait
             ->whereIn($field, $values)
             ->get();
 
-        $this->hideUnHideFields($result);
+        $this->applyHidingShowingFieldsRules($result);
 
         return $result->toArray();
     }
@@ -455,7 +456,7 @@ trait EntityControlTrait
         return $this->getQuery()->whereIn($field, $values)->count();
     }
 
-    public function updateByList(array $values, $data, $field = null): int
+    public function updateByList(array $values, $data, $field = null)
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
