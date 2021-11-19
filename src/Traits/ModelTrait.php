@@ -12,7 +12,7 @@ use Schema;
 
 trait ModelTrait
 {
-    protected $disableLazyLoading = false;
+    protected $disableLazyLoading = true;
 
     public static function getFields(): array
     {

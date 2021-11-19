@@ -101,7 +101,7 @@ trait FixturesTrait
             $this->exportJson($fixture, $data);
         }
 
-        $this->assertEqualsFixture($fixture, $data);
+        $this->assertEquals($this->getJsonFixture($fixture), $data);
     }
 
     public function callRawRequest(string $method, string $uri, $content, array $headers = []): TestResponse

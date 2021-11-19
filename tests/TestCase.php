@@ -9,10 +9,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Traits\FixturesTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 
 abstract class TestCase extends BaseTest
@@ -65,7 +65,7 @@ abstract class TestCase extends BaseTest
         return $this;
     }
 
-    public function call(string $method, string $uri, array $parameters = [], array $cookies = [], array $files = [], array $server = [], $content = null): TestResponse
+    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         if (!empty($this->jwt)) {
             $server['HTTP_AUTHORIZATION'] = "Bearer {$this->jwt}";
