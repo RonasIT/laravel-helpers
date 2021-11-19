@@ -33,28 +33,28 @@ class Importer
     ];
     protected $mandatoryFields = [];
 
-    public function setInput($input)
+    public function setInput($input): self
     {
         $this->input = $input;
 
         return $this;
     }
 
-    public function setService($service)
+    public function setService($service): self
     {
         $this->service = $service;
 
         return $this;
     }
 
-    public function setExporter($exporter)
+    public function setExporter($exporter): self
     {
         $this->exporter = app($exporter);
 
         return $this;
     }
 
-    public function import()
+    public function import(): array
     {
         $this->prepare();
 
@@ -65,12 +65,14 @@ class Importer
         return $this->report;
     }
 
-    public function prepare()
+    public function prepare(): self
     {
         $this->iterator = new CsvIterator($this->input);
+
+        return $this;
     }
 
-    protected function markAllLines()
+    protected function markAllLines(): void
     {
         $isFilterLine = true;
 
@@ -102,13 +104,13 @@ class Importer
         }
     }
 
-    protected function resolve()
+    protected function resolve(): void
     {
         $this->createAllMarked();
         $this->updateAllMarked();
     }
 
-    protected function prepareFields($line)
+    protected function prepareFields(array $line): array
     {
         return array_map(function ($field) {
             $field = strtolower($field);
@@ -117,7 +119,7 @@ class Importer
         }, $line);
     }
 
-    protected function prepareLine($line)
+    protected function prepareLine(array $line): array
     {
         if (empty($line['id'])) {
             $line['id'] = null;
@@ -130,7 +132,7 @@ class Importer
         return $line;
     }
 
-    protected function markForCreate($line)
+    protected function markForCreate(array $line): void
     {
         if (!$this->isValidForCreation($line)) {
             return;
@@ -139,7 +141,7 @@ class Importer
         $this->items[self::ITEMS_TO_CREATE][] = $line;
     }
 
-    protected function isValidForCreation($line)
+    protected function isValidForCreation(array $line): bool
     {
         if (empty($line['id'])) {
             return true;
@@ -148,14 +150,14 @@ class Importer
         return !$this->service->withTrashed()->exists(['id' => $line['id']]);
     }
 
-    protected function markForUpdate($line)
+    protected function markForUpdate(array $line): void
     {
         if ($this->isValidForUpdating($line)) {
             $this->items[self::ITEMS_TO_UPDATE][$line['id']] = $line;
         }
     }
 
-    protected function isValidForUpdating($line)
+    protected function isValidForUpdating(array $line): bool
     {
         if (empty($line['id']) || in_array($line, $this->items[self::ITEMS_TO_UPDATE])) {
             return false;
@@ -166,19 +168,19 @@ class Importer
         return !empty($diff);
     }
 
-    protected function addError($error)
+    protected function addError(string $error): void
     {
         $this->report['errors'][] = $this->formatError($error);
     }
 
-    protected function formatError($error)
+    protected function formatError(string $error): string
     {
         $lineNumber = $this->iterator->key() + 1;
 
         return "Line {$lineNumber}: {$error}";
     }
 
-    protected function validateDuplicatingOfId($item)
+    protected function validateDuplicatingOfId(array $item): bool
     {
         if (empty($item['id'])) {
             return false;
@@ -189,7 +191,7 @@ class Importer
         ]);
     }
 
-    protected function createAllMarked()
+    protected function createAllMarked(): void
     {
         foreach ($this->items[self::ITEMS_TO_CREATE] as $item) {
             $this->service->create($item);
@@ -198,7 +200,7 @@ class Importer
         }
     }
 
-    protected function updateAllMarked()
+    protected function updateAllMarked(): void
     {
         foreach ($this->items[self::ITEMS_TO_UPDATE] as $id => $item) {
             $this->service->update(['id' => $id], $item);
@@ -207,7 +209,7 @@ class Importer
         }
     }
 
-    protected function getDiff($item)
+    protected function getDiff(array $item): array
     {
         $itemFromDB = $this->service->first(['id' => $item['id']]);
 
@@ -217,7 +219,7 @@ class Importer
         return array_diff($exportedLine, $importedLine);
     }
 
-    protected function validateHeader()
+    protected function validateHeader(): void
     {
         $line = $this->iterator->current();
 

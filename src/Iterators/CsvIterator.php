@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Iterators;
 
 use Iterator;
+use Generator;
 use RonasIT\Support\Exceptions\IncorrectCSVFileException;
 
 class CsvIterator implements Iterator
@@ -19,14 +20,14 @@ class CsvIterator implements Iterator
         $this->filePath = $filePath;
     }
 
-    public function parseColumns($columns)
+    public function parseColumns($columns): self
     {
         $this->columns = $columns;
 
         return $this;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         fclose($this->file);
 
@@ -54,7 +55,7 @@ class CsvIterator implements Iterator
         });
     }
 
-    public function getGenerator()
+    public function getGenerator(): Generator
     {
         $this->rewind();
 
@@ -72,13 +73,13 @@ class CsvIterator implements Iterator
         return $this->currentRow;
     }
 
-    public function next()
+    public function next(): void
     {
         $this->currentCsvLine = fgetcsv($this->file);
         $this->currentRow++;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->currentCsvLine !== false;
     }

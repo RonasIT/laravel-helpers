@@ -5,6 +5,7 @@ namespace RonasIT\Support\Services;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
+use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
@@ -18,33 +19,40 @@ class HttpRequestService
     protected $options = [];
     protected $cookies = null;
 
+    protected $response;
+
     public function __construct()
     {
         $this->debug = config('defaults.http_service_debug', false);
     }
 
-    public function set($key, $value)
+    public function set(string $key, $value): self
     {
         $this->options[$key] = $value;
 
         return $this;
     }
 
-    public function parseJsonResponse($response)
+    public function json(): array
     {
-        $stringResponse = (string)$response->getBody();
+        $stringResponse = (string) $this->response->getBody();
 
         return json_decode($stringResponse, true);
     }
 
-    public function saveCookieSession()
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
+
+    public function saveCookieSession(): self
     {
         $this->cookies = app(CookieJar::class);
 
         return $this;
     }
 
-    public function getCookie()
+    public function getCookie(): array
     {
         if (empty($this->cookies)) {
             return [];
@@ -53,46 +61,46 @@ class HttpRequestService
         return $this->cookies->toArray();
     }
 
-    public function allowRedirects($value = true)
+    public function allowRedirects(bool $value = true): self
     {
         $this->allowRedirects = $value;
 
         return $this;
     }
 
-    public function setConnectTimeout($seconds = 0)
+    public function setConnectTimeout(int $seconds = 0): self
     {
         $this->connectTimeout = $seconds;
 
         return $this;
     }
 
-    public function sendGet($url, $data = null, $headers = [])
+    public function get(string $url, array $data = [], array $headers = []): self
     {
         return $this->send('get', $url, $data, $headers);
     }
 
-    public function sendPost($url, $data, $headers = [])
+    public function post(string $url, array $data, array $headers = []): self
     {
         return $this->send('post', $url, $data, $headers);
     }
 
-    public function sendDelete($url, $headers = [])
+    public function delete(string $url, array $headers = []): self
     {
         return $this->send('delete', $url, [], $headers);
     }
 
-    public function sendPut($url, $data, $headers = [])
+    public function put(string $url, array $data, array $headers = []): self
     {
         return $this->send('put', $url, $data, $headers);
     }
 
-    public function sendPatch($url, $data, $headers = [])
+    public function patch(string $url, array $data, array $headers = []): self
     {
         return $this->send('patch', $url, $data, $headers);
     }
 
-    protected function send($method, $url, $data = [], $headers = [])
+    protected function send(string $method, string $url, array $data = [], array $headers = []): self
     {
         $time = microtime(true);
 
@@ -101,37 +109,37 @@ class HttpRequestService
         $this->setData($method, $headers, $data);
 
         try {
-            $response = $this->sendRequest($method, $url);
+            $this->response = $this->sendRequest($method, $url);
 
-            return $response;
+            return $this;
         } catch (RequestException $exception) {
-            $response = $exception->getResponse();
+            $this->response = $exception->getResponse();
 
             throw $exception;
         } finally {
-            $this->logResponse($response, $time);
+            $this->logResponse($this->response, $time);
             $this->options = [];
         }
     }
 
-    protected function sendRequest($method, $url)
+    protected function sendRequest($method, $url): ResponseInterface
     {
         $client = new Client();
 
         switch ($method) {
-            case 'get' :
+            case 'get':
                 $response = $client->get($url, $this->options);
                 break;
-            case 'post' :
+            case 'post':
                 $response = $client->post($url, $this->options);
                 break;
-            case 'put' :
+            case 'put':
                 $response = $client->put($url, $this->options);
                 break;
-            case 'patch' :
+            case 'patch':
                 $response = $client->patch($url, $this->options);
                 break;
-            case 'delete' :
+            case 'delete':
                 $response = $client->delete($url, $this->options);
                 break;
             default :
@@ -141,7 +149,7 @@ class HttpRequestService
         return $response;
     }
 
-    protected function logRequest($typeOfRequest, $url, $data, $headers)
+    protected function logRequest(string $typeOfRequest, string $url, array $data, array $headers): void
     {
         if ($this->debug) {
             logger('');
@@ -156,7 +164,7 @@ class HttpRequestService
         }
     }
 
-    protected function logResponse($response, $time = null)
+    protected function logResponse(ResponseInterface $response, ?int $time = null): void
     {
         if ($this->debug) {
             logger('');
@@ -170,15 +178,17 @@ class HttpRequestService
         }
     }
 
-    private function setOptions($headers)
+    private function setOptions(array $headers): self
     {
         $this->options['headers'] = $headers;
         $this->options['cookies'] = $this->cookies;
         $this->options['allow_redirects'] = $this->allowRedirects;
         $this->options['connect_timeout'] = $this->connectTimeout;
+
+        return $this;
     }
 
-    private function setData($method, $headers, $data = [])
+    private function setData(string $method, array $headers, array $data = []): void
     {
         if (empty($data)) {
             return;
