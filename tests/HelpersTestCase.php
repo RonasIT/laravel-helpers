@@ -2,8 +2,9 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Foundation\Testing\TestCase as BaseTest;
+use Illuminate\Foundation\Application;
 use RonasIT\Support\Traits\FixturesTrait;
+use Illuminate\Foundation\Testing\TestCase as BaseTest;
 
 class HelpersTestCase extends BaseTest
 {
@@ -19,9 +20,9 @@ class HelpersTestCase extends BaseTest
     /**
      * Creates the application.
      *
-     * @return \Illuminate\Foundation\Application
+     * @return Application
      */
-    public function createApplication()
+    public function createApplication(): Application
     {
         return require __DIR__ . '/../bootstrap/app.php';
     }

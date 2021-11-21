@@ -12,22 +12,9 @@ use Schema;
 
 trait ModelTrait
 {
-    protected static $forceVisible = [];
-    protected static $forceHidden = [];
+    protected $disableLazyLoading = true;
 
-    protected $disableLazyLoading = false;
-
-    public static function setForceVisibleFields($fields)
-    {
-        self::$forceVisible = $fields;
-    }
-
-    public static function setForceHiddenFields($fields)
-    {
-        self::$forceHidden = $fields;
-    }
-
-    public static function getFields()
+    public static function getFields(): array
     {
         $model = (new static);
 
@@ -41,15 +28,7 @@ trait ModelTrait
         return array_merge($fillable, $guarded, $timeStamps);
     }
 
-    public function toArray()
-    {
-        $hidden = array_merge($this->hidden, self::$forceHidden);
-        $this->setHidden(array_subtraction($hidden, self::$forceVisible));
-
-        return parent::toArray();
-    }
-
-    public function getAllFieldsWithTable()
+    public function getAllFieldsWithTable(): array
     {
         $fields = Schema::getColumnListing($this->getTable());
 
@@ -72,13 +51,14 @@ trait ModelTrait
     }
 
     /**
-     * This method was added, because native laravel's method addSelect
+     * This method was added, because native Laravel's method addSelect
      * overwrites existed select clause
      * @param $query
      * @param $fields
+     *
      * @return mixed
      */
-    public function scopeAddFieldsToSelect($query, $fields = null)
+    public function scopeAddFieldsToSelect($query, array $fields = [])
     {
         if (is_null($query->getQuery()->columns)) {
             $query->addSelect("{$this->getTable()}.*");
@@ -103,7 +83,7 @@ trait ModelTrait
      *
      * @return QueryBuilder
      */
-    public function scopeOrderByRelated($query, $relations, $desc = 'DESC', $asField = null, $manyToManyStrategy = 'max')
+    public function scopeOrderByRelated(QueryBuilder $query, string $relations, string $desc = 'DESC', ?string $asField = null, string $manyToManyStrategy = 'max'): QueryBuilder
     {
         if (version_compare(app()::VERSION, '5.5') <= 0) {
             return $query->legacyOrderByRelated($relations, $desc);
@@ -121,11 +101,13 @@ trait ModelTrait
             $prevQuery = array_shift($queries);
             array_pop($queries);
 
-            $this->applyManyToManyStrategy($prevQuery, $manyToManyStrategy)
+            $this
+                ->applyManyToManyStrategy($prevQuery, $manyToManyStrategy)
                 ->select($orderField);
 
             foreach ($queries as $queryInCollection) {
-                $prevQuery = $this->applyManyToManyStrategy($queryInCollection, $manyToManyStrategy)
+                $prevQuery = $this
+                    ->applyManyToManyStrategy($queryInCollection, $manyToManyStrategy)
                     ->selectSub($prevQuery, $asField);
             }
 
@@ -143,7 +125,7 @@ trait ModelTrait
         });
     }
 
-    protected function prepareRelations($relations)
+    protected function prepareRelations(string $relations): array
     {
         if (Str::contains($relations, '.')) {
             return explode('.', $relations);
@@ -154,7 +136,7 @@ trait ModelTrait
         }
     }
 
-    private function getOrderedField(&$relations)
+    private function getOrderedField(&$relations): string
     {
         if (is_array($relations)) {
             return array_pop($relations);
@@ -163,12 +145,10 @@ trait ModelTrait
         return $relations;
     }
 
-    protected function getQueriesList($query, $relations)
+    protected function getQueriesList(QueryBuilder $query, array $relations): array
     {
         $requiredColumns = [];
-        $queryCollection = [
-            $query
-        ];
+        $queryCollection = [$query];
 
         foreach ($relations as $relationString) {
             $query = Arr::last($queryCollection);
@@ -186,7 +166,7 @@ trait ModelTrait
         return array_reverse($queryCollection);
     }
 
-    protected function applyManyToManyStrategy($query, $strategy)
+    protected function applyManyToManyStrategy(QueryBuilder $query, string $strategy): QueryBuilder
     {
         if ($strategy === 'max') {
             $query->orderBy('id', 'ASC')->limit(1);
@@ -201,12 +181,9 @@ trait ModelTrait
      * Unfortunately, Laravel older than 5.5 does not support Relation::noConstraints so for such versions we
      * have to use simplified version of orderByRelated which does not support nesting relations.
      */
-    public function scopeLegacyOrderByRelated($query, $orderField, $desc = 'DESC')
+    public function scopeLegacyOrderByRelated(QueryBuilder $query, string $orderField, string $desc = 'DESC'): void
     {
-        $entities = explode('.', $orderField);
-
-        $fieldName = array_pop($entities);
-        $relationName = array_shift($entities);
+        list ($fieldName, $relationName) = extract_last_part($orderField);
 
         if (Str::plural($relationName) !== $relationName) {
             $table = $this->getTable();
@@ -222,5 +199,4 @@ trait ModelTrait
                 ->orderBy('orderedField', $desc);
         }
     }
-
 }

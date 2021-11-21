@@ -2,11 +2,13 @@
 
 namespace RonasIT\Support\Traits;
 
+use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder as Query;
 use RonasIT\Support\Exceptions\InvalidModelException;
-use RonasIT\Support\Exceptions\PostValidationException;
 
 /**
  * @property Model model
@@ -15,27 +17,29 @@ trait EntityControlTrait
 {
     use SearchTrait;
 
-    protected $requiredRelations = [];
-    protected $requiredRelationsCount = [];
     protected $model;
-    protected $withTrashed = false;
-    protected $onlyTrashed = false;
     protected $fields;
     protected $primaryKey;
-    protected $forceMode;
+
+    protected $withTrashed = false;
+    protected $onlyTrashed = false;
+    protected $forceMode = false;
+
     protected $visibleAttributes = [];
     protected $hiddenAttributes = [];
 
-    public function all()
+    public function all(): Collection
     {
         return $this->get();
     }
 
-    public function truncate()
+    public function truncate(): self
     {
         $modelInstance = $this->model;
 
         $modelInstance::truncate();
+
+        return $this;
     }
 
     public function force($value = true): self
@@ -45,7 +49,7 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function setModel($modelClass)
+    public function setModel($modelClass): self
     {
         $this->model = new $modelClass();
 
@@ -54,10 +58,13 @@ trait EntityControlTrait
         $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
+
+        return $this;
     }
 
     /**
      * @param array|string $hiddenAttributes
+     *
      * @return $this
      */
     public function makeHidden($hiddenAttributes = []): self
@@ -69,6 +76,7 @@ trait EntityControlTrait
 
     /**
      * @param array|string $visibleAttributes
+     *
      * @return $this
      */
     public function makeVisible($visibleAttributes = []): self
@@ -78,7 +86,7 @@ trait EntityControlTrait
         return $this;
     }
 
-    protected function getQuery($where = [])
+    protected function getQuery($where = []): Query
     {
         $query = $this->model->query();
 
@@ -88,19 +96,17 @@ trait EntityControlTrait
             $this->withTrashed = false;
         }
 
-        if ($this->withTrashed && $this->isSoftDelete()) {
+        if ($this->withTrashed && $this->hasSoftDeleteTrait()) {
             $query->withTrashed();
         }
 
-        if (!empty($this->requiredRelations)) {
-            $query->with($this->requiredRelations);
+        if (!empty($this->attachedRelations)) {
+            $query->with($this->attachedRelations);
         }
 
-        if (!empty($this->requiredRelationsCount)) {
-            foreach ($this->requiredRelationsCount as $requestedRelations) {
-                $explodedRelation = explode('.', $requestedRelations);
-                $countRelation = array_pop($explodedRelation);
-                $relation = implode('.', $explodedRelation);
+        if (!empty($this->attachedRelationsCount)) {
+            foreach ($this->attachedRelationsCount as $requestedRelations) {
+                list ($countRelation, $relation) = extract_last_part($requestedRelations);
 
                 if (empty($relation)) {
                     $query->withCount($countRelation);
@@ -115,30 +121,6 @@ trait EntityControlTrait
         }
 
         return $this->constructWhere($query, $where);
-    }
-
-    /**
-     * @param $relations array|string
-     *
-     * @return $this
-     */
-    public function withRelations($relations): self
-    {
-        $this->requiredRelations = Arr::wrap($relations);
-
-        return $this;
-    }
-
-    /**
-     * @param $relations array|string
-     *
-     * @return $this
-     */
-    public function withRelationsCount($relations): self
-    {
-        $this->requiredRelationsCount = Arr::wrap($relations);
-
-        return $this;
     }
 
     /**
@@ -161,12 +143,12 @@ trait EntityControlTrait
      *
      * @return boolean
      */
-    public function existsBy($field, $value): bool
+    public function existsBy(string $field, $value): bool
     {
         return $this->getQuery([$field => $value])->exists();
     }
 
-    public function create($data)
+    public function create(array $data): Model
     {
         $entityData = Arr::only($data, $this->fields);
         $modelClass = get_class($this->model);
@@ -183,45 +165,30 @@ trait EntityControlTrait
 
         $this->afterCreateHook($model, $data);
 
-        if (!empty($this->requiredRelations)) {
-            $model->load($this->requiredRelations);
+        if (!empty($this->attachedRelations)) {
+            $model->load($this->attachedRelations);
         }
 
         return $model
             ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-            ->toArray();
+            ->makeVisible($this->visibleAttributes);
     }
 
     /**
      * Update rows by condition or primary key
      *
-     * @param array|integer $where
+     * @param mixed $where
      * @param array $data
-     * @param bool $updatedRecordsAsResult
-     * @param int $limit
      *
      * @return array|int
      */
-    public function updateMany($where, array $data, bool $updatedRecordsAsResult = true, int $limit = 50)
+    public function updateMany($where, array $data): int
     {
         $modelClass = get_class($this->model);
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
-        $idsToUpdate = [];
-
-        $this->chunk($limit, function ($items) use (&$idsToUpdate) {
-            $idsToUpdate = array_merge($idsToUpdate, Arr::pluck($items, 'id'));
-        }, $where);
-
-        $updatedRowsCount = $this->updateByList($idsToUpdate, $entityData);
-
-        if (!$updatedRecordsAsResult) {
-            return $updatedRowsCount;
-        }
-
-        return $this->getByList($unUpdatedIds);
+        return $this->getQuery($where)->update($entityData);
     }
 
     /**
@@ -230,14 +197,14 @@ trait EntityControlTrait
      * @param array|integer $where
      * @param array $data
      *
-     * @return array
+     * @return Model
      */
-    public function update($where, array $data)
+    public function update($where, array $data): ?Model
     {
         $item = $this->getQuery($where)->first();
 
         if (empty($item)) {
-            return [];
+            return null;
         }
 
         if ($this->forceMode) {
@@ -251,17 +218,16 @@ trait EntityControlTrait
 
         $this->afterUpdateHook($item, $data);
 
-        if (!empty($this->requiredRelations)) {
-            $item->load($this->requiredRelations);
+        if (!empty($this->attachedRelations)) {
+            $item->load($this->attachedRelations);
         }
 
         return $item
             ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-            ->toArray();
+            ->makeVisible($this->visibleAttributes);
     }
 
-    public function updateOrCreate($where, $data)
+    public function updateOrCreate($where, $data): Model
     {
         if ($this->exists($where)) {
             return $this->update($where, $data);
@@ -274,61 +240,46 @@ trait EntityControlTrait
         return $this->create(array_merge($data, $where));
     }
 
-    public function count($where = [])
+    public function count($where = []): int
     {
         return $this->getQuery($where)->count();
     }
 
-    public function get(array $where = [])
+    public function get(array $where = []): Collection
     {
         $result = $this->getQuery($where)->get();
 
         $this->applyHidingShowingFieldsRules($result);
 
-        return $result->toArray();
+        return $result;
     }
 
-    /**
-     * @deprecated
-     */
-    public function getOrCreate($data)
-    {
-        $entities = $this->get($data);
-
-        if (empty($entities)) {
-            return $this->create($data);
-        }
-
-        return $entities;
-    }
-
-    public function first($where = [])
+    public function first($where = []): ?Model
     {
         $entity = $this->getQuery($where)->first();
 
-        return empty($entity) ? [] : $entity
+        return empty($entity) ? null : $entity
             ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes)
-            ->toArray();
+            ->makeVisible($this->visibleAttributes);
     }
 
-    public function findBy(string $field, $value)
+    public function findBy(string $field, $value): ?Model
     {
         return $this->first([$field => $value]);
     }
 
-    public function find($id)
+    public function find($id): ?Model
     {
-        return $this->first([$this->primaryKey => $id]);
+        return $this->first($id);
     }
 
     /**
      * @param array|string|int $where array of conditions or primary key value
      * @param array $data
      *
-     * @return array|mixed
+     * @return Model
      */
-    public function firstOrCreate($where, array $data = [])
+    public function firstOrCreate($where, array $data = []): Model
     {
         $entity = $this->first($where);
 
@@ -343,9 +294,10 @@ trait EntityControlTrait
      * Delete rows by condition or primary key
      *
      * @param array|integer|string $where
+     *
      * @return integer count of deleted rows
      */
-    public function delete($where)
+    public function delete($where): int
     {
         $query = $this->getQuery($where);
 
@@ -354,14 +306,6 @@ trait EntityControlTrait
         } else {
             return $query->delete();
         }
-    }
-
-    /**
-     * @deprecated
-     */
-    public function forceDelete($where)
-    {
-        $this->getQuery($where)->forceDelete();
     }
 
     public function withTrashed($enable = true): self
@@ -378,12 +322,12 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function restore($where)
+    public function restore($where): int
     {
         return $this->getQuery($where)->onlyTrashed()->restore();
     }
 
-    public function chunk($limit, $callback, $where = [])
+    public function chunk(int $limit, Closure $callback, array $where = []): void
     {
         $this
             ->getQuery($where)
@@ -391,7 +335,7 @@ trait EntityControlTrait
             ->chunk($limit, function ($items) use ($callback) {
                 $this->applyHidingShowingFieldsRules($items);
 
-                $callback($items->toArray());
+                $callback($items);
             });
     }
 
@@ -399,10 +343,11 @@ trait EntityControlTrait
      * Delete rows by list of values a particular field or primary key
      *
      * @param array $values
-     * @param string|null $field condition field, primary key is default value
+     * @param ?string $field condition field, primary key is default value
+     *
      * @return integer count of deleted rows
      */
-    public function deleteByList(array $values, $field = null)
+    public function deleteByList(array $values, ?string $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -410,32 +355,25 @@ trait EntityControlTrait
             ->getQuery()
             ->whereIn($field, $values);
 
-        if ($this->forceMode && $this->isSoftDelete()) {
+        if ($this->forceMode && $this->hasSoftDeleteTrait()) {
             return $query->forceDelete();
         } else {
             return $query->delete();
         }
     }
 
-    public function restoreByList($values, $field = null)
+    public function restoreByList(array $values, ?string $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        $query = $this
+        return $this
             ->getQuery()
             ->onlyTrashed()
-            ->whereIn($field, $values);
-
-        $entities = $query->get();
-
-        $this->applyHidingShowingFieldsRules($entities);
-
-        $query->restore();
-
-        return $entities->toArray();
+            ->whereIn($field, $values)
+            ->restore();
     }
 
-    public function getByList(array $values, $field = null)
+    public function getByList(array $values, ?string $field = null): Collection
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -446,17 +384,17 @@ trait EntityControlTrait
 
         $this->applyHidingShowingFieldsRules($result);
 
-        return $result->toArray();
+        return $result;
     }
 
-    public function countByList(array $values, $field = null): int
+    public function countByList(array $values, ?string $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
         return $this->getQuery()->whereIn($field, $values)->count();
     }
 
-    public function updateByList(array $values, $data, $field = null)
+    public function updateByList(array $values, array $data, $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
@@ -467,21 +405,21 @@ trait EntityControlTrait
         return $query->update(Arr::only($data, $fields));
     }
 
-    protected function getEntityName()
+    protected function getEntityName(): string
     {
         $explodedModel = explode('\\', get_class($this->model));
 
         return end($explodedModel);
     }
 
-    protected function isSoftDelete(): bool
+    protected function hasSoftDeleteTrait(): bool
     {
         $traits = class_uses(get_class($this->model));
 
         return in_array(SoftDeletes::class, $traits);
     }
 
-    protected function checkPrimaryKey()
+    protected function checkPrimaryKey(): void
     {
         if (is_null($this->primaryKey)) {
             $modelClass = get_class($this->model);
@@ -490,12 +428,12 @@ trait EntityControlTrait
         }
     }
 
-    protected function afterUpdateHook($entity, $data)
+    protected function afterUpdateHook(?Model $entity, array $data)
     {
         // implement it yourself if you need it
     }
 
-    protected function afterCreateHook($entity, $data)
+    protected function afterCreateHook(?Model $entity, array $data)
     {
         // implement it yourself if you need it
     }

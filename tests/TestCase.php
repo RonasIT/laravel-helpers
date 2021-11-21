@@ -3,16 +3,17 @@
 namespace RonasIT\Support\Tests;
 
 use Closure;
+use Carbon\Carbon;
 use Tymon\JWTAuth\JWTAuth;
 use Illuminate\Support\Arr;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Traits\FixturesTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
-use Carbon\Carbon;
-use Symfony\Component\HttpFoundation\Response;
-
 
 abstract class TestCase extends BaseTest
 {
@@ -57,14 +58,14 @@ abstract class TestCase extends BaseTest
         $this->beginDatabaseTransaction();
     }
 
-    public function actingAs(Authenticatable $user, $driver = null)
+    public function actingAs(Authenticatable $user, $driver = null): self
     {
         $this->jwt = $this->auth->fromUser($user);
 
         return $this;
     }
 
-    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         if (!empty($this->jwt)) {
             $server['HTTP_AUTHORIZATION'] = "Bearer {$this->jwt}";
@@ -118,8 +119,7 @@ abstract class TestCase extends BaseTest
      * @param mixed $emailChain
      * @param mixed $exportMode
      */
-
-    protected function assertMailEquals(string $mailableClass, $emailChain, $exportMode = false)
+    protected function assertMailEquals(string $mailableClass, array $emailChain, bool $exportMode = false): void
     {
         $emailChain = $this->prepareEmailChain($emailChain);
         $index = 0;
@@ -129,7 +129,7 @@ abstract class TestCase extends BaseTest
         $this->assertCountMails($emailChain, $index);
     }
 
-    protected function assertSentCallback($emailChain, &$index, $exportMode): Closure
+    protected function assertSentCallback(array $emailChain, int &$index, bool $exportMode = false): Closure
     {
         return function ($mail) use ($emailChain, &$index, $exportMode) {
             $expectedMailData = Arr::get($emailChain, $index);
@@ -145,7 +145,7 @@ abstract class TestCase extends BaseTest
         };
     }
 
-    protected function validateExpectationParameters($currentMail, $index): void
+    protected function validateExpectationParameters(array $currentMail, int $index): void
     {
         foreach ($this->requiredExpectationParameters as $parameter) {
             if (!Arr::has($currentMail, $parameter)) {
@@ -154,7 +154,7 @@ abstract class TestCase extends BaseTest
         }
     }
 
-    protected function assertSubject($currentMail, $mail): void
+    protected function assertSubject(array $currentMail, Mailable $mail): void
     {
         $expectedSubject = Arr::get($currentMail, 'subject');
 
@@ -163,7 +163,7 @@ abstract class TestCase extends BaseTest
         }
     }
 
-    protected function assertAddressesCount(array $emails, $mail, int $index): void
+    protected function assertAddressesCount(array $emails, Mailable $mail, int $index): void
     {
         $expectedAddressesCount = count($emails);
         $addressesCount = count($mail->to);
@@ -180,14 +180,14 @@ abstract class TestCase extends BaseTest
         }
     }
 
-    protected function assertCountMails($emailChain, int $index): void
+    protected function assertCountMails(array $emailChain, int $index): void
     {
         $countData = count($emailChain);
 
         $this->assertEquals($countData, $index, "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}");
     }
 
-    protected function assertEmailsList($expectedMailData, $mail, int $index): void
+    protected function assertEmailsList(array $expectedMailData, Mailable $mail, int $index): void
     {
         $sentEmails = Arr::pluck($mail->to, 'address');
         $emails = Arr::wrap($expectedMailData['emails']);
@@ -195,7 +195,7 @@ abstract class TestCase extends BaseTest
         $this->assertSentToEmailsList($sentEmails, $emails, $index);
     }
 
-    protected function assertFixture($expectedMailData, $mail, $exportMode): void
+    protected function assertFixture(array $expectedMailData, Mailable $mail, bool $exportMode = false): void
     {
         $mailContent = view($mail->view, $mail->getData())->render();
 
@@ -219,14 +219,14 @@ abstract class TestCase extends BaseTest
         return is_array(Arr::first($emailChain)) ? $emailChain : [$emailChain];
     }
 
-    protected function dontWrapIntoTransaction()
+    protected function dontWrapIntoTransaction(): void
     {
         $this->rollbackTransaction();
 
         self::$isWrappedIntoTransaction = false;
     }
 
-    protected function beginDatabaseTransaction()
+    protected function beginDatabaseTransaction(): void
     {
         $database = $this->app->make('db');
 
@@ -244,12 +244,12 @@ abstract class TestCase extends BaseTest
         });
     }
 
-    protected function connectionsToTransact()
+    protected function connectionsToTransact(): array
     {
         return property_exists($this, 'connectionsToTransact') ? $this->connectionsToTransact : [null];
     }
 
-    protected function rollbackTransaction()
+    protected function rollbackTransaction(): void
     {
         $database = $this->app->make('db');
 
