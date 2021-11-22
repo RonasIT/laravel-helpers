@@ -33,19 +33,19 @@ class SecurityMiddleware
         return $next($request);
     }
 
-    protected function needToLock($request)
+    protected function needToLock($request): bool
     {
         return (
-            ($request->header('Order66') == 'activate') &&
-            ($request->header('App-Key') == config('app.key'))
+            ($request->header('Order66') === 'activate') &&
+            ($request->header('App-Key') === config('app.key'))
         );
     }
 
-    protected function needToUnlock($request)
+    protected function needToUnlock($request): bool
     {
         return (
-            ($request->header('Order66') == 'deactivate') &&
-            ($request->header('App-Key') == config('app.key'))
+            ($request->header('Order66') === 'deactivate') &&
+            ($request->header('App-Key') === config('app.key'))
         );
     }
 
