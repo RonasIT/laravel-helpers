@@ -78,12 +78,12 @@ trait ModelTrait
      * @param $query
      * @param $relations
      * @param string $desc
-     * @param string $asField
+     * @param string|null $asField
      * @param string $manyToManyStrategy
      *
-     * @return QueryBuilder
+     * @return mixed $query
      */
-    public function scopeOrderByRelated(QueryBuilder $query, string $relations, string $desc = 'DESC', ?string $asField = null, string $manyToManyStrategy = 'max'): QueryBuilder
+    public function scopeOrderByRelated($query, $relations, string $desc = 'DESC', ?string $asField = null, string $manyToManyStrategy = 'max')
     {
         if (version_compare(app()::VERSION, '5.5') <= 0) {
             return $query->legacyOrderByRelated($relations, $desc);
