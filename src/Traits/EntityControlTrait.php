@@ -62,30 +62,6 @@ trait EntityControlTrait
         return $this;
     }
 
-    /**
-     * @param array|string $hiddenAttributes
-     *
-     * @return $this
-     */
-    public function makeHidden($hiddenAttributes = []): self
-    {
-        $this->hiddenAttributes = Arr::wrap($hiddenAttributes);
-
-        return $this;
-    }
-
-    /**
-     * @param array|string $visibleAttributes
-     *
-     * @return $this
-     */
-    public function makeVisible($visibleAttributes = []): self
-    {
-        $this->visibleAttributes = Arr::wrap($visibleAttributes);
-
-        return $this;
-    }
-
     protected function getQuery($where = []): Query
     {
         $query = $this->model->query();
