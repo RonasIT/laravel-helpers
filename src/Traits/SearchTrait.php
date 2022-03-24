@@ -124,8 +124,6 @@ trait SearchTrait
     {
         $collection = $paginator->getCollection();
 
-        $this->applyHidingShowingFieldsRules($collection);
-
         return $paginator->setCollection($collection);
     }
 
@@ -312,16 +310,5 @@ trait SearchTrait
         }
 
         return config('defaults.items_per_page', 1);
-    }
-
-    protected function applyHidingShowingFieldsRules(Collection &$collection): void
-    {
-        if (Application::VERSION >= '5.8') {
-            $collection->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes);
-        } else {
-            $collection = $collection->each(function ($item) {
-                $item->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes);
-            });
-        }
     }
 }

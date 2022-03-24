@@ -25,9 +25,6 @@ trait EntityControlTrait
     protected $onlyTrashed = false;
     protected $forceMode = false;
 
-    protected $visibleAttributes = [];
-    protected $hiddenAttributes = [];
-
     public function all(): Collection
     {
         return $this->get();
@@ -145,9 +142,7 @@ trait EntityControlTrait
             $model->load($this->attachedRelations);
         }
 
-        return $model
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        return $model;
     }
 
     /**
@@ -198,9 +193,7 @@ trait EntityControlTrait
             $item->load($this->attachedRelations);
         }
 
-        return $item
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        return $item;
     }
 
     public function updateOrCreate($where, $data): Model
@@ -234,9 +227,7 @@ trait EntityControlTrait
     {
         $entity = $this->getQuery($where)->first();
 
-        return empty($entity) ? null : $entity
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        return empty($entity) ? null : $entity;
     }
 
     public function findBy(string $field, $value): ?Model
