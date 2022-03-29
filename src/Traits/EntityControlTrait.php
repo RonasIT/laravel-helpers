@@ -225,9 +225,7 @@ trait EntityControlTrait
 
     public function first($where = []): ?Model
     {
-        $entity = $this->getQuery($where)->first();
-
-        return empty($entity) ? null : $entity;
+        return $this->getQuery($where)->first();
     }
 
     public function findBy(string $field, $value): ?Model
