@@ -25,9 +25,6 @@ trait EntityControlTrait
     protected $onlyTrashed = false;
     protected $forceMode = false;
 
-    protected $visibleAttributes = [];
-    protected $hiddenAttributes = [];
-
     public function all(): Collection
     {
         return $this->get();
@@ -58,30 +55,6 @@ trait EntityControlTrait
         $this->primaryKey = $this->model->getKeyName();
 
         $this->checkPrimaryKey();
-
-        return $this;
-    }
-
-    /**
-     * @param array|string $hiddenAttributes
-     *
-     * @return $this
-     */
-    public function makeHidden($hiddenAttributes = []): self
-    {
-        $this->hiddenAttributes = Arr::wrap($hiddenAttributes);
-
-        return $this;
-    }
-
-    /**
-     * @param array|string $visibleAttributes
-     *
-     * @return $this
-     */
-    public function makeVisible($visibleAttributes = []): self
-    {
-        $this->visibleAttributes = Arr::wrap($visibleAttributes);
 
         return $this;
     }
@@ -169,9 +142,7 @@ trait EntityControlTrait
             $model->load($this->attachedRelations);
         }
 
-        return $model
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        return $model;
     }
 
     /**
@@ -222,9 +193,7 @@ trait EntityControlTrait
             $item->load($this->attachedRelations);
         }
 
-        return $item
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        return $item;
     }
 
     public function updateOrCreate($where, $data): Model
@@ -256,11 +225,7 @@ trait EntityControlTrait
 
     public function first($where = []): ?Model
     {
-        $entity = $this->getQuery($where)->first();
-
-        return empty($entity) ? null : $entity
-            ->makeHidden($this->hiddenAttributes)
-            ->makeVisible($this->visibleAttributes);
+        return $this->getQuery($where)->first();
     }
 
     public function findBy(string $field, $value): ?Model
