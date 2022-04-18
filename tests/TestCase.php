@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests;
 
 use Closure;
 use Carbon\Carbon;
-use Tymon\JWTAuth\JWTAuth;
 use Illuminate\Support\Arr;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\DB;
@@ -12,14 +11,12 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Traits\FixturesTrait;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 
 abstract class TestCase extends BaseTest
 {
     use FixturesTrait;
 
-    protected $jwt;
     protected $auth;
     protected $testNow = '2018-11-11 11:11:11';
 
@@ -49,29 +46,11 @@ abstract class TestCase extends BaseTest
             $this->prepareSequences($this->getTables());
         }
 
-        $this->auth = app(JWTAuth::class);
-
         Carbon::setTestNow(Carbon::parse($this->testNow));
 
         Mail::fake();
 
         $this->beginDatabaseTransaction();
-    }
-
-    public function actingAs(Authenticatable $user, $driver = null): self
-    {
-        $this->jwt = $this->auth->fromUser($user);
-
-        return $this;
-    }
-
-    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
-    {
-        if (!empty($this->jwt)) {
-            $server['HTTP_AUTHORIZATION'] = "Bearer {$this->jwt}";
-        }
-
-        return parent::call($method, $uri, $parameters, $cookies, $files, $server, $content);
     }
 
     public function tearDown(): void
