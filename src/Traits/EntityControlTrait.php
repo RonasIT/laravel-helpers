@@ -216,11 +216,7 @@ trait EntityControlTrait
 
     public function get(array $where = []): Collection
     {
-        $result = $this->getQuery($where)->get();
-
-        $this->applyHidingShowingFieldsRules($result);
-
-        return $result;
+        return $this->getQuery($where)->get();
     }
 
     public function first($where = []): ?Model
@@ -297,11 +293,7 @@ trait EntityControlTrait
         $this
             ->getQuery($where)
             ->orderBy($this->primaryKey)
-            ->chunk($limit, function ($items) use ($callback) {
-                $this->applyHidingShowingFieldsRules($items);
-
-                $callback($items);
-            });
+            ->chunk($limit, $callback);
     }
 
     /**
@@ -342,14 +334,10 @@ trait EntityControlTrait
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        $result = $this
+        return $this
             ->getQuery()
             ->whereIn($field, $values)
             ->get();
-
-        $this->applyHidingShowingFieldsRules($result);
-
-        return $result;
     }
 
     public function countByList(array $values, ?string $field = null): int
