@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Traits;
 
 use BadMethodCallException;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -145,7 +144,7 @@ trait ModelTrait
         return $relations;
     }
 
-    protected function getQueriesList(QueryBuilder $query, array $relations): array
+    protected function getQueriesList($query, array $relations): array
     {
         $requiredColumns = [];
         $queryCollection = [$query];
@@ -166,7 +165,7 @@ trait ModelTrait
         return array_reverse($queryCollection);
     }
 
-    protected function applyManyToManyStrategy(QueryBuilder $query, string $strategy): QueryBuilder
+    protected function applyManyToManyStrategy($query, string $strategy)
     {
         if ($strategy === 'max') {
             $query->orderBy('id', 'ASC')->limit(1);
@@ -181,7 +180,7 @@ trait ModelTrait
      * Unfortunately, Laravel older than 5.5 does not support Relation::noConstraints so for such versions we
      * have to use simplified version of orderByRelated which does not support nesting relations.
      */
-    public function scopeLegacyOrderByRelated(QueryBuilder $query, string $orderField, string $desc = 'DESC'): void
+    public function scopeLegacyOrderByRelated($query, string $orderField, string $desc = 'DESC'): void
     {
         list ($fieldName, $relationName) = extract_last_part($orderField);
 
