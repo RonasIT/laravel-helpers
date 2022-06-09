@@ -225,8 +225,8 @@ trait SearchTrait
     public function filterByList(string $field, string $filterName): self
     {
         if (Arr::has($this->filter, $filterName)) {
-            $this->applyWhereCallback($this->query, $field, function (&$q, $conditionField) use ($filterName) {
-                $q->whereIn($conditionField, $this->filter[$filterName]);
+            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
+                $query->whereIn($conditionField, $this->filter[$filterName]);
             });
         }
 
@@ -264,8 +264,8 @@ trait SearchTrait
 
     protected function addWhere(Query &$query, string $field, $value, string $sign = '='): void
     {
-        $this->applyWhereCallback($query, $field, function (&$q, $field) use ($sign, $value) {
-            $q->where($field, $sign, $value);
+        $this->applyWhereCallback($query, $field, function (&$query, $field) use ($sign, $value) {
+            $query->where($field, $sign, $value);
         });
     }
 
