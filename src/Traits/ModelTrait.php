@@ -2,12 +2,12 @@
 
 namespace RonasIT\Support\Traits;
 
-use BadMethodCallException;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Schema;
+use BadMethodCallException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait ModelTrait
 {

@@ -2,9 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 trait MigrationTrait
 {
@@ -19,7 +19,8 @@ trait MigrationTrait
                     $table->unsignedInteger($fieldName);
                 }
 
-                $table->foreign($fieldName)
+                $table
+                    ->foreign($fieldName)
                     ->references('id')
                     ->on($this->getTableName($toEntity))
                     ->onDelete($onDelete);
