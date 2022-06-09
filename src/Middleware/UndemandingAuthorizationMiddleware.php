@@ -3,12 +3,13 @@
 namespace RonasIT\Support\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Routing\ResponseFactory;
+use Tymon\JWTAuth\JWTAuth;
 use Illuminate\Events\Dispatcher;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Middleware\BaseMiddleware;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherInterface;
 
 /**
  * @deprecated
@@ -18,7 +19,7 @@ class UndemandingAuthorizationMiddleware extends BaseMiddleware
     protected $auth;
 
     /**
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var DispatcherInterface
      */
     protected $events;
 

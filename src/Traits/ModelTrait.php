@@ -2,13 +2,13 @@
 
 namespace RonasIT\Support\Traits;
 
+use Schema;
+use Illuminate\Support\Str;
 use BadMethodCallException;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Schema;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait ModelTrait
 {
@@ -51,10 +51,11 @@ trait ModelTrait
 
     public function getAllFieldsWithTable()
     {
-        $fields = Schema::getColumnListing($this->getTable());
+        $tableName = $this->getTable();
+        $fields = Schema::getColumnListing($tableName);
 
-        return array_map(function ($field) {
-            return "{$this->getTable()}.{$field}";
+        return array_map(function ($field) use ($tableName) {
+            return "{$tableName}.{$field}";
         }, $fields);
     }
 

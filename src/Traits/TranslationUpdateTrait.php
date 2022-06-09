@@ -27,7 +27,6 @@ trait TranslationUpdateTrait
             ])->update($translation);
         }
 
-        return $this->withRelations(['allTranslations'])
-            ->find($id);
+        return $this->withRelations(['allTranslations'])->find($id);
     }
 }

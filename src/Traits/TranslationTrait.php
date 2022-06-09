@@ -14,9 +14,9 @@ trait TranslationTrait
     public function translation()
     {
         $lang = session('lang', 'en');
+        $translationClass = $this->getTranslationClass();
 
-        return $this->hasOne($this->getTranslationClass())
-            ->where('locale', $lang);
+        return $this->hasOne($translationClass)->where('locale', $lang);
     }
 
     public function allTranslations()
@@ -24,7 +24,7 @@ trait TranslationTrait
         return $this->hasMany($this->getTranslationClass());
     }
 
-    public function getTranslationClass()
+    public function getTranslationClass(): string
     {
         return get_class($this) . 'Translation';
     }
