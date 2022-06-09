@@ -2,10 +2,10 @@
 
 namespace RonasIT\Support\Importers;
 
+use Illuminate\Support\Arr;
+use RonasIT\Support\Iterators\CsvIterator;
 use RonasIT\Support\Exceptions\IncorrectImportFileException;
 use RonasIT\Support\Exceptions\IncorrectImportLineException;
-use RonasIT\Support\Iterators\CsvIterator;
-use Illuminate\Support\Arr;
 
 class Importer
 {
@@ -22,16 +22,19 @@ class Importer
     protected $service;
     protected $iterator;
     protected $exporter;
+
+    protected $mandatoryFields = [];
+
     protected $items = [
         self::ITEMS_TO_CREATE => [],
         self::ITEMS_TO_UPDATE => []
     ];
+
     protected $report = [
         self::UPDATED_REPORTS => 0,
         self::CREATED_REPORTS => 0,
         'errors' => []
     ];
-    protected $mandatoryFields = [];
 
     public function setInput($input)
     {

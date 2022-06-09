@@ -1,21 +1,27 @@
-## Services
+[<< Traits][1]
+[Iterators >>][2]
 
-### EntityService
+# Services
+
+## EntityService
 
 The main service. All new services need to extend from it.
 
-#### setRepository($repository)
+### setRepository($repository)
+
 This method setting repository for entity. Need to use repository's methods from service. 
 $repository - valid class name of repository class.
 
 
-### HttpRequestService
+## HttpRequestService
+
 Service to working with http protocol. It is wrapper on Guzzle.
 
 To on debug mode you need to add "http_service_debug" key to configs/defaults.php file, by default - debug is off.
 If debug is on - information about all queries will write to log.
 
-####sendGet($url, $data, $headers)
+### sendGet($url, $data, $headers)
+
 Method send GET query to $url.
 - $url - string, target url;
 - $data - array with get parameters; 
@@ -23,7 +29,8 @@ Method send GET query to $url.
 
 Return response.
 
-####sendPost
+### sendPost
+
 Method send POST query to $url.
 - $url - string, target url;
 - $data - array with body parameters; 
@@ -33,14 +40,16 @@ Return response.
 
 don't forget to set content-type/application-json header if you want that $data will send as json
 
-####sendDelete
+### sendDelete
+
 Method send DELETE query to $url.
 - $url - string, target url;
 - $headers - array with headers;
 
 Return response.
 
-####sendPut 
+### sendPut 
+
 Method send PUT query to $url.
 - $url - string, target url;
 - $data - array with body parameters; 
@@ -48,12 +57,20 @@ Method send PUT query to $url.
 
 Return response.
 
-####parseJsonResponse($response)
+### parseJsonResponse($response)
+
 Get response data and parse it to associative array.
 - $response - response object from sendGet/sendPost/sendDelete/sendDelete functions;
 
-####saveCookieSession()
+### saveCookieSession()
+
 Saving cookies from request.
 
-####getCookie()
+### getCookie()
 Return saved cookies.
+
+[<< Traits][1]
+[Iterators >>][2]
+
+[1]:traits.md
+[2]:iterators.md
