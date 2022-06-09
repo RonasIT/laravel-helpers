@@ -6,11 +6,11 @@ use Iterator;
 
 class DBIterator implements Iterator
 {
-    protected $currentItem = [];
-    protected $sample = [];
     protected $query;
-    protected $itemsPerPage;
     protected $position;
+    protected $sample = [];
+    protected $itemsPerPage;
+    protected $currentItem = [];
 
     public function __construct($query, $itemsPerPage = 100)
     {

@@ -1,20 +1,26 @@
-##Iterators
+[<< Services][1]
 
-###CsvIterator
+## Iterators
+
+### CsvIterator
 
 Iterates .csv file.
 
-####__construct($fileName)
+#### __construct($fileName)
+
 - $fileName - string, path to .csv file;
 
-####parseColumns($columns)
+#### parseColumns($columns)
+
 Get csv line as associative array.
 - $columns - array with csv file's columns;
 
-####getGenerator()
+#### getGenerator()
+
 Return iterable object for foreach.
 
 Example: 
+
 ````
 >>> $csv = new \RonasIT\Support\Iterators\CsvIterator('/tmp/1.csv')
 >>> $csv->parseColumns(['id', 'name']);
@@ -34,16 +40,18 @@ Example:
    )⏎
 ````
 
+### DBIterator
 
-###DBIterator
-Iterates results of database query. It very convenient for imports or exports 
+Iterate results of the database query. It is very convenient for imports or exports 
 Actually it is just a wrapper of chunk. 
 
-####__construct($query, $itemsPerPage)
+#### __construct($query, $itemsPerPage)
+
 - $query - object 
 - $itemsPerPage - integer. Size of chunk sample.
 
 Example:
+
 ````
 >>> $query = \App\Models\Category::with('translation')->orderBy('created_at', 'DESC');
 >>> foreach($iterator->getGenerator() as $category) {
@@ -79,3 +87,7 @@ array (
   ),
 .....
 ```` 
+
+[<< Services][1]
+
+[1]:services.md

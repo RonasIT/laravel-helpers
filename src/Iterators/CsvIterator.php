@@ -7,11 +7,11 @@ use RonasIT\Support\Exceptions\IncorrectCSVFileException;
 
 class CsvIterator implements Iterator
 {
-    protected $currentCsvLine = [];
-    protected $currentRow = 0;
     protected $file;
     protected $filePath;
     protected $columns = [];
+    protected $currentRow = 0;
+    protected $currentCsvLine = [];
 
     public function __construct($filePath)
     {

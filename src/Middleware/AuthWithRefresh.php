@@ -3,18 +3,19 @@
 namespace RonasIT\Support\Middleware;
 
 use Closure;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Middleware\GetUserFromToken;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class AuthWithRefresh extends GetUserFromToken
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param  Request $request
+     * @param  Closure $next
      * @return mixed
      * @throws JWTException
      * @throws JWTException

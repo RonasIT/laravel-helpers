@@ -1,12 +1,15 @@
-## To migrate your project to 1.1: 
+# Migration guide
 
-#### EntityControlTrait
+## 1.1
+
+### EntityControlTrait
 
 All relations variables moved form method arguments to `withRelations` method.
 
 Methods: withRelations, withTrashed, onlyTrashed return `$this` to make call chains.
 
 Before: 
+
 ```php
 $repository->withTrashed();
 
@@ -17,6 +20,7 @@ $repository->firstWithRelations(
 ```
 
 After:
+
 ```php
 $repository
     ->withRelations($relation)
@@ -30,7 +34,8 @@ Method `update`: now is used for updated first found entity in database.
 Triggers eloquent functional such as casts, mutator, accessor. 
 If first argument is not an array, then it will be used as primary key.
 
-Before: 
+Before:
+
 ```php
 
 $repository->update([
@@ -47,6 +52,7 @@ $repository->update([
 ```
 
 After:
+
 ```php
 $repository->update([
     'id' => 1
@@ -67,14 +73,16 @@ $repository->updateMany([
 
 Method firstOrCreate: now is accepting 2 parameters.
 
-Before: 
+Before:
+
 ```php
 $repository->firstOrCreate([
     'name' = 'Jon'
 ]);
 ```
 
-After: 
+After:
+
 ```php
 $repository->firstOrCreate([
     'id' => 5
@@ -83,48 +91,58 @@ $repository->firstOrCreate([
 ]);
 ```
 
-Methods `find` and `findBy` don't contains relations in arguments.  
+Methods `find` and `findBy` don't contains relations in arguments.
+
 Before:
+
 ```php
 $this->find(1, ['relation']);
 ``` 
-After: 
+
+After:
+
 ```php
 $this->withRelations(['relation'])->find(1);
 ```
 
 Before:
+
 ```php
 $this->findBy('email', 'test@test.com', ['relation']);
 ``` 
-After: 
+
+After:
+
 ```php
 $this->withRelations(['relation'])->findBy('email', 'test@test.com');
 ```
 
-#### FilesUploadTrait 
+### FilesUploadTrait 
 
 This class is now used to upload files, all other classes is now @deprecated.
 
-#### FixturesTrait
+### FixturesTrait
 
 jsonExport now have jsonExport($fixture, $data) call. 
 
-Before: 
+Before:
+
 ```php
 $this->exportJson($data, $fixture);
 ```
 
 After:
+
 ```php
 $this->exportJson($fixture, $data)
 ```
 
-#### SearchTrait
+### SearchTrait
 
 Added new methods: filterMoreOrEqualThan and filterLessOrEqualThan.
 
 getSearchResults now will always return all responses in one format
+
 ```json
 {
     "current_page": 1,
@@ -142,8 +160,8 @@ getSearchResults now will always return all responses in one format
 }
 ```
 
-If you will send flag `all` then you will get all entities in field `data` and field `per_page` will equals to field `total`
+If you'll send flag `all` then you will get all entities in field `data` and field `per_page` will equal to field `total`
 
-#### Others
+### Others
 
 `UndemandingAuthorizationMiddleware` will be deprecated if you want to upgrade jwt to 1.0 version. Use `'check'` instead.
