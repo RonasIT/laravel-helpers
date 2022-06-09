@@ -2,9 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Foundation\Testing\TestResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\TestResponse;
 
 trait FixturesTrait
 {

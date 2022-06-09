@@ -1,10 +1,14 @@
-[<< Back](../readme.md)
+[<< Readme][1]
+[Traits >>][2]
 
 ## Functions
 
 ### array_get_list($array, $path)
+
 This function designed to get list of all values witch placed in $path in $array.
+
 **Example**
+
 ```php
 >>> $data = [
         'id' => 1,
@@ -56,6 +60,7 @@ This function designed to get list of all values witch placed in $path in $array
 ````
 
 ### is_associative($array)
+
 Verifies whether an associative array or a list
 
 ```php
@@ -73,9 +78,11 @@ Verifies whether an associative array or a list
 ````
 
 ### array_subtraction($array1, $array2)
+
 Return subtraction of two arrays
 
 **Example**
+
 ```php
 >>> $array1 = [1, 2, 3];
 >>> $array2 = [1, 2];
@@ -84,9 +91,11 @@ Return subtraction of two arrays
 ````
 
 ### array_equals($array1, $array2)
+
 Check equivalency of two arrays
 
 ### array_round($array)
+
 Round all values in list of floats. It designed just for density.
 
 ```php
@@ -95,9 +104,12 @@ Round all values in list of floats. It designed just for density.
 ````
 
 ### elseChain(...$callbacks)
+
 This feature is designed to get the first non-empty function result. It does not make sense in php7, 
 but can be useful when developing applications on php5.  
+
 **Example**
+
 ```php
     $value = elseChain(
         function() use ($request, $code) {
@@ -117,16 +129,20 @@ but can be useful when developing applications on php5.
 
 
 ### mkdir_recursively($path)
+
 Create directory recursively. The native mkdir() function recursively create directory incorrectly.
 Here is solution of this problem.
 
 ### rmdir_recursively($path)
+
 Remove directory recursively with all nested files and directories.
 
 ### getGUID()
+
 Generate GUID
 
 ### array_concat($array, $callback)
+
 Concat results of callback call. Array should be array of strings. Arguments of callback are `$value`, `$key`
 
 ```php
@@ -142,9 +158,11 @@ Concat results of callback call. Array should be array of strings. Arguments of 
 ````
 
 ### clear_folder($path)
+
 Remove all files and folders from `$path`
 
 ### array_associate($array, $callback)
+
 Builds an associative array by gotten keys and values. Arguments of callback id `$value`, `$key`
 
 ```php
@@ -177,6 +195,7 @@ Builds an associative array by gotten keys and values. Arguments of callback id 
 ````
 
 ### array_duplicate($array)
+
 Return duplicated values of array
 
 ```php
@@ -188,6 +207,7 @@ Return duplicated values of array
 ````
 
 ### array_unique_object($objectsList, $key = 'id')
+
 Return unique objects from array by field
 
 ```php
@@ -227,7 +247,9 @@ Return unique objects from array by field
 ````
 
 ### array_undot($array)
+
 inverse transformation from array_dot
+
 ```php
 >>> $array = [
     'some.nested.value' => 1,
@@ -252,4 +274,8 @@ inverse transformation from array_dot
    ]
 ````
 
-[<< Back](../readme.md)
+[<< Readme][1]
+[Traits >>][2]
+
+[1]:../readme.md
+[2]:traits.md

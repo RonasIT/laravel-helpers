@@ -90,6 +90,6 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
     {
         $this->fileName = empty($this->fileName) ? uniqid() : $this->fileName;
 
-        return $this->fileName . '.' . $this->type;
+        return "{$this->fileName}.{$this->type}";
     }
 }

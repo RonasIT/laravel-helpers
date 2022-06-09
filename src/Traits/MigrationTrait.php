@@ -77,6 +77,7 @@ trait MigrationTrait
         if (Schema::hasTable($entityName)) {
             return $entityName;
         }
+
         $entityName = Str::snake($entityName);
 
         return Str::plural($entityName);
