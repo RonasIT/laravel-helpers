@@ -16,7 +16,7 @@ trait FilesUploadTrait
         return $preparedName;
     }
 
-    protected function checkUploadedFile($path)
+    protected function checkUploadedFile($path): bool
     {
         return Storage::exists($path);
     }
@@ -35,7 +35,7 @@ trait FilesUploadTrait
         }
     }
 
-    protected function generateName($path)
+    protected function generateName($path): string
     {
         $name = basename($path);
         $explodedName = explode('.', $name);
