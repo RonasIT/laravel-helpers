@@ -1,29 +1,38 @@
-## Services
+[<< Traits][1]
+[Iterators >>][2]
 
-### EntityService
+# Services
 
-The main service. All new services need to extend from it.
+## EntityService
 
-#### setRepository($repository)
-This method setting repository for entity. Need to use repository's methods from service. 
-$repository - valid class name of repository class.
+The base class for service classes related to database entities. It allows to use pseudo inheritance
+between the service class and related repository class;
 
+### setRepository($repository)
 
-### HttpRequestService
-Service to working with http protocol. It is wrapper on Guzzle.
+Associate service class with the repository class which will using in pseudo inheritance.
+- $repository - valid class name of repository class.
 
-To on debug mode you need to add "http_service_debug" key to configs/defaults.php file, by default - debug is off.
-If debug is on - information about all queries will write to log.
+## HttpRequestService
 
-####sendGet($url, $data, $headers)
-Method send GET query to $url.
+Service to working with http/https protocols based on Guzzle library.
+
+Features:
+- service can be injected via the `app()` helper, which allows to mock it in testing;
+- debug mode, write all requests into the log file. Enabling by setting config `defaults.http_service_debug` to `true`.
+
+### sendGet($url, $data, $headers)
+
+Method to send `GET` request to $url.
+
 - $url - string, target url;
 - $data - array with get parameters; 
 - $headers - array with headers;
 
 Return response.
 
-####sendPost
+### sendPost
+
 Method send POST query to $url.
 - $url - string, target url;
 - $data - array with body parameters; 
@@ -33,14 +42,16 @@ Return response.
 
 don't forget to set content-type/application-json header if you want that $data will send as json
 
-####sendDelete
+### sendDelete
+
 Method send DELETE query to $url.
 - $url - string, target url;
 - $headers - array with headers;
 
 Return response.
 
-####sendPut 
+### sendPut 
+
 Method send PUT query to $url.
 - $url - string, target url;
 - $data - array with body parameters; 
@@ -48,12 +59,20 @@ Method send PUT query to $url.
 
 Return response.
 
-####parseJsonResponse($response)
+### parseJsonResponse($response)
+
 Get response data and parse it to associative array.
 - $response - response object from sendGet/sendPost/sendDelete/sendDelete functions;
 
-####saveCookieSession()
+### saveCookieSession()
+
 Saving cookies from request.
 
-####getCookie()
+### getCookie()
 Return saved cookies.
+
+[<< Traits][1]
+[Iterators >>][2]
+
+[1]:traits.md
+[2]:iterators.md

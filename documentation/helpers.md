@@ -1,103 +1,117 @@
-[<< Back](../readme.md)
+[<< Readme][1]
+[Traits >>][2]
 
 ## Functions
 
-### array_get_list($array, $path)
-This function designed to get list of all values witch placed in $path in $array.
-**Example**
+### array_get_list($array, $path): array
+
+This function designed to get list of all values witch placed in `$path` in `$array`.
+
 ```php
->>> $data = [
-        'id' => 1,
-        'some_value' => 'qweqwe',
-        'nested_values' => [
-            [
-                'id' => 4,
-                'another_some_value' => 'value',
-                'next_level_of_nesting' => [
-                    [
-                        'id' => 6,
-                        'value' => 'h'
-                    ],
-                    [
-                        'id' => 7,
-                        'value' => 'e'
-                    ]
+$data = [
+    'id' => 1,
+    'some_value' => 'qweqwe',
+    'nested_values' => [
+        [
+            'id' => 4,
+            'another_some_value' => 'value',
+            'next_level_of_nesting' => [
+                [
+                    'id' => 6,
+                    'value' => 'h'
+                ],
+                [
+                    'id' => 7,
+                    'value' => 'e'
                 ]
-            ],
-            [
-                'id' => 5,
-                'another_some_value' => 'value',
-                'next_level_of_nesting' => [
-                    [
-                        'id' => 8,
-                        'value' => 'l'
-                    ],
-                    [
-                        'id' => 9,
-                        'value' => 'l'
-                    ]
+            ]
+        ],
+        [
+            'id' => 5,
+            'another_some_value' => 'value',
+            'next_level_of_nesting' => [
+                [
+                    'id' => 8,
+                    'value' => 'l'
+                ],
+                [
+                    'id' => 9,
+                    'value' => 'l'
                 ]
-            ],
-            [
-                'id' => 6,
-                'another_some_value' => 'value',
-                'next_level_of_nesting' => [
-                    [
-                        'id' => 10,
-                        'value' => 'o'
-                    ]
+            ]
+        ],
+        [
+            'id' => 6,
+            'another_some_value' => 'value',
+            'next_level_of_nesting' => [
+                [
+                    'id' => 10,
+                    'value' => 'o'
                 ]
             ]
         ]
-    ];
-    
->>> $result = array_get_list($data, 'nested_values.*.next_level_of_nesting.*.value');
-=> ['h', 'e', 'l', 'l', 'o'];
+    ]
+];
+
+$result = array_get_list($data, 'nested_values.*.next_level_of_nesting.*.value'); //['h', 'e', 'l', 'l', 'o'];
 ````
 
-### is_associative($array)
-Verifies whether an associative array or a list
+### is_associative($array): bool
+
+Verifies whether `$array` is associative array or a list
 
 ```php
->>> $associative = [
-        'key' => 'value'
-    ]; 
->>> $list = ['some', 'values'];
+$associative = [
+    'key' => 'value'
+];
+ 
+$list = ['some', 'values'];
 
->>> is_associative($associative);
-=> true
-
->>> is_associative($list);
-=> false
-
+is_associative($associative); //true
+is_associative($list); //false
 ````
 
-### array_subtraction($array1, $array2)
-Return subtraction of two arrays
+### array_subtraction($array1, $array2): array
 
-**Example**
+Return subtraction of `$array2` from `$array1`
+
 ```php
->>> $array1 = [1, 2, 3];
->>> $array2 = [1, 2];
->>> $result = array_subtraction($array1, $array2);
-=> [3]
+$array1 = [1, 2, 3];
+$array2 = [1, 2];
+
+$result = array_subtraction($array1, $array2); //[3]
 ````
 
-### array_equals($array1, $array2)
-Check equivalency of two arrays
+### array_equals($array1, $array2): bool
 
-### array_round($array)
-Round all values in list of floats. It designed just for density.
+Verifies whether two arrays are equals
 
 ```php
->>> $result = array([1.4, 2.9, 1.534]);
-=> [1, 3, 2]
+$array1 = [1, 2, 3];
+$array2 = [1, 2];
+$array3 = [3, 2, 1];
+
+array_equals($array1, $array3); //true
+array_equals($array1, $array2); //false
+````
+
+### array_round($array): array
+
+Round all values in list of floats.
+
+```php
+$array = [1.4, 2.9, 1.534];
+
+array_round($array); //[1, 3, 2]
 ````
 
 ### elseChain(...$callbacks)
+
 This feature is designed to get the first non-empty function result. It does not make sense in php7, 
 but can be useful when developing applications on php5.  
+
 **Example**
+
 ```php
     $value = elseChain(
         function() use ($request, $code) {
@@ -117,16 +131,20 @@ but can be useful when developing applications on php5.
 
 
 ### mkdir_recursively($path)
+
 Create directory recursively. The native mkdir() function recursively create directory incorrectly.
 Here is solution of this problem.
 
 ### rmdir_recursively($path)
+
 Remove directory recursively with all nested files and directories.
 
 ### getGUID()
+
 Generate GUID
 
 ### array_concat($array, $callback)
+
 Concat results of callback call. Array should be array of strings. Arguments of callback are `$value`, `$key`
 
 ```php
@@ -142,9 +160,11 @@ Concat results of callback call. Array should be array of strings. Arguments of 
 ````
 
 ### clear_folder($path)
+
 Remove all files and folders from `$path`
 
 ### array_associate($array, $callback)
+
 Builds an associative array by gotten keys and values. Arguments of callback id `$value`, `$key`
 
 ```php
@@ -177,6 +197,7 @@ Builds an associative array by gotten keys and values. Arguments of callback id 
 ````
 
 ### array_duplicate($array)
+
 Return duplicated values of array
 
 ```php
@@ -188,6 +209,7 @@ Return duplicated values of array
 ````
 
 ### array_unique_object($objectsList, $key = 'id')
+
 Return unique objects from array by field
 
 ```php
@@ -227,7 +249,9 @@ Return unique objects from array by field
 ````
 
 ### array_undot($array)
+
 inverse transformation from array_dot
+
 ```php
 >>> $array = [
     'some.nested.value' => 1,
@@ -252,4 +276,8 @@ inverse transformation from array_dot
    ]
 ````
 
-[<< Back](../readme.md)
+[<< Readme][1]
+[Traits >>][2]
+
+[1]:../readme.md
+[2]:traits.md

@@ -47,13 +47,15 @@ class BaseRequest extends FormRequest
         $result = [];
 
         foreach ($validation as $fieldName => $validatedKeys) {
-            if (Arr::has($fields, $fieldName)) {
+            if (Arr::has($fields, $fieldName) || $fieldName === '*') {
                 $validatedItem = Arr::get($fields, $fieldName);
 
                 if ($this->isNotNestedRule($validatedKeys)) {
                     $result[$fieldName] = $validatedItem;
                 } elseif (Arr::has($validatedKeys, '*')) {
                     $result[$fieldName] = $this->processNestedRule($validatedKeys['*'], $validatedItem);
+                } elseif ($fieldName === '*') {
+                    $result = $this->processNestedRule($validatedKeys, $fields);
                 } else {
                     $result[$fieldName] = $this->filterOnlyValidated($validatedItem, $validatedKeys);
                 }

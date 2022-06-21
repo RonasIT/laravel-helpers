@@ -2,9 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Foundation\Testing\TestResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\TestResponse;
 
 trait FixturesTrait
 {
@@ -48,7 +48,7 @@ trait FixturesTrait
     ];
 
     protected $truncateExceptTables = ['migrations', 'password_resets'];
-    protected $prepareSequencesExceptTables = ['migrations', 'password_resets', 'settings'];
+    protected $prepareSequencesExceptTables = ['migrations', 'password_resets'];
 
     protected function loadTestDump(): void
     {

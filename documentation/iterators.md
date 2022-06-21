@@ -1,81 +1,59 @@
-##Iterators
+[<< Services][1]
 
-###CsvIterator
+## Iterators
 
-Iterates .csv file.
+### CsvIterator
 
-####__construct($fileName)
-- $fileName - string, path to .csv file;
+Iterates `.csv` file.
 
-####parseColumns($columns)
+#### __construct($fileName)
+
+- $fileName - string, path to `.csv` file;
+
+#### parseColumns($columns)
+
 Get csv line as associative array.
 - $columns - array with csv file's columns;
 
-####getGenerator()
-Return iterable object for foreach.
+#### getGenerator()
+
+Return iterable object.
 
 Example: 
-````
->>> $csv = new \RonasIT\Support\Iterators\CsvIterator('/tmp/1.csv')
->>> $csv->parseColumns(['id', 'name']);
 
->>> foreach ($csv->getGenerator() as $line) {
-    var_export($line);
+```php
+$csv = new \RonasIT\Support\Iterators\CsvIterator('/tmp/1.csv');
+$csv->parseColumns(['id', 'name']);
+
+foreach ($csv->getGenerator() as $line) {
+    dump($line);
 }
-=> array (
-     'id' => '1',
-     'name' => 'first',
-   )array (
-     'id' => '2',
-     'name' => 'second',
-   )array (
-     'id' => '3',
-     'name' => 'third',
-   )⏎
+
+//['order_index' => '1', 'name' => 'first']
+//['order_index' => '2', 'name' => 'second']
+//['order_index' => '3', 'name' => 'third']
 ````
 
+### DBIterator
 
-###DBIterator
-Iterates results of database query. It very convenient for imports or exports 
-Actually it is just a wrapper of chunk. 
+Iterate results of the database query via chunk logic. 
 
-####__construct($query, $itemsPerPage)
-- $query - object 
-- $itemsPerPage - integer. Size of chunk sample.
+#### __construct($query, $itemsPerPage)
 
-Example:
-````
->>> $query = \App\Models\Category::with('translation')->orderBy('created_at', 'DESC');
->>> foreach($iterator->getGenerator() as $category) {
-   var_export($category);
+- $query - QueryBuilder object;
+- $itemsPerPage - integer, chunk size.
+
+```php
+$query = \App\Models\Category::orderBy('created_at', 'DESC');
+
+foreach($iterator->getGenerator() as $category) {
+   dump($category);
 }
-array (
-  'id' => 4,
-  'created_at' => '2018-01-23 07:20:06',
-  'updated_at' => '2018-01-23 07:20:06',
-  'deleted_at' => NULL,
-  'parent_id' => NULL,
-  'translation' => 
-  array (
-    'id' => 8,
-    'locale' => 'en',
-    'category_id' => 4,
-    'title' => 'Contemporary and modern art',
-    'description' => 'Contemporary and modern art',
-  ),
-)array (
-  'id' => 5,
-  'created_at' => '2018-01-23 07:20:06',
-  'updated_at' => '2018-01-23 07:20:06',
-  'deleted_at' => NULL,
-  'parent_id' => NULL,
-  'translation' => 
-  array (
-    'id' => 10,
-    'locale' => 'en',
-    'category_id' => 5,
-    'title' => 'Asian Art',
-    'description' => '',
-  ),
-.....
-```` 
+
+//['id' => 1, 'name' => 'first', 'created_at' => '2018-01-23 07:20:06']
+//['id' => 5, 'name' => 'second', 'created_at' => '2018-01-23 07:20:06']
+```
+
+[<< Services][1]
+
+[1]:services.md

@@ -1,80 +1,75 @@
-## To migrate your project to 1.1: 
+# Migration guide
 
-#### EntityControlTrait
+## 1.1
 
-All relations variables moved form method arguments to `withRelations` method.
+### EntityControlTrait
 
-Methods: withRelations, withTrashed, onlyTrashed return `$this` to make call chains.
+#### Call chains
 
-Before: 
+Next methods return self to allow to use call chain: `withRelations`, `withTrashed`, `onlyTrashed`.
+
+Old syntax:
+
 ```php
 $repository->withTrashed();
 
-$repository->firstWithRelations(
-    ['id' => 1], 
-    ['some_relation']
-);
+$repository->first(['id' => 1]);
 ```
 
-After:
+New syntax:
+
 ```php
-$repository
-    ->withRelations($relation)
-    ->withTrashed()
-    ->first();
+$repository->withTrashed()->first(['id' => 1]);
 ```
 
-Method `updateMany`: now is used for updating multiple entities in database.
+#### withRelations method
 
-Method `update`: now is used for updated first found entity in database. 
-Triggers eloquent functional such as casts, mutator, accessor. 
-If first argument is not an array, then it will be used as primary key.
+Attaching relations moved from the methods arguments to separate `withRelations` method.
 
-Before: 
+Old syntax:
+
 ```php
-
-$repository->update([
-    'id' => 1
-], [
-    'name' => 'newName'
-]);
-
-$repository->update([
-    'name' => 'Jon'
-], [
-    'name' => 'Jonatan'
-]);
+$userRepository->firstWithRelations(['id' => 1], ['role']);
 ```
 
-After:
+New syntax:
+
 ```php
-$repository->update([
-    'id' => 1
-], [
-    'name' => 'newName'
-]);
+$userRepository->withRelations(['role'])->first(['id' => 1]);
+```
 
-$repository->update(1, [
-    'name' => 'newName'
-]);
+#### update and updateMany method
 
-$repository->updateMany([
-    'name' => 'Jon'
-], [
-    'name' => 'Jonatan'
-]);
+New `updateMany` method should be used for updating multiple entities in database.
+
+```php
+$this->userRepository->updateMany(['is_active' => false], ['role_id' => ROLE::ARCHIVE_USER]);
+```
+
+The `update` method now using for updated first found entity in database.
+
+```php
+$this->userRepository->update(['id' => 1], ['is_active' => false]);
+```
+
+The first argument will be interpreted as a primary key condition if it has non array type.
+
+```php
+$this->userRepository->update(1, ['is_active' => false]);
 ```
 
 Method firstOrCreate: now is accepting 2 parameters.
 
-Before: 
+Before:
+
 ```php
 $repository->firstOrCreate([
     'name' = 'Jon'
 ]);
 ```
 
-After: 
+After:
+
 ```php
 $repository->firstOrCreate([
     'id' => 5
@@ -83,48 +78,58 @@ $repository->firstOrCreate([
 ]);
 ```
 
-Methods `find` and `findBy` don't contains relations in arguments.  
+Methods `find` and `findBy` don't contains relations in arguments.
+
 Before:
+
 ```php
 $this->find(1, ['relation']);
 ``` 
-After: 
+
+After:
+
 ```php
 $this->withRelations(['relation'])->find(1);
 ```
 
 Before:
+
 ```php
 $this->findBy('email', 'test@test.com', ['relation']);
 ``` 
-After: 
+
+After:
+
 ```php
 $this->withRelations(['relation'])->findBy('email', 'test@test.com');
 ```
 
-#### FilesUploadTrait 
+### FilesUploadTrait 
 
 This class is now used to upload files, all other classes is now @deprecated.
 
-#### FixturesTrait
+### FixturesTrait
 
 jsonExport now have jsonExport($fixture, $data) call. 
 
-Before: 
+Before:
+
 ```php
 $this->exportJson($data, $fixture);
 ```
 
 After:
+
 ```php
 $this->exportJson($fixture, $data)
 ```
 
-#### SearchTrait
+### SearchTrait
 
 Added new methods: filterMoreOrEqualThan and filterLessOrEqualThan.
 
 getSearchResults now will always return all responses in one format
+
 ```json
 {
     "current_page": 1,
@@ -142,8 +147,8 @@ getSearchResults now will always return all responses in one format
 }
 ```
 
-If you will send flag `all` then you will get all entities in field `data` and field `per_page` will equals to field `total`
+If you'll send flag `all` then you will get all entities in field `data` and field `per_page` will equal to field `total`
 
-#### Others
+### Others
 
 `UndemandingAuthorizationMiddleware` will be deprecated if you want to upgrade jwt to 1.0 version. Use `'check'` instead.
