@@ -48,7 +48,7 @@ trait FixturesTrait
     ];
 
     protected $truncateExceptTables = ['migrations', 'password_resets'];
-    protected $prepareSequencesExceptTables = ['migrations', 'password_resets', 'settings'];
+    protected $prepareSequencesExceptTables = ['migrations', 'password_resets'];
 
     protected function loadTestDump()
     {

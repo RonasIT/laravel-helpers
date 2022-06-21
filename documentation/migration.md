@@ -4,71 +4,58 @@
 
 ### EntityControlTrait
 
-All relations variables moved form method arguments to `withRelations` method.
+#### Call chains
 
-Methods: withRelations, withTrashed, onlyTrashed return `$this` to make call chains.
+Next methods return self to allow to use call chain: `withRelations`, `withTrashed`, `onlyTrashed`.
 
-Before: 
+Old syntax:
 
 ```php
 $repository->withTrashed();
 
-$repository->firstWithRelations(
-    ['id' => 1], 
-    ['some_relation']
-);
+$repository->first(['id' => 1]);
 ```
 
-After:
+New syntax:
 
 ```php
-$repository
-    ->withRelations($relation)
-    ->withTrashed()
-    ->first();
+$repository->withTrashed()->first(['id' => 1]);
 ```
 
-Method `updateMany`: now is used for updating multiple entities in database.
+#### withRelations method
 
-Method `update`: now is used for updated first found entity in database. 
-Triggers eloquent functional such as casts, mutator, accessor. 
-If first argument is not an array, then it will be used as primary key.
+Attaching relations moved from the methods arguments to separate `withRelations` method.
 
-Before:
+Old syntax:
 
 ```php
-
-$repository->update([
-    'id' => 1
-], [
-    'name' => 'newName'
-]);
-
-$repository->update([
-    'name' => 'Jon'
-], [
-    'name' => 'Jonatan'
-]);
+$userRepository->firstWithRelations(['id' => 1], ['role']);
 ```
 
-After:
+New syntax:
 
 ```php
-$repository->update([
-    'id' => 1
-], [
-    'name' => 'newName'
-]);
+$userRepository->withRelations(['role'])->first(['id' => 1]);
+```
 
-$repository->update(1, [
-    'name' => 'newName'
-]);
+#### update and updateMany method
 
-$repository->updateMany([
-    'name' => 'Jon'
-], [
-    'name' => 'Jonatan'
-]);
+New `updateMany` method should be used for updating multiple entities in database.
+
+```php
+$this->userRepository->updateMany(['is_active' => false], ['role_id' => ROLE::ARCHIVE_USER]);
+```
+
+The `update` method now using for updated first found entity in database.
+
+```php
+$this->userRepository->update(['id' => 1], ['is_active' => false]);
+```
+
+The first argument will be interpreted as a primary key condition if it has non array type.
+
+```php
+$this->userRepository->update(1, ['is_active' => false]);
 ```
 
 Method firstOrCreate: now is accepting 2 parameters.

@@ -8,7 +8,7 @@ class HelpersTest extends HelpersTestCase
 {
     use FixturesTrait;
 
-    public function getData()
+    public function getData(): array
     {
         return [
             [
@@ -56,7 +56,7 @@ class HelpersTest extends HelpersTestCase
      * @param string $key
      * @param array $expected
      */
-    public function testGetList($input, $key, $expected)
+    public function testGetList(array $input, string $key, array $expected)
     {
         $input = $this->getJsonFixture($input);
 
