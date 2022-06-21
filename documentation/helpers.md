@@ -3,104 +3,106 @@
 
 ## Functions
 
-### array_get_list($array, $path)
+### array_get_list($array, $path): array
 
-This function designed to get list of all values witch placed in $path in $array.
-
-**Example**
+This function designed to get list of all values witch placed in `$path` in `$array`.
 
 ```php
->>> $data = [
-        'id' => 1,
-        'some_value' => 'qweqwe',
-        'nested_values' => [
-            [
-                'id' => 4,
-                'another_some_value' => 'value',
-                'next_level_of_nesting' => [
-                    [
-                        'id' => 6,
-                        'value' => 'h'
-                    ],
-                    [
-                        'id' => 7,
-                        'value' => 'e'
-                    ]
+$data = [
+    'id' => 1,
+    'some_value' => 'qweqwe',
+    'nested_values' => [
+        [
+            'id' => 4,
+            'another_some_value' => 'value',
+            'next_level_of_nesting' => [
+                [
+                    'id' => 6,
+                    'value' => 'h'
+                ],
+                [
+                    'id' => 7,
+                    'value' => 'e'
                 ]
-            ],
-            [
-                'id' => 5,
-                'another_some_value' => 'value',
-                'next_level_of_nesting' => [
-                    [
-                        'id' => 8,
-                        'value' => 'l'
-                    ],
-                    [
-                        'id' => 9,
-                        'value' => 'l'
-                    ]
+            ]
+        ],
+        [
+            'id' => 5,
+            'another_some_value' => 'value',
+            'next_level_of_nesting' => [
+                [
+                    'id' => 8,
+                    'value' => 'l'
+                ],
+                [
+                    'id' => 9,
+                    'value' => 'l'
                 ]
-            ],
-            [
-                'id' => 6,
-                'another_some_value' => 'value',
-                'next_level_of_nesting' => [
-                    [
-                        'id' => 10,
-                        'value' => 'o'
-                    ]
+            ]
+        ],
+        [
+            'id' => 6,
+            'another_some_value' => 'value',
+            'next_level_of_nesting' => [
+                [
+                    'id' => 10,
+                    'value' => 'o'
                 ]
             ]
         ]
-    ];
-    
->>> $result = array_get_list($data, 'nested_values.*.next_level_of_nesting.*.value');
-=> ['h', 'e', 'l', 'l', 'o'];
+    ]
+];
+
+$result = array_get_list($data, 'nested_values.*.next_level_of_nesting.*.value'); //['h', 'e', 'l', 'l', 'o'];
 ````
 
-### is_associative($array)
+### is_associative($array): bool
 
-Verifies whether an associative array or a list
+Verifies whether `$array` is associative array or a list
 
 ```php
->>> $associative = [
-        'key' => 'value'
-    ]; 
->>> $list = ['some', 'values'];
+$associative = [
+    'key' => 'value'
+];
+ 
+$list = ['some', 'values'];
 
->>> is_associative($associative);
-=> true
-
->>> is_associative($list);
-=> false
-
+is_associative($associative); //true
+is_associative($list); //false
 ````
 
-### array_subtraction($array1, $array2)
+### array_subtraction($array1, $array2): array
 
-Return subtraction of two arrays
-
-**Example**
+Return subtraction of `$array2` from `$array1`
 
 ```php
->>> $array1 = [1, 2, 3];
->>> $array2 = [1, 2];
->>> $result = array_subtraction($array1, $array2);
-=> [3]
+$array1 = [1, 2, 3];
+$array2 = [1, 2];
+
+$result = array_subtraction($array1, $array2); //[3]
 ````
 
-### array_equals($array1, $array2)
+### array_equals($array1, $array2): bool
 
-Check equivalency of two arrays
-
-### array_round($array)
-
-Round all values in list of floats. It designed just for density.
+Verifies whether two arrays are equals
 
 ```php
->>> $result = array([1.4, 2.9, 1.534]);
-=> [1, 3, 2]
+$array1 = [1, 2, 3];
+$array2 = [1, 2];
+$array3 = [3, 2, 1];
+
+array_equals($array1, $array3); //true
+array_equals($array1, $array2); //false
+````
+
+### array_round($array): array
+
+Round all values in list of floats.
+
+```php
+$array = [1.4, 2.9, 1.534];
+
+array_round($array); //[1, 3, 2]
 ````
 
 ### elseChain(...$callbacks)

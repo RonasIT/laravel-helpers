@@ -5,24 +5,26 @@
 
 ## EntityService
 
-The main service. All new services need to extend from it.
+The base class for service classes related to database entities. It allows to use pseudo inheritance
+between the service class and related repository class;
 
 ### setRepository($repository)
 
-This method setting repository for entity. Need to use repository's methods from service. 
-$repository - valid class name of repository class.
-
+Associate service class with the repository class which will using in pseudo inheritance.
+- $repository - valid class name of repository class.
 
 ## HttpRequestService
 
-Service to working with http protocol. It is wrapper on Guzzle.
+Service to working with http/https protocols based on Guzzle library.
 
-To on debug mode you need to add "http_service_debug" key to configs/defaults.php file, by default - debug is off.
-If debug is on - information about all queries will write to log.
+Features:
+- service can be injected via the `app()` helper, which allows to mock it in testing;
+- debug mode, write all requests into the log file. Enabling by setting config `defaults.http_service_debug` to `true`.
 
 ### sendGet($url, $data, $headers)
 
-Method send GET query to $url.
+Method to send `GET` request to $url.
+
 - $url - string, target url;
 - $data - array with get parameters; 
 - $headers - array with headers;

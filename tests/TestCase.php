@@ -13,13 +13,13 @@ use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
-
 abstract class TestCase extends BaseTest
 {
     use FixturesTrait;
 
     protected $jwt;
     protected $auth;
+
     protected $testNow = '2018-11-11 11:11:11';
 
     protected static $startedTestSuite;
@@ -83,19 +83,19 @@ abstract class TestCase extends BaseTest
     }
 
     /**
-     * Email Chain should looks like following construction:
+     * Email Chain should look like following construction:
      *   [
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
-     *      'fixture' => 'expected_rendered_fixture.html', fixture name  to which send email sexpected to be equal on the step 1
+     *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
      *   ]
      *
-     * or be array, if sent more than 1 email:
+     * or be an array, if sent more than 1 email:
      *
      * [
      *   [
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
-     *      'fixture' => 'expected_rendered_fixture.html', fixture name  to which send email sexpected to be equal on the step 1
+     *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
      *   ]
      * ],
@@ -103,7 +103,7 @@ abstract class TestCase extends BaseTest
      * [
      *   [
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step N
-     *      'fixture' => 'expected_rendered_fixture.html', fixture name  to which send email sexpected to be equal on the step N
+     *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step N
      *      'subject' => string|null, expected email subject from the step N
      *   ]
      * ]
@@ -149,7 +149,7 @@ abstract class TestCase extends BaseTest
     {
         foreach ($this->requiredExpectationParameters as $parameter) {
             if (!Arr::has($currentMail, $parameter)) {
-                abort(Response::HTTP_INTERNAL_SERVER_ERROR, "Missing required key '{$parameter}' in the input data set on the step: {$index}");
+                abort(Response::HTTP_INTERNAL_SERVER_ERROR, "Missing required key \"{$parameter}\" in the input data set on the step: {$index}");
             }
         }
     }
@@ -159,7 +159,7 @@ abstract class TestCase extends BaseTest
         $expectedSubject = Arr::get($currentMail, 'subject');
 
         if (!empty($expectedSubject)) {
-            $this->assertEquals($expectedSubject, $mail->subject, "Failed assert that the expected subject '{$expectedSubject}' equals to the actual '{$mail->subject}'");
+            $this->assertEquals($expectedSubject, $mail->subject, "Failed assert that the expected subject {$expectedSubject}' equals to the actual '{$mail->subject}'");
         }
     }
 
