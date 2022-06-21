@@ -52,11 +52,11 @@ class HelpersTest extends HelpersTestCase
     /**
      * @dataProvider getData
      *
-     * @param array $input
+     * @param string $input
      * @param string $key
-     * @param array $expected
+     * @param string $expected
      */
-    public function testGetList(array $input, string $key, array $expected)
+    public function testGetList(string $input, string $key, string $expected)
     {
         $input = $this->getJsonFixture($input);
 

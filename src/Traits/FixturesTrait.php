@@ -50,7 +50,7 @@ trait FixturesTrait
     protected $truncateExceptTables = ['migrations', 'password_resets'];
     protected $prepareSequencesExceptTables = ['migrations', 'password_resets'];
 
-    protected function loadTestDump()
+    protected function loadTestDump(): void
     {
         $dump = $this->getFixture('dump.sql', false);
 
@@ -66,18 +66,18 @@ trait FixturesTrait
         DB::unprepared($dump);
     }
 
-    public function getFixturePath($fn)
+    public function getFixturePath(string $fixtureName): string
     {
         $class = get_class($this);
         $explodedClass = explode('\\', $class);
         $className = Arr::last($explodedClass);
 
-        return base_path("tests/fixtures/{$className}/{$fn}");
+        return base_path("tests/fixtures/{$className}/{$fixtureName}");
     }
 
-    public function getFixture($fn, $failIfNotExists = true)
+    public function getFixture(string $fixtureName, $failIfNotExists = true): string
     {
-        $path = $this->getFixturePath($fn);
+        $path = $this->getFixturePath($fixtureName);
 
         if (file_exists($path)) {
             return file_get_contents($path);
@@ -90,19 +90,12 @@ trait FixturesTrait
         return '';
     }
 
-    public function getJsonFixture($fn, $assoc = true)
+    public function getJsonFixture(string $fixtureName, $assoc = true)
     {
-        return json_decode($this->getFixture($fn), $assoc);
+        return json_decode($this->getFixture($fixtureName), $assoc);
     }
 
-    public function getJsonResponse()
-    {
-        $response = $this->response->getContent();
-
-        return json_decode($response, true);
-    }
-
-    public function assertEqualsFixture($fixture, $data, bool $exportMode = false)
+    public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
     {
         if ($exportMode) {
             $this->exportJson($fixture, $data);
@@ -111,27 +104,14 @@ trait FixturesTrait
         $this->assertEquals($this->getJsonFixture($fixture), $data);
     }
 
-    /**
-     * This method is actual only for Laravel 5.3 and lower
-     *
-     * @deprecated
-     */
-    public function exportJsonResponse($fixture)
-    {
-        $response = $this->getJsonResponse();
-        $content = json_encode($response, JSON_PRETTY_PRINT);
-
-        return file_put_contents($this->getFixturePath($fixture), $content);
-    }
-
-    public function callRawRequest($method, $uri, $content, array $headers = [])
+    public function callRawRequest(string $method, string $uri, $content, array $headers = []): TestResponse
     {
         $server = $this->transformHeadersToServerVars($headers);
 
         return $this->call($method, $uri, [], [], [], $server, $content);
     }
 
-    public function exportJson($fixture, $data)
+    public function exportJson($fixture, $data): void
     {
         if ($data instanceof TestResponse) {
             $data = $data->json();
@@ -140,7 +120,7 @@ trait FixturesTrait
         $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
 
-    public function clearDatabase($scheme, $tables, $except)
+    public function clearDatabase(string $scheme, array $tables, array $except): void
     {
         if ($scheme === 'pgsql') {
             $query = $this->getClearPsqlDatabaseQuery($tables, $except);
@@ -153,7 +133,7 @@ trait FixturesTrait
         }
     }
 
-    public function getClearPsqlDatabaseQuery($tables, $except = ['migrations'])
+    public function getClearPsqlDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {
@@ -164,7 +144,7 @@ trait FixturesTrait
         });
     }
 
-    public function getClearMySQLDatabaseQuery($tables, $except = ['migrations'])
+    public function getClearMySQLDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
@@ -179,7 +159,7 @@ trait FixturesTrait
         return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
-    public function prepareSequences($tables, $except = [])
+    public function prepareSequences(array $tables, array $except = []): void
     {
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
@@ -194,7 +174,7 @@ trait FixturesTrait
         app('db.connection')->unprepared($query);
     }
 
-    public function exportFile($response, $fixture)
+    public function exportFile(TestResponse $response, string $fixture): void
     {
         $this->exportContent(
             file_get_contents($response->getFile()->getPathName()),
@@ -202,7 +182,7 @@ trait FixturesTrait
         );
     }
 
-    protected function getTables()
+    protected function getTables(): array
     {
         if (empty(self::$tables)) {
             self::$tables = app('db.connection')
@@ -213,7 +193,7 @@ trait FixturesTrait
         return self::$tables;
     }
 
-    protected function exportContent($content, $fixture)
+    protected function exportContent($content, string $fixture): void
     {
         if (env('FAIL_EXPORT_JSON', true)) {
             $this->fail(preg_replace('/[ ]+/mu', ' ',

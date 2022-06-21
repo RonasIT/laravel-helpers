@@ -4,15 +4,17 @@ namespace RonasIT\Support;
 
 use Illuminate\Support\Arr;
 use Illuminate\Foundation\Http\FormRequest;
-use RonasIT\Support\AutoDoc\Traits\AutoDocRequestTrait;
 
 class BaseRequest extends FormRequest
 {
-    use AutoDocRequestTrait;
-
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
+    }
+
+    public function rules(): array
+    {
+        return [];
     }
 
     /**
@@ -25,7 +27,7 @@ class BaseRequest extends FormRequest
      * @return array;
      */
 
-    public function onlyValidated($keys = null, $default = null)
+    public function onlyValidated($keys = null, $default = null): array
     {
         $rules = array_keys($this->rules());
 
@@ -74,12 +76,12 @@ class BaseRequest extends FormRequest
         }, $validatedItem);
     }
 
-    protected function isNotNestedRule($validatedKeys)
+    protected function isNotNestedRule($validatedKeys): bool
     {
         return is_integer($validatedKeys);
     }
 
-    private function sortByStrlen(array &$array)
+    private function sortByStrlen(array &$array): void
     {
         $collection = collect($array)->sortBy(function ($string) {
             return strlen($string);

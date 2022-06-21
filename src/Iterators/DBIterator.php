@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Iterators;
 
 use Iterator;
+use Generator;
 
 class DBIterator implements Iterator
 {
@@ -18,7 +19,7 @@ class DBIterator implements Iterator
         $this->itemsPerPage = $itemsPerPage;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->loadSample();
     }
@@ -33,7 +34,7 @@ class DBIterator implements Iterator
         return $this->sample['data'][$this->position]['id'];
     }
 
-    public function next()
+    public function next(): void
     {
         $this->position++;
 
@@ -42,7 +43,7 @@ class DBIterator implements Iterator
         }
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return !($this->isLastSample() && $this->isEndOfSample());
     }
@@ -57,7 +58,7 @@ class DBIterator implements Iterator
         return $this->sample['current_page'] >= $this->sample['last_page'];
     }
 
-    public function loadSample($page = 1)
+    public function loadSample($page = 1): void
     {
         $this->sample = $this->query
             ->paginate($this->itemsPerPage, ['*'], 'page', $page)
@@ -66,7 +67,7 @@ class DBIterator implements Iterator
         $this->position = 0;
     }
 
-    public function getGenerator()
+    public function getGenerator(): Generator
     {
         $this->rewind();
 

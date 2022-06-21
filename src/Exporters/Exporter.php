@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Exporters;
 
 use Illuminate\Support\Arr;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -31,12 +32,14 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
         return $this;
     }
 
-    public function setDisk($disk)
+    public function setDisk($disk): self
     {
         $this->disk = $disk;
+
+        return $this;
     }
 
-    public function setFileName($fileName): self
+    public function setFileName(string $fileName): self
     {
         $this->fileName = $fileName;
 
@@ -48,7 +51,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
      *
      * @return $this
      */
-    public function setType($type): self
+    public function setType(string $type): self
     {
         $this->type = $type;
 
@@ -64,7 +67,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
         return Storage::disk($this->disk)->path($filename);
     }
 
-    public function query()
+    public function query(): Builder
     {
         return $this->query;
     }

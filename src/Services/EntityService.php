@@ -11,7 +11,7 @@ class EntityService
 {
     protected $repository;
 
-    public function setRepository($repository)
+    public function setRepository($repository): self
     {
         $this->repository = app($repository);
 

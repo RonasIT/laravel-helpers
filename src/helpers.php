@@ -395,3 +395,14 @@ function array_undot($array)
 
     return $result;
 }
+
+function extract_last_part(string $string, string $separator = '.'): array
+{
+    $entities = explode($separator, $string);
+
+    $fieldName = array_pop($entities);
+
+    $relation = implode($separator, $entities);
+
+    return [$fieldName, $relation];
+}

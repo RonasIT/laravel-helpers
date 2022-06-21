@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Traits;
 
+use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -18,7 +20,10 @@ trait SearchTrait
     protected $query;
     protected $filter;
 
-    public function paginate()
+    protected $attachedRelations = [];
+    protected $attachedRelationsCount = [];
+
+    public function paginate(): LengthAwarePaginator
     {
         $defaultPerPage = config('defaults.items_per_page');
         $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage);
@@ -28,16 +33,16 @@ trait SearchTrait
     }
 
     /**
-     * @param $field string, filtered field, you can pass field name with dots to filter by field of relation
-     * @param $filterName string|null, key from filters which contains filter value
-     * @return $this
+     * @param $field string filtered field, you can pass field name with dots to filter by field of relation
+     * @param $filterName string|null key from filters which contains filter value
+     *
+     * @return self
      */
-    public function filterBy($field, $filterName = null)
+    public function filterBy(string $field, ?string $filterName = null): self
     {
         if (empty($filterName)) {
             if (Str::contains($field, '.')) {
-                $entities = explode('.', $field);
-                $filterName = Arr::last($entities);
+                list ($filterName) = extract_last_part($field);
             } else {
                 $filterName = $field;
             }
@@ -50,15 +55,13 @@ trait SearchTrait
         return $this;
     }
 
-    public function filterByQuery(array $fields)
+    public function filterByQuery(array $fields): self
     {
         if (!empty($this->filter['query'])) {
             $this->query->where(function ($query) use ($fields) {
                 foreach ($fields as $field) {
                     if (Str::contains($field, '.')) {
-                        $entities = explode('.', $field);
-                        $fieldName = array_pop($entities);
-                        $relations = implode('.', $entities);
+                        list ($fieldName, $relations) = extract_last_part($field);
 
                         $query->orWhereHas($relations, function ($query) use ($fieldName) {
                             $query->where(
@@ -77,7 +80,7 @@ trait SearchTrait
         return $this;
     }
 
-    public function searchQuery($filter)
+    public function searchQuery(array $filter): self
     {
         if (!empty($filter['with_trashed'])) {
             $this->withTrashed();
@@ -90,12 +93,12 @@ trait SearchTrait
         return $this;
     }
 
-    public function getSearchResults()
+    public function getSearchResults(): LengthAwarePaginator
     {
         $this->orderBy();
 
         if (empty($this->filter['all'])) {
-            return $this->getModifiedPaginator($this->paginate())->toArray();
+            return $this->getModifiedPaginator($this->paginate());
         }
 
         $data = $this->query->get();
@@ -103,9 +106,10 @@ trait SearchTrait
         return $this->wrapPaginatedData($data);
     }
 
-    public function wrapPaginatedData($data)
+    public function wrapPaginatedData(Collection $data): LengthAwarePaginator
     {
-        $total = count($data);
+        $total = $data->count();
+
         $perPage = $this->calculatePerPage($total);
 
         $paginator = new LengthAwarePaginator($data, count($data), $perPage, 1, [
@@ -113,19 +117,17 @@ trait SearchTrait
             'pageName' => 'page'
         ]);
 
-        return $this->getModifiedPaginator($paginator)->toArray();
+        return $this->getModifiedPaginator($paginator);
     }
 
-    public function getModifiedPaginator($paginator)
+    public function getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator
     {
         $collection = $paginator->getCollection();
-
-        $this->applyHidingShowingFieldsRules($collection);
 
         return $paginator->setCollection($collection);
     }
 
-    public function orderBy($default = null, $defaultDesc = false)
+    public function orderBy(?string $default = null, bool $defaultDesc = false): self
     {
         $default = (empty($default)) ? $this->primaryKey : $default;
 
@@ -138,61 +140,39 @@ trait SearchTrait
             $this->query->orderBy($orderField, $this->getDesc($isDesc));
         }
 
-        if ($orderField != $default) {
+        if ($orderField !== $default) {
             $this->query->orderBy($default, $this->getDesc($defaultDesc));
         }
 
         return $this;
     }
 
-    protected function getDesc($isDesc)
+    protected function getDesc(bool $isDesc): string
     {
         return $isDesc ? 'DESC' : 'ASC';
     }
 
-    /**
-     * @deprecated
-     *
-     * Use filterBy() with dot notation instead
-     */
-    public function filterByRelationField($relation, $field, $filterName = null)
-    {
-        if (empty($filterName)) {
-            $filterName = $field;
-        }
-
-        if (Arr::has($this->filter, $filterName)) {
-            $this->query->whereHas($relation, function ($query) use ($field, $filterName) {
-                $query->where(
-                    $field, $this->filter[$filterName]
-                );
-            });
-        }
-
-        return $this;
-    }
-
-    public function filterMoreThan($field, $value)
+    public function filterMoreThan(string $field, $value): self
     {
         return $this->filterValue($field, '>', $value);
     }
 
-    public function filterLessThan($field, $value)
+    public function filterLessThan(string $field, $value): self
     {
         return $this->filterValue($field, '<', $value);
     }
 
-    public function filterMoreOrEqualThan($field, $value)
+    public function filterMoreOrEqualThan(string $field, $value): self
     {
         return $this->filterValue($field, '>=', $value);
     }
 
-    public function filterLessOrEqualThan($field, $value)
+    public function filterLessOrEqualThan(string $field, $value): self
     {
         return $this->filterValue($field, '<=', $value);
     }
 
-    public function filterValue($field, $sign, $value)
+    public function filterValue(string $field, string $sign, $value): self
     {
         if (!empty($value)) {
             $this->query->where($field, $sign, $value);
@@ -201,16 +181,31 @@ trait SearchTrait
         return $this;
     }
 
-    public function with()
+    /**
+     * @param $relations array|string
+     *
+     * @return $this
+     */
+    public function with($relations): self
     {
-        if (!empty($this->filter['with'])) {
-            $this->query->with($this->filter['with']);
-        }
+        $this->attachedRelations = Arr::wrap($relations);
 
         return $this;
     }
 
-    protected function getQuerySearchCallback($field)
+    /**
+     * @param $relations array|string
+     *
+     * @return $this
+     */
+    public function withCount($relations): self
+    {
+        $this->attachedRelationsCount = Arr::wrap($relations);
+
+        return $this;
+    }
+
+    protected function getQuerySearchCallback(string $field): Closure
     {
         $databaseDriver = config('database.default');
         $dbRawValue = "lower({$field})";
@@ -227,7 +222,7 @@ trait SearchTrait
         };
     }
 
-    public function filterByList($field, $filterName)
+    public function filterByList(string $field, string $filterName): self
     {
         if (Arr::has($this->filter, $filterName)) {
             $this->applyWhereCallback($this->query, $field, function (&$q, $conditionField) use ($filterName) {
@@ -238,7 +233,7 @@ trait SearchTrait
         return $this;
     }
 
-    public function filterFrom($field, $strict = true, $filterName = null)
+    public function filterFrom(string $field, bool $strict = true, ?string $filterName = null): self
     {
         $filterName = empty($filterName) ? 'from' : $filterName;
         $sign = $strict ? '>' : '>=';
@@ -250,7 +245,7 @@ trait SearchTrait
         return $this;
     }
 
-    public function filterTo($field, $strict = true, $filterName = null)
+    public function filterTo(string $field, bool $strict = true, ?string $filterName = null): self
     {
         $filterName = empty($filterName) ? 'to' : $filterName;
         $sign = $strict ? '<' : '<=';
@@ -262,42 +257,19 @@ trait SearchTrait
         return $this;
     }
 
-    public function withCount()
-    {
-        if (!empty($this->filter['with_count'])) {
-            foreach ($this->filter['with_count'] as $requestedRelations) {
-                $explodedRelation = explode('.', $requestedRelations);
-                $countRelation = array_pop($explodedRelation);
-                $relation = implode('.', $explodedRelation);
-
-                if (empty($relation)) {
-                    $this->query->withCount($countRelation);
-                } else {
-                    $this->query->with([
-                        $relation => function ($query) use ($countRelation) {
-                            $query->withCount($countRelation);
-                        }
-                    ]);
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    public function getSearchQuery()
+    public function getSearchQuery(): Query
     {
         return $this->query;
     }
 
-    protected function addWhere(&$query, $field, $value, $sign = '=')
+    protected function addWhere(Query &$query, string $field, $value, string $sign = '='): void
     {
         $this->applyWhereCallback($query, $field, function (&$q, $field) use ($sign, $value) {
             $q->where($field, $sign, $value);
         });
     }
 
-    protected function constructWhere($query, $where = [], $field = null)
+    protected function constructWhere(Query $query, $where = [], ?string $field = null): Query
     {
         if (!is_array($where)) {
             $field = (empty($field)) ? $this->primaryKey : $field;
@@ -314,11 +286,10 @@ trait SearchTrait
         return $query;
     }
 
-    protected function applyWhereCallback($query, $field, $callback) {
+    protected function applyWhereCallback(Query $query, string $field, Closure $callback): void
+    {
         if (Str::contains($field, '.')) {
-            $entities = explode('.', $field);
-            $conditionField = array_pop($entities);
-            $relations = implode('.', $entities);
+            list ($conditionField, $relations) = extract_last_part($field);
 
             $query->whereHas($relations, function ($q) use ($callback, $conditionField) {
                 $callback($q, $conditionField);
@@ -328,7 +299,7 @@ trait SearchTrait
         }
     }
 
-    protected function calculatePerPage($total)
+    protected function calculatePerPage(int $total): int
     {
         if ($total > 0) {
             return $total;
@@ -339,16 +310,5 @@ trait SearchTrait
         }
 
         return config('defaults.items_per_page', 1);
-    }
-
-    protected function applyHidingShowingFieldsRules(&$collection)
-    {
-        if (Application::VERSION >= '5.8') {
-            $collection->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes);
-        } else {
-            $collection = $collection->each(function (&$item) {
-                $item->makeHidden($this->hiddenAttributes)->makeVisible($this->visibleAttributes);
-            });
-        }
     }
 }
