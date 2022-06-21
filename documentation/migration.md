@@ -18,6 +18,7 @@ $repository->first(['id' => 1]);
 
 New syntax:
 
+
 ```php
 $repository->withTrashed()->first(['id' => 1]);
 ```

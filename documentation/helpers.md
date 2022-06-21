@@ -7,6 +7,7 @@
 
 This function designed to get list of all values witch placed in `$path` in `$array`.
 
+
 ```php
 $data = [
     'id' => 1,

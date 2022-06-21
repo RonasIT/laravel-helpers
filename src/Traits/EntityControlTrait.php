@@ -111,7 +111,7 @@ trait EntityControlTrait
     /**
      * Checking that record with this key value exists
      *
-     * @param $field
+     * @param string $field
      * @param $value
      *
      * @return boolean
@@ -151,7 +151,7 @@ trait EntityControlTrait
      * @param mixed $where
      * @param array $data
      *
-     * @return array|int
+     * @return int
      */
     public function updateMany($where, array $data): int
     {

@@ -172,7 +172,7 @@ class HttpRequestService
             logger('');
             logger('getting response: ');
             logger('code', ["<{$response->getStatusCode()}>"]);
-            logger('body', ["<{$response->getBody(true)}>"]);
+            logger('body', ["<{$response->getBody()}>"]);
             logger('time', [!empty($time) ? (microtime(true) - $time) : null]);
             logger('');
         }
@@ -196,6 +196,7 @@ class HttpRequestService
 
         if ($method == 'get') {
             $this->options['query'] = $data;
+
             return;
         }
 
@@ -213,6 +214,7 @@ class HttpRequestService
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;
+
             return;
         }
 
