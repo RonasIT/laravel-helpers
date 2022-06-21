@@ -174,14 +174,14 @@ class Importer
         $this->report['errors'][] = $this->formatError($error);
     }
 
-    protected function formatError($error)
+    protected function formatError($error): string
     {
         $lineNumber = $this->iterator->key() + 1;
 
         return "Line {$lineNumber}: {$error}";
     }
 
-    protected function validateDuplicatingOfId($item)
+    protected function validateDuplicatingOfId($item): bool
     {
         if (empty($item['id'])) {
             return false;

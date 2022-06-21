@@ -22,7 +22,7 @@ class HelpersTestCase extends BaseTest
      *
      * @return Application
      */
-    public function createApplication()
+    public function createApplication(): Application
     {
         return require __DIR__ . '/../bootstrap/app.php';
     }

@@ -2,12 +2,12 @@
 
 namespace RonasIT\Support;
 
-use Illuminate\Support\ServiceProvider;
-use RonasIT\Support\Middleware\SecurityMiddleware;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\JWTAuth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\ExcelServiceProvider;
+use RonasIT\Support\Middleware\SecurityMiddleware;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -25,17 +25,13 @@ class HelpersServiceProvider extends ServiceProvider
             return $result[0]->entities_count == 0;
         });
 
-        app(ExcelServiceProvider::class, [
-            'app' => app()
-        ])->boot();
+        app(ExcelServiceProvider::class, ['app' => app()])->boot();
 
         $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
     }
 
     public function register()
     {
-        app(ExcelServiceProvider::class, [
-            'app' => app()
-        ])->register();
+        app(ExcelServiceProvider::class, ['app' => app()])->register();
     }
 }

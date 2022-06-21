@@ -21,54 +21,42 @@ Features:
 - service can be injected via the `app()` helper, which allows to mock it in testing;
 - debug mode, write all requests into the log file. Enabling by setting config `defaults.http_service_debug` to `true`.
 
-### sendGet($url, $data, $headers)
+### get(string $url, array $data = [], array $headers = []): self
 
-Method to send `GET` request to $url.
+Method to send `GET` request to `$url`.
 
-- $url - string, target url;
-- $data - array with get parameters; 
-- $headers - array with headers;
+Make request, save response to the protected field and return self.
 
-Return response.
+### post(string $url, array $data, array $headers = []): self
 
-### sendPost
+Method to send `POST` request to `$url`.
 
-Method send POST query to $url.
-- $url - string, target url;
-- $data - array with body parameters; 
-- $headers - array with headers;
+### delete(string $url, array $headers = []): self
 
-Return response.
+Method to send `DELETE` request to `$url`.
 
-don't forget to set content-type/application-json header if you want that $data will send as json
+### put(string $url, array $data, array $headers = []): self 
 
-### sendDelete
+Method to send `PUT` request to `$url`.
 
-Method send DELETE query to $url.
-- $url - string, target url;
-- $headers - array with headers;
+### patch(string $url, array $data, array $headers = []): self
 
-Return response.
+Method to send `PATCH` request to `$url`.
 
-### sendPut 
+### getResponse(): ResponseInterface
 
-Method send PUT query to $url.
-- $url - string, target url;
-- $data - array with body parameters; 
-- $headers - array with headers;
+Return last response object.
 
-Return response.
+### json(): array
 
-### parseJsonResponse($response)
-
-Get response data and parse it to associative array.
-- $response - response object from sendGet/sendPost/sendDelete/sendDelete functions;
+Return last response's content as associative array.
 
 ### saveCookieSession()
 
 Saving cookies from request.
 
 ### getCookie()
+
 Return saved cookies.
 
 [<< Traits][1]

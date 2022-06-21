@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\Storage;
 
 trait FilesUploadTrait
 {
-    protected function saveFile($fileName, $content, $returnUrl = false)
+    protected function saveFile($fileName, $content): string
     {
         $preparedName = $this->generateName($fileName);
+
         Storage::put($preparedName, $content);
 
-        return $returnUrl ? Storage::url($preparedName) : Storage::path($preparedName);
+        return $preparedName;
     }
 
     protected function checkUploadedFile($path)

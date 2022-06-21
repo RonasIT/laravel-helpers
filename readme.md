@@ -16,9 +16,13 @@ This plugin provides set of helpers functions, services and traits.
 
 ## Migration guids
  - [1.1][5]
+ - [2.0.0][6]
+ - [2.0.8][7]
 
 [1]:./documentation/helpers.md
 [2]:./documentation/traits.md
 [3]:./documentation/services.md
 [4]:./documentation/iterators.md
 [5]:./documentation/migration.md#1.1
+[6]:./documentation/migration.md#2.0.0
+[7]:./documentation/migration.md#2.0.8

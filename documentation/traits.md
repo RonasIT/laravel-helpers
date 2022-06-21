@@ -34,7 +34,7 @@ search you need. Available search methods are:
 * `filterByQueryOnRelation($relation, [fields])` - filtering with "LIKE" operator by related model fields
 * `filterByRelation($relation, $field)` - filtering by related model field.
 
-Also you can specify results order using `order_by()` method and specify relations by `with()`
+Also, you can specify results order using `order_by()` method and specify relations by `with()`
 method if you want retrieve related data too.
 
 To get results call `getSearchResults()` method, that's it. You can pass `all` filter to get all results, or use
@@ -67,7 +67,7 @@ public function search()
 
 ## TranslationTrait
 
-Add multi language support for models.
+Add multi-language support for models.
 Requirements: translation model have to be named as `{modelName}Translation` and contains locale field.
 For example, for model `Product` you should create `ProductTranslation` model and create fields you want translate plus required `locale` field.
 
