@@ -11,6 +11,7 @@ class SecurityMiddleware
     protected $cache;
 
     const MAINTENANCE_MODE_KEY = 'maintenance_activated';
+    const MAINTENANCE_MODE_HEADER = 'maintenance';
 
     public function __construct(Repository $cache)
     {
@@ -19,11 +20,11 @@ class SecurityMiddleware
 
     public function handle($request, Closure $next)
     {
-        if ($this->needToLock($request)) {
+        if ($this->needToEnable($request)) {
             $this->cache->forever(self::MAINTENANCE_MODE_KEY, true);
         }
 
-        if ($this->needToUnlock($request)) {
+        if ($this->needToDisable($request)) {
             $this->cache->forget(self::MAINTENANCE_MODE_KEY);
         }
 
@@ -34,14 +35,14 @@ class SecurityMiddleware
         return $next($request);
     }
 
-    protected function needToLock($request): bool
+    protected function needToEnable($request): bool
     {
-        return ($request->header('Order') === 'activate') && ($request->header('App-Key') === config('app.key'));
+        return ($request->header(self::MAINTENANCE_MODE_HEADER) === 'activate') && ($request->header('App-Key') === config('app.key'));
     }
 
-    protected function needToUnlock($request): bool
+    protected function needToDisable($request): bool
     {
-        return ($request->header('Order') === 'deactivate') && ($request->header('App-Key') === config('app.key'));
+        return ($request->header(self::MAINTENANCE_MODE_HEADER) === 'deactivate') && ($request->header('App-Key') === config('app.key'));
     }
 
     //To hide the reason from attackers

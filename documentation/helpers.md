@@ -7,7 +7,6 @@
 
 This function designed to get list of all values witch placed in `$path` in `$array`.
 
-
 ```php
 $data = [
     'id' => 1,
@@ -146,30 +145,33 @@ Generate GUID
 
 ### array_concat($array, $callback)
 
-Concat results of callback call. Array should be array of strings. Arguments of callback are `$value`, `$key`
+Concat results of callback call. The first `$array` argument should be an array of strings.
 
 ```php
-    >>> $array = ['some', 'random', 'values'];
-    >>> $result = array_concat($array, function ($value, $key) {
-            return "{$key}. {$value}\n";
-        });
-    => """
-       0. some\n
-       1. random\n
-       2. values\n
-       """
+$array = ['some', 'random', 'values'];
+
+$result = array_concat($array, function ($value, $key) {
+    return "{$key}. {$value}\n";
+});
+
+/**
+0. some
+1. random
+2. values
+
+ */ 
 ````
 
 ### clear_folder($path)
 
-Remove all files and folders from `$path`
+Remove all files and folders from `$path`.
 
 ### array_associate($array, $callback)
 
-Builds an associative array by gotten keys and values. Arguments of callback id `$value`, `$key`
+Builds an associative array by gotten keys and values.
 
 ```php
->>> $array = [
+$array = [
     [
         'id' => 1,
         'value' => 'first'
@@ -184,29 +186,26 @@ Builds an associative array by gotten keys and values. Arguments of callback id 
     ]
 ];
 
->>> $result = array_associate($array, function($value) {
+$result = array_associate($array, function($value) {
     return [
         'key' => $value['id'],
         'value' => $value['value']
     ];
 });
-=> [
-     1 => "first",
-     2 => "second",
-     3 => "third",
-   ]
+
+//[1 => "first", 2 => "second", 3 => "third"]
 ````
 
 ### array_duplicate($array)
 
-Return duplicated values of array
+Return duplicated values of input `$array`.
 
 ```php
->>> $array = [1, 2, 2, 3];
->>> array_duplicate($array);
-=> [
-     2 => 2,
-   ]
+$array = [1, 2, 2, 3];
+
+array_duplicate($array);
+
+//[2 => 2]
 ````
 
 ### array_unique_object($objectsList, $key = 'id')

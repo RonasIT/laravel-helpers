@@ -129,7 +129,7 @@ abstract class TestCase extends BaseTest
     {
         foreach ($this->requiredExpectationParameters as $parameter) {
             if (!Arr::has($currentMail, $parameter)) {
-                abort(Response::HTTP_INTERNAL_SERVER_ERROR, "Missing required key \"{$parameter}\" in the input data set on the step: {$index}");
+                abort(Response::HTTP_INTERNAL_SERVER_ERROR, "Missing required key \"{$parameter}\" in the input data set on the step: {$index}.");
             }
         }
     }
@@ -139,7 +139,7 @@ abstract class TestCase extends BaseTest
         $expectedSubject = Arr::get($currentMail, 'subject');
 
         if (!empty($expectedSubject)) {
-            $this->assertEquals($expectedSubject, $mail->subject, "Failed assert that the expected subject {$expectedSubject}' equals to the actual '{$mail->subject}'");
+            $this->assertEquals($expectedSubject, $mail->subject, "Failed assert that the expected subject \"{$expectedSubject}\" equals to the actual \"{$mail->subject}\".");
         }
     }
 
@@ -148,7 +148,7 @@ abstract class TestCase extends BaseTest
         $expectedAddressesCount = count($emails);
         $addressesCount = count($mail->to);
 
-        $this->assertEquals($expectedAddressesCount, $addressesCount, "Failed assert that email on the step {$index}, was sent to {$expectedAddressesCount} addresses, actually email had sent to the {$addressesCount} addresses");
+        $this->assertEquals($expectedAddressesCount, $addressesCount, "Failed assert that email on the step {$index}, was sent to {$expectedAddressesCount} addresses, actually email had sent to the {$addressesCount} addresses.");
     }
 
     protected function assertSentToEmailsList(array $sentEmails, array $emails, int $index): void
@@ -164,7 +164,7 @@ abstract class TestCase extends BaseTest
     {
         $countData = count($emailChain);
 
-        $this->assertEquals($countData, $index, "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}");
+        $this->assertEquals($countData, $index, "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}.");
     }
 
     protected function assertEmailsList(array $expectedMailData, Mailable $mail, int $index): void
@@ -183,11 +183,9 @@ abstract class TestCase extends BaseTest
             $this->exportContent($mailContent, $expectedMailData['fixture']);
         }
 
-        $this->assertEquals(
-            $this->getFixture($expectedMailData['fixture']),
-            $mailContent,
-            "Fixture {$expectedMailData['fixture']} does not equals rendered mail."
-        );
+        $fixture = $this->getFixture($expectedMailData['fixture']);
+
+        $this->assertEquals($fixture, $mailContent, "Fixture {$expectedMailData['fixture']} does not equals rendered mail.");
     }
 
     protected function prepareEmailChain($emailChain): array
@@ -196,7 +194,7 @@ abstract class TestCase extends BaseTest
             $emailChain = $this->getJsonFixture($emailChain);
         }
 
-        return is_array(Arr::first($emailChain)) ? $emailChain : [$emailChain];
+        return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
     }
 
     protected function dontWrapIntoTransaction(): void

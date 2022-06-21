@@ -18,7 +18,6 @@ $repository->first(['id' => 1]);
 
 New syntax:
 
-
 ```php
 $repository->withTrashed()->first(['id' => 1]);
 ```
@@ -153,3 +152,55 @@ If you'll send flag `all` then you will get all entities in field `data` and fie
 ### Others
 
 `UndemandingAuthorizationMiddleware` will be deprecated if you want to upgrade jwt to 1.0 version. Use `'check'` instead.
+
+## 2.0.0
+
+### EntityControlTrait
+
+All implemented methods now return model classes/collections instead of arrays
+
+### HttpRequestService
+
+#### Removed methods
+
+The next methods had been removed:
+- `sendGet`
+- `sendPut`
+- `sendPost`
+- `sendPatch`
+- `sendDelete`
+- `parseJsonResponse`
+
+#### New methods
+
+The next methods had been implemented:
+- `get(string $url, array $data = [], array $headers = []): self`
+- `put(string $url, array $data, array $headers = []): self`
+- `post(string $url, array $data, array $headers = []): self`
+- `delete(string $url, array $headers = []): self`
+- `patch(string $url, array $data, array $headers = []): self`
+- `getResponse(): ResponseInterface`
+- `json(): array`
+
+Old syntax:
+
+```php
+$response = $httpRequestService->get($url);
+
+$data = $httpRequestService->parseJsonResponse($response);
+```
+
+New syntax:
+
+```php
+$data = $httpRequestService->get($url)->json();
+```
+
+## 2.0.8
+
+### FilesUploadTrait
+
+#### saveFile($fileName, $content): string
+
+- now return generated file name instead of url/path
+- `$returnUrl` third argument had been removed

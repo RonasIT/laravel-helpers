@@ -4,6 +4,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
 
 /**
+ * @deprecated use elseif construction instead
+ *
  * It calls on all callbacks to the first, which did not return null.
  * The resulting value is the result of the function and returns.
  *
@@ -108,7 +110,7 @@ function array_get_list($array, $path)
 }
 
 /**
- * Verifies whether an associative array or a list
+ * Verifies whether input is associative array or a list
  *
  * @param array $array
  *
@@ -117,6 +119,18 @@ function array_get_list($array, $path)
 function is_associative($array)
 {
     return $array !== array_values($array);
+}
+
+/**
+ * Verifies whether input is array or arrays or not
+ *
+ * @param array $array
+ *
+ * @return boolean
+ */
+function is_multidimensional(array $array): bool
+{
+    return is_array(Arr::first($array));
 }
 
 /**
@@ -231,7 +245,6 @@ function fPutQuotedCsv($handle, $row, $fd = ',', $quot = '"')
 
     return strlen($str);
 }
-
 
 function clear_folder($path)
 {
