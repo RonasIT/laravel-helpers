@@ -18,7 +18,7 @@ interface ExporterInterface
      *
      * @param $fileName string
      */
-    public function setFileName($fileName);
+    public function setFileName(string $fileName);
 
     /**
      * Set exporting format
@@ -26,7 +26,7 @@ interface ExporterInterface
      * @param $type string should be one of presented here https://docs.laravel-excel.com/3.0/exports/export-formats.html
      * @return $this
      */
-    public function setType($type);
+    public function setType(string $type);
 }
 
 

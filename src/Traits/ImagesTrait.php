@@ -35,7 +35,7 @@ trait ImagesTrait
         return config('defaults.upload.prod');
     }
 
-    protected function uploadPath($folder)
+    protected function uploadPath($folder): string
     {
         return "{$this->getUploadFolder()}/{$folder}";
     }

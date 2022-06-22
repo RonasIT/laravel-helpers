@@ -2,6 +2,9 @@
 
 namespace RonasIT\Support\Interfaces;
 
+/**
+ * @deprecated Use SwaggerDriverInterface instead https://github.com/RonasIT/laravel-swagger/blob/master/src/Interfaces/SwaggerDriverInterface.php
+ */
 interface DataCollectorInterface
 {
     /**

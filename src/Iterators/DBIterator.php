@@ -42,17 +42,17 @@ class DBIterator implements Iterator
         }
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return !($this->isLastSample() && $this->isEndOfSample());
     }
 
-    public function isEndOfSample()
+    public function isEndOfSample(): bool
     {
         return $this->position >= count($this->sample['data']);
     }
 
-    public function isLastSample()
+    public function isLastSample(): bool
     {
         return $this->sample['current_page'] >= $this->sample['last_page'];
     }

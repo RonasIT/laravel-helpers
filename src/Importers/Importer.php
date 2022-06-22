@@ -16,6 +16,7 @@ class Importer
 
     const CREATED_REPORTS = 'created';
     const UPDATED_REPORTS = 'updated';
+    const ERRORS_REPORTS = 'errors';
 
     protected $input;
 
@@ -33,7 +34,7 @@ class Importer
     protected $report = [
         self::UPDATED_REPORTS => 0,
         self::CREATED_REPORTS => 0,
-        'errors' => []
+        self::ERRORS_REPORTS => []
     ];
 
     public function setInput($input)
@@ -57,7 +58,7 @@ class Importer
         return $this;
     }
 
-    public function import()
+    public function import(): array
     {
         $this->prepare();
 
@@ -111,7 +112,7 @@ class Importer
         $this->updateAllMarked();
     }
 
-    protected function prepareFields($line)
+    protected function prepareFields($line): array
     {
         return array_map(function ($field) {
             $field = strtolower($field);
@@ -142,7 +143,7 @@ class Importer
         $this->items[self::ITEMS_TO_CREATE][] = $line;
     }
 
-    protected function isValidForCreation($line)
+    protected function isValidForCreation($line): bool
     {
         if (empty($line['id'])) {
             return true;
@@ -158,7 +159,7 @@ class Importer
         }
     }
 
-    protected function isValidForUpdating($line)
+    protected function isValidForUpdating($line): bool
     {
         if (empty($line['id']) || in_array($line, $this->items[self::ITEMS_TO_UPDATE])) {
             return false;
@@ -174,22 +175,20 @@ class Importer
         $this->report['errors'][] = $this->formatError($error);
     }
 
-    protected function formatError($error)
+    protected function formatError($error): string
     {
         $lineNumber = $this->iterator->key() + 1;
 
         return "Line {$lineNumber}: {$error}";
     }
 
-    protected function validateDuplicatingOfId($item)
+    protected function validateDuplicatingOfId($item): bool
     {
         if (empty($item['id'])) {
             return false;
         }
 
-        return $this->service->withTrashed()->exists([
-            'id' => $item['id']
-        ]);
+        return $this->service->withTrashed()->exists(['id' => $item['id']]);
     }
 
     protected function createAllMarked()

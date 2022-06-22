@@ -13,10 +13,7 @@ trait FilesTestTrait
 
     public function checkFile($uploadedFileName, $fixturePath)
     {
-        return $this->assertEquals(
-            $this->getFixture($fixturePath),
-            Storage::get($uploadedFileName)
-        );
+        return $this->assertEqualsFixture($fixturePath, Storage::get($uploadedFileName));
     }
 
     public function clearFolder()

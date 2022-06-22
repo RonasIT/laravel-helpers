@@ -6,7 +6,7 @@
 ## EntityService
 
 The base class for service classes related to database entities. It allows to use pseudo inheritance
-between the service class and related repository class;
+between the service class and related repository class.
 
 ### setRepository($repository)
 
@@ -25,44 +25,24 @@ Features:
 
 Method to send `GET` request to $url.
 
-- $url - string, target url;
-- $data - array with get parameters; 
-- $headers - array with headers;
-
 Return response.
 
-### sendPost
+### sendPost($url, $data, $headers)
 
-Method send POST query to $url.
-- $url - string, target url;
-- $data - array with body parameters; 
-- $headers - array with headers;
+Method to send `POST` request to $url.
 
-Return response.
+### sendDelete($url, $headers)
 
-don't forget to set content-type/application-json header if you want that $data will send as json
+Method to send `DELETE` request to $url.
 
-### sendDelete
+### sendPut($url, $data, $headers)
 
-Method send DELETE query to $url.
-- $url - string, target url;
-- $headers - array with headers;
-
-Return response.
-
-### sendPut 
-
-Method send PUT query to $url.
-- $url - string, target url;
-- $data - array with body parameters; 
-- $headers - array with headers;
-
-Return response.
+Method to send `PUT` request to $url.
 
 ### parseJsonResponse($response)
 
 Get response data and parse it to associative array.
-- $response - response object from sendGet/sendPost/sendDelete/sendDelete functions;
+- $response - response object received from the `sendGet`/`sendPost`/`sendDelete`/`sendDelete` methods.
 
 ### saveCookieSession()
 

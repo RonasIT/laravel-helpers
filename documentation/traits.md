@@ -9,13 +9,27 @@ Provides CRUD-based methods to work with database-related entities.
 
 ## FixturesTrait
 
-This trait is designed to make testing understandable and cleaner.
-All auxiliary data such as the results of the operation can be placed in a way corresponding 
-to the following mask **base_path("tests/fixtures/{$testClassName}/{$fixture}")**, 
-and is easily obtained by the method *$this->getFixture($fixture)* or through *$this->getJsonFixture($fixture)*, 
-in which will be performed automatically decode json-data.
-Also you can tune your TestCase for restore dump of database witch will be places in 
-**base_path("tests/fixtures/{$testClassName}/dump.sql")** and method for comfortable getting of Json-responses
+Is a powerful tool which make testing process understandable and cleaner. 
+
+### Fixtures
+
+All additional data such as the results of the operation or input data can be
+presented via `.json` files and grouped by the test case name in the path
+`/tests/fixtures/{$testClassName}`.
+
+The most common fixtures helpers presented below:
+- `getFixture($fn, $failIfNotExists = true)`
+- `getJsonFixture($fn, $assoc = true)`
+- `assertEqualsFixture($fixture, $data, bool $exportMode = false)`
+- `exportJson($fixture, $data)`
+- `exportContent($content, $fixture)`
+- `exportFile($response, $fixture)`
+
+### DB prefilling
+
+ Trait also provides an ability to use the same initial database state before
+each test running. Testing database will be automatically cleared in the `setUp`
+method and restore from the `/tests/fixtures/{$testClassName}/dump.sql` file.
 
 ## MockHttpRequestTrait
 

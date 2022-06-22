@@ -11,8 +11,8 @@ class AddDefaultUser extends Migration
     {
         if (config('app.env') != 'testing') {
             User::create([
-                'name'     => '{{$name}}',
-                'email'    => '{{$email}}',
+                'name' => '{{$name}}',
+                'email' => '{{$email}}',
                 'password' => bcrypt('{{$password}}'),
                 'role_id' => RoleRepository::ADMIN_ROLE
             ]);
@@ -21,7 +21,7 @@ class AddDefaultUser extends Migration
 
     public function down()
     {
-        if (config('app.env') != 'testing') {
+        if (config('app.env') !== 'testing') {
             User::where('email', '{{$email}}')->delete();
         }
     }

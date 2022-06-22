@@ -6,6 +6,9 @@ use RonasIT\Support\Services\HttpRequestService;
 use GuzzleHttp\ClientInterface;
 use Mockery;
 
+/**
+ * @deprecated
+ */
 trait MockHttpRequestTrait
 {
     public function setResponse($response, $http = null)

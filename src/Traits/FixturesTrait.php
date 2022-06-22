@@ -66,7 +66,7 @@ trait FixturesTrait
         DB::unprepared($dump);
     }
 
-    public function getFixturePath($fn)
+    public function getFixturePath($fn): string
     {
         $class = get_class($this);
         $explodedClass = explode('\\', $class);
@@ -95,6 +95,9 @@ trait FixturesTrait
         return json_decode($this->getFixture($fn), $assoc);
     }
 
+    /**
+     * @deprecated actual only for Laravel 5.3 and lower
+     */
     public function getJsonResponse()
     {
         $response = $this->response->getContent();
@@ -112,9 +115,7 @@ trait FixturesTrait
     }
 
     /**
-     * This method is actual only for Laravel 5.3 and lower
-     *
-     * @deprecated
+     * @deprecated actual only for Laravel 5.3 and lower
      */
     public function exportJsonResponse($fixture)
     {
@@ -153,7 +154,7 @@ trait FixturesTrait
         }
     }
 
-    public function getClearPsqlDatabaseQuery($tables, $except = ['migrations'])
+    public function getClearPsqlDatabaseQuery($tables, $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
             if (in_array($table, $except)) {
@@ -164,7 +165,7 @@ trait FixturesTrait
         });
     }
 
-    public function getClearMySQLDatabaseQuery($tables, $except = ['migrations'])
+    public function getClearMySQLDatabaseQuery($tables, $except = ['migrations']): string
     {
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 

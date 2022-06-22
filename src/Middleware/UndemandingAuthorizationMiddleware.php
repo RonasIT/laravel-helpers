@@ -4,6 +4,7 @@ namespace RonasIT\Support\Middleware;
 
 use Closure;
 use Tymon\JWTAuth\JWTAuth;
+use Illuminate\Http\Request;
 use Illuminate\Events\Dispatcher;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Middleware\BaseMiddleware;
@@ -34,8 +35,8 @@ class UndemandingAuthorizationMiddleware extends BaseMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param  Request $request
+     * @param  Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)

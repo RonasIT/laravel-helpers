@@ -30,12 +30,16 @@ Old syntax:
 
 ```php
 $userRepository->firstWithRelations(['id' => 1], ['role']);
+$userRepository->find(1, ['role']);
+$userRepository->findBy('id', 1, ['role']);
 ```
 
 New syntax:
 
 ```php
 $userRepository->withRelations(['role'])->first(['id' => 1]);
+$userRepository->withRelations(['role'])->find(1);
+$userRepository->withRelations(['role'])->findBy('id', 1);
 ```
 
 #### update and updateMany method
@@ -58,50 +62,20 @@ The first argument will be interpreted as a primary key condition if it has non 
 $this->userRepository->update(1, ['is_active' => false]);
 ```
 
-Method firstOrCreate: now is accepting 2 parameters.
+#### firstOrCreate method
 
-Before:
+Now is accepting 2 parameters.
+
+Old syntax:
 
 ```php
-$repository->firstOrCreate([
-    'name' = 'Jon'
-]);
+$repository->firstOrCreate(['name' = 'Jon', 'email' => 'john@mail.com']);
 ```
 
-After:
+New syntax:
 
 ```php
-$repository->firstOrCreate([
-    'id' => 5
-], [
-    'name' => 'Jon'
-]);
-```
-
-Methods `find` and `findBy` don't contains relations in arguments.
-
-Before:
-
-```php
-$this->find(1, ['relation']);
-``` 
-
-After:
-
-```php
-$this->withRelations(['relation'])->find(1);
-```
-
-Before:
-
-```php
-$this->findBy('email', 'test@test.com', ['relation']);
-``` 
-
-After:
-
-```php
-$this->withRelations(['relation'])->findBy('email', 'test@test.com');
+$repository->firstOrCreate(['email' => 'john@mail.com'], ['name' = 'Jon']);
 ```
 
 ### FilesUploadTrait 
@@ -110,44 +84,50 @@ This class is now used to upload files, all other classes is now @deprecated.
 
 ### FixturesTrait
 
-jsonExport now have jsonExport($fixture, $data) call. 
+#### exportJson
 
-Before:
+Changed arguments order
+
+Old syntax:
 
 ```php
 $this->exportJson($data, $fixture);
 ```
 
-After:
+New syntax:
 
 ```php
-$this->exportJson($fixture, $data)
+$this->exportJson($fixture, $data);
 ```
 
 ### SearchTrait
 
-Added new methods: filterMoreOrEqualThan and filterLessOrEqualThan.
+#### filterMoreOrEqualThan and filterLessOrEqualThan
 
-getSearchResults now will always return all responses in one format
+Filtering records by more/less or equals to the filter value.
+
+#### All flag
+
+After applying `all` filter - results will be return with the pagination wrapper.
 
 ```json
 {
     "current_page": 1,
-    "data": [...],
+    "data": [],
     "first_page_url": "https:\/\/localhost\/\/entities?page=1",
     "from": 1,
     "last_page": 1,
     "last_page_url": "https:\/\/localhost\/\/entities?page=1",
     "next_page_url": null,
     "path": "https:\/\/localhost\/\/entities",
-    "per_page": 10,
+    "per_page": 921,
     "prev_page_url": null,
     "to": 1,
-    "total": 1
+    "total": 921
 }
 ```
 
-If you'll send flag `all` then you will get all entities in field `data` and field `per_page` will equal to field `total`
+`per_page` field will be equal to the `total` field in this case.
 
 ### Others
 

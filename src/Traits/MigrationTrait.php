@@ -2,9 +2,9 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 trait MigrationTrait
 {
@@ -19,7 +19,8 @@ trait MigrationTrait
                     $table->unsignedInteger($fieldName);
                 }
 
-                $table->foreign($fieldName)
+                $table
+                    ->foreign($fieldName)
                     ->references('id')
                     ->on($this->getTableName($toEntity))
                     ->onDelete($onDelete);
@@ -64,7 +65,7 @@ trait MigrationTrait
         Schema::drop($bridgeTableName);
     }
 
-    protected function getBridgeTable($fromEntity, $toEntity)
+    protected function getBridgeTable($fromEntity, $toEntity): string
     {
         $entities = [Str::snake($fromEntity), Str::snake($toEntity)];
         sort($entities, SORT_STRING);
@@ -72,7 +73,7 @@ trait MigrationTrait
         return implode('_', $entities);
     }
 
-    protected function getTableName($entityName)
+    protected function getTableName($entityName): string
     {
         if (Schema::hasTable($entityName)) {
             return $entityName;
