@@ -17,7 +17,7 @@ All additional data such as the results of the operation or input data can be
 presented via `.json` files and grouped by the test case name in the path
 `/tests/fixtures/{$testClassName}`.
 
-The most common fixtures helpers presented below:
+The main fixture helpers are following:
 - `getFixture($fn, $failIfNotExists = true)`
 - `getJsonFixture($fn, $assoc = true)`
 - `assertEqualsFixture($fixture, $data, bool $exportMode = false)`
