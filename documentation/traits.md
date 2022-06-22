@@ -9,7 +9,7 @@ Provides CRUD-based methods to work with database-related entities.
 
 ## FixturesTrait
 
-Is a powerful tool which make testing process understandable and cleaner. 
+This is a powerful tool which makes testing process understandable and cleaner.
 
 ### Fixtures
 
