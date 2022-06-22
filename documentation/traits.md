@@ -29,7 +29,7 @@ The most common fixtures helpers presented below:
 
  Trait also provides an ability to use the same initial database state before
 each test running. Testing database will be automatically cleared in the `setUp`
-method and restore from the `/tests/fixtures/{$testClassName}/dump.sql` file.
+method and restored from the `/tests/fixtures/{$testClassName}/dump.sql` file.
 
 ## MockHttpRequestTrait
 
