@@ -63,7 +63,7 @@ class BaseRequest extends FormRequest
         return $result;
     }
 
-    protected function processNestedRule($validatedKeys, $validatedItem)
+    protected function processNestedRule($validatedKeys, $validatedItem): array
     {
         if ($this->isNotNestedRule($validatedKeys)) {
             return $validatedItem;
@@ -74,7 +74,7 @@ class BaseRequest extends FormRequest
         }, $validatedItem);
     }
 
-    protected function isNotNestedRule($validatedKeys)
+    protected function isNotNestedRule($validatedKeys): bool
     {
         return is_integer($validatedKeys);
     }

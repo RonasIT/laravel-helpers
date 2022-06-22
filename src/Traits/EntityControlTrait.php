@@ -221,7 +221,7 @@ trait EntityControlTrait
             return $updatedRowsCount;
         }
 
-        return $this->getByList($unUpdatedIds);
+        return $this->getByList($idsToUpdate);
     }
 
     /**

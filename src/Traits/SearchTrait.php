@@ -2,13 +2,13 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Foundation\Application;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Foundation\Application;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder as Query;
 
 /**
  * @property Query query
@@ -302,9 +302,7 @@ trait SearchTrait
         if (!is_array($where)) {
             $field = (empty($field)) ? $this->primaryKey : $field;
 
-            $where = [
-                $field => $where
-            ];
+            $where = [$field => $where];
         }
 
         foreach ($where as $field => $value) {

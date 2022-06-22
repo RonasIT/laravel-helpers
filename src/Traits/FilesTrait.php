@@ -31,7 +31,7 @@ trait FilesTrait
         Storage::delete($name);
     }
 
-    protected function prepareName($name)
+    protected function prepareName($name): string
     {
         $explodedName = explode('.', $name);
         $extension = array_pop($explodedName);

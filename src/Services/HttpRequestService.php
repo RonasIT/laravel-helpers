@@ -23,7 +23,7 @@ class HttpRequestService
         $this->debug = config('defaults.http_service_debug', false);
     }
 
-    public function set($key, $value)
+    public function set($key, $value): self
     {
         $this->options[$key] = $value;
 
@@ -37,14 +37,14 @@ class HttpRequestService
         return json_decode($stringResponse, true);
     }
 
-    public function saveCookieSession()
+    public function saveCookieSession(): self
     {
         $this->cookies = app(CookieJar::class);
 
         return $this;
     }
 
-    public function getCookie()
+    public function getCookie(): array
     {
         if (empty($this->cookies)) {
             return [];
@@ -53,14 +53,14 @@ class HttpRequestService
         return $this->cookies->toArray();
     }
 
-    public function allowRedirects($value = true)
+    public function allowRedirects($value = true): self
     {
         $this->allowRedirects = $value;
 
         return $this;
     }
 
-    public function setConnectTimeout($seconds = 0)
+    public function setConnectTimeout($seconds = 0): self
     {
         $this->connectTimeout = $seconds;
 

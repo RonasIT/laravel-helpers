@@ -51,8 +51,8 @@ class AuthWithRefresh extends GetUserFromToken
     /**
      * Refresh token
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param  Request $request
+     * @param  Closure $next
      * @return mixed
      * @throws JWTException
      */

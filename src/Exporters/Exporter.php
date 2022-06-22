@@ -36,7 +36,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
         $this->disk = $disk;
     }
 
-    public function setFileName($fileName): self
+    public function setFileName(string $fileName): self
     {
         $this->fileName = $fileName;
 
@@ -48,7 +48,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
      *
      * @return $this
      */
-    public function setType($type): self
+    public function setType(string $type): self
     {
         $this->type = $type;
 

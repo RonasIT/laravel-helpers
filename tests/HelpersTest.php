@@ -45,7 +45,7 @@ class HelpersTest extends HelpersTestCase
                 'array' => 'areas.json',
                 'key' => 'zips.*.area.houses.*.number',
                 'expected' => 'areas.houses.json'
-            ],
+            ]
         ];
     }
 
@@ -62,8 +62,6 @@ class HelpersTest extends HelpersTestCase
 
         $result = array_get_list($input, $key);
 
-        $this->assertEquals(
-            $this->getJsonFixture($expected), $result
-        );
+        $this->assertEqualsFixture($expected, $result);
     }
 }

@@ -49,7 +49,7 @@ trait ModelTrait
         return parent::toArray();
     }
 
-    public function getAllFieldsWithTable()
+    public function getAllFieldsWithTable(): array
     {
         $tableName = $this->getTable();
         $fields = Schema::getColumnListing($tableName);
@@ -144,14 +144,12 @@ trait ModelTrait
         });
     }
 
-    protected function prepareRelations($relations)
+    protected function prepareRelations($relations): array
     {
         if (Str::contains($relations, '.')) {
             return explode('.', $relations);
         } else {
-            return [
-                $relations
-            ];
+            return [$relations];
         }
     }
 

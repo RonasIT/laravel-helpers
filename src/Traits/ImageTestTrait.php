@@ -61,7 +61,7 @@ trait ImageTestTrait
         );
     }
 
-    protected function getImageRoute($imagePath)
+    protected function getImageRoute($imagePath): string
     {
         $route = config('imagecache.route');
         $templates = config('imagecache.templates');

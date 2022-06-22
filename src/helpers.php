@@ -108,15 +108,27 @@ function array_get_list($array, $path)
 }
 
 /**
- * Verifies whether an associative array or a list
+ * Verifies whether input `$array` is an associative array or a list
  *
  * @param array $array
  *
  * @return boolean
  */
-function is_associative($array)
+function is_associative($array): bool
 {
     return $array !== array_values($array);
+}
+
+/**
+ * Verifies whether input is array or arrays or not
+ *
+ * @param array $array
+ *
+ * @return boolean
+ */
+function is_multidimensional(array $array): bool
+{
+    return is_array(Arr::first($array));
 }
 
 /**
@@ -194,7 +206,7 @@ function getGUID()
         . chr(125);// "}"
 }
 
-function array_concat($array, $callback)
+function array_concat($array, $callback): string
 {
     $content = '';
 
@@ -231,7 +243,6 @@ function fPutQuotedCsv($handle, $row, $fd = ',', $quot = '"')
 
     return strlen($str);
 }
-
 
 function clear_folder($path)
 {

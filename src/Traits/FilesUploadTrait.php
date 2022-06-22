@@ -10,12 +10,13 @@ trait FilesUploadTrait
     protected function saveFile($fileName, $content, $returnUrl = false)
     {
         $preparedName = $this->generateName($fileName);
+
         Storage::put($preparedName, $content);
 
         return $returnUrl ? Storage::url($preparedName) : Storage::path($preparedName);
     }
 
-    protected function checkUploadedFile($path)
+    protected function checkUploadedFile($path): bool
     {
         return Storage::exists($path);
     }
@@ -34,7 +35,7 @@ trait FilesUploadTrait
         }
     }
 
-    protected function generateName($path)
+    protected function generateName($path): string
     {
         $name = basename($path);
         $explodedName = explode('.', $name);

@@ -145,30 +145,30 @@ Generate GUID
 
 ### array_concat($array, $callback)
 
-Concat results of callback call. Array should be array of strings. Arguments of callback are `$value`, `$key`
+Concat results of callback call. The first `$array` argument should be an array of strings.
 
 ```php
-    >>> $array = ['some', 'random', 'values'];
-    >>> $result = array_concat($array, function ($value, $key) {
-            return "{$key}. {$value}\n";
-        });
-    => """
-       0. some\n
-       1. random\n
-       2. values\n
-       """
-````
+$array = ['some', 'random', 'values'];
+$result = array_concat($array, function ($value, $key) {
+    return "{$key}. {$value}\n";
+});
+/**
+ 0. some
+ 1. random
+ 2. values
+*/ 
+```
 
 ### clear_folder($path)
 
-Remove all files and folders from `$path`
+Remove all files and folders from `$path`.
 
 ### array_associate($array, $callback)
 
-Builds an associative array by gotten keys and values. Arguments of callback id `$value`, `$key`
+Builds an associative array by gotten keys and values.
 
 ```php
->>> $array = [
+$array = [
     [
         'id' => 1,
         'value' => 'first'
@@ -183,97 +183,101 @@ Builds an associative array by gotten keys and values. Arguments of callback id 
     ]
 ];
 
->>> $result = array_associate($array, function($value) {
+$result = array_associate($array, function($value) {
     return [
         'key' => $value['id'],
         'value' => $value['value']
     ];
 });
-=> [
-     1 => "first",
-     2 => "second",
-     3 => "third",
-   ]
-````
+
+//[1 => 'first', 2 => 'second', 3 => 'third']
+```
 
 ### array_duplicate($array)
 
-Return duplicated values of array
+Return duplicated values of input `$array`.
 
 ```php
->>> $array = [1, 2, 2, 3];
->>> array_duplicate($array);
-=> [
-     2 => 2,
-   ]
-````
+$array = [1, 2, 2, 3];
+array_duplicate($array);
+
+//[2 => 2]
+```
 
 ### array_unique_object($objectsList, $key = 'id')
 
-Return unique objects from array by field
+Return unique objects from array by field.
 
 ```php
->> $array = [
-     [
-       "id" => 1,
-       "value" => "first",
-     ],
-     [
-       "id" => 2,
-       "value" => "second",
-     ],
-     [
-       "id" => 2,
-       "value" => "second",
-     ],
-     [
-       "id" => 3,
-       "value" => "third",
-     ],
-   ]
->>> $result = array_unique_object($array)
-=> [
-     0 => [
-       "id" => 1,
-       "value" => "first",
-     ],
-     1 => [
-       "id" => 2,
-       "value" => "second",
-     ],
-     3 => [
-       "id" => 3,
-       "value" => "third",
-     ],
-   ]
+$array = [
+    [
+        'id' => 1,
+        'value' => 'first'
+    ],
+    [
+        'id' => 2,
+        'value' => 'second'
+    ],
+    [
+        'id' => 2,
+        'value' => 'second'
+    ],
+    [
+        'id' => 3,
+        'value' => 'third'
+    ]
+];
+
+$result = array_unique_object($array);
+
+/**
+[
+    0 => [
+        'id' => 1,
+        'value' => 'first'
+    ],
+    1 => [
+        'id' => 2,
+        'value' => 'second'
+    ],
+    3 => [
+        'id' => 3,
+        'value' => 'third'
+    ]
+]
+*/ 
 ````
 
 ### array_undot($array)
 
-inverse transformation from array_dot
+Inverse transformation from `array_dot`.
 
 ```php
->>> $array = [
+$array = [
     'some.nested.value' => 1,
     'some.array.0.value' => 2,
     'some.array.1.value' => 3
 ];
->>> array_undot($array)
-=> [
-     "some" => [
-       "nested" => [
-         "value" => 1,
-       ],
-       "array" => [
-         [
-           "value" => 2,
-         ],
-         [
-           "value" => 3,
-         ],
-       ],
-     ],
-   ]
+
+array_undot($array);
+
+/**
+[
+    'some' => [
+        'nested' => [
+            'value' => 1
+        ],
+        'array' => [
+            [
+                'value' => 2
+            ],
+            [
+                'value' => 3
+            ]
+        ]
+    ]
+]
+*/ 
 ````
 
 [<< Readme][1]
