@@ -82,14 +82,14 @@ trait SearchTrait
 
     public function searchQuery(array $filter): self
     {
-        $this->filterList($filter);
+        $this->processFilterList($filter);
 
         $this->filter = $filter;
 
         return $this;
     }
 
-    public function filterList(array $filter)
+    public function processFilterList(array $filter)
     {
         if (!empty($filter['with_trashed'])) {
             $this->withTrashed();
