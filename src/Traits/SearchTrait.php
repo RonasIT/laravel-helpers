@@ -49,7 +49,11 @@ trait SearchTrait
         }
 
         if (Arr::has($this->filter, $filterName)) {
-            $this->addWhere($this->query, $field, $this->filter[$filterName]);
+            $values = Arr::wrap($this->filter[$filterName]);
+
+            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($values) {
+                $query->whereIn($conditionField, $values);
+            });
         }
 
         return $this;
@@ -220,17 +224,6 @@ trait SearchTrait
 
             $query->orWhere($field, 'like', "%{$loweredQuery}%");
         };
-    }
-
-    public function filterByList(string $field, string $filterName): self
-    {
-        if (Arr::has($this->filter, $filterName)) {
-            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
-                $query->whereIn($conditionField, $this->filter[$filterName]);
-            });
-        }
-
-        return $this;
     }
 
     public function filterFrom(string $field, bool $strict = true, ?string $filterName = null): self
