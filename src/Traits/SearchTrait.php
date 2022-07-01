@@ -82,15 +82,23 @@ trait SearchTrait
 
     public function searchQuery(array $filter): self
     {
-        if (!empty($filter['with_trashed'])) {
-            $this->withTrashed();
-        }
-
-        $this->query = $this->getQuery();
+        $this->filterList($filter);
 
         $this->filter = $filter;
 
         return $this;
+    }
+
+    public function filterList(array $filter)
+    {
+        if (!empty($filter['with_trashed'])) {
+            $this->withTrashed();
+        }
+
+        $this->query = $this
+            ->with(Arr::get($filter, 'with', []))
+            ->withCount(Arr::get($filter, 'with_count', []))
+            ->getQuery();
     }
 
     public function getSearchResults(): LengthAwarePaginator
