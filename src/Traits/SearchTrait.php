@@ -82,6 +82,8 @@ trait SearchTrait
             $this->withTrashed();
         }
 
+        $this->query = $this->getQuery();
+
         $this->filter = $filter;
 
         if (!empty($this->filter)) {
