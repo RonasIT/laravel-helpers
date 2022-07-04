@@ -82,11 +82,6 @@ trait SearchTrait
             $this->withTrashed();
         }
 
-        $this->query = $this
-            ->with(Arr::get($filter, 'with', []))
-            ->withCount(Arr::get($filter, 'with_count', []))
-            ->getQuery();
-
         $this->filter = $filter;
 
         if (!empty($this->filter)) {
