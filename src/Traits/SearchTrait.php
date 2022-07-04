@@ -23,6 +23,25 @@ trait SearchTrait
     protected $attachedRelations = [];
     protected $attachedRelationsCount = [];
 
+    protected $reservedFilters  = [
+        'with',
+        'with_count',
+        'with_trashed',
+        'query',
+        'order_by',
+        'all',
+        'per_page',
+        'page',
+        'desc',
+        'from',
+        'to'
+    ];
+
+    protected $listPostfixs = [
+        '_in_list',
+        '_not_in_list'
+    ];
+
     public function paginate(): LengthAwarePaginator
     {
         $defaultPerPage = config('defaults.items_per_page');
@@ -30,33 +49,6 @@ trait SearchTrait
         $page = Arr::get($this->filter, 'page', 1);
 
         return $this->query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    /**
-     * @param $field string filtered field, you can pass field name with dots to filter by field of relation
-     * @param $filterName string|null key from filters which contains filter value
-     *
-     * @return self
-     */
-    public function filterBy(string $field, ?string $filterName = null): self
-    {
-        if (empty($filterName)) {
-            if (Str::contains($field, '.')) {
-                list ($filterName) = extract_last_part($field);
-            } else {
-                $filterName = $field;
-            }
-        }
-
-        if (Arr::has($this->filter, $filterName)) {
-            $values = Arr::wrap($this->filter[$filterName]);
-
-            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($values) {
-                $query->whereIn($conditionField, $values);
-            });
-        }
-
-        return $this;
     }
 
     public function filterByQuery(array $fields): self
@@ -90,11 +82,45 @@ trait SearchTrait
             $this->withTrashed();
         }
 
-        $this->query = $this->getQuery();
+        $this->query = $this
+            ->with(Arr::get($filter, 'with', []))
+            ->withCount(Arr::get($filter, 'with_count', []))
+            ->getQuery();
 
         $this->filter = $filter;
 
+        if (!empty($this->filter)) {
+            foreach ($this->filter as $field => $values) {
+                if (!in_array($field, $this->reservedFilters) && is_array($values) || !in_array($field, $this->reservedFilters) && is_string($values)) {
+                    $notInList = strpos($field, $this->listPostfixs[1]);
+
+                    if ($notInList) {
+                        $this->filter($this->listPostfixs[1], 'whereNotIn', $field, $values);
+                    } else {
+                        $this->filter($this->listPostfixs[0], 'whereIn', $field, $values);
+                    }
+                }
+            }
+        }
+
         return $this;
+    }
+
+    protected function filter($postfix, $where, $field, $values)
+    {
+        $fieldWithoutPostfix = Str::replace($postfix, '', $field);
+
+        if (!is_array($values) || !Arr::isAssoc($values)) {
+            $this->query->{$where}($fieldWithoutPostfix, Arr::wrap($values));
+        } else {
+            foreach ($values as $relationFiled => $value) {
+                $fieldWithRelation = $fieldWithoutPostfix . '.' . $relationFiled;
+            }
+
+            $this->applyWhereCallback($this->query, $fieldWithRelation, function (&$query, $conditionField) use ($value, $where) {
+                $query->{$where}($conditionField, Arr::wrap($value));
+            });
+        }
     }
 
     public function getSearchResults(): LengthAwarePaginator
