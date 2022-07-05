@@ -29,6 +29,8 @@ abstract class TestCase extends BaseTest
         'fixture'
     ];
 
+    protected $globalExportMode = false;
+
     public function setUp(): void
     {
         parent::setUp();

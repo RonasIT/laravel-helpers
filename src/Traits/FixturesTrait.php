@@ -95,9 +95,13 @@ trait FixturesTrait
         return json_decode($this->getFixture($fixtureName), $assoc);
     }
 
-    public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
+    public function assertEqualsFixture(string $fixture, $data, $exportMode = false): void
     {
-        if ($exportMode) {
+        if ($exportMode === null) {
+            $exportMode = $this->globalExportMode;
+        }
+
+        if ($exportMode === true) {
             $this->exportJson($fixture, $data);
         }
 
