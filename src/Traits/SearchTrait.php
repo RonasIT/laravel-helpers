@@ -86,16 +86,21 @@ trait SearchTrait
 
         $this->filter = $filter;
 
-        if (!empty($this->filter)) {
-            foreach ($this->filter as $field => $values) {
-                if (!in_array($field, $this->reservedFilters) && is_array($values) || !in_array($field, $this->reservedFilters) && is_string($values)) {
-                    $notInList = strpos($field, $this->listPostfixs[1]);
-
-                    if ($notInList) {
-                        $this->filter($this->listPostfixs[1], 'whereNotIn', $field, $values);
-                    } else {
-                        $this->filter($this->listPostfixs[0], 'whereIn', $field, $values);
-                    }
+        if (!empty($filter)) {
+            foreach($filter as $fieldName => $value) {
+                $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters) && (is_array($value) || is_string($value)));
+                if ($isNotReservedFilter || Str::endWith($fieldName, '_in_list')) {
+                    $field = Str::replace($fieldName, '_in_list', '');
+                    $this->filterBy($field, $value);
+                } elseif (Str::endWith($fieldName, '_not_in_list')) {
+                    $field = Str::replace($fieldName, '_not_in_list', '');
+                    $this->query->whereNotIn($field, $value);
+                } elseif (Str::endWith($fieldName, '_from')) {
+                    $field = Str::replace($fieldName, '_from', '');
+                    $this->filterFrom($field, $value);
+                } elseif (Str::endWith($fieldName, '_to')) {
+                    $field = Str::replace($fieldName, '_to', '');
+                    $this->filterTo($field, $value);
                 }
             }
         }
@@ -103,22 +108,22 @@ trait SearchTrait
         return $this;
     }
 
-    protected function filter($postfix, $where, $field, $values)
-    {
-        $fieldWithoutPostfix = Str::replace($postfix, '', $field);
-
-        if (!is_array($values) || !Arr::isAssoc($values)) {
-            $this->query->{$where}($fieldWithoutPostfix, Arr::wrap($values));
-        } else {
-            foreach ($values as $relationFiled => $value) {
-                $fieldWithRelation = $fieldWithoutPostfix . '.' . $relationFiled;
-            }
-
-            $this->applyWhereCallback($this->query, $fieldWithRelation, function (&$query, $conditionField) use ($value, $where) {
-                $query->{$where}($conditionField, Arr::wrap($value));
-            });
-        }
-    }
+//    protected function filter($postfix, $where, $field, $values)
+//    {
+//        $fieldWithoutPostfix = Str::replace($postfix, '', $field);
+//
+//        if (!is_array($values) || !Arr::isAssoc($values)) {
+//            $this->query->{$where}($fieldWithoutPostfix, Arr::wrap($values));
+//        } else {
+//            foreach ($values as $relationFiled => $value) {
+//                $fieldWithRelation = $fieldWithoutPostfix . '.' . $relationFiled;
+//            }
+//
+//            $this->applyWhereCallback($this->query, $fieldWithRelation, function (&$query, $conditionField) use ($value, $where) {
+//                $query->{$where}($conditionField, Arr::wrap($value));
+//            });
+//        }
+//    }
 
     public function getSearchResults(): LengthAwarePaginator
     {
