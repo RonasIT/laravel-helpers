@@ -29,7 +29,12 @@ abstract class TestCase extends BaseTest
         'fixture'
     ];
 
-    protected $globalExportMode = false;
+    protected $globalExportMode;
+
+    protected function setGlobalExportMode(bool $value)
+    {
+        $this->globalExportMode = $value;
+    }
 
     public function setUp(): void
     {
