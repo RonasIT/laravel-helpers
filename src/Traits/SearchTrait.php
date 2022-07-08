@@ -96,7 +96,7 @@ trait SearchTrait
         return $this;
     }
 
-    public function searchQuery(array $filter): self
+    public function searchQuery(array $filter = []): self
     {
         if (!empty($filter['with_trashed'])) {
             $this->withTrashed();
@@ -109,28 +109,24 @@ trait SearchTrait
 
         $this->filter = $filter;
 
-        if (!empty($filter)) {
-            foreach($filter as $fieldName => $value) {
-                $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters));
+        foreach($filter as $fieldName => $value) {
+            $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters));
 
-                $isValidValue = (is_array($value) || is_string($value) || is_integer($value) || is_double($value) || is_bool($value));
-
-                if (Str::endsWith($fieldName, '_not_in_list') && $isValidValue) {
-                    $field = Str::replace('_not_in_list', '', $fieldName);
-                    $this->query->whereNotIn($field, $value);
-                } elseif (Str::endsWith($fieldName, '_from') && $isValidValue) {
-                    $field = Str::replace('_from', '', $fieldName);
-                    $this->filter[$field] = $value;
-                    $this->filterFrom($field, true, $field);
-                } elseif (Str::endsWith($fieldName, '_to') && $isValidValue) {
-                    $field = Str::replace('_to', '', $fieldName);
-                    $this->filter[$field] = $value;
-                    $this->filterTo($field, true, $field);
-                } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list') && $isValidValue) {
-                    $field = Str::replace('_in_list', '', $fieldName);
-                    $this->filter[$field] = $value;
-                    $this->filterBy($field);
-                }
+            if (Str::endsWith($fieldName, '_not_in_list')) {
+                $field = Str::replace('_not_in_list', '', $fieldName);
+                $this->query->whereNotIn($field, $value);
+            } elseif (Str::endsWith($fieldName, '_from')) {
+                $field = Str::replace('_from', '', $fieldName);
+                $this->filter[$field] = $value;
+                $this->filterFrom($field, true, $field);
+            } elseif (Str::endsWith($fieldName, '_to')) {
+                $field = Str::replace('_to', '', $fieldName);
+                $this->filter[$field] = $value;
+                $this->filterTo($field, true, $field);
+            } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list')) {
+                $field = Str::replace('_in_list', '', $fieldName);
+                $this->filter[$field] = $value;
+                $this->filterBy($field);
             }
         }
 
