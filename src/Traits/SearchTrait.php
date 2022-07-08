@@ -32,14 +32,7 @@ trait SearchTrait
         'all',
         'per_page',
         'page',
-        'desc',
-        'from',
-        'to'
-    ];
-
-    protected $listPostfixs = [
-        '_in_list',
-        '_not_in_list'
+        'desc'
     ];
 
     public function paginate(): LengthAwarePaginator
@@ -49,6 +42,33 @@ trait SearchTrait
         $page = Arr::get($this->filter, 'page', 1);
 
         return $this->query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * @param $field string filtered field, you can pass field name with dots to filter by field of relation
+     * @param $filterName string|null key from filters which contains filter value
+     *
+     * @return self
+     */
+    public function filterBy(string $field, ?string $filterName = null): self
+    {
+        if (empty($filterName)) {
+            if (Str::contains($field, '.')) {
+                list ($filterName) = extract_last_part($field);
+            } else {
+                $filterName = $field;
+            }
+        }
+
+        if (Arr::has($this->filter, $filterName)) {
+            $values = Arr::wrap($this->filter[$filterName]);
+
+            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($values) {
+                $query->whereIn($conditionField, $values);
+            });
+        }
+
+        return $this;
     }
 
     public function filterByQuery(array $fields): self
@@ -91,25 +111,33 @@ trait SearchTrait
 
         if (!empty($filter)) {
             foreach($filter as $fieldName => $value) {
-                $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters) && (is_array($value) || is_string($value)));
-                if ($isNotReservedFilter || Str::endWith($fieldName, '_in_list')) {
-                    $field = Str::replace($fieldName, '_in_list', '');
-                    $this->filterBy($field, $value);
-                } elseif (Str::endWith($fieldName, '_not_in_list')) {
-                    $field = Str::replace($fieldName, '_not_in_list', '');
+                $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters));
+
+                $isValidValue = (is_array($value) || is_string($value) || is_integer($value) || is_double($value) || is_bool($value));
+
+                if (Str::endsWith($fieldName, '_not_in_list') && $isValidValue) {
+                    $field = Str::replace('_not_in_list', '', $fieldName);
                     $this->query->whereNotIn($field, $value);
-                } elseif (Str::endWith($fieldName, '_from')) {
-                    $field = Str::replace($fieldName, '_from', '');
-                    $this->filterFrom($field, $value);
-                } elseif (Str::endWith($fieldName, '_to')) {
-                    $field = Str::replace($fieldName, '_to', '');
-                    $this->filterTo($field, $value);
+                } elseif (Str::endsWith($fieldName, '_from') && $isValidValue) {
+                    $field = Str::replace('_from', '', $fieldName);
+                    $this->filter[$field] = $value;
+                    $this->filterFrom($field, true, $field);
+                } elseif (Str::endsWith($fieldName, '_to') && $isValidValue) {
+                    $field = Str::replace('_to', '', $fieldName);
+                    $this->filter[$field] = $value;
+                    $this->filterTo($field, true, $field);
+                } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list') && $isValidValue) {
+                    $field = Str::replace('_in_list', '', $fieldName);
+                    $this->filter[$field] = $value;
+                    $this->filterBy($field);
                 }
             }
         }
 
         return $this;
     }
+
+
 
     public function getSearchResults(): LengthAwarePaginator
     {
