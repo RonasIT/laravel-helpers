@@ -108,23 +108,6 @@ trait SearchTrait
         return $this;
     }
 
-//    protected function filter($postfix, $where, $field, $values)
-//    {
-//        $fieldWithoutPostfix = Str::replace($postfix, '', $field);
-//
-//        if (!is_array($values) || !Arr::isAssoc($values)) {
-//            $this->query->{$where}($fieldWithoutPostfix, Arr::wrap($values));
-//        } else {
-//            foreach ($values as $relationFiled => $value) {
-//                $fieldWithRelation = $fieldWithoutPostfix . '.' . $relationFiled;
-//            }
-//
-//            $this->applyWhereCallback($this->query, $fieldWithRelation, function (&$query, $conditionField) use ($value, $where) {
-//                $query->{$where}($conditionField, Arr::wrap($value));
-//            });
-//        }
-//    }
-
     public function getSearchResults(): LengthAwarePaginator
     {
         $this->orderBy();
