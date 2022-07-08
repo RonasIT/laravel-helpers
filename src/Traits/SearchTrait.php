@@ -136,9 +136,7 @@ trait SearchTrait
 
         return $this;
     }
-
-
-
+    
     public function getSearchResults(): LengthAwarePaginator
     {
         $this->orderBy();
