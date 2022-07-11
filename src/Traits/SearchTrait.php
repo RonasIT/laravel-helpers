@@ -120,7 +120,6 @@ trait SearchTrait
                 $this->filterFrom($field, false, $fieldName);
             } elseif (Str::endsWith($fieldName, '_to')) {
                 $field = Str::replace('_to', '', $fieldName);
-                $this->filter[$field] = $value;
                 $this->filterTo($field, false, $fieldName);
             } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list')) {
                 $field = Str::replace('_in_list', '', $fieldName);
