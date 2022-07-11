@@ -117,15 +117,13 @@ trait SearchTrait
                 $this->query->whereNotIn($field, $value);
             } elseif (Str::endsWith($fieldName, '_from')) {
                 $field = Str::replace('_from', '', $fieldName);
-                $this->filter[$field] = $value;
-                $this->filterFrom($field, true, $field);
+                $this->filterFrom($field, false, $fieldName);
             } elseif (Str::endsWith($fieldName, '_to')) {
                 $field = Str::replace('_to', '', $fieldName);
                 $this->filter[$field] = $value;
-                $this->filterTo($field, true, $field);
+                $this->filterTo($field, false, $fieldName);
             } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list')) {
                 $field = Str::replace('_in_list', '', $fieldName);
-                $this->filter[$field] = $value;
                 $this->filterBy($field);
             }
         }
