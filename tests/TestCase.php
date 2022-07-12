@@ -111,7 +111,7 @@ abstract class TestCase extends BaseTest
         $emailChain = $this->prepareEmailChain($emailChain);
         $index = 0;
 
-        Mail::assertSent($mailableClass, $this->assertSentCallback($emailChain, $index, $exportMode));
+        Mail::assertQueued($mailableClass, $this->assertSentCallback($emailChain, $index, $exportMode));
 
         $this->assertCountMails($emailChain, $index);
     }
