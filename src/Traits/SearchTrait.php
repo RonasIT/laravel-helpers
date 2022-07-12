@@ -142,7 +142,7 @@ trait SearchTrait
 
         return $this->wrapPaginatedData($data);
     }
-    
+
     public function wrapPaginatedData(Collection $data): LengthAwarePaginator
     {
         $total = $data->count();
