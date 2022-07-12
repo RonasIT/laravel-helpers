@@ -37,7 +37,7 @@ trait SearchTrait
 
     protected function setAdditionalReservedFilters(...$filterNames)
     {
-        array_push($this->reservedFilters, $filterNames);
+        array_push($this->reservedFilters, ...$filterNames);
     }
 
     public function paginate(): LengthAwarePaginator
