@@ -35,6 +35,11 @@ trait SearchTrait
         'desc'
     ];
 
+    protected function setAdditionalReservedFilters(...$filterNames)
+    {
+        array_push($this->reservedFilters, ...$filterNames);
+    }
+
     public function paginate(): LengthAwarePaginator
     {
         $defaultPerPage = config('defaults.items_per_page');
