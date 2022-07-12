@@ -23,6 +23,18 @@ trait SearchTrait
     protected $attachedRelations = [];
     protected $attachedRelationsCount = [];
 
+    protected $reservedFilters  = [
+        'with',
+        'with_count',
+        'with_trashed',
+        'query',
+        'order_by',
+        'all',
+        'per_page',
+        'page',
+        'desc'
+    ];
+
     public function paginate(): LengthAwarePaginator
     {
         $defaultPerPage = config('defaults.items_per_page');
@@ -84,7 +96,7 @@ trait SearchTrait
         return $this;
     }
 
-    public function searchQuery(array $filter): self
+    public function searchQuery(array $filter = []): self
     {
         if (!empty($filter['with_trashed'])) {
             $this->withTrashed();
@@ -96,6 +108,24 @@ trait SearchTrait
             ->getQuery();
 
         $this->filter = $filter;
+
+        foreach($filter as $fieldName => $value) {
+            $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters));
+
+            if (Str::endsWith($fieldName, '_not_in_list')) {
+                $field = Str::replace('_not_in_list', '', $fieldName);
+                $this->query->whereNotIn($field, $value);
+            } elseif (Str::endsWith($fieldName, '_from')) {
+                $field = Str::replace('_from', '', $fieldName);
+                $this->filterFrom($field, false, $fieldName);
+            } elseif (Str::endsWith($fieldName, '_to')) {
+                $field = Str::replace('_to', '', $fieldName);
+                $this->filterTo($field, false, $fieldName);
+            } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list')) {
+                $field = Str::replace('_in_list', '', $fieldName);
+                $this->filterBy($field);
+            }
+        }
 
         return $this;
     }
