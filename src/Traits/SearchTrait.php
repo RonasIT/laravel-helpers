@@ -128,7 +128,7 @@ trait SearchTrait
                 $this->filterTo($field, false, $fieldName);
             } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list')) {
                 $field = Str::replace('_in_list', '', $fieldName);
-                $this->filterBy($field);
+                $this->filterBy($field, $fieldName);
             }
         }
 
