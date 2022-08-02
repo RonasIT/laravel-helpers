@@ -4,12 +4,9 @@ namespace RonasIT\Support;
 
 use Illuminate\Support\Arr;
 use Illuminate\Foundation\Http\FormRequest;
-use RonasIT\Support\AutoDoc\Traits\AutoDocRequestTrait;
 
 class BaseRequest extends FormRequest
 {
-    use AutoDocRequestTrait;
-
     public function authorize()
     {
         return true;
