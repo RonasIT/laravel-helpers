@@ -27,6 +27,7 @@ trait SearchTrait
         'with',
         'with_count',
         'with_trashed',
+        'only_trashed',
         'query',
         'order_by',
         'all',
