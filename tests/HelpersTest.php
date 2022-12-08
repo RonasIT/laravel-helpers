@@ -2,12 +2,8 @@
 
 namespace RonasIT\Support\Tests;
 
-use RonasIT\Support\Traits\FixturesTrait;
-
 class HelpersTest extends HelpersTestCase
 {
-    use FixturesTrait;
-
     public function getData(): array
     {
         return [
