@@ -60,4 +60,44 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture($expected, $result);
     }
+
+    public function getIsMultidimensionalData(): array
+    {
+        return [
+            [
+                'input' => [1, 2, 3],
+                'expected' => false
+            ],
+            [
+                'input' => [
+                    'a' => 'b',
+                    'c' => 'd',
+                    'f' => [1, 2, 3]
+                ],
+                'expected' => false
+            ],
+            [
+                'input' => [
+                    [
+                        'a' => 1,
+                        'b' => 2
+                    ]
+                ],
+                'expected' => true
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getIsMultidimensionalData
+     *
+     * @param array $input
+     * @param bool $expected
+     */
+    public function testIsMultidimensional(array $input, bool $expected)
+    {
+        $result = is_multidimensional($input);
+
+        $this->assertEquals($expected, $result);
+    }
 }
