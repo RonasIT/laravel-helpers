@@ -1,5 +1,7 @@
 # Laravel Helpers 
 
+[![Coverage Status](https://coveralls.io/repos/github/DenTray/laravel-helpers/badge.svg?branch=master)](https://coveralls.io/github/DenTray/laravel-helpers?branch=master)
+
 This plugin provides set of helpers functions, services and traits. 
 
 ## Installation
