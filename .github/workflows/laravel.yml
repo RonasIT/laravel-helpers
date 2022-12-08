@@ -21,12 +21,12 @@ jobs:
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
     - name: Directory Permissions
-      run: chmod -R 777 bootstrap/cache
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
       run: |
         mkdir -p build/coverage
         mkdir -p build/logs
-        ./vendor/bin/phpunit
+        chmod -R 777 build bootstrap/cache
+    - name: Execute tests (Unit and Feature tests) via PHPUnit
+      run: ./vendor/bin/phpunit
     - name: Upload coverage results to Coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
