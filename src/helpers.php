@@ -168,6 +168,26 @@ function mkdir_recursively($path)
  */
 function array_equals($array1, $array2)
 {
+    if (is_associative($array1)) {
+        return array_equals_assoc($array1, $array2);
+    }
+
+    $collection1 = (new Collection($array1))->sort();
+    $collection2 = (new Collection($array2))->sort();
+
+    return $collection1->values()->toArray() === $collection2->values()->toArray();
+}
+
+/**
+ * Check equivalency of two associative arrays
+ *
+ * @param array $array1
+ * @param array $array2
+ *
+ * @return boolean
+ */
+function array_equals_assoc($array1, $array2)
+{
     $collection1 = (new Collection($array1))->sortKeys();
     $collection2 = (new Collection($array2))->sortKeys();
 

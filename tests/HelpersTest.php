@@ -111,6 +111,11 @@ class HelpersTest extends HelpersTestCase
                 'first_array' => 'array_equals/settings.json',
                 'second_array' => 'array_equals/settings_diff_order.json',
                 'expected' => true
+            ],
+            [
+                'first_array' => 'areas.houses.json',
+                'second_array' => 'array_equals/non_associative.json',
+                'expected' => true
             ]
         ];
     }
