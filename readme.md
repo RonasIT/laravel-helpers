@@ -1,5 +1,7 @@
 # Laravel Helpers 
 
+[![Coverage Status](https://coveralls.io/repos/github/RonasIT/laravel-helpers/badge.svg?branch=master)](https://coveralls.io/github/RonasIT/laravel-helpers?branch=master)
+
 This plugin provides set of helpers functions, services and traits. 
 
 ## Installation
