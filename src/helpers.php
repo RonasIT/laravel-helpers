@@ -172,10 +172,10 @@ function array_equals($array1, $array2)
         return array_equals_assoc($array1, $array2);
     }
 
-    $collection1 = (new Collection($array1))->sort();
-    $collection2 = (new Collection($array2))->sort();
+    $array1 = (new Collection($array1))->sort()->values()->toArray();
+    $array2 = (new Collection($array2))->sort()->values()->toArray();
 
-    return $collection1->values()->toArray() === $collection2->values()->toArray();
+    return $array1 === $array2;
 }
 
 /**
@@ -188,10 +188,10 @@ function array_equals($array1, $array2)
  */
 function array_equals_assoc($array1, $array2)
 {
-    $collection1 = (new Collection($array1))->sortKeys();
-    $collection2 = (new Collection($array2))->sortKeys();
+    $array1 = (new Collection($array1))->sortKeys()->toArray();
+    $array2 = (new Collection($array2))->sortKeys()->toArray();
 
-    return $collection1->toArray() === $collection2->toArray();
+    return $array1 === $array2;
 }
 
 /**
