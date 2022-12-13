@@ -168,10 +168,10 @@ function mkdir_recursively($path)
  */
 function array_equals($array1, $array2)
 {
-    $collection1 = (new Collection($array1))->sort();
-    $collection2 = (new Collection($array2))->sort();
+    $collection1 = (new Collection($array1))->sortKeys();
+    $collection2 = (new Collection($array2))->sortKeys();
 
-    return $collection1->values() == $collection2->values();
+    return $collection1->toArray() === $collection2->toArray();
 }
 
 /**
