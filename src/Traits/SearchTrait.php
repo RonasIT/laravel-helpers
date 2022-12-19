@@ -118,18 +118,22 @@ trait SearchTrait
         foreach($filter as $fieldName => $value) {
             $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters));
 
-            if (Str::endsWith($fieldName, '_not_in_list')) {
-                $field = Str::replace('_not_in_list', '', $fieldName);
-                $this->query->whereNotIn($field, $value);
-            } elseif (Str::endsWith($fieldName, '_from')) {
-                $field = Str::replace('_from', '', $fieldName);
-                $this->filterFrom($field, false, $fieldName);
-            } elseif (Str::endsWith($fieldName, '_to')) {
-                $field = Str::replace('_to', '', $fieldName);
-                $this->filterTo($field, false, $fieldName);
-            } elseif ($isNotReservedFilter || Str::endsWith($fieldName, '_in_list')) {
-                $field = Str::replace('_in_list', '', $fieldName);
-                $this->filterBy($field, $fieldName);
+            if ($isNotReservedFilter) {
+                if (Str::endsWith($fieldName, '_not_in_list')) {
+                    $field = Str::replace('_not_in_list', '', $fieldName);
+                    $this->query->whereNotIn($field, $value);
+                } elseif (Str::endsWith($fieldName, '_from')) {
+                    $field = Str::replace('_from', '', $fieldName);
+                    $this->filterFrom($field, false, $fieldName);
+                } elseif (Str::endsWith($fieldName, '_to')) {
+                    $field = Str::replace('_to', '', $fieldName);
+                    $this->filterTo($field, false, $fieldName);
+                } elseif (Str::endsWith($fieldName, '_in_list')) {
+                    $field = Str::replace('_in_list', '', $fieldName);
+                    $this->query->whereIn($field, $value);
+                } else {
+                    $this->filterBy($fieldName);
+                }
             }
         }
 
