@@ -7,8 +7,8 @@ on:
     branches: ["master"]
 
 jobs:
+  runs-on: ubuntu-latest
   build:
-    runs-on: ubuntu-latest
     steps:
       - uses: shivammathur/setup-php@v2
         with:
@@ -18,13 +18,11 @@ jobs:
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
   tests:
     needs: build
-    runs-on: ubuntu-latest
     steps:
       - name: Execute unit tests via PHPUnit with coverage
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
   coverall-upload:
     needs: tests
-    runs-on: ubuntu-latest
     steps:
       - name: Upload coverage results to Coveralls
         env:
