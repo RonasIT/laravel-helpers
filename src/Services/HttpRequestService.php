@@ -125,7 +125,7 @@ class HttpRequestService
         $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
-        $client = new Client();
+        $client = app(Client::class);
 
         switch ($method) {
             case 'get':
