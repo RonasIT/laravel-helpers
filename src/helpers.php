@@ -50,23 +50,6 @@ function array_round(array $array): array
 }
 
 /**
- * Get value of key from every item in list and return list of them
- *
- * @param array|string $array
- * @param string $key
- *
- * @return array
- *
- * @deprecated
- */
-function array_lists($array, $key)
-{
-    return array_map(function ($item) use ($key) {
-        return Arr::get($item, $key);
-    }, $array);
-}
-
-/**
  * Get list of element which placed in $path in $array
  *
  * @param array|string $array
