@@ -34,7 +34,7 @@ function elseChain(...$callbacks)
  * @param array $array
  * @return array
  */
-function array_round($array)
+function array_round(array $array): array
 {
     $keys = array_keys($array);
 

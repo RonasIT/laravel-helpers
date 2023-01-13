@@ -136,4 +136,13 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testArrayRound()
+    {
+        $input = $this->getJsonFixture('array_round/values.json');
+
+        $result = array_round($input);
+
+        $this->assertEqualsFixture('array_round/rounded_values.json', $result);
+    }
 }
