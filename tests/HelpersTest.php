@@ -145,4 +145,37 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture('array_round/rounded_values.json', $result);
     }
+
+    public function getArrayDuplicatesData(): array
+    {
+        return [
+            [
+                'input' => 'array_get_duplicates/numeric_array.json',
+                'expected' => 'array_get_duplicates/numeric_array_duplicates.json',
+            ],
+            [
+                'input' => 'array_get_duplicates/string_array.json',
+                'expected' => 'array_get_duplicates/string_array_duplicates.json',
+            ],
+            [
+                'input' => 'array_get_duplicates/complex_array.json',
+                'expected' => 'array_get_duplicates/complex_array_duplicates.json',
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getArrayDuplicatesData
+     *
+     * @param string $input
+     * @param string $expected
+     */
+    public function testArrayDuplicate(string $input, string $expected)
+    {
+        $input = $this->getJsonFixture($input);
+
+        $result = array_duplicate($input);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
 }

@@ -196,6 +196,8 @@ function array_subtraction($array1, $array2)
  * Generate GUID
  *
  * @return string
+ *
+ * @codeCoverageIgnore
  */
 function getGUID()
 {
@@ -287,6 +289,13 @@ function array_associate($array, $callback)
     return $result;
 }
 
+/**
+ * Get duplicate values of array
+ *
+ * @param array $array
+ *
+ * @return array
+ */
 function array_duplicate($array)
 {
     return array_diff_key($array, array_unique($array));
