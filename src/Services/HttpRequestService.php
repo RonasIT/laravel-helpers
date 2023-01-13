@@ -203,24 +203,18 @@ class HttpRequestService
             return;
         }
 
-        $contentType = elseChain(
-            function () use ($headers) {
-                return Arr::get($headers, 'Content-Type');
-            },
-            function () use ($headers) {
-                return Arr::get($headers, 'content-type');
-            },
-            function () use ($headers) {
-                return Arr::get($headers, 'CONTENT-TYPE');
-            }
-        );
+        $lowerHeaders = [];
+
+        foreach ($headers as $header => $value) {
+            $lowerHeaders[strtolower($header)] = $value;
+        }
+
+        $contentType = Arr::get($lowerHeaders, 'content-type');
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;
-
-            return;
+        } else {
+            $this->options['form_params'] = $data;
         }
-
-        $this->options['form_params'] = $data;
     }
 }
