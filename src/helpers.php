@@ -295,8 +295,22 @@ function array_associate($array, $callback)
  * @param array $array
  *
  * @return array
+ *
+ * @deprecated Use array_get_duplicates
  */
 function array_duplicate($array)
+{
+    return array_get_duplicates($array);
+}
+
+/**
+ * Get duplicate values of array
+ *
+ * @param array $array
+ *
+ * @return array
+ */
+function array_get_duplicates(array $array): array
 {
     return array_diff_key($array, array_unique($array));
 }

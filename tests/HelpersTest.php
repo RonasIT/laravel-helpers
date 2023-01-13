@@ -178,4 +178,19 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture($expected, $result);
     }
+
+    /**
+     * @dataProvider getArrayDuplicatesData
+     *
+     * @param string $input
+     * @param string $expected
+     */
+    public function testArrayGetDuplicate(string $input, string $expected)
+    {
+        $input = $this->getJsonFixture($input);
+
+        $result = array_get_duplicates($input);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
 }
