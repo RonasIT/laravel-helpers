@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
  * @param array $array
  * @return array
  */
-function array_round($array)
+function array_round(array $array): array
 {
     $keys = array_keys($array);
 
@@ -22,23 +22,6 @@ function array_round($array)
     }, $array);
 
     return array_combine($keys, $values);
-}
-
-/**
- * Get value of key from every item in list and return list of them
- *
- * @param array|string $array
- * @param string $key
- *
- * @return array
- *
- * @deprecated
- */
-function array_lists($array, $key)
-{
-    return array_map(function ($item) use ($key) {
-        return Arr::get($item, $key);
-    }, $array);
 }
 
 /**
