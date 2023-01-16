@@ -245,11 +245,18 @@ function clear_folder($path)
  * Builds an associative array by gotten keys and values
  *
  * @param array $array
- * @param callable $callback
+ * @param callable $callback - should return associate array with 'key' and 'value' keys
+ *
+ * @example $callback
+ *  function  ($value, $key) {
+ *    return [
+ *      'key' => $key,
+ *      'value' => $value,
+ *    ];
  *
  * @return array
  */
-function array_associate($array, $callback)
+function array_associate(array $array, callable $callback): array
 {
     $result = [];
 

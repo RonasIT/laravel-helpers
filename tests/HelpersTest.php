@@ -279,4 +279,17 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture('array_undot/result.json', $result);
     }
 
+    public function testArrayAssociate()
+    {
+        $input = $this->getJsonFixture('array_associate/data.json');
+
+        $result = array_associate($input, function ($value, $key) {
+            return [
+                'key' => "prepared_{$key}",
+                'value' => $value
+            ];
+        });
+
+        $this->assertEqualsFixture('array_associate/result.json', $result);
+    }
 }
