@@ -193,4 +193,39 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture($expected, $result);
     }
+
+    public function getArrayUniqueObjectsData(): array
+    {
+        return [
+            [
+                'filter' => 'id',
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_string_key.json',
+            ],
+            [
+                'filter' => ['name'],
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key.json',
+            ],
+            [
+                'filter' => function($objet) {
+                    return $objet['id'];
+                },
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key.json',
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getArrayUniqueObjectsData
+     *
+     * @param string|callable|array  $filter
+     * @param string $expected
+     */
+    public function testArrayUniqueObjects($filter, string $expected)
+    {
+        $input = $this->getJsonFixture('array_unique_objects/array_with_duplicates.json');
+
+        $result = array_unique_objects($input, $filter);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
 }
