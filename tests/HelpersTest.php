@@ -269,4 +269,14 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture($expected, $result);
     }
+
+    public function testArrayUndot()
+    {
+        $input = $this->getJsonFixture('array_undot/data.json');
+
+        $result = array_undot($input);
+
+        $this->assertEqualsFixture('array_undot/result.json', $result);
+    }
+
 }

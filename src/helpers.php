@@ -373,7 +373,7 @@ function array_default(&$array, $key, $default)
  * @param $array
  * @return array
  */
-function array_undot($array)
+function array_undot(array $array): array
 {
     $result = [];
 
