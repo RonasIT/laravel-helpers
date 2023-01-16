@@ -2,8 +2,6 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Support\Arr;
-
 trait MockClassTrait
 {
     /**
@@ -12,6 +10,7 @@ trait MockClassTrait
      * [
      *     [
      *         'method' => 'yourMethod',
+     *         'arguments' => ['firstArgumentValue', 2, true],
      *         'result' => 'result_fixture.json'
      *     ]
      * ]
@@ -21,15 +20,24 @@ trait MockClassTrait
      */
     public function mockClass(string $class, array $callChain): void
     {
-        $methods = Arr::pluck($callChain, 'method');
+        $methodsCalls = collect($callChain)->groupBy('method');
+
         $mock = $this
             ->getMockBuilder($class)
-            ->setMethods($methods)
+            ->onlyMethods($methodsCalls->keys()->toArray())
             ->getMock();
 
-        foreach ($callChain as $call) {
-            $mock->method($call['method'])->willReturn($call['result']);
-        }
+        $methodsCalls->each(function ($calls, $method) use (&$mock) {
+            $mock
+                ->expects($this->exactly($calls->count()))
+                ->method($method)
+                ->withConsecutive(...$calls->map(function ($call) {
+                    return $call['arguments'];
+                })->toArray())
+                ->willReturnOnConsecutiveCalls(...$calls->map(function ($call) {
+                    return $call['result'];
+                })->toArray());
+        });
 
         $this->app->instance($class, $mock);
     }

@@ -102,14 +102,12 @@ class HttpRequestService
 
     protected function send(string $method, string $url, array $data = [], array $headers = []): self
     {
-        $time = microtime(true);
+        $startTime = microtime(true);
 
         $this->logRequest($method, $url, $data, $headers);
-        $this->setOptions($headers);
-        $this->setData($method, $headers, $data);
 
         try {
-            $this->response = $this->sendRequest($method, $url);
+            $this->response = $this->sendRequest($method, $url, $data, $headers);
 
             return $this;
         } catch (RequestException $exception) {
@@ -117,14 +115,17 @@ class HttpRequestService
 
             throw $exception;
         } finally {
-            $this->logResponse($this->response, $time);
+            $this->logResponse($startTime);
             $this->options = [];
         }
     }
 
-    protected function sendRequest($method, $url): ResponseInterface
+    protected function sendRequest($method, $url, array $data = [], array $headers = []): ResponseInterface
     {
-        $client = new Client();
+        $this->setOptions($headers);
+        $this->setData($method, $headers, $data);
+
+        $client = app(Client::class);
 
         switch ($method) {
             case 'get':
@@ -164,16 +165,18 @@ class HttpRequestService
         }
     }
 
-    protected function logResponse(ResponseInterface $response, ?int $time = null): void
+    protected function logResponse(?int $time = null): void
     {
+        $endTime = (empty($time)) ? null : microtime(true) - $time;
+
         if ($this->debug) {
             logger('');
             logger('-------------------------------------');
             logger('');
             logger('getting response: ');
-            logger('code', ["<{$response->getStatusCode()}>"]);
-            logger('body', ["<{$response->getBody()}>"]);
-            logger('time', [!empty($time) ? (microtime(true) - $time) : null]);
+            logger('code', ["<{$this->response->getStatusCode()}>"]);
+            logger('body', ["<{$this->response->getBody()}>"]);
+            logger('time', [$endTime]);
             logger('');
         }
     }
@@ -200,24 +203,19 @@ class HttpRequestService
             return;
         }
 
-        $contentType = elseChain(
-            function () use ($headers) {
-                return Arr::get($headers, 'Content-Type');
-            },
-            function () use ($headers) {
-                return Arr::get($headers, 'content-type');
-            },
-            function () use ($headers) {
-                return Arr::get($headers, 'CONTENT-TYPE');
-            }
-        );
+        $lowerHeaders = array_associate($headers, function ($value, $key) {
+            return [
+                'key' => strtolower($key),
+                'value' => $value
+            ];
+        });
+
+        $contentType = Arr::get($lowerHeaders, 'content-type');
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;
-
-            return;
+        } else {
+            $this->options['form_params'] = $data;
         }
-
-        $this->options['form_params'] = $data;
     }
 }

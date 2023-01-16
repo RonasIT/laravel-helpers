@@ -104,13 +104,6 @@ trait FixturesTrait
         $this->assertEquals($this->getJsonFixture($fixture), $data);
     }
 
-    public function callRawRequest(string $method, string $uri, $content, array $headers = []): TestResponse
-    {
-        $server = $this->transformHeadersToServerVars($headers);
-
-        return $this->call($method, $uri, [], [], [], $server, $content);
-    }
-
     public function exportJson($fixture, $data): void
     {
         if ($data instanceof TestResponse) {

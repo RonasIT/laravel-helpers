@@ -70,6 +70,13 @@ abstract class TestCase extends BaseTest
         parent::tearDown();
     }
 
+    public function callRawRequest(string $method, string $uri, $content, array $headers = []): TestResponse
+    {
+        $server = $this->transformHeadersToServerVars($headers);
+
+        return $this->call($method, $uri, [], [], [], $server, $content);
+    }
+
     /**
      * Email Chain should look like following construction:
      *   [

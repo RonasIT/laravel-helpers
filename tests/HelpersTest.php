@@ -136,4 +136,160 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testArrayRound()
+    {
+        $input = $this->getJsonFixture('array_round/values.json');
+
+        $result = array_round($input);
+
+        $this->assertEqualsFixture('array_round/rounded_values.json', $result);
+    }
+
+    public function getArrayDuplicatesData(): array
+    {
+        return [
+            [
+                'input' => 'array_get_duplicates/numeric_array.json',
+                'expected' => 'array_get_duplicates/numeric_array_duplicates.json',
+            ],
+            [
+                'input' => 'array_get_duplicates/string_array.json',
+                'expected' => 'array_get_duplicates/string_array_duplicates.json',
+            ],
+            [
+                'input' => 'array_get_duplicates/complex_array.json',
+                'expected' => 'array_get_duplicates/complex_array_duplicates.json',
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getArrayDuplicatesData
+     *
+     * @param string $input
+     * @param string $expected
+     */
+    public function testArrayDuplicate(string $input, string $expected)
+    {
+        $input = $this->getJsonFixture($input);
+
+        $result = array_duplicate($input);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
+
+    /**
+     * @dataProvider getArrayDuplicatesData
+     *
+     * @param string $input
+     * @param string $expected
+     */
+    public function testArrayGetDuplicate(string $input, string $expected)
+    {
+        $input = $this->getJsonFixture($input);
+
+        $result = array_get_duplicates($input);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
+
+    public function getArrayUniqueObjectsData(): array
+    {
+        return [
+            [
+                'filter' => 'id',
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_string_key.json',
+            ],
+            [
+                'filter' => ['name'],
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key.json',
+            ],
+            [
+                'filter' => function($objet) {
+                    return $objet['id'];
+                },
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key.json',
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getArrayUniqueObjectsData
+     *
+     * @param string|callable|array  $filter
+     * @param string $expected
+     */
+    public function testArrayUniqueObjects($filter, string $expected)
+    {
+        $input = $this->getJsonFixture('array_unique_objects/array_with_duplicates.json');
+
+        $result = array_unique_objects($input, $filter);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
+
+    public function testArrayTrim()
+    {
+        $input = $this->getJsonFixture('array_trim/data.json');
+
+        $result = array_trim($input);
+
+        $this->assertEqualsFixture('array_trim/result.json', $result);
+    }
+
+    public function getArrayRemoveByFieldData(): array
+    {
+        return [
+            [
+                'field' => 'id',
+                'value' => 1,
+                'expected' => 'array_remove_by_field/result_remove_by_id.json',
+            ],
+            [
+                'field' => 'name',
+                'value' => 'test2',
+                'expected' => 'array_remove_by_field/result_remove_by_name.json',
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getArrayRemoveByFieldData
+     *
+     * @param string  $field
+     * @param string|numeric $value
+     * @param string $expected
+     */
+    public function testArrayRemoveByField(string $field, $value, string $expected)
+    {
+        $input = $this->getJsonFixture('array_remove_by_field/data.json');
+
+        $result = array_remove_by_field($input, $field, $value);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
+
+    public function testArrayUndot()
+    {
+        $input = $this->getJsonFixture('array_undot/data.json');
+
+        $result = array_undot($input);
+
+        $this->assertEqualsFixture('array_undot/result.json', $result);
+    }
+
+    public function testArrayAssociate()
+    {
+        $input = $this->getJsonFixture('array_associate/data.json');
+
+        $result = array_associate($input, function ($value, $key) {
+            return [
+                'key' => "prepared_{$key}",
+                'value' => $value
+            ];
+        });
+
+        $this->assertEqualsFixture('array_associate/result.json', $result);
+    }
 }

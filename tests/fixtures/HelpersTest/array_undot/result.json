@@ -1,0 +1,9 @@
+{
+    "user": {
+        "id": 1,
+        "name": "Test",
+        "settings": {
+            "is_public": true
+        }
+    }
+}

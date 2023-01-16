@@ -4,37 +4,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
 
 /**
- * @deprecated use elseif construction instead
- *
- * It calls on all callbacks to the first, which did not return null.
- * The resulting value is the result of the function and returns.
- *
- * @param mixed ...$callbacks
- *
- * @return mixed
- */
-function elseChain(...$callbacks)
-{
-    $value = null;
-
-    foreach ($callbacks as $callback) {
-        $value = $callback();
-
-        if (!empty($value)) {
-            return $value;
-        }
-    }
-
-    return $value;
-}
-
-/**
  * Round all values in list of floats.
  *
  * @param array $array
  * @return array
  */
-function array_round($array)
+function array_round(array $array): array
 {
     $keys = array_keys($array);
 
@@ -47,23 +22,6 @@ function array_round($array)
     }, $array);
 
     return array_combine($keys, $values);
-}
-
-/**
- * Get value of key from every item in list and return list of them
- *
- * @param array|string $array
- * @param string $key
- *
- * @return array
- *
- * @deprecated
- */
-function array_lists($array, $key)
-{
-    return array_map(function ($item) use ($key) {
-        return Arr::get($item, $key);
-    }, $array);
 }
 
 /**
@@ -213,6 +171,8 @@ function array_subtraction($array1, $array2)
  * Generate GUID
  *
  * @return string
+ *
+ * @codeCoverageIgnore
  */
 function getGUID()
 {
@@ -285,11 +245,19 @@ function clear_folder($path)
  * Builds an associative array by gotten keys and values
  *
  * @param array $array
- * @param callable $callback
+ * @param callable $callback - should return associate array with "key" and "value" keys
+ *
+ * @example $callback
+ *  function ($value, $key) {
+ *      return [
+ *        'key' => $key,
+ *        'value' => $value,
+ *      ];
+ *  }
  *
  * @return array
  */
-function array_associate($array, $callback)
+function array_associate(array $array, callable $callback): array
 {
     $result = [];
 
@@ -304,7 +272,28 @@ function array_associate($array, $callback)
     return $result;
 }
 
+/**
+ * Get duplicate values of array
+ *
+ * @param array $array
+ *
+ * @return array
+ *
+ * @deprecated Use array_get_duplicates
+ */
 function array_duplicate($array)
+{
+    return array_get_duplicates($array);
+}
+
+/**
+ * Get duplicate values of array
+ *
+ * @param array $array
+ *
+ * @return array
+ */
+function array_get_duplicates(array $array): array
 {
     return array_diff_key($array, array_unique($array));
 }
@@ -347,20 +336,7 @@ function array_unique_objects($objectsList, $filter = 'id')
     });
 }
 
-/**
- * @deprecated
- *
- * @param array $objectsList
- * @param string|callable|array $filter
- *
- * @return array
- */
-function array_unique_object($objectsList, $filter = 'id')
-{
-    return array_unique_objects($objectsList, $filter);
-}
-
-function array_trim($array)
+function array_trim(array $array): array
 {
     return array_map(
         function ($item) {
@@ -405,7 +381,7 @@ function array_default(&$array, $key, $default)
  * @param $array
  * @return array
  */
-function array_undot($array)
+function array_undot(array $array): array
 {
     $result = [];
 
