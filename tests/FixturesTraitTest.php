@@ -49,7 +49,7 @@ class FixturesTraitTest extends HelpersTestCase
 
         $result = $this->getClearPsqlDatabaseQuery($tables);
 
-        $this->assertEqualsFixture('clear_database/clear_psql_db_query.json', $result);
+        $this->assertEquals($this->getFixture('clear_database/clear_psql_db_query.sql'), $result);
     }
 
     public function testGetClearMysqlDatabaseQuery()
@@ -58,6 +58,6 @@ class FixturesTraitTest extends HelpersTestCase
 
         $result = $this->getClearMySQLDatabaseQuery($tables);
 
-        $this->assertEqualsFixture('clear_database/clear_mysql_db_query.json', $result);
+        $this->assertEquals($this->getFixture('clear_database/clear_mysql_db_query.sql'), $result);
     }
 }
