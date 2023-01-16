@@ -237,4 +237,36 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture('array_trim/result.json', $result);
     }
+
+    public function getArrayRemoveByFieldData(): array
+    {
+        return [
+            [
+                'field' => 'id',
+                'value' => 1,
+                'expected' => 'array_remove_by_field/result_remove_by_id.json',
+            ],
+            [
+                'field' => 'name',
+                'value' => 'test2',
+                'expected' => 'array_remove_by_field/result_remove_by_name.json',
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getArrayRemoveByFieldData
+     *
+     * @param string  $field
+     * @param string|numeric $value
+     * @param string $expected
+     */
+    public function testArrayRemoveByField(string $field, $value, string $expected)
+    {
+        $input = $this->getJsonFixture('array_remove_by_field/data.json');
+
+        $result = array_remove_by_field($input, $field, $value);
+
+        $this->assertEqualsFixture($expected, $result);
+    }
 }
