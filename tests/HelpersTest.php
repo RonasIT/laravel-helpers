@@ -228,4 +228,13 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture($expected, $result);
     }
+
+    public function testArrayTrim()
+    {
+        $input = $this->getJsonFixture('array_trim/data.json');
+
+        $result = array_trim($input);
+
+        $this->assertEqualsFixture('array_trim/result.json', $result);
+    }
 }

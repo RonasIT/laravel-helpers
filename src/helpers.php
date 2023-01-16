@@ -328,7 +328,7 @@ function array_unique_objects($objectsList, $filter = 'id')
     });
 }
 
-function array_trim($array)
+function array_trim(array $array): array
 {
     return array_map(
         function ($item) {
