@@ -10,7 +10,7 @@ trait HttpRequestServiceMockTrait
 
     protected function mockGuzzleClient($method, $arguments)
     {
-        $mock = $this->mockCLass(Client::class, [$method]);
+        $mock = $this->mockClass(Client::class, [$method]);
 
         $mock->expects($this->exactly(1))->method($method)->withConsecutive($arguments);
 

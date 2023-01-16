@@ -27,7 +27,7 @@ class HttpRequestServiceTest extends HelpersTestCase
 
     public function testSend()
     {
-        $mock = $this->mockCLass(HttpRequestService::class, ['sendRequest']);
+        $mock = $this->mockClass(HttpRequestService::class, ['sendRequest']);
 
         $mock
             ->expects($this->once())
