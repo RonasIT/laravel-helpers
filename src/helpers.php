@@ -328,19 +328,6 @@ function array_unique_objects($objectsList, $filter = 'id')
     });
 }
 
-/**
- * @deprecated
- *
- * @param array $objectsList
- * @param string|callable|array $filter
- *
- * @return array
- */
-function array_unique_object($objectsList, $filter = 'id')
-{
-    return array_unique_objects($objectsList, $filter);
-}
-
 function array_trim($array)
 {
     return array_map(
