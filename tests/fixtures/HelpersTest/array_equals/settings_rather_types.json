@@ -1,0 +1,8 @@
+{
+    "period": "weekly",
+    "time": "17:15:00",
+    "day_of_week": "Wednesday",
+    "is_enabled": true,
+    "next_notification_at": "2020-01-01 12:00:00",
+    "day_of_month": 15
+}

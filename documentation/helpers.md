@@ -105,31 +105,6 @@ $array = [1.4, 2.9, 1.534];
 array_round($array); //[1, 3, 2]
 ````
 
-### elseChain(...$callbacks)
-
-This feature is designed to get the first non-empty function result. It does not make sense in php7, 
-but can be useful when developing applications on php5.  
-
-**Example**
-
-```php
-    $value = elseChain(
-        function() use ($request, $code) {
-            return empty($request) ? Response::$statusTexts[$code] : null;
-        },
-        function() use ($request, $code) {
-            return $this->annotationReader->getClassAnnotations($request)->get("_{$code}");
-        },
-        function() use ($code) {
-            return config("auto-doc.defaults.code-descriptions.{$code}");
-        },
-        function() use ($code) {
-            return Response::$statusTexts[$code];
-        }
-    );
-````
-
-
 ### mkdir_recursively($path)
 
 Create directory recursively. The native mkdir() function recursively create directory incorrectly.
