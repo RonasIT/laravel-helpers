@@ -108,6 +108,11 @@ trait SearchTrait
             $this->withTrashed();
         }
 
+        if (!empty($filter['only_trashed'])) {
+            $this->onlyTrashed();
+        }
+
+
         $this->query = $this
             ->with(Arr::get($filter, 'with', []))
             ->withCount(Arr::get($filter, 'with_count', []))
