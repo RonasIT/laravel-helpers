@@ -4,7 +4,6 @@ namespace RonasIT\Support\Traits;
 
 use Closure;
 use Illuminate\Support\Collection;
-use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
