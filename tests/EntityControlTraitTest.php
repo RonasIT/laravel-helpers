@@ -6,7 +6,7 @@ use RonasIT\Support\Repositories\BaseRepository;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
 
-class SearchTraitTest extends HelpersTestCase
+class EntityControlTraitTest extends HelpersTestCase
 {
     use MockTrait;
 
