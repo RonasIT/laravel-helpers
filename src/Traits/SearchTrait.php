@@ -153,6 +153,8 @@ trait SearchTrait
 
         $data = $this->query->get();
 
+        $this->resetSettableProperties();
+
         return $this->wrapPaginatedData($data);
     }
 
@@ -349,5 +351,12 @@ trait SearchTrait
         }
 
         return config('defaults.items_per_page', 1);
+    }
+
+    protected function resetSettableProperties()
+    {
+        $this->onlyTrashed(false);
+        $this->withTrashed(false);
+        $this->force(false);
     }
 }

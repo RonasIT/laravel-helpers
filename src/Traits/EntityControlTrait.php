@@ -105,7 +105,11 @@ trait EntityControlTrait
      */
     public function exists($where): bool
     {
-        return $this->getQuery($where)->exists();
+        $result = $this->getQuery($where)->exists();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     /**
@@ -118,7 +122,11 @@ trait EntityControlTrait
      */
     public function existsBy(string $field, $value): bool
     {
-        return $this->getQuery([$field => $value])->exists();
+        $result = $this->getQuery([$field => $value])->exists();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function create(array $data): Model
@@ -142,6 +150,8 @@ trait EntityControlTrait
             $model->load($this->attachedRelations);
         }
 
+        $this->resetSettableProperties();
+
         return $model;
     }
 
@@ -159,7 +169,11 @@ trait EntityControlTrait
         $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
-        return $this->getQuery($where)->update($entityData);
+        $result = $this->getQuery($where)->update($entityData);
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     /**
@@ -193,6 +207,8 @@ trait EntityControlTrait
             $item->load($this->attachedRelations);
         }
 
+        $this->resetSettableProperties();
+
         return $item;
     }
 
@@ -211,17 +227,29 @@ trait EntityControlTrait
 
     public function count($where = []): int
     {
-        return $this->getQuery($where)->count();
+        $result = $this->getQuery($where)->count();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function get(array $where = []): Collection
     {
-        return $this->getQuery($where)->get();
+        $result = $this->getQuery($where)->get();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function first($where = []): ?Model
     {
-        return $this->getQuery($where)->first();
+        $result = $this->getQuery($where)->first();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function findBy(string $field, $value): ?Model
@@ -263,10 +291,14 @@ trait EntityControlTrait
         $query = $this->getQuery($where);
 
         if ($this->forceMode) {
-            return $query->forceDelete();
+            $result = $query->forceDelete();
         } else {
-            return $query->delete();
+            $result = $query->delete();
         }
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function withTrashed($enable = true): self
@@ -285,7 +317,11 @@ trait EntityControlTrait
 
     public function restore($where): int
     {
-        return $this->getQuery($where)->onlyTrashed()->restore();
+        $result = $this->getQuery($where)->onlyTrashed()->restore();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function chunk(int $limit, Closure $callback, array $where = []): void
@@ -313,38 +349,54 @@ trait EntityControlTrait
             ->whereIn($field, $values);
 
         if ($this->forceMode && $this->hasSoftDeleteTrait()) {
-            return $query->forceDelete();
+            $result = $query->forceDelete();
         } else {
-            return $query->delete();
+            $result = $query->delete();
         }
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function restoreByList(array $values, ?string $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        return $this
+        $result = $this
             ->getQuery()
             ->onlyTrashed()
             ->whereIn($field, $values)
             ->restore();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function getByList(array $values, ?string $field = null): Collection
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        return $this
+        $result = $this
             ->getQuery()
             ->whereIn($field, $values)
             ->get();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function countByList(array $values, ?string $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
 
-        return $this->getQuery()->whereIn($field, $values)->count();
+        $result = $this->getQuery()->whereIn($field, $values)->count();
+
+        $this->resetSettableProperties();
+
+        return $result;
     }
 
     public function updateByList(array $values, array $data, $field = null): int
@@ -354,6 +406,8 @@ trait EntityControlTrait
         $query = $this->getQuery()->whereIn($field, $values);
 
         $fields = $this->forceMode ? $this->fields : $this->model->getFillable();
+
+        $this->resetSettableProperties();
 
         return $query->update(Arr::only($data, $fields));
     }
