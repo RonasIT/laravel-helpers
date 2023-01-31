@@ -221,6 +221,8 @@ trait EntityControlTrait
         $this->setResetSettableProperties(false);
 
         if ($this->exists($where)) {
+            $this->setResetSettableProperties();
+
             return $this->update($where, $data);
         }
 
@@ -459,7 +461,7 @@ trait EntityControlTrait
         // implement it yourself if you need it
     }
 
-    protected function setResetSettableProperties(bool $value = true)
+    protected function setResetSettableProperties(bool $value = true): void
     {
         $this->resetSettableProperties = $value;
     }
