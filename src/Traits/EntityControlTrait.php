@@ -25,6 +25,8 @@ trait EntityControlTrait
     protected $onlyTrashed = false;
     protected $forceMode = false;
 
+    protected $resetSettableProperties = true;
+
     public function all(): Collection
     {
         return $this->get();
@@ -189,6 +191,8 @@ trait EntityControlTrait
         $item = $this->getQuery($where)->first();
 
         if (empty($item)) {
+            $this->resetSettableProperties();
+
             return null;
         }
 
@@ -214,6 +218,8 @@ trait EntityControlTrait
 
     public function updateOrCreate($where, $data): Model
     {
+        $this->setResetSettableProperties(false);
+
         if ($this->exists($where)) {
             return $this->update($where, $data);
         }
@@ -221,6 +227,8 @@ trait EntityControlTrait
         if (!is_array($where)) {
             $where = [$this->primaryKey => $where];
         }
+
+        $this->setResetSettableProperties();
 
         return $this->create(array_merge($data, $where));
     }
@@ -270,11 +278,17 @@ trait EntityControlTrait
      */
     public function firstOrCreate($where, array $data = []): Model
     {
+        $this->setResetSettableProperties(false);
+
         $entity = $this->first($where);
+
+        $this->setResetSettableProperties();
 
         if (empty($entity)) {
             return $this->create(array_merge($data, $where));
         }
+
+        $this->resetSettableProperties();
 
         return $entity;
     }
@@ -443,5 +457,10 @@ trait EntityControlTrait
     protected function afterCreateHook(?Model $entity, array $data)
     {
         // implement it yourself if you need it
+    }
+
+    protected function setResetSettableProperties(bool $value = true)
+    {
+        $this->resetSettableProperties = $value;
     }
 }

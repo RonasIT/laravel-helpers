@@ -147,13 +147,13 @@ trait SearchTrait
     {
         $this->orderBy();
 
+        $this->resetSettableProperties();
+
         if (empty($this->filter['all'])) {
             return $this->getModifiedPaginator($this->paginate());
         }
 
         $data = $this->query->get();
-
-        $this->resetSettableProperties();
 
         return $this->wrapPaginatedData($data);
     }
@@ -353,10 +353,12 @@ trait SearchTrait
         return config('defaults.items_per_page', 1);
     }
 
-    protected function resetSettableProperties()
+    protected function resetSettableProperties(): void
     {
-        $this->onlyTrashed(false);
-        $this->withTrashed(false);
-        $this->force(false);
+        if ($this->resetSettableProperties) {
+            $this->onlyTrashed(false);
+            $this->withTrashed(false);
+            $this->force(false);
+        }
     }
 }
