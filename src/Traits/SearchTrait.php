@@ -4,7 +4,6 @@ namespace RonasIT\Support\Traits;
 
 use Closure;
 use Illuminate\Support\Collection;
-use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
@@ -106,6 +105,10 @@ trait SearchTrait
     {
         if (!empty($filter['with_trashed'])) {
             $this->withTrashed();
+        }
+
+        if (!empty($filter['only_trashed'])) {
+            $this->onlyTrashed();
         }
 
         $this->query = $this
