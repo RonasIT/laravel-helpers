@@ -132,6 +132,7 @@ abstract class TestCase extends BaseTest
             $this->assertSubject($expectedMailData, $mail);
             $this->assertEmailsList($expectedMailData, $mail, $index);
             $this->assertFixture($expectedMailData, $mail, $exportMode);
+            $this->assertEmailFrom($expectedMailData, $mail);
 
             $index++;
 
@@ -171,6 +172,15 @@ abstract class TestCase extends BaseTest
 
         foreach ($emails as $email) {
             $this->assertContains($email, $sentEmails, "Block \"To\" on {$index} step don't contains {$email}. Contains only {$emailList}.");
+        }
+    }
+
+    protected function assertEmailFrom(array $currentMail, Mailable $mail): void
+    {
+        $expectedFrom = Arr::get($currentMail, 'from');
+
+        if (!empty($expectedFrom)) {
+            $mail->assertFrom($expectedFrom);
         }
     }
 
