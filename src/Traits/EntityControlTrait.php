@@ -381,11 +381,25 @@ trait EntityControlTrait
         }
     }
 
+    /**
+     * @deprecated Method was implemented to have an ability to call some model-related methods inside the services class
+     * but since version 2.0 services classes works with he models directly and no need to call hooks
+     * @param Model|null $entity
+     * @param array $data
+     * @return void
+     */
     protected function afterUpdateHook(?Model $entity, array $data)
     {
         // implement it yourself if you need it
     }
 
+    /**
+     * @deprecated Method was implemented to have an ability to call some model-related methods inside the services class
+     * but since version 2.0 services classes works with he models directly and no need to call hooks
+     * @param Model|null $entity
+     * @param array $data
+     * @return void
+     */
     protected function afterCreateHook(?Model $entity, array $data)
     {
         // implement it yourself if you need it
