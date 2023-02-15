@@ -5,18 +5,20 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Support\Carbon;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use ReflectionMethod;
-use RonasIT\Support\Tests\Support\Mock\TestModel;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
+use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class EntityControlTraitTest extends HelpersTestCase
 {
-    use MockTrait;
+    use MockTrait, SqlMockTrait;
 
     protected TestRepository $testRepositoryClass;
     protected ReflectionProperty $onlyTrashedProperty;
     protected ReflectionMethod $getQueryMethod;
+
+    protected array $selectResult;
 
     public function setUp(): void
     {
@@ -29,6 +31,10 @@ class EntityControlTraitTest extends HelpersTestCase
 
         $this->getQueryMethod = new ReflectionMethod($this->testRepositoryClass, 'getQuery');
         $this->getQueryMethod->setAccessible('public');
+
+        $this->selectResult = $this->getJsonFixture('select_query_result.json');
+
+        Carbon::setTestNow('2020-01-01 00:00:00');
     }
 
     public function testOnlyTrashed()
@@ -73,82 +79,61 @@ class EntityControlTraitTest extends HelpersTestCase
         $mock->existsBy('id', 2);
     }
 
-    public function testSelectToFetchAll(): void
+    public function testCreate(): void
     {
-        $pdo = DBMock::mockPdo();
-        $pdo->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is null')
-            ->shouldFetchAllReturns([[
-                'id' => 1,
-                'name' => 'John',
-                'email' => 'john@example.com',
-                'created_at' => '2020-01-01 00:00:00',
-                'updated_at' => '2020-01-01 00:00:00',
-            ]]);
+        $this->mockCreate($this->selectResult);
 
-        $this->assertEquals([[
-            'id' => 1,
-            'name' => 'John',
-            'email' => 'john@example.com',
-            'created_at' => '2020-01-01 00:00:00',
-            'updated_at' => '2020-01-01 00:00:00',
-        ]], TestModel::all()->toArray());
+        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
+        $mock->expects($this->once())->method('postQueryHook');
+
+        $mock->create(['name' => 'test_name']);
     }
 
     public function testUpdateMany()
     {
         $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateForRows('update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is null', ['test_name', Carbon::now(), 1], 1);
+        $pdo->shouldUpdateForRows(
+            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is null',
+            ['test_name', Carbon::now(), 1],
+            1
+        );
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->updateMany(1, ['name' => 'test_name']);
     }
 
-//    public function testUpdate()
-//    {
-//        $pdo = DBMock::mockPdo();
-//        $pdo
-//            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
-//            ->shouldFetchAllReturns([[
-//                'id' => 1,
-//                'name' => 'John',
-//                'email' => 'john@example.com',
-//                'created_at' => '2020-01-01 00:00:00',
-//                'updated_at' => '2020-01-01 00:00:00',
-//            ]]);
-//
-//        $pdo->shouldUpdateOne('update `test_models` set `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is null', [Carbon::now(), 1]);
-//
-//        $pdo
-//            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
-//            ->shouldFetchAllReturns([[
-//                'id' => 1,
-//                'name' => 'John',
-//                'email' => 'john@example.com',
-//                'created_at' => '2020-01-01 00:00:00',
-//                'updated_at' => '2020-01-01 00:00:00',
-//            ]]);
-//
-//        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-//
-//        $mock->expects($this->once())->method('postQueryHook');
-//
-//        $mock->update(1, []);
-//    }
+    public function testUpdate()
+    {
+        $this->mockUpdate($this->selectResult);
+
+        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
+        $mock->expects($this->once())->method('postQueryHook');
+
+        $mock->update(1, ['name' => 'test_name']);
+    }
 
     public function testUpdateOrCreateEntityExists()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo->
+        $this->mockUpdateOrCreateEntityExists($this->selectResult);
 
         $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
-
         $mock->expects($this->exactly(2))->method('resetSettableProperties');
         $mock->expects($this->exactly(2))->method('postQueryHook');
 
-        $mock->updateOrCreate(1, []);
+        $mock->updateOrCreate(1, ['name' => 'test_name']);
+    }
+
+    public function testUpdateOrCreateEntityDoesntExist()
+    {
+        $this->mockUpdateOrCreateEntityDoesntExist($this->selectResult);
+
+        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
+        $mock->expects($this->exactly(2))->method('resetSettableProperties');
+        $mock->expects($this->exactly(2))->method('postQueryHook');
+
+        $mock->updateOrCreate(1, ['name' => 'test_name']);
     }
 
     public function testCount()
@@ -159,7 +144,6 @@ class EntityControlTraitTest extends HelpersTestCase
             ->whenFetchAllCalled();
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->count(['id' => 1]);
@@ -173,7 +157,6 @@ class EntityControlTraitTest extends HelpersTestCase
             ->whenFetchAllCalled();
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->get(['id' => 1]);
@@ -187,13 +170,12 @@ class EntityControlTraitTest extends HelpersTestCase
             ->whenFetchAllCalled();
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->first(1);
     }
 
-    public function testfindBy()
+    public function testFindBy()
     {
         $pdo = DBMock::mockPdo();
         $pdo
@@ -201,7 +183,6 @@ class EntityControlTraitTest extends HelpersTestCase
             ->whenFetchAllCalled();
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->findBy('id', 1);
@@ -215,58 +196,45 @@ class EntityControlTraitTest extends HelpersTestCase
             ->whenFetchAllCalled();
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->find(1);
     }
 
-//    public function testFirstOrCreate()
-//    {
-//        TestModel::saving(fn () => false);
-//
-//        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
-//
-//        $mock->expects($this->exactly(2))->method('resetSettableProperties');
-//        $mock->expects($this->exactly(2))->method('postQueryHook');
-//
-//        $mock->firstOrCreate(['id' => 1], []);
-//    }
+    public function testFirstOrCreateEntityExists()
+    {
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
+            ->shouldFetchAllReturns($this->selectResult);
 
-//    public function testFirstOrCreateEntityExists()
-//    {
-//        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'first', 'postQueryHook']);
-//
-//        $mock->expects($this->exactly(2))->method('resetSettableProperties');
-//        $mock->expects($this->once())->method('first')->willReturn(new TestModel());
-//        $mock->expects($this->once())->method('postQueryHook');
-//
-//        $mock->firstOrCreate(['id' => 1], []);
-//    }
+        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
+        $mock->expects($this->exactly(2))->method('resetSettableProperties');
+        $mock->expects($this->exactly(2))->method('postQueryHook');
 
-//    public function testFirstOrCreateEntityDoesntExist()
-//    {
-//        $pdo = DBMock::mockPdo();
-//        $pdo
-//            ->shouldPrepareForSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
-//            ->shouldExecute()
-//            ->shouldFetchAllReturns(['id' => 4]);
-//
-//        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
-//
-//        $mock->expects($this->exactly(2))->method('resetSettableProperties');
-//        $mock->expects($this->once())->method('postQueryHook');
-//
-//        $mock->firstOrCreate(['id' => 1], []);
-//    }
+        $mock->firstOrCreate(1, ['name' => 'test_name']);
+    }
+
+    public function testFirstOrCreateEntityDoesntExists()
+    {
+        $this->mockFirstOrCreateEntityDoesntExists($this->selectResult);
+
+        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
+        $mock->expects($this->exactly(2))->method('resetSettableProperties');
+        $mock->expects($this->exactly(2))->method('postQueryHook');
+
+        $mock->firstOrCreate(['id' => 1], ['name' => 'test_name']);
+    }
 
     public function testDelete()
     {
         $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateOne('update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is null', [Carbon::now(), Carbon::now(), 1]);
+        $pdo->shouldUpdateOne(
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is null',
+            [Carbon::now(), Carbon::now(), 1]
+        );
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->delete(1);
@@ -275,10 +243,12 @@ class EntityControlTraitTest extends HelpersTestCase
     public function testRestore()
     {
         $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateOne('update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is not null', [null, Carbon::now(), 1]);
+        $pdo->shouldUpdateOne(
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is not null',
+            [null, Carbon::now(), 1]
+        );
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->restore(1);
@@ -287,10 +257,13 @@ class EntityControlTraitTest extends HelpersTestCase
     public function testDeleteByList()
     {
         $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateForRows('update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null', [Carbon::now(), Carbon::now(), 1, 2, 3], 3);
+        $pdo->shouldUpdateForRows(
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null',
+            [Carbon::now(), Carbon::now(), 1, 2, 3],
+            3
+        );
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->deleteByList([1, 2, 3]);
@@ -299,10 +272,13 @@ class EntityControlTraitTest extends HelpersTestCase
     public function testRestoreByList()
     {
         $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateForRows('update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)', [null, Carbon::now(), 1, 2, 3], 3);
+        $pdo->shouldUpdateForRows(
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
+            [null, Carbon::now(), 1, 2, 3],
+            3
+        );
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->restoreByList([1, 2, 3]);
@@ -316,7 +292,6 @@ class EntityControlTraitTest extends HelpersTestCase
             ->whenFetchAllCalled();
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->getByList([1, 2, 3]);
@@ -330,7 +305,6 @@ class EntityControlTraitTest extends HelpersTestCase
             ->whenFetchAllCalled();
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->countByList([1, 2, 3]);
@@ -340,10 +314,13 @@ class EntityControlTraitTest extends HelpersTestCase
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldUpdateForRows('update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null', ['test_name', Carbon::now(), 1, 2, 3], 3);
+            ->shouldUpdateForRows(
+                'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null',
+                ['test_name', Carbon::now(), 1, 2, 3],
+                3
+            );
 
         $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-
         $mock->expects($this->once())->method('postQueryHook');
 
         $mock->updateByList([1, 2, 3], ['name' => 'test_name']);

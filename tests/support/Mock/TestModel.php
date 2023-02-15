@@ -9,4 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class TestModel extends Model
 {
     use ModelTrait, SoftDeletes;
+
+    protected $fillable = ['name'];
 }

@@ -7,10 +7,11 @@ use RonasIT\Support\Tests\Support\Mock\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
 use ReflectionMethod;
+use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class SearchTraitTest extends HelpersTestCase
 {
-    use MockTrait;
+    use MockTrait, SqlMockTrait;
 
     protected TestRepository $testRepositoryClass;
     protected ReflectionProperty $onlyTrashedProperty;
@@ -71,26 +72,30 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResult()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo
-            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null')
-            ->whenFetchAllCalled();
+        $this->mockGetSearchResult();
 
         $this->testRepositoryClass->searchQuery()->getSearchResults();
     }
 
-    public function testGetSearchResultWithOnlyTrash()
+    public function testGetSearchResultWithOnlyTrashed()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo
-            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is not null')
-            ->whenFetchAllCalled();
+        $this->mockGetSearchResultWithOnlyTrash();
 
         $this->testRepositoryClass->searchQuery(['only_trashed' => true])->getSearchResults();
 
         $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
 
         $this->assertEquals(false, $onlyTrashed);
+    }
+
+    public function testGetSearchResultAggregateIsNull()
+    {
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null')
+            ->shouldFetchAllReturns([['aggregate' => null]]);
+
+        $this->testRepositoryClass->searchQuery([])->getSearchResults();
     }
 
     public function testPostQueryHookMethod()
