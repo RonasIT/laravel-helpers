@@ -147,7 +147,7 @@ trait SearchTrait
     {
         $this->orderBy();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         if (empty($this->filter['all'])) {
             return $this->getModifiedPaginator($this->paginate());
@@ -353,9 +353,9 @@ trait SearchTrait
         return config('defaults.items_per_page', 1);
     }
 
-    protected function resetSettableProperties(): void
+    protected function postQueryHook(): void
     {
-        if ($this->resetSettableProperties) {
+        if ($this->shouldSettablePropertiesBeReset) {
             $this->onlyTrashed(false);
             $this->withTrashed(false);
             $this->force(false);

@@ -2,7 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
-use RonasIT\Support\Tests\Support\Mock\DummyConnection;
+use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
@@ -18,8 +18,8 @@ class SearchTraitTest extends HelpersTestCase
     protected ReflectionProperty $forceModeProperty;
     protected ReflectionProperty $queryProperty;
 
-    protected ReflectionMethod $resetSettablePropertiesMethod;
-    protected ReflectionMethod $setResetSettablePropertiesMethod;
+    protected ReflectionMethod $postQueryHookMethod;
+    protected ReflectionMethod $resetSettableProperties;
 
     public function setUp(): void
     {
@@ -39,11 +39,11 @@ class SearchTraitTest extends HelpersTestCase
         $this->queryProperty = new ReflectionProperty(TestRepository::class, 'query');
         $this->queryProperty->setAccessible('pubic');
 
-        $this->resetSettablePropertiesMethod = new ReflectionMethod($this->testRepositoryClass, 'resetSettableProperties');
-        $this->resetSettablePropertiesMethod->setAccessible('pubic');
+        $this->postQueryHookMethod = new ReflectionMethod($this->testRepositoryClass, 'postQueryHook');
+        $this->postQueryHookMethod->setAccessible('pubic');
 
-        $this->setResetSettablePropertiesMethod = new ReflectionMethod($this->testRepositoryClass, 'setResetSettableProperties');
-        $this->setResetSettablePropertiesMethod->setAccessible('pubic');
+        $this->resetSettableProperties = new ReflectionMethod($this->testRepositoryClass, 'resetSettableProperties');
+        $this->resetSettableProperties->setAccessible('pubic');
     }
 
     public function testSearchQueryWithOnlyTrashed()
@@ -59,9 +59,32 @@ class SearchTraitTest extends HelpersTestCase
         $this->assertEqualsFixture('search_query_with_only_trashed_sql.json', $sql);
     }
 
+    public function testGetSearchResultWithAll()
+    {
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc')
+            ->whenFetchAllCalled();
+
+        $this->testRepositoryClass->searchQuery(['all' => true])->getSearchResults();
+    }
+
     public function testGetSearchResult()
     {
-        DummyConnection::mock();
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null')
+            ->whenFetchAllCalled();
+
+        $this->testRepositoryClass->searchQuery()->getSearchResults();
+    }
+
+    public function testGetSearchResultWithOnlyTrash()
+    {
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is not null')
+            ->whenFetchAllCalled();
 
         $this->testRepositoryClass->searchQuery(['only_trashed' => true])->getSearchResults();
 
@@ -70,13 +93,13 @@ class SearchTraitTest extends HelpersTestCase
         $this->assertEquals(false, $onlyTrashed);
     }
 
-    public function testResetSettableProperties()
+    public function testPostQueryHookMethod()
     {
         $this->testRepositoryClass->onlyTrashed();
         $this->testRepositoryClass->force();
         $this->testRepositoryClass->withTrashed();
 
-        $this->resetSettablePropertiesMethod->invoke($this->testRepositoryClass);
+        $this->postQueryHookMethod->invoke($this->testRepositoryClass);
 
         $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
         $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
@@ -87,15 +110,15 @@ class SearchTraitTest extends HelpersTestCase
         $this->assertEquals(false, $forceMode);
     }
 
-    public function testResetSettablePropertiesPropertyFalse()
+    public function testPostQueryHookMethodPropertyFalse()
     {
         $this->testRepositoryClass->onlyTrashed();
         $this->testRepositoryClass->force();
         $this->testRepositoryClass->withTrashed();
 
-        $this->setResetSettablePropertiesMethod->invoke($this->testRepositoryClass, false);
+        $this->resetSettableProperties->invoke($this->testRepositoryClass, false);
 
-        $this->resetSettablePropertiesMethod->invoke($this->testRepositoryClass);
+        $this->postQueryHookMethod->invoke($this->testRepositoryClass);
 
         $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
         $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);

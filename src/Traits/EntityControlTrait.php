@@ -25,7 +25,7 @@ trait EntityControlTrait
     protected $onlyTrashed = false;
     protected $forceMode = false;
 
-    protected $resetSettableProperties = true;
+    protected $shouldSettablePropertiesBeReset = true;
 
     public function all(): Collection
     {
@@ -109,7 +109,7 @@ trait EntityControlTrait
     {
         $result = $this->getQuery($where)->exists();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -126,7 +126,7 @@ trait EntityControlTrait
     {
         $result = $this->getQuery([$field => $value])->exists();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -152,7 +152,7 @@ trait EntityControlTrait
             $model->load($this->attachedRelations);
         }
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $model;
     }
@@ -173,7 +173,7 @@ trait EntityControlTrait
 
         $result = $this->getQuery($where)->update($entityData);
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -191,7 +191,7 @@ trait EntityControlTrait
         $item = $this->getQuery($where)->first();
 
         if (empty($item)) {
-            $this->resetSettableProperties();
+            $this->postQueryHook();
 
             return null;
         }
@@ -211,17 +211,17 @@ trait EntityControlTrait
             $item->load($this->attachedRelations);
         }
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $item;
     }
 
     public function updateOrCreate($where, $data): Model
     {
-        $this->setResetSettableProperties(false);
+        $this->resetSettableProperties(false);
 
         if ($this->exists($where)) {
-            $this->setResetSettableProperties();
+            $this->resetSettableProperties();
 
             return $this->update($where, $data);
         }
@@ -230,7 +230,7 @@ trait EntityControlTrait
             $where = [$this->primaryKey => $where];
         }
 
-        $this->setResetSettableProperties();
+        $this->resetSettableProperties();
 
         return $this->create(array_merge($data, $where));
     }
@@ -239,7 +239,7 @@ trait EntityControlTrait
     {
         $result = $this->getQuery($where)->count();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -248,7 +248,7 @@ trait EntityControlTrait
     {
         $result = $this->getQuery($where)->get();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -257,7 +257,7 @@ trait EntityControlTrait
     {
         $result = $this->getQuery($where)->first();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -280,17 +280,17 @@ trait EntityControlTrait
      */
     public function firstOrCreate($where, array $data = []): Model
     {
-        $this->setResetSettableProperties(false);
+        $this->resetSettableProperties(false);
 
         $entity = $this->first($where);
 
-        $this->setResetSettableProperties();
+        $this->resetSettableProperties();
 
         if (empty($entity)) {
             return $this->create(array_merge($data, $where));
         }
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $entity;
     }
@@ -312,7 +312,7 @@ trait EntityControlTrait
             $result = $query->delete();
         }
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -335,7 +335,7 @@ trait EntityControlTrait
     {
         $result = $this->getQuery($where)->onlyTrashed()->restore();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -370,7 +370,7 @@ trait EntityControlTrait
             $result = $query->delete();
         }
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -385,7 +385,7 @@ trait EntityControlTrait
             ->whereIn($field, $values)
             ->restore();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -399,7 +399,7 @@ trait EntityControlTrait
             ->whereIn($field, $values)
             ->get();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -410,7 +410,7 @@ trait EntityControlTrait
 
         $result = $this->getQuery()->whereIn($field, $values)->count();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $result;
     }
@@ -423,7 +423,7 @@ trait EntityControlTrait
 
         $fields = $this->forceMode ? $this->fields : $this->model->getFillable();
 
-        $this->resetSettableProperties();
+        $this->postQueryHook();
 
         return $query->update(Arr::only($data, $fields));
     }
@@ -461,8 +461,8 @@ trait EntityControlTrait
         // implement it yourself if you need it
     }
 
-    protected function setResetSettableProperties(bool $value = true): void
+    protected function resetSettableProperties(bool $value = true): void
     {
-        $this->resetSettableProperties = $value;
+        $this->shouldSettablePropertiesBeReset = $value;
     }
 }
