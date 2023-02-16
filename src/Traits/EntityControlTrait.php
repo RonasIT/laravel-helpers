@@ -346,6 +346,8 @@ trait EntityControlTrait
             ->getQuery($where)
             ->orderBy($this->primaryKey)
             ->chunk($limit, $callback);
+
+        $this->postQueryHook();
     }
 
     /**

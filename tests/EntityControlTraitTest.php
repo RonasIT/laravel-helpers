@@ -53,261 +53,319 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->assertEqualsFixture('get_query_sql.json', $sql);
     }
 
+    public function testAll()
+    {
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null')
+            ->whenFetchAllCalled();
+
+        $this->testRepositoryClass->onlyTrashed()->all();
+
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
+    }
+
     public function testExists()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select exists(select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null) as `exists`', [1])
+            ->shouldSelect('select exists(select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`', [1])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->exists(['id' => 1]);
 
-        $mock->exists(['id' => 1]);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testExistsBy()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select exists(select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null) as `exists`', [2])
+            ->shouldSelect('select exists(select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`', [2])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->existsBy('id', 2);
 
-        $mock->existsBy('id', 2);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
-    public function testCreate(): void
+    public function testCreate()
     {
         $this->mockCreate($this->selectResult);
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->create(['name' => 'test_name']);
 
-        $mock->create(['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testUpdateMany()
     {
         $pdo = DBMock::mockPdo();
         $pdo->shouldUpdateForRows(
-            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is null',
+            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` = ?',
             ['test_name', Carbon::now(), 1],
             1
         );
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->updateMany(1, ['name' => 'test_name']);
 
-        $mock->updateMany(1, ['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testUpdate()
     {
         $this->mockUpdate($this->selectResult);
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->update(1, ['name' => 'test_name']);
 
-        $mock->update(1, ['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
+    }
+
+    public function testUpdateDoesntExist()
+    {
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1])
+            ->shouldFetchAllReturns([]);
+
+        $this->testRepositoryClass->onlyTrashed()->update(1, ['name' => 'test_name']);
+
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testUpdateOrCreateEntityExists()
     {
         $this->mockUpdateOrCreateEntityExists($this->selectResult);
 
-        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
-        $mock->expects($this->exactly(2))->method('resetSettableProperties');
-        $mock->expects($this->exactly(2))->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->updateOrCreate(1, ['name' => 'test_name']);
 
-        $mock->updateOrCreate(1, ['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testUpdateOrCreateEntityDoesntExist()
     {
         $this->mockUpdateOrCreateEntityDoesntExist($this->selectResult);
 
-        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
-        $mock->expects($this->exactly(2))->method('resetSettableProperties');
-        $mock->expects($this->exactly(2))->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->updateOrCreate(1, ['name' => 'test_name']);
 
-        $mock->updateOrCreate(1, ['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testCount()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select count(*) as aggregate from `test_models` where `id` = ? and `test_models`.`deleted_at` is null', [1])
+            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?', [1])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->count(['id' => 1]);
 
-        $mock->count(['id' => 1]);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testGet()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null', [1])
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?', [1])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->get(['id' => 1]);
 
-        $mock->get(['id' => 1]);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testFirst()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->first(1);
 
-        $mock->first(1);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testFindBy()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->findBy('id', 1);
 
-        $mock->findBy('id', 1);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testFind()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->find(1);
 
-        $mock->find(1);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testFirstOrCreateEntityExists()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select * from `test_models` where `id` = ? and `test_models`.`deleted_at` is null limit 1', [1])
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1])
             ->shouldFetchAllReturns($this->selectResult);
 
-        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
-        $mock->expects($this->exactly(2))->method('resetSettableProperties');
-        $mock->expects($this->exactly(2))->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->firstOrCreate(1, ['name' => 'test_name']);
 
-        $mock->firstOrCreate(1, ['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testFirstOrCreateEntityDoesntExists()
     {
         $this->mockFirstOrCreateEntityDoesntExists($this->selectResult);
 
-        $mock = $this->mockClass(TestRepository::class, ['resetSettableProperties', 'postQueryHook']);
-        $mock->expects($this->exactly(2))->method('resetSettableProperties');
-        $mock->expects($this->exactly(2))->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->firstOrCreate(['id' => 1], ['name' => 'test_name']);
 
-        $mock->firstOrCreate(['id' => 1], ['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testDelete()
     {
         $pdo = DBMock::mockPdo();
         $pdo->shouldUpdateOne(
-            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is null',
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` = ?',
             [Carbon::now(), Carbon::now(), 1]
         );
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->delete(1);
 
-        $mock->delete(1);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testRestore()
     {
         $pdo = DBMock::mockPdo();
         $pdo->shouldUpdateOne(
-            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` = ? and `test_models`.`deleted_at` is not null',
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` = ? and `test_models`.`deleted_at` is not null',
             [null, Carbon::now(), 1]
         );
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->restore(1);
 
-        $mock->restore(1);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
+    }
+
+    public function testChunk()
+    {
+        $pdo = DBMock::mockPdo();
+        $pdo
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null order by `id` asc limit 10 offset 0')
+            ->whenFetchAllCalled();
+
+        $this->testRepositoryClass->onlyTrashed()->chunk(10, function () {});
+
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testDeleteByList()
     {
         $pdo = DBMock::mockPdo();
         $pdo->shouldUpdateForRows(
-            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null',
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
             [Carbon::now(), Carbon::now(), 1, 2, 3],
             3
         );
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->deleteByList([1, 2, 3]);
 
-        $mock->deleteByList([1, 2, 3]);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testRestoreByList()
     {
         $pdo = DBMock::mockPdo();
         $pdo->shouldUpdateForRows(
-            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
             [null, Carbon::now(), 1, 2, 3],
             3
         );
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->restoreByList([1, 2, 3]);
 
-        $mock->restoreByList([1, 2, 3]);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testGetByList()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select * from `test_models` where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null', [1, 2, 3])
+            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)', [1, 2, 3])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->getByList([1, 2, 3]);
 
-        $mock->getByList([1, 2, 3]);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testCountByList()
     {
         $pdo = DBMock::mockPdo();
         $pdo
-            ->shouldSelect('select count(*) as aggregate from `test_models` where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null', [1, 2, 3])
+            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)', [1, 2, 3])
             ->whenFetchAllCalled();
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->countByList([1, 2, 3]);
 
-        $mock->countByList([1, 2, 3]);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 
     public function testUpdateByList()
@@ -315,14 +373,15 @@ class EntityControlTraitTest extends HelpersTestCase
         $pdo = DBMock::mockPdo();
         $pdo
             ->shouldUpdateForRows(
-                'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` in (?, ?, ?) and `test_models`.`deleted_at` is null',
+                'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
                 ['test_name', Carbon::now(), 1, 2, 3],
                 3
             );
 
-        $mock = $this->mockClass(TestRepository::class, ['postQueryHook']);
-        $mock->expects($this->once())->method('postQueryHook');
+        $this->testRepositoryClass->onlyTrashed()->updateByList([1, 2, 3], ['name' => 'test_name']);
 
-        $mock->updateByList([1, 2, 3], ['name' => 'test_name']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(false, $onlyTrashed);
     }
 }
