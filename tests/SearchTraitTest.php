@@ -66,7 +66,17 @@ class SearchTraitTest extends HelpersTestCase
 
         $sql = $this->queryProperty->getValue($this->testRepositoryClass)->toSql();
 
-        $this->assertSettableProperties(true, false, true, ['relation'], ['relation']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
+        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
+        $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
+        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(true, $onlyTrashed);
+        $this->assertEquals(false, $withTrashed);
+        $this->assertEquals(true, $forceMode);
+        $this->assertEquals(['relation'], $attachedRelations);
+        $this->assertEquals(['relation'], $attachedRelationsCount);
 
         $this->assertEqualsFixture('search_query_sql.json', $sql);
     }
@@ -92,7 +102,7 @@ class SearchTraitTest extends HelpersTestCase
             ])
             ->getSearchResults();
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testGetSearchResultWithTrashed()
@@ -128,6 +138,16 @@ class SearchTraitTest extends HelpersTestCase
             ->searchQuery()
             ->getSearchResults();
 
-        $this->assertSettableProperties(true, false, true, ['relation'], ['relation']);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
+        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
+        $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
+        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
+
+        $this->assertEquals(true, $onlyTrashed);
+        $this->assertEquals(false, $withTrashed);
+        $this->assertEquals(true, $forceMode);
+        $this->assertEquals(['relation'], $attachedRelations);
+        $this->assertEquals(['relation'], $attachedRelationsCount);
     }
 }

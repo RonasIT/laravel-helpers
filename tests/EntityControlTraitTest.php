@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
-use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
@@ -106,7 +105,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->force()
             ->all();
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testAllEmptyResult()
@@ -121,7 +120,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->force()
             ->all();
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testExists()
@@ -136,7 +135,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->exists(['id' => 1]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testExistsBy()
@@ -151,7 +150,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->existsBy('id', 2);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testCreate()
@@ -166,13 +165,12 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->create(['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testUpdateMany()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateForRows(
+        $this->mockUpdateSqlQuery(
             'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` = ?',
             ['test_name', Carbon::now(), 1],
             1
@@ -186,7 +184,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateMany(1, ['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testUpdate()
@@ -201,7 +199,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->update(1, ['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testUpdateDoesntExist()
@@ -216,7 +214,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->update(1, ['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testUpdateOrCreateEntityExists()
@@ -231,7 +229,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateOrCreate(1, ['name' => 'test_name']);
 
-       $this->assertSettableProperties();
+       $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testUpdateOrCreateEntityDoesntExist()
@@ -246,7 +244,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateOrCreate(1, ['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testCount()
@@ -261,7 +259,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->count(['id' => 1]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testGet()
@@ -276,7 +274,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->get(['id' => 1]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testGetEmptyResult()
@@ -291,7 +289,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->get(['id' => 1]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFirst()
@@ -306,7 +304,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->first(1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFirstEmptyResult()
@@ -321,7 +319,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->first(1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFindBy()
@@ -336,7 +334,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->findBy('id', 1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFindByEmptyResult()
@@ -351,7 +349,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->findBy('id', 1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFind()
@@ -366,7 +364,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->find(1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFindEmptyResult()
@@ -381,7 +379,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->find(1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFirstOrCreateEntityExists()
@@ -396,7 +394,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->firstOrCreate(['id' => 1], ['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testFirstOrCreateEntityDoesntExists()
@@ -411,16 +409,12 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->firstOrCreate(['id' => 1], ['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testDelete()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo->shouldDeleteOne(
-            'delete from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?',
-            [1]
-        );
+        $this->mockDelete('delete from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?', [1]);
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -430,13 +424,12 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->delete(1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testRestore()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateOne(
+        $this->mockUpdateSqlQuery(
             'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` = ? and `test_models`.`deleted_at` is not null',
             [null, Carbon::now(), 1]
         );
@@ -449,7 +442,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->restore(1);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testChunk()
@@ -464,7 +457,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->chunk(10, function () {});
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testChunkEmptyResult()
@@ -479,13 +472,12 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->chunk(10, function () {});
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testDeleteByList()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo->shouldDeleteForRows(
+        $this->mockDelete(
             'delete from `test_models` where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
             [1, 2, 3],
             3
@@ -499,13 +491,12 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->deleteByList([1, 2, 3]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testRestoreByList()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo->shouldUpdateForRows(
+        $this->mockUpdateSqlQuery(
             'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
             [null, Carbon::now(), 1, 2, 3],
             3
@@ -519,7 +510,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->restoreByList([1, 2, 3]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testGetByList()
@@ -534,7 +525,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->getByList([1, 2, 3]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testGetByListEmptyResult()
@@ -549,7 +540,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->getByList([1, 2, 3]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testCountByList()
@@ -564,18 +555,16 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->countByList([1, 2, 3]);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testUpdateByList()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo
-            ->shouldUpdateForRows(
-                'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
-                ['test_name', Carbon::now(), 1, 2, 3],
-                3
-            );
+        $this->mockUpdateSqlQuery(
+            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
+            ['test_name', Carbon::now(), 1, 2, 3],
+            3
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -585,6 +574,6 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateByList([1, 2, 3], ['name' => 'test_name']);
 
-        $this->assertSettableProperties();
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 }

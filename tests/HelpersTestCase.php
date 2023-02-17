@@ -24,24 +24,18 @@ class HelpersTestCase extends BaseTest
         $app->setBasePath(__DIR__ . '/..');
     }
 
-    protected function assertSettableProperties(
-        $expectedOnlyTrashed = false,
-        $expectedWithTrashed = false,
-        $expectedForceMode = false,
-        $expectedAttachedRelations = [],
-        $expectedAttachedRelationsCount = []
-    ): void
+    protected function assertSettablePropertiesReset($class): void
     {
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
-        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
-        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
-        $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
-        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($class);
+        $withTrashed = $this->withTrashedProperty->getValue($class);
+        $forceMode = $this->forceModeProperty->getValue($class);
+        $attachedRelations = $this->attachedRelationsProperty->getValue($class);
+        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($class);
 
-        $this->assertEquals($expectedOnlyTrashed, $onlyTrashed);
-        $this->assertEquals($expectedWithTrashed, $withTrashed);
-        $this->assertEquals($expectedForceMode, $forceMode);
-        $this->assertEquals($expectedAttachedRelations, $attachedRelations);
-        $this->assertEquals($expectedAttachedRelationsCount, $attachedRelationsCount);
+        $this->assertEquals(false, $onlyTrashed);
+        $this->assertEquals(false, $withTrashed);
+        $this->assertEquals(false, $forceMode);
+        $this->assertEquals([], $attachedRelations);
+        $this->assertEquals([], $attachedRelationsCount);
     }
 }

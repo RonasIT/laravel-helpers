@@ -68,8 +68,7 @@ trait SqlMockTrait
     {
         $pdo = DBMock::mockPdo();
 
-        $pdo->shouldInsert('insert into `test_models` (`name`, `updated_at`, `created_at`) values (?, ?, ?)', ['test_name', Carbon::now(), Carbon::now()]);
-        $pdo->expects('lastInsertId')->andReturn(1);
+        $this->mockInsert('insert into `test_models` (`name`, `updated_at`, `created_at`) values (?, ?, ?)', ['test_name', Carbon::now(), Carbon::now()], 1, $pdo);
 
         $this->mockSelect('select * from `test_models` where `id` = ? limit 1', [1], $selectResult, $pdo);
 
@@ -82,7 +81,7 @@ trait SqlMockTrait
 
         $this->mockSelect('select * from `relation_models` where `relation_models`.`test_model_id` in (1)', [], $selectResult, $pdo);
 
-        $pdo->shouldUpdateOne('update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ?', ['test_name', Carbon::now(), 1]);
+        $this->mockUpdateSqlQuery('update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ?', ['test_name', Carbon::now(), 1], null, $pdo);
 
         $this->mockSelect('select * from `test_models` where `id` = ? limit 1', [1], $selectResult, $pdo);
 
@@ -99,7 +98,7 @@ trait SqlMockTrait
 
         $this->mockSelect('select * from `relation_models` where `relation_models`.`test_model_id` in (1)', [], $selectResult, $pdo);
 
-        $pdo->shouldUpdateOne('update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ?', ['test_name', Carbon::now(), 1]);
+        $this->mockUpdateSqlQuery('update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ?', ['test_name', Carbon::now(), 1], null, $pdo);
 
         $this->mockSelect('select * from `test_models` where `id` = ? limit 1', [1], $selectResult, $pdo);
 
@@ -112,8 +111,7 @@ trait SqlMockTrait
     {
         $pdo = $this->mockSelect('select exists(select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`', [1], [['exists' => false]]);
 
-        $pdo->shouldInsert('insert into `test_models` (`name`, `id`, `updated_at`, `created_at`) values (?, ?, ?, ?)', ['test_name', 1, Carbon::now(), Carbon::now()]);
-        $pdo->expects('lastInsertId')->andReturn(1);
+        $this->mockInsert('insert into `test_models` (`name`, `id`, `updated_at`, `created_at`) values (?, ?, ?, ?)', ['test_name', 1, Carbon::now(), Carbon::now()], 1, $pdo);
 
         $this->mockSelect('select * from `test_models` where `id` = ? limit 1', [1], $selectResult, $pdo);
 
@@ -124,8 +122,7 @@ trait SqlMockTrait
     {
         $pdo = $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1]);
 
-        $pdo->shouldInsert('insert into `test_models` (`name`, `id`, `updated_at`, `created_at`) values (?, ?, ?, ?)', ['test_name', 1, Carbon::now(), Carbon::now()]);
-        $pdo->expects('lastInsertId')->andReturn(1);
+        $this->mockInsert('insert into `test_models` (`name`, `id`, `updated_at`, `created_at`) values (?, ?, ?, ?)', ['test_name', 1, Carbon::now(), Carbon::now()], 1, $pdo);
 
         $this->mockSelect('select * from `test_models` where `id` = ? limit 1', [1], $selectResult, $pdo);
 
@@ -146,6 +143,48 @@ trait SqlMockTrait
         $pdo = $this->mockSelect('select count(*) as aggregate from `test_models`', [], [['aggregate' => 1]]);
 
         $this->mockSelect('select * from `test_models` order by `id` asc limit 15 offset 0', [], [], $pdo);
+    }
+
+    protected function mockUpdateSqlQuery(string $sql, array $bindings = [], ?int $rowCount = null, SingleConnectionProxy $pdo = null): SingleConnectionProxy
+    {
+        if (empty($pdo)) {
+            $pdo = DBMock::mockPdo();
+        }
+
+        if (!empty($rowCount)) {
+            $pdo->shouldUpdateForRows($sql, $bindings, $rowCount);
+        } else {
+            $pdo->shouldUpdateOne($sql, $bindings);
+        }
+
+        return $pdo;
+    }
+
+    protected function mockDelete(string $sql, array $bindings = [], ?int $rowCount = null, SingleConnectionProxy $pdo = null): SingleConnectionProxy
+    {
+        if (empty($pdo)) {
+            $pdo = DBMock::mockPdo();
+        }
+
+        if (!empty($rowCount)) {
+            $pdo->shouldDeleteForRows($sql, $bindings, $rowCount);
+        } else {
+            $pdo->shouldDeleteOne($sql, $bindings);
+        }
+
+        return $pdo;
+    }
+
+    protected function mockInsert(string $sql, array $data, int $lastInsertId, SingleConnectionProxy $pdo = null): SingleConnectionProxy
+    {
+        if (empty($pdo)) {
+            $pdo = DBMock::mockPdo();
+        }
+
+        $pdo->shouldInsert($sql, $data);
+        $pdo->expects('lastInsertId')->andReturn($lastInsertId);
+
+        return $pdo;
     }
 
     protected function mockSelect(string $query, array $bindings = [], array $result = [], SingleConnectionProxy $pdo = null): SingleConnectionProxy
