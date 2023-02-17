@@ -1,1 +1,0 @@
-"select * from `test_models` where `test_models`.`deleted_at` is null"

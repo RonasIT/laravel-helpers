@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0bad46cd01aca15227f2a5e8137c2b67",
+    "content-hash": "fd48ca5159261781265e55575d98047f",
     "packages": [
         {
             "name": "brick/math",
@@ -973,57 +973,6 @@
             "time": "2022-10-26T14:07:24+00:00"
         },
         {
-            "name": "hamcrest/hamcrest-php",
-            "version": "v2.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hamcrest/hamcrest-php.git",
-                "reference": "8c3d0a3f6af734494ad8f6fbbee0ba92422859f3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/8c3d0a3f6af734494ad8f6fbbee0ba92422859f3",
-                "reference": "8c3d0a3f6af734494ad8f6fbbee0ba92422859f3",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.3|^7.0|^8.0"
-            },
-            "replace": {
-                "cordoval/hamcrest-php": "*",
-                "davedevelopment/hamcrest-php": "*",
-                "kodova/hamcrest-php": "*"
-            },
-            "require-dev": {
-                "phpunit/php-file-iterator": "^1.4 || ^2.0",
-                "phpunit/phpunit": "^4.8.36 || ^5.7 || ^6.5 || ^7.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "hamcrest"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "This is the PHP port of Hamcrest Matchers",
-            "keywords": [
-                "test"
-            ],
-            "support": {
-                "issues": "https://github.com/hamcrest/hamcrest-php/issues",
-                "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.0.1"
-            },
-            "time": "2020-07-09T08:09:16+00:00"
-        },
-        {
             "name": "laravel/framework",
             "version": "v8.83.27",
             "source": {
@@ -1198,16 +1147,16 @@
         },
         {
             "name": "laravel/serializable-closure",
-            "version": "v1.2.2",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/serializable-closure.git",
-                "reference": "47afb7fae28ed29057fdca37e16a84f90cc62fae"
+                "reference": "f23fe9d4e95255dacee1bf3525e0810d1a1b0f37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/47afb7fae28ed29057fdca37e16a84f90cc62fae",
-                "reference": "47afb7fae28ed29057fdca37e16a84f90cc62fae",
+                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/f23fe9d4e95255dacee1bf3525e0810d1a1b0f37",
+                "reference": "f23fe9d4e95255dacee1bf3525e0810d1a1b0f37",
                 "shasum": ""
             },
             "require": {
@@ -1254,20 +1203,20 @@
                 "issues": "https://github.com/laravel/serializable-closure/issues",
                 "source": "https://github.com/laravel/serializable-closure"
             },
-            "time": "2022-09-08T13:45:54+00:00"
+            "time": "2023-01-30T18:31:20+00:00"
         },
         {
             "name": "league/commonmark",
-            "version": "2.3.8",
+            "version": "2.3.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "c493585c130544c4e91d2e0e131e6d35cb0cbc47"
+                "reference": "c1e114f74e518daca2729ea8c4bf1167038fa4b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/c493585c130544c4e91d2e0e131e6d35cb0cbc47",
-                "reference": "c493585c130544c4e91d2e0e131e6d35cb0cbc47",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/c1e114f74e518daca2729ea8c4bf1167038fa4b5",
+                "reference": "c1e114f74e518daca2729ea8c4bf1167038fa4b5",
                 "shasum": ""
             },
             "require": {
@@ -1360,7 +1309,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-12-10T16:02:17+00:00"
+            "time": "2023-02-15T14:07:24+00:00"
         },
         {
             "name": "league/config",
@@ -1596,28 +1545,28 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "3.1.45",
+            "version": "3.1.46",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                "reference": "80627071a8cebb3c1119f1d2881bb6a03a8f9152"
+                "reference": "ba0b9b9305d5b603c3938d4d1d4a13025c92c241"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/80627071a8cebb3c1119f1d2881bb6a03a8f9152",
-                "reference": "80627071a8cebb3c1119f1d2881bb6a03a8f9152",
+                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/ba0b9b9305d5b603c3938d4d1d4a13025c92c241",
+                "reference": "ba0b9b9305d5b603c3938d4d1d4a13025c92c241",
                 "shasum": ""
             },
             "require": {
                 "composer/semver": "^3.3",
                 "ext-json": "*",
-                "illuminate/support": "5.8.*|^6.0|^7.0|^8.0|^9.0",
+                "illuminate/support": "5.8.*|^6.0|^7.0|^8.0|^9.0|^10.0",
                 "php": "^7.0|^8.0",
                 "phpoffice/phpspreadsheet": "^1.18",
                 "psr/simple-cache": "^1.0|^2.0|^3.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^6.0|^7.0",
+                "orchestra/testbench": "^6.0|^7.0|^8.0",
                 "predis/predis": "^1.1"
             },
             "type": "library",
@@ -1660,7 +1609,7 @@
             ],
             "support": {
                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
-                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.45"
+                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.46"
             },
             "funding": [
                 {
@@ -1672,7 +1621,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-01-02T17:17:56+00:00"
+            "time": "2023-01-26T20:40:09+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -1860,89 +1809,17 @@
             "time": "2022-12-02T22:17:43+00:00"
         },
         {
-            "name": "mockery/mockery",
-            "version": "1.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mockery/mockery.git",
-                "reference": "e92dcc83d5a51851baf5f5591d32cb2b16e3684e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mockery/mockery/zipball/e92dcc83d5a51851baf5f5591d32cb2b16e3684e",
-                "reference": "e92dcc83d5a51851baf5f5591d32cb2b16e3684e",
-                "shasum": ""
-            },
-            "require": {
-                "hamcrest/hamcrest-php": "^2.0.1",
-                "lib-pcre": ">=7.0",
-                "php": "^7.3 || ^8.0"
-            },
-            "conflict": {
-                "phpunit/phpunit": "<8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^8.5 || ^9.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.4.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Mockery": "library/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Pádraic Brady",
-                    "email": "padraic.brady@gmail.com",
-                    "homepage": "http://blog.astrumfutura.com"
-                },
-                {
-                    "name": "Dave Marshall",
-                    "email": "dave.marshall@atstsolutions.co.uk",
-                    "homepage": "http://davedevelopment.co.uk"
-                }
-            ],
-            "description": "Mockery is a simple yet flexible PHP mock object framework",
-            "homepage": "https://github.com/mockery/mockery",
-            "keywords": [
-                "BDD",
-                "TDD",
-                "library",
-                "mock",
-                "mock objects",
-                "mockery",
-                "stub",
-                "test",
-                "test double",
-                "testing"
-            ],
-            "support": {
-                "issues": "https://github.com/mockery/mockery/issues",
-                "source": "https://github.com/mockery/mockery/tree/1.5.1"
-            },
-            "time": "2022-09-07T15:32:08+00:00"
-        },
-        {
             "name": "monolog/monolog",
-            "version": "2.8.0",
+            "version": "2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "720488632c590286b88b80e62aa3d3d551ad4a50"
+                "reference": "f259e2b15fb95494c83f52d3caad003bbf5ffaa1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/720488632c590286b88b80e62aa3d3d551ad4a50",
-                "reference": "720488632c590286b88b80e62aa3d3d551ad4a50",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/f259e2b15fb95494c83f52d3caad003bbf5ffaa1",
+                "reference": "f259e2b15fb95494c83f52d3caad003bbf5ffaa1",
                 "shasum": ""
             },
             "require": {
@@ -1957,7 +1834,7 @@
                 "doctrine/couchdb": "~1.0@dev",
                 "elasticsearch/elasticsearch": "^7 || ^8",
                 "ext-json": "*",
-                "graylog2/gelf-php": "^1.4.2",
+                "graylog2/gelf-php": "^1.4.2 || ^2@dev",
                 "guzzlehttp/guzzle": "^7.4",
                 "guzzlehttp/psr7": "^2.2",
                 "mongodb/mongodb": "^1.8",
@@ -2019,7 +1896,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/2.8.0"
+                "source": "https://github.com/Seldaek/monolog/tree/2.9.1"
             },
             "funding": [
                 {
@@ -2031,130 +1908,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-24T11:55:47+00:00"
-        },
-        {
-            "name": "mpyw/laravel-database-mock",
-            "version": "v0.0.1-alpha4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mpyw/laravel-database-mock.git",
-                "reference": "6e4e8fdcb9d37e36e037f27bc5cc3a2999d4c81c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mpyw/laravel-database-mock/zipball/6e4e8fdcb9d37e36e037f27bc5cc3a2999d4c81c",
-                "reference": "6e4e8fdcb9d37e36e037f27bc5cc3a2999d4c81c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pdo": "*",
-                "illuminate/database": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
-                "illuminate/support": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
-                "mpyw/mockery-pdo": "0.0.1-alpha7@alpha",
-                "php": "^7.3 || ^8.0"
-            },
-            "require-dev": {
-                "nilportugues/sql-query-formatter": "^1.2.2",
-                "orchestra/testbench": "*",
-                "orchestra/testbench-core": "^4.9 || ^5.9 || >=6.6",
-                "phpunit/phpunit": ">=9.5"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Mpyw\\LaravelDatabaseMock\\DatabaseMockServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Mpyw\\LaravelDatabaseMock\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "mpyw",
-                    "email": "ryosuke_i_628@yahoo.co.jp"
-                }
-            ],
-            "description": "Database Mocking Library which mocks PDO underlying Laravel Connection classes",
-            "keywords": [
-                "database",
-                "eloquent",
-                "illuminate",
-                "laravel",
-                "mock",
-                "mocking",
-                "query",
-                "test",
-                "unit"
-            ],
-            "support": {
-                "issues": "https://github.com/mpyw/laravel-database-mock/issues",
-                "source": "https://github.com/mpyw/laravel-database-mock/tree/v0.0.1-alpha4"
-            },
-            "time": "2022-07-14T23:38:20+00:00"
-        },
-        {
-            "name": "mpyw/mockery-pdo",
-            "version": "v0.0.1-alpha7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mpyw/mockery-pdo.git",
-                "reference": "3e80a41fd08b7705a14ff260da5d6bf6afdf7cd9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mpyw/mockery-pdo/zipball/3e80a41fd08b7705a14ff260da5d6bf6afdf7cd9",
-                "reference": "3e80a41fd08b7705a14ff260da5d6bf6afdf7cd9",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pdo": "*",
-                "mockery/mockery": "^1.3.3 || ^1.4.2",
-                "php": "^7.3 || ^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Mpyw\\MockeryPDO\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "mpyw",
-                    "email": "ryosuke_i_628@yahoo.co.jp"
-                }
-            ],
-            "description": "BDD-style PDO Mocking Library for Mockery",
-            "keywords": [
-                "BDD",
-                "database",
-                "mock",
-                "mockery",
-                "mocking",
-                "pdo",
-                "test",
-                "testing"
-            ],
-            "support": {
-                "issues": "https://github.com/mpyw/mockery-pdo/issues",
-                "source": "https://github.com/mpyw/mockery-pdo/tree/v0.0.1-alpha7"
-            },
-            "time": "2021-11-13T19:09:22+00:00"
+            "time": "2023-02-06T13:44:46+00:00"
         },
         {
             "name": "myclabs/php-enum",
@@ -2221,16 +1975,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.65.0",
+            "version": "2.66.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "09acf64155c16dc6f580f36569ae89344e9734a3"
+                "reference": "496712849902241f04902033b0441b269effe001"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/09acf64155c16dc6f580f36569ae89344e9734a3",
-                "reference": "09acf64155c16dc6f580f36569ae89344e9734a3",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/496712849902241f04902033b0441b269effe001",
+                "reference": "496712849902241f04902033b0441b269effe001",
                 "shasum": ""
             },
             "require": {
@@ -2319,7 +2073,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-01-06T15:55:01+00:00"
+            "time": "2023-01-29T18:53:47+00:00"
         },
         {
             "name": "nette/schema",
@@ -2536,16 +2290,16 @@
         },
         {
             "name": "phpoffice/phpspreadsheet",
-            "version": "1.27.0",
+            "version": "1.27.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-                "reference": "eeb8582f9cabf5a7f4ef78015691163233a1834f"
+                "reference": "ef4e6ef74990239946d3983451a9bbed5ef1be5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/eeb8582f9cabf5a7f4ef78015691163233a1834f",
-                "reference": "eeb8582f9cabf5a7f4ef78015691163233a1834f",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/ef4e6ef74990239946d3983451a9bbed5ef1be5d",
+                "reference": "ef4e6ef74990239946d3983451a9bbed5ef1be5d",
                 "shasum": ""
             },
             "require": {
@@ -2572,7 +2326,7 @@
                 "psr/simple-cache": "^1.0 || ^2.0 || ^3.0"
             },
             "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "dev-master",
+                "dealerdirect/phpcodesniffer-composer-installer": "dev-main",
                 "dompdf/dompdf": "^1.0 || ^2.0",
                 "friendsofphp/php-cs-fixer": "^3.2",
                 "mitoteam/jpgraph": "^10.2.4",
@@ -2635,9 +2389,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHPOffice/PhpSpreadsheet/issues",
-                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/1.27.0"
+                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/1.27.1"
             },
-            "time": "2023-01-24T20:07:45+00:00"
+            "time": "2023-02-08T07:02:13+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -5587,16 +5341,16 @@
         },
         {
             "name": "tecnickcom/tcpdf",
-            "version": "6.2.22",
+            "version": "6.2.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/TCPDF.git",
-                "reference": "ac6e92fccc7d9383dfd787056831349621b1aca2"
+                "reference": "367241059ca166e3a76490f4448c284e0a161f15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/ac6e92fccc7d9383dfd787056831349621b1aca2",
-                "reference": "ac6e92fccc7d9383dfd787056831349621b1aca2",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/367241059ca166e3a76490f4448c284e0a161f15",
+                "reference": "367241059ca166e3a76490f4448c284e0a161f15",
                 "shasum": ""
             },
             "require": {
@@ -5648,7 +5402,7 @@
             "support": {
                 "source": "https://github.com/tecnickcom/TCPDF/tree/master"
             },
-            "time": "2018-09-14T15:26:29+00:00"
+            "time": "2018-10-16T17:24:05+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -6047,6 +5801,252 @@
                 "source": "https://github.com/FakerPHP/Faker/tree/v1.9.2"
             },
             "time": "2020-12-11T14:32:13+00:00"
+        },
+        {
+            "name": "hamcrest/hamcrest-php",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hamcrest/hamcrest-php.git",
+                "reference": "8c3d0a3f6af734494ad8f6fbbee0ba92422859f3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hamcrest/hamcrest-php/zipball/8c3d0a3f6af734494ad8f6fbbee0ba92422859f3",
+                "reference": "8c3d0a3f6af734494ad8f6fbbee0ba92422859f3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3|^7.0|^8.0"
+            },
+            "replace": {
+                "cordoval/hamcrest-php": "*",
+                "davedevelopment/hamcrest-php": "*",
+                "kodova/hamcrest-php": "*"
+            },
+            "require-dev": {
+                "phpunit/php-file-iterator": "^1.4 || ^2.0",
+                "phpunit/phpunit": "^4.8.36 || ^5.7 || ^6.5 || ^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "hamcrest"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "This is the PHP port of Hamcrest Matchers",
+            "keywords": [
+                "test"
+            ],
+            "support": {
+                "issues": "https://github.com/hamcrest/hamcrest-php/issues",
+                "source": "https://github.com/hamcrest/hamcrest-php/tree/v2.0.1"
+            },
+            "time": "2020-07-09T08:09:16+00:00"
+        },
+        {
+            "name": "mockery/mockery",
+            "version": "1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mockery/mockery.git",
+                "reference": "e92dcc83d5a51851baf5f5591d32cb2b16e3684e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/e92dcc83d5a51851baf5f5591d32cb2b16e3684e",
+                "reference": "e92dcc83d5a51851baf5f5591d32cb2b16e3684e",
+                "shasum": ""
+            },
+            "require": {
+                "hamcrest/hamcrest-php": "^2.0.1",
+                "lib-pcre": ">=7.0",
+                "php": "^7.3 || ^8.0"
+            },
+            "conflict": {
+                "phpunit/phpunit": "<8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5 || ^9.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Mockery": "library/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Pádraic Brady",
+                    "email": "padraic.brady@gmail.com",
+                    "homepage": "http://blog.astrumfutura.com"
+                },
+                {
+                    "name": "Dave Marshall",
+                    "email": "dave.marshall@atstsolutions.co.uk",
+                    "homepage": "http://davedevelopment.co.uk"
+                }
+            ],
+            "description": "Mockery is a simple yet flexible PHP mock object framework",
+            "homepage": "https://github.com/mockery/mockery",
+            "keywords": [
+                "BDD",
+                "TDD",
+                "library",
+                "mock",
+                "mock objects",
+                "mockery",
+                "stub",
+                "test",
+                "test double",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/mockery/mockery/issues",
+                "source": "https://github.com/mockery/mockery/tree/1.5.1"
+            },
+            "time": "2022-09-07T15:32:08+00:00"
+        },
+        {
+            "name": "mpyw/laravel-database-mock",
+            "version": "v0.0.1-alpha4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mpyw/laravel-database-mock.git",
+                "reference": "6e4e8fdcb9d37e36e037f27bc5cc3a2999d4c81c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mpyw/laravel-database-mock/zipball/6e4e8fdcb9d37e36e037f27bc5cc3a2999d4c81c",
+                "reference": "6e4e8fdcb9d37e36e037f27bc5cc3a2999d4c81c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "illuminate/database": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
+                "illuminate/support": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
+                "mpyw/mockery-pdo": "0.0.1-alpha7@alpha",
+                "php": "^7.3 || ^8.0"
+            },
+            "require-dev": {
+                "nilportugues/sql-query-formatter": "^1.2.2",
+                "orchestra/testbench": "*",
+                "orchestra/testbench-core": "^4.9 || ^5.9 || >=6.6",
+                "phpunit/phpunit": ">=9.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Mpyw\\LaravelDatabaseMock\\DatabaseMockServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mpyw\\LaravelDatabaseMock\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "mpyw",
+                    "email": "ryosuke_i_628@yahoo.co.jp"
+                }
+            ],
+            "description": "Database Mocking Library which mocks PDO underlying Laravel Connection classes",
+            "keywords": [
+                "database",
+                "eloquent",
+                "illuminate",
+                "laravel",
+                "mock",
+                "mocking",
+                "query",
+                "test",
+                "unit"
+            ],
+            "support": {
+                "issues": "https://github.com/mpyw/laravel-database-mock/issues",
+                "source": "https://github.com/mpyw/laravel-database-mock/tree/v0.0.1-alpha4"
+            },
+            "time": "2022-07-14T23:38:20+00:00"
+        },
+        {
+            "name": "mpyw/mockery-pdo",
+            "version": "v0.0.1-alpha7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mpyw/mockery-pdo.git",
+                "reference": "3e80a41fd08b7705a14ff260da5d6bf6afdf7cd9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mpyw/mockery-pdo/zipball/3e80a41fd08b7705a14ff260da5d6bf6afdf7cd9",
+                "reference": "3e80a41fd08b7705a14ff260da5d6bf6afdf7cd9",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "mockery/mockery": "^1.3.3 || ^1.4.2",
+                "php": "^7.3 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mpyw\\MockeryPDO\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "mpyw",
+                    "email": "ryosuke_i_628@yahoo.co.jp"
+                }
+            ],
+            "description": "BDD-style PDO Mocking Library for Mockery",
+            "keywords": [
+                "BDD",
+                "database",
+                "mock",
+                "mockery",
+                "mocking",
+                "pdo",
+                "test",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/mpyw/mockery-pdo/issues",
+                "source": "https://github.com/mpyw/mockery-pdo/tree/v0.0.1-alpha7"
+            },
+            "time": "2021-11-13T19:09:22+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -6514,16 +6514,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "9.2.23",
+            "version": "9.2.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "9f1f0f9a2fbb680b26d1cf9b61b6eac43a6e4e9c"
+                "reference": "2cf940ebc6355a9d430462811b5aaa308b174bed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/9f1f0f9a2fbb680b26d1cf9b61b6eac43a6e4e9c",
-                "reference": "9f1f0f9a2fbb680b26d1cf9b61b6eac43a6e4e9c",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/2cf940ebc6355a9d430462811b5aaa308b174bed",
+                "reference": "2cf940ebc6355a9d430462811b5aaa308b174bed",
                 "shasum": ""
             },
             "require": {
@@ -6579,7 +6579,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.23"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.24"
             },
             "funding": [
                 {
@@ -6587,7 +6587,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-12-28T12:41:10+00:00"
+            "time": "2023-01-26T08:26:55+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -6832,16 +6832,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.28",
+            "version": "9.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "954ca3113a03bf780d22f07bf055d883ee04b65e"
+                "reference": "e7b1615e3e887d6c719121c6d4a44b0ab9645555"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/954ca3113a03bf780d22f07bf055d883ee04b65e",
-                "reference": "954ca3113a03bf780d22f07bf055d883ee04b65e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e7b1615e3e887d6c719121c6d4a44b0ab9645555",
+                "reference": "e7b1615e3e887d6c719121c6d4a44b0ab9645555",
                 "shasum": ""
             },
             "require": {
@@ -6883,7 +6883,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "9.5-dev"
+                    "dev-master": "9.6-dev"
                 }
             },
             "autoload": {
@@ -6914,7 +6914,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.28"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.3"
             },
             "funding": [
                 {
@@ -6930,7 +6930,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-01-14T12:32:24+00:00"
+            "time": "2023-02-04T13:37:15+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -7351,16 +7351,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "5.1.4",
+            "version": "5.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "1b5dff7bb151a4db11d49d90e5408e4e938270f7"
+                "reference": "830c43a844f1f8d5b7a1f6d6076b784454d8b7ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/1b5dff7bb151a4db11d49d90e5408e4e938270f7",
-                "reference": "1b5dff7bb151a4db11d49d90e5408e4e938270f7",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/830c43a844f1f8d5b7a1f6d6076b784454d8b7ed",
+                "reference": "830c43a844f1f8d5b7a1f6d6076b784454d8b7ed",
                 "shasum": ""
             },
             "require": {
@@ -7402,7 +7402,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/environment/issues",
-                "source": "https://github.com/sebastianbergmann/environment/tree/5.1.4"
+                "source": "https://github.com/sebastianbergmann/environment/tree/5.1.5"
             },
             "funding": [
                 {
@@ -7410,7 +7410,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-04-03T09:37:03+00:00"
+            "time": "2023-02-03T06:03:51+00:00"
         },
         {
             "name": "sebastian/exporter",
@@ -7724,16 +7724,16 @@
         },
         {
             "name": "sebastian/recursion-context",
-            "version": "4.0.4",
+            "version": "4.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/recursion-context.git",
-                "reference": "cd9d8cf3c5804de4341c283ed787f099f5506172"
+                "reference": "e75bd0f07204fec2a0af9b0f3cfe97d05f92efc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/cd9d8cf3c5804de4341c283ed787f099f5506172",
-                "reference": "cd9d8cf3c5804de4341c283ed787f099f5506172",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/e75bd0f07204fec2a0af9b0f3cfe97d05f92efc1",
+                "reference": "e75bd0f07204fec2a0af9b0f3cfe97d05f92efc1",
                 "shasum": ""
             },
             "require": {
@@ -7772,10 +7772,10 @@
                 }
             ],
             "description": "Provides functionality to recursively process PHP variables",
-            "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
+            "homepage": "https://github.com/sebastianbergmann/recursion-context",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/recursion-context/issues",
-                "source": "https://github.com/sebastianbergmann/recursion-context/tree/4.0.4"
+                "source": "https://github.com/sebastianbergmann/recursion-context/tree/4.0.5"
             },
             "funding": [
                 {
@@ -7783,7 +7783,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-10-26T13:17:30+00:00"
+            "time": "2023-02-03T06:07:39+00:00"
         },
         {
             "name": "sebastian/resource-operations",
@@ -7842,16 +7842,16 @@
         },
         {
             "name": "sebastian/type",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/type.git",
-                "reference": "fb3fe09c5f0bae6bc27ef3ce933a1e0ed9464b6e"
+                "reference": "75e2c2a32f5e0b3aef905b9ed0b179b953b3d7c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/fb3fe09c5f0bae6bc27ef3ce933a1e0ed9464b6e",
-                "reference": "fb3fe09c5f0bae6bc27ef3ce933a1e0ed9464b6e",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/75e2c2a32f5e0b3aef905b9ed0b179b953b3d7c7",
+                "reference": "75e2c2a32f5e0b3aef905b9ed0b179b953b3d7c7",
                 "shasum": ""
             },
             "require": {
@@ -7886,7 +7886,7 @@
             "homepage": "https://github.com/sebastianbergmann/type",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/type/issues",
-                "source": "https://github.com/sebastianbergmann/type/tree/3.2.0"
+                "source": "https://github.com/sebastianbergmann/type/tree/3.2.1"
             },
             "funding": [
                 {
@@ -7894,7 +7894,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-09-12T14:47:03+00:00"
+            "time": "2023-02-03T06:13:03+00:00"
         },
         {
             "name": "sebastian/version",
@@ -8013,16 +8013,16 @@
         },
         {
             "name": "spatie/laravel-ray",
-            "version": "1.32.0",
+            "version": "1.32.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-ray.git",
-                "reference": "05fc99dba671c5d7478cb0400fe7152d7f00712e"
+                "reference": "0c28a8274ec261a2857b4318b6f934af98024395"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ray/zipball/05fc99dba671c5d7478cb0400fe7152d7f00712e",
-                "reference": "05fc99dba671c5d7478cb0400fe7152d7f00712e",
+                "url": "https://api.github.com/repos/spatie/laravel-ray/zipball/0c28a8274ec261a2857b4318b6f934af98024395",
+                "reference": "0c28a8274ec261a2857b4318b6f934af98024395",
                 "shasum": ""
             },
             "require": {
@@ -8082,7 +8082,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-ray/issues",
-                "source": "https://github.com/spatie/laravel-ray/tree/1.32.0"
+                "source": "https://github.com/spatie/laravel-ray/tree/1.32.2"
             },
             "funding": [
                 {
@@ -8094,7 +8094,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-01-11T10:37:27+00:00"
+            "time": "2023-02-06T09:46:50+00:00"
         },
         {
             "name": "spatie/macroable",
@@ -8148,16 +8148,16 @@
         },
         {
             "name": "spatie/ray",
-            "version": "1.36.0",
+            "version": "1.36.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ray.git",
-                "reference": "4a4def8cda4806218341b8204c98375aa8c34323"
+                "reference": "71dfde21900447ab37698fc07ff28b7f1e1822b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ray/zipball/4a4def8cda4806218341b8204c98375aa8c34323",
-                "reference": "4a4def8cda4806218341b8204c98375aa8c34323",
+                "url": "https://api.github.com/repos/spatie/ray/zipball/71dfde21900447ab37698fc07ff28b7f1e1822b8",
+                "reference": "71dfde21900447ab37698fc07ff28b7f1e1822b8",
                 "shasum": ""
             },
             "require": {
@@ -8172,7 +8172,8 @@
             },
             "require-dev": {
                 "illuminate/support": "6.x|^8.18|^9.0",
-                "nesbot/carbon": "^2.43",
+                "nesbot/carbon": "^2.63",
+                "pestphp/pest": "^1.22",
                 "phpstan/phpstan": "^0.12.92",
                 "phpunit/phpunit": "^9.5",
                 "spatie/phpunit-snapshot-assertions": "^4.2",
@@ -8207,7 +8208,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/ray/issues",
-                "source": "https://github.com/spatie/ray/tree/1.36.0"
+                "source": "https://github.com/spatie/ray/tree/1.36.2"
             },
             "funding": [
                 {
@@ -8219,7 +8220,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2022-08-11T14:04:18+00:00"
+            "time": "2023-02-10T09:24:13+00:00"
         },
         {
             "name": "symfony/config",
@@ -8553,28 +8554,30 @@
         },
         {
             "name": "zbateson/mail-mime-parser",
-            "version": "2.2.3",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zbateson/mail-mime-parser.git",
-                "reference": "295c7f82a8c44af685680d9df6714beb812e90ff"
+                "reference": "20b3e48eb799537683780bc8782fbbe9bc25934a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zbateson/mail-mime-parser/zipball/295c7f82a8c44af685680d9df6714beb812e90ff",
-                "reference": "295c7f82a8c44af685680d9df6714beb812e90ff",
+                "url": "https://api.github.com/repos/zbateson/mail-mime-parser/zipball/20b3e48eb799537683780bc8782fbbe9bc25934a",
+                "reference": "20b3e48eb799537683780bc8782fbbe9bc25934a",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/psr7": "^1.7.0|^2.0",
-                "php": ">=5.4",
+                "php": ">=7.1",
                 "pimple/pimple": "^3.0",
                 "zbateson/mb-wrapper": "^1.0.1",
                 "zbateson/stream-decorators": "^1.0.6"
             },
             "require-dev": {
+                "friendsofphp/php-cs-fixer": "*",
                 "mikey179/vfsstream": "^1.6.0",
-                "sanmai/phpunit-legacy-adapter": "^6.3 || ^8.2"
+                "phpstan/phpstan": "*",
+                "phpunit/phpunit": "<10"
             },
             "suggest": {
                 "ext-iconv": "For best support/performance",
@@ -8622,7 +8625,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-09-28T16:31:49+00:00"
+            "time": "2023-02-14T22:58:03+00:00"
         },
         {
             "name": "zbateson/mb-wrapper",
@@ -8758,10 +8761,9 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "alpha",
     "stability-flags": {
-        "mpyw/laravel-database-mock": 15,
-        "mpyw/mockery-pdo": 15
+        "mpyw/laravel-database-mock": 15
     },
     "prefer-stable": false,
     "prefer-lowest": false,

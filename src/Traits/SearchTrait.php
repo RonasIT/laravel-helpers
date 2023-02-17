@@ -112,8 +112,8 @@ trait SearchTrait
         }
 
         $this->query = $this
-            ->with(Arr::get($filter, 'with', []))
-            ->withCount(Arr::get($filter, 'with_count', []))
+            ->with(Arr::get($filter, 'with', $this->attachedRelations))
+            ->withCount(Arr::get($filter, 'with_count', $this->attachedRelationsCount))
             ->getQuery();
 
         $this->filter = $filter;
@@ -359,6 +359,8 @@ trait SearchTrait
             $this->onlyTrashed(false);
             $this->withTrashed(false);
             $this->force(false);
+            $this->with([]);
+            $this->withCount([]);
         }
     }
 }

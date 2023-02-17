@@ -2,11 +2,9 @@
 
 namespace RonasIT\Support\Tests;
 
-use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
-use ReflectionMethod;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class SearchTraitTest extends HelpersTestCase
@@ -14,13 +12,16 @@ class SearchTraitTest extends HelpersTestCase
     use MockTrait, SqlMockTrait;
 
     protected TestRepository $testRepositoryClass;
+
     protected ReflectionProperty $onlyTrashedProperty;
     protected ReflectionProperty $withTrashedProperty;
     protected ReflectionProperty $forceModeProperty;
+    protected ReflectionProperty $attachedRelationsProperty;
+    protected ReflectionProperty $attachedRelationsCountProperty;
     protected ReflectionProperty $queryProperty;
+    protected ReflectionProperty $shouldSettablePropertiesBeResetProperty;
 
-    protected ReflectionMethod $postQueryHookMethod;
-    protected ReflectionMethod $resetSettableProperties;
+    protected array $selectResult;
 
     public function setUp(): void
     {
@@ -37,100 +38,96 @@ class SearchTraitTest extends HelpersTestCase
         $this->forceModeProperty = new ReflectionProperty(TestRepository::class, 'forceMode');
         $this->forceModeProperty->setAccessible('pubic');
 
+        $this->attachedRelationsProperty = new ReflectionProperty(TestRepository::class, 'attachedRelations');
+        $this->attachedRelationsProperty->setAccessible('pubic');
+
+        $this->attachedRelationsCountProperty = new ReflectionProperty(TestRepository::class, 'attachedRelationsCount');
+        $this->attachedRelationsCountProperty->setAccessible('pubic');
+
+        $this->shouldSettablePropertiesBeResetProperty = new ReflectionProperty(TestRepository::class, 'shouldSettablePropertiesBeReset');
+        $this->shouldSettablePropertiesBeResetProperty->setAccessible('pubic');
+
         $this->queryProperty = new ReflectionProperty(TestRepository::class, 'query');
         $this->queryProperty->setAccessible('pubic');
 
-        $this->postQueryHookMethod = new ReflectionMethod($this->testRepositoryClass, 'postQueryHook');
-        $this->postQueryHookMethod->setAccessible('pubic');
-
-        $this->resetSettableProperties = new ReflectionMethod($this->testRepositoryClass, 'resetSettableProperties');
-        $this->resetSettableProperties->setAccessible('pubic');
+        $this->selectResult = $this->getJsonFixture('select_query_result.json');
     }
 
-    public function testSearchQueryWithOnlyTrashed()
+    public function testSearchQuery()
     {
-        $this->testRepositoryClass->searchQuery(['only_trashed' => true]);
-
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+        $this->testRepositoryClass
+            ->force()
+            ->searchQuery([
+                'with_trashed' => true,
+                'only_trashed' => true,
+                'with' => ['relation'],
+                'with_count' => ['relation']
+            ]);
 
         $sql = $this->queryProperty->getValue($this->testRepositoryClass)->toSql();
 
-        $this->assertEquals(true, $onlyTrashed);
+        $this->assertSettableProperties(true, false, true, ['relation'], ['relation']);
 
-        $this->assertEqualsFixture('search_query_with_only_trashed_sql.json', $sql);
+        $this->assertEqualsFixture('search_query_sql.json', $sql);
     }
 
     public function testGetSearchResultWithAll()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo
-            ->shouldSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc')
-            ->whenFetchAllCalled();
+        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc');
 
         $this->testRepositoryClass->searchQuery(['all' => true])->getSearchResults();
     }
 
     public function testGetSearchResult()
     {
-        $this->mockGetSearchResult();
+        $this->mockGetSearchResult($this->selectResult);
 
-        $this->testRepositoryClass->searchQuery()->getSearchResults();
+        $this->testRepositoryClass
+            ->force()
+            ->searchQuery([
+                'with_trashed' => true,
+                'only_trashed' => true,
+                'with' => 'relation',
+                'with_count' => 'relation'
+            ])
+            ->getSearchResults();
+
+        $this->assertSettableProperties();
     }
 
-    public function testGetSearchResultWithOnlyTrashed()
+    public function testGetSearchResultWithTrashed()
     {
-        $this->mockGetSearchResultWithOnlyTrash();
+        $this->mockGetSearchResultWithTrashed();
 
-        $this->testRepositoryClass->searchQuery(['only_trashed' => true])->getSearchResults();
+        $this->testRepositoryClass->searchQuery(['with_trashed' => true])->getSearchResults();
 
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
 
-        $this->assertEquals(false, $onlyTrashed);
+        $this->assertEquals(false, $withTrashed);
     }
 
     public function testGetSearchResultAggregateIsNull()
     {
-        $pdo = DBMock::mockPdo();
-        $pdo
-            ->shouldSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null')
-            ->shouldFetchAllReturns([['aggregate' => null]]);
+        $this->mockSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null', [], [['aggregate' => null]]);
 
-        $this->testRepositoryClass->searchQuery([])->getSearchResults();
-    }
-
-    public function testPostQueryHookMethod()
-    {
-        $this->testRepositoryClass->onlyTrashed();
-        $this->testRepositoryClass->force();
-        $this->testRepositoryClass->withTrashed();
-
-        $this->postQueryHookMethod->invoke($this->testRepositoryClass);
-
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
-        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
-        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
-
-        $this->assertEquals(false, $onlyTrashed);
-        $this->assertEquals(false, $withTrashed);
-        $this->assertEquals(false, $forceMode);
+        $this->testRepositoryClass->searchQuery()->getSearchResults();
     }
 
     public function testPostQueryHookMethodPropertyFalse()
     {
-        $this->testRepositoryClass->onlyTrashed();
-        $this->testRepositoryClass->force();
-        $this->testRepositoryClass->withTrashed();
+        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->resetSettableProperties->invoke($this->testRepositoryClass, false);
+        $this->mockGetSearchResult($this->selectResult);
 
-        $this->postQueryHookMethod->invoke($this->testRepositoryClass);
+        $this->testRepositoryClass
+            ->onlyTrashed()
+            ->withTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->searchQuery()
+            ->getSearchResults();
 
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
-        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
-        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
-
-        $this->assertEquals(true, $onlyTrashed);
-        $this->assertEquals(true, $withTrashed);
-        $this->assertEquals(true, $forceMode);
+        $this->assertSettableProperties(true, false, true, ['relation'], ['relation']);
     }
 }
