@@ -112,8 +112,8 @@ trait SearchTrait
         }
 
         $this->query = $this
-            ->with(Arr::get($filter, 'with', []))
-            ->withCount(Arr::get($filter, 'with_count', []))
+            ->with(Arr::get($filter, 'with', $this->attachedRelations))
+            ->withCount(Arr::get($filter, 'with_count', $this->attachedRelationsCount))
             ->getQuery();
 
         $this->filter = $filter;
@@ -146,6 +146,8 @@ trait SearchTrait
     public function getSearchResults(): LengthAwarePaginator
     {
         $this->orderBy();
+
+        $this->postQueryHook();
 
         if (empty($this->filter['all'])) {
             return $this->getModifiedPaginator($this->paginate());
@@ -349,5 +351,16 @@ trait SearchTrait
         }
 
         return config('defaults.items_per_page', 1);
+    }
+
+    protected function postQueryHook(): void
+    {
+        if ($this->shouldSettablePropertiesBeReset) {
+            $this->onlyTrashed(false);
+            $this->withTrashed(false);
+            $this->force(false);
+            $this->with([]);
+            $this->withCount([]);
+        }
     }
 }
