@@ -51,7 +51,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
      *
      * @return $this
      */
-    public function setType(string $type): self
+    public function setType(string $type)
     {
         $this->type = $type;
 
