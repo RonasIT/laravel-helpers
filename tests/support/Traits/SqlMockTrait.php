@@ -145,6 +145,11 @@ trait SqlMockTrait
         $this->mockSelect('select * from `test_models` order by `id` asc limit 15 offset 0', [], [], $pdo);
     }
 
+    protected function mockGetCountOfUsersExceptAuthorized(int $count): void
+    {
+        $this->mockSelect("select count(*) as entities_count from users where id <> 1 and email = 'mail@mail.com';", [], [['entities_count' => $count]]);
+    }
+
     protected function mockUpdateSqlQuery(string $sql, array $bindings = [], ?int $rowCount = null, SingleConnectionProxy $pdo = null): SingleConnectionProxy
     {
         if (empty($pdo)) {
