@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use ReflectionProperty;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
@@ -14,6 +15,7 @@ class HttpRequestServiceTest extends HelpersTestCase
 
     protected HttpRequestService $httpRequestServiceClass;
     protected ReflectionProperty $optionsProperty;
+    protected ReflectionProperty $responseProperty;
 
     public function setUp(): void
     {
@@ -22,7 +24,10 @@ class HttpRequestServiceTest extends HelpersTestCase
         $this->httpRequestServiceClass = new HttpRequestService();
 
         $this->optionsProperty = new ReflectionProperty(HttpRequestService::class, 'options');
-        $this->optionsProperty->setAccessible('pubic');
+        $this->optionsProperty->setAccessible(true);
+
+        $this->responseProperty = new ReflectionProperty(HttpRequestService::class, 'response');
+        $this->responseProperty->setAccessible(true);
     }
 
     public function testSend()
@@ -125,5 +130,25 @@ class HttpRequestServiceTest extends HelpersTestCase
         $this->httpRequestServiceClass->put('https://some.url.com', [
             'some_key' => 'some_value'
         ], $headers);
+    }
+
+    public function testJSONResponse()
+    {
+        $response = $this->getFixture('json_response.json');
+
+        $this->responseProperty->setValue($this->httpRequestServiceClass, new GuzzleResponse(200, [], $response));
+
+        $result = $this->httpRequestServiceClass->json();
+
+        $this->assertEquals(json_decode($response, true), $result);
+    }
+
+    public function testNotJSONResponse()
+    {
+        $this->expectException(InvalidJSONFormatException::class);
+
+        $this->responseProperty->setValue($this->httpRequestServiceClass, new GuzzleResponse(401, [], 'Some not json string'));
+
+        $this->httpRequestServiceClass->json();
     }
 }
