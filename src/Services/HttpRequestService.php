@@ -203,11 +203,10 @@ class HttpRequestService
             return;
         }
 
-        $lowerHeaders = array_associate($headers, function ($value, $key) {
-            return [
-                'key' => strtolower($key),
-                'value' => $value
-            ];
+        $lowerHeaders = [];
+
+        array_walk($headers, function($value, $key) use (&$lowerHeaders) {
+            $lowerHeaders[strtolower($key)] = $value;
         });
 
         $contentType = Arr::get($lowerHeaders, 'content-type');

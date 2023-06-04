@@ -37,7 +37,7 @@ class CsvIterator implements Iterator
         $this->currentRow = 0;
     }
 
-    public function current()
+    public function current(): array
     {
         if (empty($this->columns)) {
             return $this->currentCsvLine;
@@ -47,12 +47,13 @@ class CsvIterator implements Iterator
             throw new IncorrectCSVFileException('Incorrect CSV file');
         }
 
-        return array_associate($this->currentCsvLine, function ($value, $key) {
-            return [
-                'key' => $this->columns[$key],
-                'value' => $value
-            ];
+        $result = [];
+
+        array_walk($this->currentCsvLine, function($value, $key) use (&$result) {
+            $result[$this->columns[$key]] = $value;
         });
+
+        return $result;
     }
 
     public function getGenerator(): Generator
