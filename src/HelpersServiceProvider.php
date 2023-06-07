@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Middleware\SecurityMiddleware;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Illuminate\Support\Arr;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -19,15 +19,21 @@ class HelpersServiceProvider extends ServiceProvider
         $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
         $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
 
-        Validator::extend('unique_except_of_authorized_user', function ($attribute, $value) {
-            if (gettype($value) !== 'string') {
-                throw new UnprocessableEntityHttpException("The {$attribute} must be a string.");
-            }
-
+        Validator::extend('unique_except_of_authorized_user', function ($attribute, $value, $parameters = []) {
+            $table = !empty($parameters)
+                ? $parameters[0]
+                : 'users';
+            $keyField = (!empty($parameters) && count($parameters) > 1)
+                ? $parameters[1]
+                : 'id';
             $userId = Auth::id();
-            $result = DB::select("select count(*) as entities_count from users where id <> {$userId} and {$attribute} = '{$value}';");
 
-            return $result[0]['entities_count'] == 0;
+            $result = DB::table($table)
+                ->where($keyField, '<>', $userId)
+                ->whereIn($attribute, Arr::flatten((array)$value))
+                ->exists();
+
+            return !$result;
         });
 
         app(ExcelServiceProvider::class, ['app' => app()])->boot();

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class ValidatorTest extends HelpersTestCase
 {
@@ -17,13 +16,12 @@ class ValidatorTest extends HelpersTestCase
     {
         parent::setUp();
 
-        Auth::shouldReceive('id')
-            ->andReturn(1);
+        Auth::shouldReceive('id')->andReturn(1);
     }
 
     public function testUniqueExceptOfAuthorizedUserPass()
     {
-        $this->mockGetCountOfUsersExceptAuthorized(0);
+        $this->mockExistsUsersExceptAuthorized(false);
 
         $validator = Validator::make(
             ['email' => 'mail@mail.com'],
@@ -33,9 +31,33 @@ class ValidatorTest extends HelpersTestCase
         $this->assertTrue($validator->passes());
     }
 
+    public function testUniqueExceptOfAuthorizedUserPassWithArray()
+    {
+        $this->mockExistsUsersExceptAuthorizedByArray(false, 'clients');
+
+        $validator = Validator::make(
+            ['email' => [['mail@mail.com'], ['mail@mail.net']]],
+            ['email' => 'unique_except_of_authorized_user:clients']
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testUniqueExceptOfAuthorizedUserPassWithDifferentKeyField()
+    {
+        $this->mockExistsUsersExceptAuthorizedByArray(false, 'clients', 'user_id');
+
+        $validator = Validator::make(
+            ['email' => [['mail@mail.com'], ['mail@mail.net']]],
+            ['email' => 'unique_except_of_authorized_user:clients,user_id']
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
     public function testUniqueExceptOfAuthorizedUserFail()
     {
-        $this->expectException(UnprocessableEntityHttpException::class);
+        $this->mockExistsUsersExceptAuthorizedByArray(true);
 
         $validator = Validator::make(
             ['email' => ['mail@mail.com', 'mail@mail.net']],
@@ -43,6 +65,5 @@ class ValidatorTest extends HelpersTestCase
         );
 
         $this->assertTrue($validator->fails());
-        $this->expectExceptionMessage('The email must be a string.');
     }
 }
