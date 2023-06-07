@@ -146,8 +146,6 @@ trait EntityControlTrait
         $model->save();
         $model->refresh();
 
-        $this->afterCreateHook($model, $data);
-
         if (!empty($this->attachedRelations)) {
             $model->load($this->attachedRelations);
         }
@@ -204,8 +202,6 @@ trait EntityControlTrait
 
         $item->save();
         $item->refresh();
-
-        $this->afterUpdateHook($item, $data);
 
         if (!empty($this->attachedRelations)) {
             $item->load($this->attachedRelations);
@@ -451,30 +447,6 @@ trait EntityControlTrait
 
             throw new InvalidModelException("Model {$modelClass} must have primary key.");
         }
-    }
-
-    /**
-     * @deprecated Method was implemented to have an ability to call some model-related methods inside the services class
-     * but since version 2.0 services classes works with he models directly and no need to call hooks
-     * @param Model|null $entity
-     * @param array $data
-     * @return void
-     */
-    protected function afterUpdateHook(?Model $entity, array $data)
-    {
-        // implement it yourself if you need it
-    }
-
-    /**
-     * @deprecated Method was implemented to have an ability to call some model-related methods inside the services class
-     * but since version 2.0 services classes works with he models directly and no need to call hooks
-     * @param Model|null $entity
-     * @param array $data
-     * @return void
-     */
-    protected function afterCreateHook(?Model $entity, array $data)
-    {
-        // implement it yourself if you need it
     }
 
     protected function resetSettableProperties(bool $value = true): void
