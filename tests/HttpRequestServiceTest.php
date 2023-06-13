@@ -134,20 +134,48 @@ class HttpRequestServiceTest extends HelpersTestCase
 
     public function testJSONResponse()
     {
-        $response = $this->getFixture('json_response.json');
+        $responseJson = $this->getFixture('json_response.json');
 
-        $this->responseProperty->setValue($this->httpRequestServiceClass, new GuzzleResponse(200, [], $response));
+        $this->mockGuzzleClient('get', [
+            'https://some.url.com',
+            [
+                'headers' => [
+                    'some_header' => 'some_header_value'
+                ],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 0
+            ]
+        ], new GuzzleResponse(200, [], $responseJson));
+
+        $this->httpRequestServiceClass->get('https://some.url.com', [], [
+            'some_header' => 'some_header_value'
+        ]);
 
         $result = $this->httpRequestServiceClass->json();
 
-        $this->assertEquals(json_decode($response, true), $result);
+        $this->assertEquals(json_decode($responseJson, true), $result);
     }
 
     public function testNotJSONResponse()
     {
         $this->expectException(InvalidJSONFormatException::class);
 
-        $this->responseProperty->setValue($this->httpRequestServiceClass, new GuzzleResponse(401, [], 'Some not json string'));
+        $this->mockGuzzleClient('get', [
+            'https://some.url.com',
+            [
+                'headers' => [
+                    'some_header' => 'some_header_value'
+                ],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 0
+            ]
+        ], new GuzzleResponse(200, [], 'Some not json string'));
+
+        $this->httpRequestServiceClass->get('https://some.url.com', [], [
+            'some_header' => 'some_header_value'
+        ]);
 
         $this->httpRequestServiceClass->json();
     }

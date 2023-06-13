@@ -40,11 +40,11 @@ class HttpRequestService
 
         $result = json_decode($stringResponse, true);
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            return $result;
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new InvalidJSONFormatException($stringResponse);
         }
 
-        throw new InvalidJSONFormatException('Response contains invalid JSON');
+        return $result;
     }
 
     public function getResponse(): ResponseInterface
@@ -132,6 +132,7 @@ class HttpRequestService
         $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
+        /* @var $client GuzzleHttp\Client */
         $client = app(Client::class);
 
         switch ($method) {
