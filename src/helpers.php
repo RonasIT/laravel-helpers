@@ -257,7 +257,7 @@ function clear_folder($path)
  *
  * @return array
  * 
- * @deprecated Use array_walk instead
+ * @deprecated Use array_walk, forEach or mapWithKeys instead
  */
 function array_associate(array $array, callable $callback): array
 {

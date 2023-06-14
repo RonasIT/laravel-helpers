@@ -134,7 +134,8 @@ class CsvIteratorTest extends HelpersTestCase
 
         $generator = $this->csvIteratorClass->getGenerator();
 
-        foreach ($generator as $columns) {}
+        foreach ($generator as $row) {
+        }
 
         $this->assertFalse($this->csvIteratorClass->valid());
     }

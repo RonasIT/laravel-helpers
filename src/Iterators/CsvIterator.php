@@ -47,13 +47,7 @@ class CsvIterator implements Iterator
             throw new IncorrectCSVFileException('Incorrect CSV file');
         }
 
-        $result = [];
-
-        array_walk($this->currentCsvLine, function($value, $key) use (&$result) {
-            $result[$this->columns[$key]] = $value;
-        });
-
-        return $result;
+        return array_combine($this->columns, $this->currentCsvLine);
     }
 
     public function getGenerator(): Generator
