@@ -83,8 +83,8 @@ class CsvIteratorTest extends HelpersTestCase
         $result = [];
         $generator = $this->csvIteratorClass->getGenerator();
 
-        foreach ($generator as $columns) {
-            $result[] = $columns;
+        foreach ($generator as $row) {
+            $result[] = $row;
         }
 
         $rowKey = $this->csvIteratorClass->key();
