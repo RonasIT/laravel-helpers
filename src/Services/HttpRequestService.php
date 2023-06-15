@@ -211,14 +211,8 @@ class HttpRequestService
             return;
         }
 
-        $lowerHeaders = array_associate($headers, function ($value, $key) {
-            return [
-                'key' => strtolower($key),
-                'value' => $value
-            ];
-        });
-
-        $contentType = Arr::get($lowerHeaders, 'content-type');
+        $headers = array_change_key_case($headers, CASE_LOWER);
+        $contentType = Arr::get($headers, 'content-type');
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;

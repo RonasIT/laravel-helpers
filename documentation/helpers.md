@@ -141,7 +141,7 @@ $result = array_concat($array, function ($value, $key) {
 
 Remove all files and folders from `$path`.
 
-### array_associate($array, $callback)
+### array_associate($array, $callback) (deprecated)
 
 Builds an associative array by gotten keys and values.
 
