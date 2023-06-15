@@ -10,4 +10,9 @@ class TestRepository extends BaseRepository
     {
         $this->setModel(TestModel::class);
     }
+
+    public function getUser(): string
+    {
+        return 'Correct result';
+    }
 }
