@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\RequestException;
+use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
 class HttpRequestService
@@ -32,9 +33,15 @@ class HttpRequestService
 
     public function parseJsonResponse($response)
     {
-        $stringResponse = (string)$response->getBody();
+        $stringResponse = (string) $response->getBody();
 
-        return json_decode($stringResponse, true);
+        $result = json_decode($stringResponse, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new InvalidJSONFormatException($stringResponse);
+        }
+
+        return $result;
     }
 
     public function saveCookieSession(): self
