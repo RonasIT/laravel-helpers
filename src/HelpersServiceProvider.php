@@ -20,17 +20,13 @@ class HelpersServiceProvider extends ServiceProvider
         $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
 
         Validator::extend('unique_except_of_authorized_user', function ($attribute, $value, $parameters = []) {
-            $table = !empty($parameters)
-                ? $parameters[0]
-                : 'users';
-            $keyField = (!empty($parameters) && count($parameters) > 1)
-                ? $parameters[1]
-                : 'id';
+            $table = Arr::get($parameters, 0, 'users');
+            $keyField = Arr::get($parameters, 1, 'id');
             $userId = Auth::id();
 
             $result = DB::table($table)
                 ->where($keyField, '<>', $userId)
-                ->whereIn($attribute, Arr::flatten((array)$value))
+                ->whereIn($attribute, Arr::flatten((array) $value))
                 ->exists();
 
             return !$result;
