@@ -141,7 +141,7 @@ $result = array_concat($array, function ($value, $key) {
 
 Remove all files and folders from `$path`.
 
-### array_associate($array, $callback)
+### array_associate($array, $callback) (deprecated)
 
 Builds an associative array by gotten keys and values.
 
@@ -171,14 +171,14 @@ $result = array_associate($array, function($value) {
 //[1 => "first", 2 => "second", 3 => "third"]
 ````
 
-### array_duplicate($array)
+### array_get_duplicates($array)
 
 Return duplicated values of input `$array`.
 
 ```php
 $array = [1, 2, 2, 3];
 
-array_duplicate($array);
+array_get_duplicates($array);
 
 //[2 => 2]
 ````

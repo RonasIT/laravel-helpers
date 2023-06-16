@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
+use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
 class HttpRequestService
@@ -37,7 +38,13 @@ class HttpRequestService
     {
         $stringResponse = (string) $this->response->getBody();
 
-        return json_decode($stringResponse, true);
+        $result = json_decode($stringResponse, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new InvalidJSONFormatException($stringResponse);
+        }
+
+        return $result;
     }
 
     public function getResponse(): ResponseInterface
@@ -125,6 +132,7 @@ class HttpRequestService
         $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
+        /* @var $client GuzzleHttp\Client */
         $client = app(Client::class);
 
         switch ($method) {
@@ -203,14 +211,8 @@ class HttpRequestService
             return;
         }
 
-        $lowerHeaders = array_associate($headers, function ($value, $key) {
-            return [
-                'key' => strtolower($key),
-                'value' => $value
-            ];
-        });
-
-        $contentType = Arr::get($lowerHeaders, 'content-type');
+        $headers = array_change_key_case($headers, CASE_LOWER);
+        $contentType = Arr::get($headers, 'content-type');
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;

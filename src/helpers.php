@@ -243,7 +243,7 @@ function clear_folder($path)
 
 /**
  * Builds an associative array by gotten keys and values
- *
+ * 
  * @param array $array
  * @param callable $callback - should return associate array with "key" and "value" keys
  *
@@ -256,6 +256,8 @@ function clear_folder($path)
  *  }
  *
  * @return array
+ * 
+ * @deprecated Use array_walk, forEach or mapWithKeys instead
  */
 function array_associate(array $array, callable $callback): array
 {
@@ -270,20 +272,6 @@ function array_associate(array $array, callable $callback): array
     }
 
     return $result;
-}
-
-/**
- * Get duplicate values of array
- *
- * @param array $array
- *
- * @return array
- *
- * @deprecated Use array_get_duplicates
- */
-function array_duplicate($array)
-{
-    return array_get_duplicates($array);
 }
 
 /**
