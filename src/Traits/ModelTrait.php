@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait ModelTrait
@@ -137,7 +136,7 @@ trait ModelTrait
         }
     }
 
-    private function getOrderedField(&$relations): string
+    protected function getOrderedField(&$relations): string
     {
         if (is_array($relations)) {
             return array_pop($relations);

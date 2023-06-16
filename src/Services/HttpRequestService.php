@@ -181,7 +181,7 @@ class HttpRequestService
         }
     }
 
-    private function setOptions(array $headers): self
+    protected function setOptions(array $headers): self
     {
         $this->options['headers'] = $headers;
         $this->options['cookies'] = $this->cookies;
@@ -191,7 +191,7 @@ class HttpRequestService
         return $this;
     }
 
-    private function setData(string $method, array $headers, array $data = []): void
+    protected function setData(string $method, array $headers, array $data = []): void
     {
         if (empty($data)) {
             return;
