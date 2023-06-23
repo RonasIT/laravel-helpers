@@ -107,7 +107,7 @@ class HttpRequestService
         return $this->send('patch', $url, $data, $headers);
     }
 
-    protected function send(string $method, string $url, array $data = [], array $headers = []): self
+    public function send(string $method, string $url, array $data = [], array $headers = []): self
     {
         $startTime = microtime(true);
 
