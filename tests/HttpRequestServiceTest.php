@@ -5,6 +5,7 @@ namespace RonasIT\Support\Tests;
 use ReflectionProperty;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
+use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
@@ -223,6 +224,17 @@ class HttpRequestServiceTest extends HelpersTestCase
         ]);
 
         $this->httpRequestServiceClass->patch('https://some.url.com', [
+            'some_key' => 'some_value'
+        ], [
+            'some_header' => 'some_header_value'
+        ]);
+    }
+
+    public function testSendWithUnsupportedMethod()
+    {
+        $this->expectException(UnknownRequestMethodException::class);
+
+        $this->httpRequestServiceClass->send('unsupported', 'https://some.url.com', [
             'some_key' => 'some_value'
         ], [
             'some_header' => 'some_header_value'

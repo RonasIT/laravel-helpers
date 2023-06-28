@@ -132,7 +132,6 @@ class HttpRequestService
         $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
-        /* @var $client GuzzleHttp\Client */
         $client = app(Client::class);
 
         switch ($method) {
