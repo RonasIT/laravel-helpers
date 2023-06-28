@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/app/tests" tests="98" assertions="449" errors="0" warnings="0" failures="0" skipped="0" time="7.991022">
+    <testsuite name="RonasIT\Support\Tests\CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" tests="10" assertions="15" errors="0" warnings="0" failures="0" skipped="0" time="1.473131">
+      <testcase name="testOpenNotExistsFile" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="24" assertions="1" time="0.892513"/>
+      <testcase name="testParseColumns" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="33" assertions="1" time="0.089011"/>
+      <testcase name="testCurrent" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="44" assertions="1" time="0.061243"/>
+      <testcase name="testKey" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="51" assertions="1" time="0.058489"/>
+      <testcase name="testNext" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="58" assertions="2" time="0.061416"/>
+      <testcase name="testRewind" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="69" assertions="2" time="0.064197"/>
+      <testcase name="testGenerator" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="81" assertions="2" time="0.061393"/>
+      <testcase name="testGeneratorWithHeader" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="96" assertions="2" time="0.058770"/>
+      <testcase name="testGeneratorWithHeadersInvalidCount" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="115" assertions="1" time="0.062112"/>
+      <testcase name="testValid" class="RonasIT\Support\Tests\CsvIteratorTest" classname="RonasIT.Support.Tests.CsvIteratorTest" file="/app/tests/CsvIteratorTest.php" line="131" assertions="2" time="0.063988"/>
+    </testsuite>
+    <testsuite name="RonasIT\Support\Tests\EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" tests="35" assertions="347" errors="0" warnings="0" failures="0" skipped="0" time="2.949327">
+      <testcase name="testOnlyTrashed" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="51" assertions="1" time="0.091606"/>
+      <testcase name="testWithTrashed" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="60" assertions="1" time="0.060692"/>
+      <testcase name="testForce" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="69" assertions="1" time="0.061132"/>
+      <testcase name="testWith" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="78" assertions="1" time="0.069841"/>
+      <testcase name="testAll" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="96" assertions="9" time="0.375399"/>
+      <testcase name="testAllEmptyResult" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="111" assertions="7" time="0.068577"/>
+      <testcase name="testExists" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="126" assertions="8" time="0.075357"/>
+      <testcase name="testExistsBy" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="141" assertions="8" time="0.081233"/>
+      <testcase name="testCreate" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="156" assertions="16" time="0.087404"/>
+      <testcase name="testUpdateMany" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="171" assertions="10" time="0.077046"/>
+      <testcase name="testUpdate" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="190" assertions="22" time="0.096923"/>
+      <testcase name="testUpdateDoesntExist" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="205" assertions="8" time="0.072382"/>
+      <testcase name="testUpdateOrCreateEntityExists" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="220" assertions="25" time="0.101992"/>
+      <testcase name="testUpdateOrCreateEntityDoesntExist" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="235" assertions="20" time="0.084832"/>
+      <testcase name="testCount" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="250" assertions="8" time="0.069723"/>
+      <testcase name="testGet" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="265" assertions="10" time="0.075005"/>
+      <testcase name="testGetEmptyResult" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="280" assertions="8" time="0.068821"/>
+      <testcase name="testFirst" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="295" assertions="10" time="0.075207"/>
+      <testcase name="testFirstEmptyResult" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="310" assertions="8" time="0.076054"/>
+      <testcase name="testFindBy" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="325" assertions="10" time="0.073221"/>
+      <testcase name="testFindByEmptyResult" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="340" assertions="8" time="0.075831"/>
+      <testcase name="testFind" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="355" assertions="10" time="0.078784"/>
+      <testcase name="testFindEmptyResult" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="370" assertions="8" time="0.069564"/>
+      <testcase name="testFirstOrCreateEntityExists" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="385" assertions="10" time="0.075248"/>
+      <testcase name="testFirstOrCreateEntityDoesntExists" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="400" assertions="20" time="0.085517"/>
+      <testcase name="testDelete" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="415" assertions="8" time="0.071775"/>
+      <testcase name="testRestore" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="430" assertions="10" time="0.072539"/>
+      <testcase name="testChunk" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="448" assertions="9" time="0.077968"/>
+      <testcase name="testChunkEmptyResult" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="463" assertions="7" time="0.070275"/>
+      <testcase name="testDeleteByList" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="478" assertions="10" time="0.073465"/>
+      <testcase name="testRestoreByList" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="497" assertions="12" time="0.071555"/>
+      <testcase name="testGetByList" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="516" assertions="12" time="0.075017"/>
+      <testcase name="testGetByListEmptyResult" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="531" assertions="10" time="0.071901"/>
+      <testcase name="testCountByList" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="546" assertions="10" time="0.067531"/>
+      <testcase name="testUpdateByList" class="RonasIT\Support\Tests\EntityControlTraitTest" classname="RonasIT.Support.Tests.EntityControlTraitTest" file="/app/tests/EntityControlTraitTest.php" line="561" assertions="12" time="0.069909"/>
+    </testsuite>
+    <testsuite name="RonasIT\Support\Tests\EntityServiceTest" file="/app/tests/EntityServiceTest.php" tests="3" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.191922">
+      <testcase name="testSetRepository" class="RonasIT\Support\Tests\EntityServiceTest" classname="RonasIT.Support.Tests.EntityServiceTest" file="/app/tests/EntityServiceTest.php" line="28" assertions="1" time="0.061801"/>
+      <testcase name="testCallRepositoryMethod" class="RonasIT\Support\Tests\EntityServiceTest" classname="RonasIT.Support.Tests.EntityServiceTest" file="/app/tests/EntityServiceTest.php" line="35" assertions="1" time="0.069290"/>
+      <testcase name="testCallNotExistsRepositoryMethod" class="RonasIT\Support\Tests\EntityServiceTest" classname="RonasIT.Support.Tests.EntityServiceTest" file="/app/tests/EntityServiceTest.php" line="44" assertions="1" time="0.060830"/>
+    </testsuite>
+    <testsuite name="RonasIT\Support\Tests\FixturesTraitTest" file="/app/tests/FixturesTraitTest.php" tests="5" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.344520">
+      <testsuite name="RonasIT\Support\Tests\FixturesTraitTest::testGetFixture" tests="1" assertions="1" errors="0" warnings="0" failures="0" skipped="0" time="0.063969">
+        <testcase name="testGetFixture with data set #0" class="RonasIT\Support\Tests\FixturesTraitTest" classname="RonasIT.Support.Tests.FixturesTraitTest" file="/app/tests/FixturesTraitTest.php" line="23" assertions="1" time="0.063969"/>
+      </testsuite>
+      <testcase name="testGetFixtureNotExistsWithoutException" class="RonasIT\Support\Tests\FixturesTraitTest" classname="RonasIT.Support.Tests.FixturesTraitTest" file="/app/tests/FixturesTraitTest.php" line="30" assertions="1" time="0.066127"/>
+      <testcase name="testGetFixtureNotExistsWithException" class="RonasIT\Support\Tests\FixturesTraitTest" classname="RonasIT.Support.Tests.FixturesTraitTest" file="/app/tests/FixturesTraitTest.php" line="37" assertions="2" time="0.061704"/>
+      <testcase name="testGetClearPsqlDatabaseQuery" class="RonasIT\Support\Tests\FixturesTraitTest" classname="RonasIT.Support.Tests.FixturesTraitTest" file="/app/tests/FixturesTraitTest.php" line="46" assertions="1" time="0.081621"/>
+      <testcase name="testGetClearMysqlDatabaseQuery" class="RonasIT\Support\Tests\FixturesTraitTest" classname="RonasIT.Support.Tests.FixturesTraitTest" file="/app/tests/FixturesTraitTest.php" line="55" assertions="1" time="0.071099"/>
+    </testsuite>
+    <testsuite name="RonasIT\Support\Tests\HelpersTest" file="/app/tests/HelpersTest.php" tests="26" assertions="26" errors="0" warnings="0" failures="0" skipped="0" time="1.623814">
+      <testsuite name="RonasIT\Support\Tests\HelpersTest::testGetList" tests="7" assertions="7" errors="0" warnings="0" failures="0" skipped="0" time="0.453349">
+        <testcase name="testGetList with data set #0" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="55" assertions="1" time="0.064739"/>
+        <testcase name="testGetList with data set #1" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="55" assertions="1" time="0.061465"/>
+        <testcase name="testGetList with data set #2" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="55" assertions="1" time="0.059928"/>
+        <testcase name="testGetList with data set #3" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="55" assertions="1" time="0.060806"/>
+        <testcase name="testGetList with data set #4" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="55" assertions="1" time="0.070392"/>
+        <testcase name="testGetList with data set #5" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="55" assertions="1" time="0.076432"/>
+        <testcase name="testGetList with data set #6" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="55" assertions="1" time="0.059586"/>
+      </testsuite>
+      <testsuite name="RonasIT\Support\Tests\HelpersTest::testIsMultidimensional" tests="3" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.174212">
+        <testcase name="testIsMultidimensional with data set #0" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="88" assertions="1" time="0.058549"/>
+        <testcase name="testIsMultidimensional with data set #1" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="88" assertions="1" time="0.056696"/>
+        <testcase name="testIsMultidimensional with data set #2" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="88" assertions="1" time="0.058968"/>
+      </testsuite>
+      <testsuite name="RonasIT\Support\Tests\HelpersTest::testEquals" tests="4" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.269736">
+        <testcase name="testEquals with data set #0" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="130" assertions="1" time="0.060139"/>
+        <testcase name="testEquals with data set #1" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="130" assertions="1" time="0.066879"/>
+        <testcase name="testEquals with data set #2" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="130" assertions="1" time="0.082257"/>
+        <testcase name="testEquals with data set #3" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="130" assertions="1" time="0.060462"/>
+      </testsuite>
+      <testcase name="testArrayRound" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="140" assertions="1" time="0.067011"/>
+      <testsuite name="RonasIT\Support\Tests\HelpersTest::testArrayGetDuplicate" tests="3" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.178658">
+        <testcase name="testArrayGetDuplicate with data set #0" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="173" assertions="1" time="0.058588"/>
+        <testcase name="testArrayGetDuplicate with data set #1" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="173" assertions="1" time="0.063653"/>
+        <testcase name="testArrayGetDuplicate with data set #2" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="173" assertions="1" time="0.056418"/>
+      </testsuite>
+      <testsuite name="RonasIT\Support\Tests\HelpersTest::testArrayUniqueObjects" tests="3" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.179187">
+        <testcase name="testArrayUniqueObjects with data set #0" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="208" assertions="1" time="0.059362"/>
+        <testcase name="testArrayUniqueObjects with data set #1" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="208" assertions="1" time="0.058177"/>
+        <testcase name="testArrayUniqueObjects with data set #2" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="208" assertions="1" time="0.061647"/>
+      </testsuite>
+      <testcase name="testArrayTrim" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="217" assertions="1" time="0.061499"/>
+      <testsuite name="RonasIT\Support\Tests\HelpersTest::testArrayRemoveByField" tests="2" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.116979">
+        <testcase name="testArrayRemoveByField with data set #0" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="249" assertions="1" time="0.058881"/>
+        <testcase name="testArrayRemoveByField with data set #1" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="249" assertions="1" time="0.058098"/>
+      </testsuite>
+      <testcase name="testArrayUndot" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="258" assertions="1" time="0.062828"/>
+      <testcase name="testArrayAssociate" class="RonasIT\Support\Tests\HelpersTest" classname="RonasIT.Support.Tests.HelpersTest" file="/app/tests/HelpersTest.php" line="267" assertions="1" time="0.060353"/>
+    </testsuite>
+    <testsuite name="RonasIT\Support\Tests\HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" tests="13" assertions="15" errors="0" warnings="0" failures="0" skipped="0" time="0.953773">
+      <testcase name="testSend" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="41" assertions="1" time="0.196366"/>
+      <testcase name="testSetOption" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="62" assertions="1" time="0.058990"/>
+      <testcase name="testSendPut" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="109" assertions="1" time="0.106091"/>
+      <testsuite name="RonasIT\Support\Tests\HttpRequestServiceTest::testSendPutAsJSON" tests="5" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.289917">
+        <testcase name="testSendPutAsJSON with data set #0" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="159" assertions="1" time="0.057174"/>
+        <testcase name="testSendPutAsJSON with data set #1" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="159" assertions="1" time="0.058107"/>
+        <testcase name="testSendPutAsJSON with data set #2" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="159" assertions="1" time="0.057780"/>
+        <testcase name="testSendPutAsJSON with data set #3" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="159" assertions="1" time="0.056742"/>
+        <testcase name="testSendPutAsJSON with data set #4" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="159" assertions="1" time="0.060114"/>
+      </testsuite>
+      <testcase name="testSendPost" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="179" assertions="1" time="0.058476"/>
+      <testcase name="testSendDelete" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="203" assertions="1" time="0.058906"/>
+      <testcase name="testSendPatch" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="222" assertions="1" time="0.057701"/>
+      <testcase name="testJSONResponse" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="246" assertions="2" time="0.066829"/>
+      <testcase name="testNotJSONResponse" class="RonasIT\Support\Tests\HttpRequestServiceTest" classname="RonasIT.Support.Tests.HttpRequestServiceTest" file="/app/tests/HttpRequestServiceTest.php" line="271" assertions="2" time="0.060497"/>
+    </testsuite>
+    <testsuite name="RonasIT\Support\Tests\SearchTraitTest" file="/app/tests/SearchTraitTest.php" tests="6" assertions="37" errors="0" warnings="0" failures="0" skipped="0" time="0.454535">
+      <testcase name="testSearchQuery" class="RonasIT\Support\Tests\SearchTraitTest" classname="RonasIT.Support.Tests.SearchTraitTest" file="/app/tests/SearchTraitTest.php" line="56" assertions="6" time="0.068399"/>
+      <testcase name="testGetSearchResultWithAll" class="RonasIT\Support\Tests\SearchTraitTest" classname="RonasIT.Support.Tests.SearchTraitTest" file="/app/tests/SearchTraitTest.php" line="84" assertions="2" time="0.076024"/>
+      <testcase name="testGetSearchResult" class="RonasIT\Support\Tests\SearchTraitTest" classname="RonasIT.Support.Tests.SearchTraitTest" file="/app/tests/SearchTraitTest.php" line="91" assertions="11" time="0.078525"/>
+      <testcase name="testGetSearchResultWithTrashed" class="RonasIT\Support\Tests\SearchTraitTest" classname="RonasIT.Support.Tests.SearchTraitTest" file="/app/tests/SearchTraitTest.php" line="108" assertions="5" time="0.069309"/>
+      <testcase name="testGetSearchResultAggregateIsNull" class="RonasIT\Support\Tests\SearchTraitTest" classname="RonasIT.Support.Tests.SearchTraitTest" file="/app/tests/SearchTraitTest.php" line="119" assertions="2" time="0.064271"/>
+      <testcase name="testPostQueryHookMethodPropertyFalse" class="RonasIT\Support\Tests\SearchTraitTest" classname="RonasIT.Support.Tests.SearchTraitTest" file="/app/tests/SearchTraitTest.php" line="126" assertions="11" time="0.098007"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
