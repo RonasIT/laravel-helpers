@@ -24,10 +24,9 @@ class CsvIteratorTest extends HelpersTestCase
     public function testOpenNotExistsFile()
     {
         $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage('fopen(not_exists_file.csv): Failed to open stream: No such file or directory');
 
         new CsvIterator('not_exists_file.csv');
-
-        $this->expectExceptionMessage('fopen(not_exists_file.csv): failed to open stream: No such file or directory');
     }
 
     public function testParseColumns()
@@ -115,6 +114,7 @@ class CsvIteratorTest extends HelpersTestCase
     public function testGeneratorWithHeadersInvalidCount()
     {
         $this->expectException(IncorrectCSVFileException::class);
+        $this->expectExceptionMessage('Incorrect CSV file');
 
         $header = $this->getJsonFixture('header_invalid_count.json');
 
@@ -124,8 +124,6 @@ class CsvIteratorTest extends HelpersTestCase
 
         foreach ($generator as $row) {
         }
-
-        $this->expectExceptionMessage('Incorrect CSV file');
     }
 
     public function testValid()
