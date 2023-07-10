@@ -211,13 +211,15 @@ class HttpRequestService
             return;
         }
 
-        $headers = array_change_key_case($headers, CASE_LOWER);
+        $headers = array_change_key_case($headers);
         $contentType = Arr::get($headers, 'content-type');
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;
-        } else {
+        } elseif (preg_match('/application\/x-www-form-urlencoded/', $contentType)) {
             $this->options['form_params'] = $data;
+        } else {
+            $this->options['body'] = json_encode($data);
         }
     }
 }
