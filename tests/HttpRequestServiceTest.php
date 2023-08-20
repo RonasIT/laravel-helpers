@@ -78,9 +78,7 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'cookies' => null,
                 'allow_redirects' => false,
                 'connect_timeout' => 0,
-                'form_params' => [
-                    'some_key' => 'some_value'
-                ]
+                'body' => '{"some_key":"some_value"}'
             ]
         ]);
 
@@ -104,9 +102,7 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 999,
-                'form_params' => [
-                    'some_key' => 'some_value'
-                ]
+                'body' => '{"some_key":"some_value"}'
             ]
         ]);
 
@@ -117,13 +113,36 @@ class HttpRequestServiceTest extends HelpersTestCase
         ]);
     }
 
-    public function testSendPut()
+    public function testSendPutWithoutContentType()
     {
         $this->mockGuzzleClient('put', [
             'https://some.url.com',
             [
                 'headers' => [
                     'some_header' => 'some_header_value'
+                ],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 0,
+                'body' => '{"some_key":"some_value"}'
+            ]
+        ]);
+
+        $this->httpRequestServiceClass->put('https://some.url.com', [
+            'some_key' => 'some_value'
+        ], [
+            'some_header' => 'some_header_value'
+        ]);
+    }
+
+    public function testSendPutWithMultipartContentType()
+    {
+        $this->mockGuzzleClient('put', [
+            'https://some.url.com',
+            [
+                'headers' => [
+                    'some_header' => 'some_header_value',
+                    'Content-type' => 'application/x-www-form-urlencoded'
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
@@ -137,7 +156,8 @@ class HttpRequestServiceTest extends HelpersTestCase
         $this->httpRequestServiceClass->put('https://some.url.com', [
             'some_key' => 'some_value'
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
+            'Content-type' => 'application/x-www-form-urlencoded'
         ]);
     }
 
@@ -217,9 +237,7 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
-                'form_params' => [
-                    'some_key' => 'some_value'
-                ]
+                'body' => '{"some_key":"some_value"}'
             ]
         ]);
 
