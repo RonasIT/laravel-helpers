@@ -151,7 +151,7 @@ class HttpRequestService
                 $response = $client->delete($url, $this->options);
                 break;
             default :
-                throw app(UnknownRequestMethodException::class)->setMethod($method);
+                throw new UnknownRequestMethodException($method);
         }
 
         return $response;
