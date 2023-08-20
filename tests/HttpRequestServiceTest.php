@@ -233,12 +233,9 @@ class HttpRequestServiceTest extends HelpersTestCase
     public function testSendWithUnsupportedMethod()
     {
         $this->expectException(UnknownRequestMethodException::class);
+        $this->expectExceptionMessage("Unknown request method 'unsupported'");
 
-        $this->httpRequestServiceClass->send('unsupported', 'https://some.url.com', [
-            'some_key' => 'some_value'
-        ], [
-            'some_header' => 'some_header_value'
-        ]);
+        $this->httpRequestServiceClass->send('unsupported', 'https://some.url.com');
     }
 
     public function testJSONResponse()
@@ -264,6 +261,8 @@ class HttpRequestServiceTest extends HelpersTestCase
         $result = $this->httpRequestServiceClass->json();
 
         $this->assertEquals(json_decode($responseJson, true), $result);
+
+        $result = $this->httpRequestServiceClass->getResponse();
     }
 
     public function testNotJSONResponse()
