@@ -3,9 +3,12 @@
 namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
+use RonasIT\Support\Tests\Support\Traits\MockTrait;
 
 class FixturesTraitTest extends HelpersTestCase
 {
+    use MockTrait;
+
     public function getFixtureData(): array
     {
         return [
@@ -59,5 +62,25 @@ class FixturesTraitTest extends HelpersTestCase
         $result = $this->getClearMySQLDatabaseQuery($tables);
 
         $this->assertEquals($this->getFixture('clear_database/clear_mysql_db_query.sql'), $result);
+    }
+
+    public function testPrepareSequences()
+    {
+
+        $mock = $this->mockClass(\Doctrine\DBAL\Schema\AbstractSchemaManager);
+
+        // mock database connection
+        $connection = $this->createMock(\Illuminate\Database\Connection::class);
+        /*$connection->expects($this->once())
+            ->method('select')
+            ->with('SELECT setval(\'users_id_seq\', (SELECT MAX(id) FROM users))');*/
+
+        $connection->expects($this->once())
+            ->method('getDoctrineSchemaManager')
+            ->willReturn();
+
+        $this->app->instance('db.connection', $connection);
+
+        $this->getTables();
     }
 }

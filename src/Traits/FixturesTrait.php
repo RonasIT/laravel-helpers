@@ -160,7 +160,7 @@ trait FixturesTrait
             if (in_array($table, $except)) {
                 return '';
             } else {
-                return "SELECT setval('{$table}_id_seq', (select max(id) from {$table}));\n";
+                return "SELECT setval('{$table}_id_seq', (select coalesce(max(id), 1) from {$table}), (case when (select max(id) from {$table}) is NULL then false else true end));\n";
             }
         });
 
