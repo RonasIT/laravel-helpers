@@ -43,12 +43,13 @@ class EntityServiceTest extends HelpersTestCase
 
     public function testCallNotExistsRepositoryMethod()
     {
+        $className = get_class($this->entityServiceClass);
+
         $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage("Method getSomething does not exists in {$className}.");
 
         $this->entityServiceClass->setRepository(TestRepository::class);
 
         $this->entityServiceClass->getSomething();
-
-        $this->expectExceptionMessage('Method getSomething does not exists in {$className}.');
     }
 }

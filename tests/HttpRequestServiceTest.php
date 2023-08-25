@@ -5,6 +5,7 @@ namespace RonasIT\Support\Tests;
 use ReflectionProperty;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
+use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
@@ -16,6 +17,8 @@ class HttpRequestServiceTest extends HelpersTestCase
     protected HttpRequestService $httpRequestServiceClass;
     protected ReflectionProperty $optionsProperty;
     protected ReflectionProperty $responseProperty;
+    protected ReflectionProperty $allowRedirectsProperty;
+    protected ReflectionProperty $connectTimeoutProperty;
 
     public function setUp(): void
     {
@@ -53,13 +56,61 @@ class HttpRequestServiceTest extends HelpersTestCase
 
     public function testSetOption()
     {
-        $this->httpRequestServiceClass->set('allow_redirects', true);
+        $this->httpRequestServiceClass->set('allow_redirects', false);
 
         $actualOptions = $this->optionsProperty->getValue($this->httpRequestServiceClass);
 
         $this->assertEquals([
-            'allow_redirects' => true
+            'allow_redirects' => false
         ], $actualOptions);
+    }
+
+    public function testAllowRedirects()
+    {
+        $this->httpRequestServiceClass->allowRedirects(false);
+
+        $this->mockGuzzleClient('put', [
+            'https://some.url.com',
+            [
+                'headers' => [
+                    'some_header' => 'some_header_value'
+                ],
+                'cookies' => null,
+                'allow_redirects' => false,
+                'connect_timeout' => 0,
+                'body' => '{"some_key":"some_value"}'
+            ]
+        ]);
+
+        $this->httpRequestServiceClass->put('https://some.url.com', [
+            'some_key' => 'some_value'
+        ], [
+            'some_header' => 'some_header_value'
+        ]);
+    }
+
+    public function testConnectTimeout()
+    {
+        $this->httpRequestServiceClass->setConnectTimeout(999);
+
+        $this->mockGuzzleClient('post', [
+            'https://some.url.com',
+            [
+                'headers' => [
+                    'some_header' => 'some_header_value'
+                ],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 999,
+                'body' => '{"some_key":"some_value"}'
+            ]
+        ]);
+
+        $this->httpRequestServiceClass->post('https://some.url.com', [
+            'some_key' => 'some_value'
+        ], [
+            'some_header' => 'some_header_value'
+        ]);
     }
 
     public function testSendPutWithoutContentType()
@@ -156,6 +207,55 @@ class HttpRequestServiceTest extends HelpersTestCase
         ], $headers);
     }
 
+    public function testSendDelete()
+    {
+        $this->mockGuzzleClient('delete', [
+            'https://some.url.com',
+            [
+                'headers' => [
+                    'some_header' => 'some_header_value'
+                ],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 0
+            ]
+        ]);
+
+        $this->httpRequestServiceClass->delete('https://some.url.com', [
+            'some_header' => 'some_header_value'
+        ]);
+    }
+
+    public function testSendPatch()
+    {
+        $this->mockGuzzleClient('patch', [
+            'https://some.url.com',
+            [
+                'headers' => [
+                    'some_header' => 'some_header_value'
+                ],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 0,
+                'body' => '{"some_key":"some_value"}'
+            ]
+        ]);
+
+        $this->httpRequestServiceClass->patch('https://some.url.com', [
+            'some_key' => 'some_value'
+        ], [
+            'some_header' => 'some_header_value'
+        ]);
+    }
+
+    public function testSendWithUnsupportedMethod()
+    {
+        $this->expectException(UnknownRequestMethodException::class);
+        $this->expectExceptionMessage("Unknown request method 'unsupported'");
+
+        $this->httpRequestServiceClass->send('unsupported', 'https://some.url.com');
+    }
+
     public function testJSONResponse()
     {
         $responseJson = $this->getFixture('json_response.json');
@@ -176,9 +276,11 @@ class HttpRequestServiceTest extends HelpersTestCase
             'some_header' => 'some_header_value'
         ]);
 
-        $result = $this->httpRequestServiceClass->json();
+        $resultRaw = $this->httpRequestServiceClass->getResponse()->getBody();
+        $resultJson = $this->httpRequestServiceClass->json();
 
-        $this->assertEquals(json_decode($responseJson, true), $result);
+        $this->assertEquals($responseJson, $resultRaw);
+        $this->assertEquals(json_decode($responseJson, true), $resultJson);
     }
 
     public function testNotJSONResponse()

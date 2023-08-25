@@ -37,10 +37,9 @@ class FixturesTraitTest extends HelpersTestCase
     public function testGetFixtureNotExistsWithException()
     {
         $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('not_exists_fixture.json fixture does not exist');
 
         $this->getFixture('get_fixture/not_exists_fixture.json');
-
-        $this->expectExceptionMessage('not_exists_fixture.json fixture does not exist');
     }
 
     public function testGetClearPsqlDatabaseQuery()

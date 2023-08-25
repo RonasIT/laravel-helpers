@@ -132,7 +132,6 @@ class HttpRequestService
         $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
-        /* @var $client GuzzleHttp\Client */
         $client = app(Client::class);
 
         switch ($method) {
@@ -152,7 +151,7 @@ class HttpRequestService
                 $response = $client->delete($url, $this->options);
                 break;
             default :
-                throw app(UnknownRequestMethodException::class)->setMethod($method);
+                throw new UnknownRequestMethodException($method);
         }
 
         return $response;
@@ -189,7 +188,7 @@ class HttpRequestService
         }
     }
 
-    private function setOptions(array $headers): self
+    protected function setOptions(array $headers): self
     {
         $this->options['headers'] = $headers;
         $this->options['cookies'] = $this->cookies;
@@ -199,7 +198,7 @@ class HttpRequestService
         return $this;
     }
 
-    private function setData(string $method, array $headers, array $data = []): void
+    protected function setData(string $method, array $headers, array $data = []): void
     {
         if (empty($data)) {
             return;
