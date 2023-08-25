@@ -276,11 +276,11 @@ class HttpRequestServiceTest extends HelpersTestCase
             'some_header' => 'some_header_value'
         ]);
 
-        $result = $this->httpRequestServiceClass->json();
+        $resultRaw = $this->httpRequestServiceClass->getResponse()->getBody();
+        $resultJson = $this->httpRequestServiceClass->json();
 
-        $this->assertEquals(json_decode($responseJson, true), $result);
-
-        $result = $this->httpRequestServiceClass->getResponse();
+        $this->assertEquals($responseJson, $resultRaw);
+        $this->assertEquals(json_decode($responseJson, true), $resultJson);
     }
 
     public function testNotJSONResponse()
