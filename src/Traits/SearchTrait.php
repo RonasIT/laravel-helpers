@@ -76,22 +76,22 @@ trait SearchTrait
         return $this;
     }
 
-    public function filterByQuery(array $fields): self
+    public function filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self
     {
         if (!empty($this->filter['query'])) {
-            $this->query->where(function ($query) use ($fields) {
+            $this->query->where(function ($query) use ($fields, $mask) {
                 foreach ($fields as $field) {
                     if (Str::contains($field, '.')) {
                         list ($fieldName, $relations) = extract_last_part($field);
 
-                        $query->orWhereHas($relations, function ($query) use ($fieldName) {
+                        $query->orWhereHas($relations, function ($query) use ($fieldName, $mask) {
                             $query->where(
-                                $this->getQuerySearchCallback($fieldName)
+                                $this->getQuerySearchCallback($fieldName, $mask)
                             );
                         });
                     } else {
                         $query->orWhere(
-                            $this->getQuerySearchCallback($field)
+                            $this->getQuerySearchCallback($field, $mask)
                         );
                     }
                 }
@@ -257,20 +257,11 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getQuerySearchCallback(string $field): Closure
+    protected function getQuerySearchCallback(string $field, string $mask): Closure
     {
-        $databaseDriver = config('database.default');
-        $dbRawValue = "lower({$field})";
-
-        if ($databaseDriver === 'pgsql') {
-            $dbRawValue = "lower(text({$field}))";
-        }
-
-        return function ($query) use ($dbRawValue) {
-            $loweredQuery = mb_strtolower($this->filter['query']);
-            $field = DB::raw($dbRawValue);
-
-            $query->orWhere($field, 'like', "%{$loweredQuery}%");
+        return function ($query) use ($field, $mask) {
+            $value = str_replace('{{ value }}', $this->filter['query'], $mask);
+            $query->orWhere($field, 'ilike', DB::raw($value));
         };
     }
 

@@ -150,4 +150,32 @@ class SearchTraitTest extends HelpersTestCase
         $this->assertEquals(['relation'], $attachedRelations);
         $this->assertEquals(['relation'], $attachedRelationsCount);
     }
+
+    public function testSearchQueryWithQuery()
+    {
+        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
+
+        $this->mockGetSearchResultWithQuery($this->selectResult);
+
+        $this->testRepositoryClass
+            ->searchQuery([
+                'query' => 'search_string'
+            ])
+            ->filterByQuery(['query_field', 'another_query_field'])
+            ->getSearchResults();
+    }
+
+    public function testSearchQueryWithMaskedQuery()
+    {
+        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
+
+        $this->mockGetSearchResultWithCustomQuery($this->selectResult);
+
+        $this->testRepositoryClass
+            ->searchQuery([
+                'query' => 'search_string'
+            ])
+            ->filterByQuery(['query_field', 'another_query_field'], "'%' || unaccent('{{ value }}') || '%'")
+            ->getSearchResults();
+    }
 }

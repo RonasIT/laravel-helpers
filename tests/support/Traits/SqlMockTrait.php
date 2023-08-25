@@ -209,6 +209,24 @@ trait SqlMockTrait
         $this->mockSelect('select * from `test_models` order by `id` asc limit 15 offset 0', [], [], $pdo);
     }
 
+    protected function mockGetSearchResultWithQuery(array $selectResult): void
+    {
+        $pdo = $this->mockSelect("select count(*) as aggregate from `test_models` where ((`query_field` ilike '%search_string%') or (`another_query_field` ilike '%search_string%')) and `test_models`.`deleted_at` is null", [], [
+            ['aggregate' => 1]
+        ]);
+
+        $this->mockSelect("select * from `test_models` where ((`query_field` ilike '%search_string%') or (`another_query_field` ilike '%search_string%')) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0", [], $selectResult, $pdo);
+    }
+
+    protected function mockGetSearchResultWithCustomQuery(array $selectResult): void
+    {
+        $pdo = $this->mockSelect("select count(*) as aggregate from `test_models` where ((`query_field` ilike '%' || unaccent('search_string') || '%') or (`another_query_field` ilike '%' || unaccent('search_string') || '%')) and `test_models`.`deleted_at` is null", [], [
+            ['aggregate' => 1]
+        ]);
+
+        $this->mockSelect("select * from `test_models` where ((`query_field` ilike '%' || unaccent('search_string') || '%') or (`another_query_field` ilike '%' || unaccent('search_string') || '%')) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0", [], $selectResult, $pdo);
+    }
+
     protected function mockExistsUsersExceptAuthorized(bool $isExist, string $table = 'users'): void
     {
         $this->mockSelect("select exists(select * from `{$table}` where `id` <> ? and `email` in (?)) as `exists`", [
