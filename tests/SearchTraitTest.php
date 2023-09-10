@@ -2,6 +2,10 @@
 
 namespace RonasIT\Support\Tests;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Config;
+use ReflectionClass;
+use ReflectionMethod;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
@@ -21,6 +25,8 @@ class SearchTraitTest extends HelpersTestCase
     protected ReflectionProperty $queryProperty;
     protected ReflectionProperty $shouldSettablePropertiesBeResetProperty;
 
+    protected ReflectionMethod $setAdditionalReservedFiltersMethod;
+
     protected array $selectResult;
 
     public function setUp(): void
@@ -30,25 +36,29 @@ class SearchTraitTest extends HelpersTestCase
         $this->testRepositoryClass = new TestRepository();
 
         $this->onlyTrashedProperty = new ReflectionProperty(TestRepository::class, 'onlyTrashed');
-        $this->onlyTrashedProperty->setAccessible('pubic');
+        $this->onlyTrashedProperty->setAccessible(true);
 
         $this->withTrashedProperty = new ReflectionProperty(TestRepository::class, 'withTrashed');
-        $this->withTrashedProperty->setAccessible('pubic');
+        $this->withTrashedProperty->setAccessible(true);
 
         $this->forceModeProperty = new ReflectionProperty(TestRepository::class, 'forceMode');
-        $this->forceModeProperty->setAccessible('pubic');
+        $this->forceModeProperty->setAccessible(true);
 
         $this->attachedRelationsProperty = new ReflectionProperty(TestRepository::class, 'attachedRelations');
-        $this->attachedRelationsProperty->setAccessible('pubic');
+        $this->attachedRelationsProperty->setAccessible(true);
 
         $this->attachedRelationsCountProperty = new ReflectionProperty(TestRepository::class, 'attachedRelationsCount');
-        $this->attachedRelationsCountProperty->setAccessible('pubic');
+        $this->attachedRelationsCountProperty->setAccessible(true);
 
         $this->shouldSettablePropertiesBeResetProperty = new ReflectionProperty(TestRepository::class, 'shouldSettablePropertiesBeReset');
-        $this->shouldSettablePropertiesBeResetProperty->setAccessible('pubic');
+        $this->shouldSettablePropertiesBeResetProperty->setAccessible(true);
 
         $this->queryProperty = new ReflectionProperty(TestRepository::class, 'query');
-        $this->queryProperty->setAccessible('pubic');
+        $this->queryProperty->setAccessible(true);
+
+        $reflectionClass = new ReflectionClass(TestRepository::class);
+        $this->setAdditionalReservedFiltersMethod = $reflectionClass->getMethod('setAdditionalReservedFilters');
+        $this->setAdditionalReservedFiltersMethod->setAccessible(true);
 
         $this->selectResult = $this->getJsonFixture('select_query_result.json');
     }
@@ -167,6 +177,8 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testSearchQueryWithMaskedQuery()
     {
+        Config::set('database.default', 'pgsql');
+
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
         $this->mockGetSearchResultWithCustomQuery($this->selectResult);
@@ -176,6 +188,44 @@ class SearchTraitTest extends HelpersTestCase
                 'query' => 'search_string'
             ])
             ->filterByQuery(['query_field', 'another_query_field'], "'%' || unaccent('{{ value }}') || '%'")
+            ->getSearchResults();
+    }
+
+    public function testSearchQueryWithRelations()
+    {
+        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
+
+        $this->mockGetSearchResultWithRelations($this->selectResult);
+
+        $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
+            'relation_name'
+        ]);
+
+        $this->testRepositoryClass
+            ->searchQuery([
+                'query' => 'search_string',
+                'order_by' => 'relation.id',
+                'relation_name' => 'some_value'
+            ])
+            ->filterByQuery(['query_field', 'relation.another_query_field'])
+            ->filterBy('relation.name', 'relation_name')
+            ->getSearchResults();
+    }
+
+    public function testSearchQueryWithFilters()
+    {
+        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
+
+        $this->mockGetSearchResultWithFilters($this->selectResult);
+
+        $this->testRepositoryClass
+            ->searchQuery([
+                'date_from' => Carbon::now(),
+                'date_to' => Carbon::now(),
+                'user_id_in_list' => [1, 2],
+                'user_id_not_in_list' => [3, 4],
+                'name' => 'text_name',
+            ])
             ->getSearchResults();
     }
 }

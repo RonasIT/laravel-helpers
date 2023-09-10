@@ -260,8 +260,13 @@ trait SearchTrait
     protected function getQuerySearchCallback(string $field, string $mask): Closure
     {
         return function ($query) use ($field, $mask) {
+            $databaseDriver = config('database.default');
             $value = str_replace('{{ value }}', $this->filter['query'], $mask);
-            $query->orWhere($field, 'ilike', DB::raw($value));
+            $operator = ($databaseDriver === 'pgsql')
+                ? 'ilike'
+                : 'like';
+
+            $query->orWhere($field, $operator, DB::raw($value));
         };
     }
 
