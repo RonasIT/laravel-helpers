@@ -209,6 +209,56 @@ trait SqlMockTrait
         $this->mockSelect('select * from `test_models` order by `id` asc limit 15 offset 0', [], [], $pdo);
     }
 
+    protected function mockGetSearchResultWithQuery(array $selectResult): void
+    {
+        $pdo = $this->mockSelect("select count(*) as aggregate from `test_models` where ((`query_field` like '%search_string%') or (`another_query_field` like '%search_string%')) and `test_models`.`deleted_at` is null", [], [
+            ['aggregate' => 1]
+        ]);
+
+        $this->mockSelect("select * from `test_models` where ((`query_field` like '%search_string%') or (`another_query_field` like '%search_string%')) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0", [], $selectResult, $pdo);
+    }
+
+    protected function mockGetSearchResultWithCustomQuery(array $selectResult): void
+    {
+        $pdo = $this->mockSelect('select count(*) as aggregate from "test_models" where (("query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\') or ("another_query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\')) and "test_models"."deleted_at" is null', [], [
+            ['aggregate' => 1]
+        ]);
+
+        $this->mockSelect('select * from "test_models" where (("query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\') or ("another_query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\')) and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0', [], $selectResult, $pdo);
+    }
+
+    protected function mockGetSearchResultWithRelations(array $selectResult): void
+    {
+        $pdo = $this->mockSelect("select count(*) as aggregate from `test_models` where ((`query_field` like '%search_string%') or exists (select * from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id` and (`another_query_field` like '%search_string%'))) and exists (select * from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id` and `name` in (?)) and `test_models`.`deleted_at` is null", [
+            'some_value'
+        ], [
+            ['aggregate' => 1]
+        ]);
+
+        $this->mockSelect("select `test_models`.*, (select `id` from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id` order by `id` asc limit 1) as `relation_id` from `test_models` where ((`query_field` like '%search_string%') or exists (select * from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id` and (`another_query_field` like '%search_string%'))) and exists (select * from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id` and `name` in (?)) and `test_models`.`deleted_at` is null order by `relation_id` asc, `id` asc limit 15 offset 0", [
+            'some_value'
+        ], $selectResult, $pdo);
+    }
+
+    protected function mockGetSearchResultWithFilters(array $selectResult): void
+    {
+        $pdo = $this->mockSelect("select count(*) as aggregate from `test_models` where `date` >= ? and `date` <= ? and `user_id` in (?, ?) and `user_id` not in (?, ?) and `name` in (?) and `test_models`.`deleted_at` is null", [
+            Carbon::now(),
+            Carbon::now(),
+            1, 2, 3, 4,
+            'text_name',
+        ], [
+            ['aggregate' => 1]
+        ]);
+
+        $this->mockSelect("select * from `test_models` where `date` >= ? and `date` <= ? and `user_id` in (?, ?) and `user_id` not in (?, ?) and `name` in (?) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0", [
+            Carbon::now(),
+            Carbon::now(),
+            1, 2, 3, 4,
+            'text_name',
+        ], $selectResult, $pdo);
+    }
+
     protected function mockExistsUsersExceptAuthorized(bool $isExist, string $table = 'users'): void
     {
         $this->mockSelect("select exists(select * from `{$table}` where `id` <> ? and `email` in (?)) as `exists`", [
