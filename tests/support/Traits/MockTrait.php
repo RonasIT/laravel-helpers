@@ -2,13 +2,22 @@
 
 namespace RonasIT\Support\Tests\Support\Traits;
 
+use PHPUnit\Framework\MockObject\MockObject;
+
 trait MockTrait
 {
-    protected function mockClass($className, $methods = [])
+    protected function mockClass($className, $methods = [], $disableConstructor = false): MockObject
     {
-        return $this
-            ->getMockBuilder($className)
-            ->onlyMethods($methods)
-            ->getMock();
+        $builder = $this->getMockBuilder($className);
+
+        if ($methods) {
+            $builder->onlyMethods($methods);
+        }
+
+        if ($disableConstructor) {
+            $builder->disableOriginalConstructor();
+        }
+
+        return $builder->getMock();
     }
 }

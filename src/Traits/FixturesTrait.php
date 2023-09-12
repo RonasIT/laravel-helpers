@@ -4,7 +4,8 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Testing\TestResponse;
+use RonasIT\Support\Exceptions\UnexpectedExportException;
 
 trait FixturesTrait
 {

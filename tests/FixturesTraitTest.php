@@ -2,7 +2,15 @@
 
 namespace RonasIT\Support\Tests;
 
+use Doctrine\DBAL\Schema\PostgreSQLSchemaManager;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Illuminate\Database\Connection;
+use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
+use RonasIT\Support\Exceptions\UnexpectedExportException;
+use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 
 class FixturesTraitTest extends HelpersTestCase
@@ -66,21 +74,24 @@ class FixturesTraitTest extends HelpersTestCase
 
     public function testPrepareSequences()
     {
-
-        $mock = $this->mockClass(\Doctrine\DBAL\Schema\AbstractSchemaManager);
-
-        // mock database connection
-        $connection = $this->createMock(\Illuminate\Database\Connection::class);
-        /*$connection->expects($this->once())
-            ->method('select')
-            ->with('SELECT setval(\'users_id_seq\', (SELECT MAX(id) FROM users))');*/
-
-        $connection->expects($this->once())
-            ->method('getDoctrineSchemaManager')
-            ->willReturn();
+        $connection = $this->mockClass(Connection::class, [], true);
+        $mock = $this->mockClass(PostgreSQLSchemaManager::class, ['listTableNames'], true);
 
         $this->app->instance('db.connection', $connection);
 
-        $this->getTables();
+        $mock->expects($this->once())
+            ->method('listTableNames')
+            ->willReturn($this->getJsonFixture('prepare_sequences/tables.json'));
+
+        $connection->expects($this->once())
+            ->method('getDoctrineSchemaManager')
+            ->willReturn($mock);
+
+        $connection->expects($this->once())
+            ->method('unprepared')
+            ->with($this->getFixture('prepare_sequences/sequences.sql'))
+            ->willReturn(true);
+
+        $this->prepareSequences($this->getTables());
     }
 }
