@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;

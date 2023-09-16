@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\UnexpectedExportException;
 
@@ -48,12 +47,14 @@ trait FixturesTrait
         'tiger.pagc_rules',
     ];
 
-    protected $truncateExceptTables = ['migrations', 'password_resets'];
-    protected $prepareSequencesExceptTables = ['migrations', 'password_resets'];
+    protected array $truncateExceptTables = ['migrations', 'password_resets'];
+    protected array $prepareSequencesExceptTables = ['migrations', 'password_resets'];
+
+    protected string $dumpFileName = 'dump.sql';
 
     protected function loadTestDump(): void
     {
-        $dump = $this->getFixture('dump.sql', false);
+        $dump = $this->getFixture($this->dumpFileName, false);
 
         if (empty($dump)) {
             return;
@@ -64,7 +65,7 @@ trait FixturesTrait
 
         $this->clearDatabase($scheme, $databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
-        DB::unprepared($dump);
+        app('db.connection')->unprepared($dump);
     }
 
     public function getFixturePath(string $fixtureName): string
@@ -189,8 +190,8 @@ trait FixturesTrait
 
     protected function exportContent($content, string $fixture): void
     {
-        if (env('FAIL_EXPORT_JSON', true)) {
-            $this->fail(preg_replace('/[ ]+/mu', ' ',
+        if (config('FAIL_EXPORT_JSON', true)) {
+            throw new UnexpectedExportException(preg_replace('/[ ]+/mu', ' ',
                 'Looks like you forget to remove exportJson. If it is your local environment add 
                 FAIL_EXPORT_JSON=false to .env.testing.
                 If it is dev.testing environment then remove it.'
