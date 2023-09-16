@@ -10,6 +10,7 @@ class CsvIteratorTest extends HelpersTestCase
 {
     protected CsvIterator $csvIteratorClass;
     protected ReflectionProperty $columnsProperty;
+    protected ReflectionProperty $filePathProperty;
 
     public function setUp(): void
     {
@@ -19,6 +20,9 @@ class CsvIteratorTest extends HelpersTestCase
 
         $this->columnsProperty = new ReflectionProperty(CsvIterator::class, 'columns');
         $this->columnsProperty->setAccessible(true);
+
+        $this->filePathProperty = new ReflectionProperty(CsvIterator::class, 'filePath');
+        $this->filePathProperty->setAccessible(true);
     }
 
     public function testOpenNotExistsFile()
@@ -34,6 +38,17 @@ class CsvIteratorTest extends HelpersTestCase
         $header = $this->getJsonFixture('header.json');
 
         $this->csvIteratorClass->parseColumns($header);
+
+        $actualHeader = $this->columnsProperty->getValue($this->csvIteratorClass);
+
+        $this->assertEquals($header, $actualHeader);
+    }
+
+    public function testSetColumns()
+    {
+        $header = $this->getJsonFixture('header.json');
+
+        $this->csvIteratorClass->setColumns($header);
 
         $actualHeader = $this->columnsProperty->getValue($this->csvIteratorClass);
 
@@ -73,13 +88,33 @@ class CsvIteratorTest extends HelpersTestCase
         $rowKey = $this->csvIteratorClass->key();
         $currentLine = $this->csvIteratorClass->current();
 
-        $this->assertEquals(0, $rowKey);
+        $this->assertEquals(1, $rowKey);
         $this->assertEqualsFixture('current_after_next_line.json', $currentLine);
     }
 
-    public function testGenerator()
+    public function testGeneratorWithoutSettingColumnHeaders()
     {
         $result = [];
+        $generator = $this->csvIteratorClass->getGenerator();
+
+        foreach ($generator as $row) {
+            $result[] = $row;
+        }
+
+        $rowKey = $this->csvIteratorClass->key();
+
+        $this->assertEquals(7, $rowKey);
+        $this->assertEqualsFixture('all_data.json', $result);
+    }
+
+    public function testGeneratorWithSettingColumnHeaders()
+    {
+        $result = [];
+        $header = $this->getJsonFixture('header.json');
+
+        $this->filePathProperty->setValue($this->csvIteratorClass, $this->getFixturePath('addresses_without_header.csv'));
+        $this->csvIteratorClass->setColumns($header);
+
         $generator = $this->csvIteratorClass->getGenerator();
 
         foreach ($generator as $row) {
@@ -92,25 +127,6 @@ class CsvIteratorTest extends HelpersTestCase
         $this->assertEqualsFixture('all_data.json', $result);
     }
 
-    public function testGeneratorWithHeader()
-    {
-        $result = [];
-        $header = $this->getJsonFixture('header.json');
-
-        $this->csvIteratorClass->parseColumns($header);
-
-        $generator = $this->csvIteratorClass->getGenerator();
-
-        foreach ($generator as $row) {
-            $result[] = $row;
-        }
-
-        $rowKey = $this->csvIteratorClass->key();
-
-        $this->assertEquals(6, $rowKey);
-        $this->assertEqualsFixture('all_data_with_header.json', $result);
-    }
-
     public function testGeneratorWithHeadersInvalidCount()
     {
         $this->expectException(IncorrectCSVFileException::class);
@@ -118,7 +134,7 @@ class CsvIteratorTest extends HelpersTestCase
 
         $header = $this->getJsonFixture('header_invalid_count.json');
 
-        $this->csvIteratorClass->parseColumns($header);
+        $this->csvIteratorClass->setColumns($header);
 
         $generator = $this->csvIteratorClass->getGenerator();
 
