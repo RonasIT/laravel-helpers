@@ -20,7 +20,17 @@ class CsvIterator implements Iterator
         $this->filePath = $filePath;
     }
 
+    /**
+     * @deprecated use setColumns instead
+     */
     public function parseColumns($columns): self
+    {
+        $this->columns = $columns;
+
+        return $this;
+    }
+
+    public function setColumns($columns): self
     {
         $this->columns = $columns;
 
@@ -32,9 +42,9 @@ class CsvIterator implements Iterator
         fclose($this->file);
 
         $this->file = fopen($this->filePath, 'r');
-
-        $this->currentCsvLine = fgetcsv($this->file);
         $this->currentRow = 0;
+
+        $this->next();
     }
 
     public function current(): array
@@ -53,6 +63,12 @@ class CsvIterator implements Iterator
     public function getGenerator(): Generator
     {
         $this->rewind();
+
+        if (empty($this->columns)) {
+            $this->columns = $this->currentCsvLine;
+
+            $this->next();
+        }
 
         while ($this->valid()) {
             $line = $this->current();
