@@ -4,7 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
-use RonasIT\Support\Exceptions\UnexpectedExportException;
+use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
 trait FixturesTrait
 {
@@ -190,12 +190,8 @@ trait FixturesTrait
 
     protected function exportContent($content, string $fixture): void
     {
-        if (config('FAIL_EXPORT_JSON', true)) {
-            throw new UnexpectedExportException(preg_replace('/[ ]+/mu', ' ',
-                'Looks like you forget to remove exportJson. If it is your local environment add 
-                FAIL_EXPORT_JSON=false to .env.testing.
-                If it is dev.testing environment then remove it.'
-            ));
+        if (env('FAIL_EXPORT_JSON', true)) {
+            throw new ForbiddenExportModeException();
         }
 
         file_put_contents(
