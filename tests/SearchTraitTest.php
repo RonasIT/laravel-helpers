@@ -220,8 +220,12 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
-                'date_from' => Carbon::now(),
-                'date_to' => Carbon::now(),
+                'date_gte' => Carbon::now(),
+                'date_lte' => Carbon::now(),
+                'created_at_from' => Carbon::now(),
+                'created_at_to' => Carbon::now(),
+                'updated_at_gt' => Carbon::now(),
+                'updated_at_lt' => Carbon::now(),
                 'user_id_in_list' => [1, 2],
                 'user_id_not_in_list' => [3, 4],
                 'name' => 'text_name',
