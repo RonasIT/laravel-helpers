@@ -6,10 +6,12 @@ class ForbiddenExportModeException extends EntityCreateException
 {
     public function __construct()
     {
-        parent::__construct(preg_replace('/[ ]+/mu', ' ',
-            'Looks like you forget to remove exportJson. If it is your local environment add 
-                FAIL_EXPORT_JSON=false to .env.testing.
-                If it is dev.testing environment then remove it.'
-        ));
+        $envKey = 'FAIL_EXPORT_JSON';
+        $envFile = '.env.testing';
+
+        parent::__construct(
+            "Looks like you try to export fixture.\nIf you see this message while "
+            . "running tests in the local environment - please set {$envKey}=false to {$envFile}."
+        );
     }
 }

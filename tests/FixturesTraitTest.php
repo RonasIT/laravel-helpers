@@ -65,6 +65,8 @@ class FixturesTraitTest extends HelpersTestCase
         ));
 
         $this->assertEquals($this->getJsonFixture('export_json/response.json'), $result);
+
+        $this->assertFileExists($this->getFixturePath('export_json/response.json'));
     }
 
     public function testGetFixtureNotExistsWithoutException()
