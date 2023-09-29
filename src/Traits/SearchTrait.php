@@ -125,18 +125,24 @@ trait SearchTrait
                 if (Str::endsWith($fieldName, '_not_in_list')) {
                     $field = Str::replace('_not_in_list', '', $fieldName);
                     $this->query->whereNotIn($field, $value);
-                } elseif (Str::endsWith($fieldName, ['_gte', '_from'])) {
-                    $field = preg_replace('/(_(gte|from))$/', '', $fieldName);
+                } elseif (Str::endsWith($fieldName, '_gte')) {
+                    $field = Str::replace('_gte', '', $fieldName);
                     $this->filterGreater($field, false, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_gt')) {
                     $field = Str::replace('_gt', '', $fieldName);
                     $this->filterGreater($field, true, $fieldName);
-                } elseif (Str::endsWith($fieldName, ['_lte', '_to'])) {
-                    $field = preg_replace('/(_(lte|to))$/', '', $fieldName);
+                } elseif (Str::endsWith($fieldName, '_lte')) {
+                    $field = Str::replace('_lte', '', $fieldName);
                     $this->filterLess($field, false, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_lt')) {
                     $field = Str::replace('_lt', '', $fieldName);
                     $this->filterLess($field, true, $fieldName);
+                } elseif (Str::endsWith($fieldName, '_from')) {
+                    $field = Str::replace('_from', '', $fieldName);
+                    $this->filterFrom($field, false, $fieldName);
+                } elseif (Str::endsWith($fieldName, '_to')) {
+                    $field = Str::replace('_to', '', $fieldName);
+                    $this->filterTo($field, false, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_in_list')) {
                     $field = Str::replace('_in_list', '', $fieldName);
                     $this->query->whereIn($field, $value);
