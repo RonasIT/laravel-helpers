@@ -12,6 +12,13 @@ class HelpersTestCase extends BaseTest
 
     protected $globalExportMode = false;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        putenv('FAIL_EXPORT_JSON=true');
+    }
+
     protected function getPackageProviders($app): array
     {
         return [
