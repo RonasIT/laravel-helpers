@@ -213,7 +213,7 @@ trait SearchTrait
 
     protected function getDesc(bool $isDesc): string
     {
-        return $isDesc ? 'DESC' : 'ASC';
+        return ($isDesc) ? 'DESC' : 'ASC';
     }
 
     public function filterMoreThan(string $field, $value): self
@@ -283,22 +283,15 @@ trait SearchTrait
     }
 
     /** @deprecated use filterGreater instead */
-    public function filterFrom(string $field, bool $strict = true, ?string $filterName = null): self
+    public function filterFrom(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
-        $filterName = empty($filterName) ? 'from' : $filterName;
-        $sign = $strict ? '>' : '>=';
-
-        if (isset($this->filter[$filterName])) {
-            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
-        }
-
-        return $this;
+        return $this->filterGreater($field, $isStrict, $filterName);
     }
 
-    public function filterGreater(string $field, bool $strict = true, ?string $filterName = null): self
+    public function filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
         $filterName = empty($filterName) ? 'from' : $filterName;
-        $sign = $strict ? '>' : '>=';
+        $sign = ($isStrict) ? '>' : '>=';
 
         if (isset($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
@@ -308,22 +301,15 @@ trait SearchTrait
     }
 
     /** @deprecated use filterLess instead */
-    public function filterTo(string $field, bool $strict = true, ?string $filterName = null): self
+    public function filterTo(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
-        $filterName = empty($filterName) ? 'to' : $filterName;
-        $sign = $strict ? '<' : '<=';
-
-        if (isset($this->filter[$filterName])) {
-            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
-        }
-
-        return $this;
+        return $this->filterLess($field, $isStrict, $filterName);
     }
 
-    public function filterLess(string $field, bool $strict = true, ?string $filterName = null): self
+    public function filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
-        $filterName = empty($filterName) ? 'to' : $filterName;
-        $sign = $strict ? '<' : '<=';
+        $filterName = (empty($filterName)) ? 'to' : $filterName;
+        $sign = ($isStrict) ? '<' : '<=';
 
         if (isset($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
