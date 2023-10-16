@@ -242,19 +242,34 @@ trait SqlMockTrait
 
     protected function mockGetSearchResultWithFilters(array $selectResult): void
     {
-        $pdo = $this->mockSelect("select count(*) as aggregate from `test_models` where `date` >= ? and `date` <= ? and `user_id` in (?, ?) and `user_id` not in (?, ?) and `name` in (?) and `test_models`.`deleted_at` is null", [
+        $pdo = $this->mockSelect(
+            "select count(*) as aggregate from `test_models` where `date` >= ? and `date` <= ? and `created_at` >= ? and `created_at` <= ? and `updated_at` > ? and `updated_at` < ? and `user_id` in (?, ?) and `user_id` not in (?, ?) and `name` in (?) and `test_models`.`deleted_at` is null", [
             Carbon::now(),
             Carbon::now(),
-            1, 2, 3, 4,
+            Carbon::now(),
+            Carbon::now(),
+            Carbon::now(),
+            Carbon::now(),
+            1,
+            2,
+            3,
+            4,
             'text_name',
         ], [
             ['aggregate' => 1]
         ]);
 
-        $this->mockSelect("select * from `test_models` where `date` >= ? and `date` <= ? and `user_id` in (?, ?) and `user_id` not in (?, ?) and `name` in (?) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0", [
+        $this->mockSelect("select * from `test_models` where `date` >= ? and `date` <= ? and `created_at` >= ? and `created_at` <= ? and `updated_at` > ? and `updated_at` < ? and `user_id` in (?, ?) and `user_id` not in (?, ?) and `name` in (?) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0", [
             Carbon::now(),
             Carbon::now(),
-            1, 2, 3, 4,
+            Carbon::now(),
+            Carbon::now(),
+            Carbon::now(),
+            Carbon::now(),
+            1,
+            2,
+            3,
+            4,
             'text_name',
         ], $selectResult, $pdo);
     }
