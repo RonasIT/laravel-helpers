@@ -41,8 +41,14 @@ class NovaTestTraitTest extends HelpersTestCase
 
         $mock = Mockery::mock('overload:' . MysqlBuilder::class);
         $mock->shouldReceive('getColumnListing')
-            ->andReturn(['json_column']);
-        $mock->shouldReceive('getColumnType')
+            ->andReturn(['id', 'json_column'])
+
+            ->shouldReceive('getColumnType')
+            ->with('users', 'id')
+            ->andReturn('int')
+
+            ->shouldReceive('getColumnType')
+            ->with('users', 'json_column')
             ->andReturn('json');
 
         $this->cacheJsonFields('users');
@@ -58,11 +64,35 @@ class NovaTestTraitTest extends HelpersTestCase
 
         $mock = Mockery::mock('overload:' . MysqlBuilder::class);
         $mock->shouldReceive('getColumnListing')
-            ->andReturn(['id', 'name']);
-        $mock->shouldReceive('getColumnType')
+            ->andReturn(['id', 'name'])
+
+            ->shouldReceive('getColumnType')
+            ->with('users', 'id')
+            ->andReturn('int')
+
+            ->shouldReceive('getColumnType')
+            ->with('users', 'name')
             ->andReturn('string');
 
         $this->cacheJsonFields('users');
         $this->assertEmpty(self::$jsonFields['users']);
+    }
+
+    public function testPrepareChangesWithJsonFields()
+    {
+        self::$jsonFields['users'][] = 'json_column';
+
+        $unpreparedChanges = $this->getJsonFixture('requests/unprepared_changes_with_json_field.json');
+        $result = $this->prepareChanges('users', $unpreparedChanges);
+        $this->assertEqualsFixture('responses/prepared_changes_with_json_field_result.json', $result);
+    }
+
+    public function testPrepareChangesWithoutJsonFields()
+    {
+        self::$jsonFields['users'] = [];
+
+        $unpreparedChanges = $this->getJsonFixture('requests/unprepared_changes_without_json_field.json');
+        $result = $this->prepareChanges('users', $unpreparedChanges);
+        $this->assertEqualsFixture('responses/prepared_changes_without_json_field_result.json', $result);
     }
 }
