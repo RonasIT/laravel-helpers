@@ -5,6 +5,7 @@ namespace RonasIT\Support\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
+use RonasIT\Support\Tests\TestCase;
 
 trait FixturesTrait
 {
@@ -99,7 +100,7 @@ trait FixturesTrait
 
     public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
     {
-        if ($exportMode || $this->globalExportMode) {
+        if ($exportMode || ($this instanceof TestCase && $this->globalExportMode)) {
             $this->exportJson($fixture, $data);
         }
 
