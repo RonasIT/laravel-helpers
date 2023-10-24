@@ -33,9 +33,7 @@ abstract class TestCase extends BaseTest
 
     protected function setGlobalExportMode()
     {
-        if (property_exists(self::class, 'globalExportMode')) {
-            $this->globalExportMode = true;
-        }
+        $this->globalExportMode = true;
     }
 
     public function setUp(): void
