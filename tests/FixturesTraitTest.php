@@ -167,4 +167,13 @@ class FixturesTraitTest extends HelpersTestCase
 
         $this->prepareSequences($this->getTables());
     }
+
+    public function testGetFixtureWithoutGlobalExportMode()
+    {
+        $response = $this->getJsonFixture('get_fixture/export_fixture.json');
+
+        unset($this->globalExportMode);
+
+        $this->assertEqualsFixture('get_fixture/export_fixture.json', $response);
+    }
 }
