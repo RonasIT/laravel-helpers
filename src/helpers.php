@@ -105,7 +105,9 @@ function mkdir_recursively($path)
 
     array_walk($explodedPath, function ($dir) use (&$currentPath) {
         if ($currentPath != '/') {
-            $currentPath .= '/';
+            str_contains(php_uname(), 'Windows')
+                ? $currentPath .= '/'
+                : $currentPath .= '/' . $dir;
         } else {
             $currentPath .= $dir;
         }
