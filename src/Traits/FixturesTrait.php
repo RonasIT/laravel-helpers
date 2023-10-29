@@ -100,7 +100,7 @@ trait FixturesTrait
 
     public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
     {
-        if ($this->globalExportMode ?? $exportMode) {
+        if ($exportMode || !empty($this->globalExportMode)) {
             $this->exportJson($fixture, $data);
         }
 
