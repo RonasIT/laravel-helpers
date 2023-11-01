@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Arr;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Traits\FixturesTrait;
 use RonasIT\Support\Traits\AuthTestTrait;
@@ -36,7 +37,7 @@ class AuthTestTraitTest extends HelpersTestCase
 
     public function testActingWithEmptySession()
     {
-        $session = $this->app['session']->getDrivers()['array'];
+        $session = Arr::get($this->app['session']->getDrivers(), 'array', collect());
 
         $loginSession = array_filter($session->all(), function ($key) {
             return strpos($key, 'login_session_') === 0;
