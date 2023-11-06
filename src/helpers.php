@@ -99,9 +99,15 @@ function is_multidimensional(array $array): bool
  */
 function mkdir_recursively($path)
 {
-    $explodedPath = explode('/', $path);
+    $currentPath = getcwd();
 
-    $currentPath = $explodedPath[0];
+    if (DIRECTORY_SEPARATOR === '\\') {
+        $currentPath = str_replace(DIRECTORY_SEPARATOR, '/', getcwd());
+        $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+    }
+
+    $path = str_replace($currentPath, '', $path);
+    $explodedPath = explode('/', $path);
 
     array_walk($explodedPath, function ($dir) use (&$currentPath) {
         if ($currentPath != '/') {
