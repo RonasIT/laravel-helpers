@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 
@@ -170,10 +171,14 @@ class FixturesTraitTest extends HelpersTestCase
 
     public function testGetFixtureWithoutGlobalExportMode()
     {
-        $response = $this->getJsonFixture('get_fixture/export_fixture.json');
+        $content = $this->getJsonFixture('get_fixture/export_fixture.json');
+
+        $this->globalExportMode = true;
 
         unset($this->globalExportMode);
 
-        $this->assertEqualsFixture('get_fixture/export_fixture.json', $response);
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->assertEqualsFixture('get_fixture/exists_fixture_comparison.json', $content);
     }
 }
