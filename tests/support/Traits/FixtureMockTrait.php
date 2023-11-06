@@ -15,7 +15,8 @@ trait FixtureMockTrait
     protected function mockForCachingJsonFields(): void
     {
         $mock = Mockery::mock('overload:' . MysqlBuilder::class);
-        $mock->shouldReceive('getColumnListing')
+        $mock
+            ->shouldReceive('getColumnListing')
             ->andReturn(['id', 'json_column'])
 
             ->shouldReceive('getColumnType')
@@ -30,7 +31,8 @@ trait FixtureMockTrait
     protected function mockForCachingWithoutJsonFields(): void
     {
         $mock = Mockery::mock('overload:' . MysqlBuilder::class);
-        $mock->shouldReceive('getColumnListing')
+        $mock
+            ->shouldReceive('getColumnListing')
             ->andReturn(['id', 'name'])
 
             ->shouldReceive('getColumnType')
@@ -47,7 +49,8 @@ trait FixtureMockTrait
         Config::set('database.default', 'mysql');
 
         $schemeMock = Mockery::mock('overload:' . MysqlBuilder::class);
-        $schemeMock->shouldReceive('getColumnListing')
+        $schemeMock
+            ->shouldReceive('getColumnListing')
             ->andReturn([
                 'id', 'user_id', 'title', 'text', 'description',
                 'is_public', 'json_column', 'created_at', 'updated_at'
@@ -93,15 +96,18 @@ trait FixtureMockTrait
 
         DB::swap($connection);
 
-        $builderMock->expects($this->once())
+        $builderMock
+            ->expects($this->once())
             ->method('orderBy')
             ->willReturn($builderMock);
 
-        $builderMock->expects($this->once())
+        $builderMock
+            ->expects($this->once())
             ->method('get')
             ->willReturn($responseMock);
 
-        $connection->expects($this->once())
+        $connection
+            ->expects($this->once())
             ->method('table')
             ->willReturn($builderMock);
     }
