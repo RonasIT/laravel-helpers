@@ -102,7 +102,7 @@ function mkdir_recursively($path)
     $currentPath = getcwd();
 
     if (DIRECTORY_SEPARATOR === '\\') {
-        $currentPath = str_replace(DIRECTORY_SEPARATOR, '/', getcwd());
+        $currentPath = str_replace(DIRECTORY_SEPARATOR, '/', $currentPath);
         $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
 
