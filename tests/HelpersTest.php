@@ -277,4 +277,24 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture('array_associate/result.json', $result);
     }
+
+    public function testArraySubtraction()
+    {
+        $input1 = $this->getJsonFixture('array_subtraction/data1.json');
+        $input2 = $this->getJsonFixture('array_subtraction/data2.json');
+
+        $result = array_subtraction($input1, $input2);
+
+        $this->assertEqualsFixture('array_subtraction/result.json', $result);
+    }
+
+    public function testArrayRemoveElements()
+    {
+        $input1 = $this->getJsonFixture('array_remove_elements/data1.json');
+        $input2 = $this->getJsonFixture('array_remove_elements/data2.json');
+
+        $result = array_remove_elements($input1, $input2);
+
+        $this->assertEqualsFixture('array_remove_elements/result.json', $result);
+    }
 }
