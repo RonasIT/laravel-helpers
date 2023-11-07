@@ -125,6 +125,18 @@ trait SearchTrait
                 if (Str::endsWith($fieldName, '_not_in_list')) {
                     $field = Str::replace('_not_in_list', '', $fieldName);
                     $this->query->whereNotIn($field, $value);
+                } elseif (Str::endsWith($fieldName, '_gte')) {
+                    $field = Str::replace('_gte', '', $fieldName);
+                    $this->filterGreater($field, false, $fieldName);
+                } elseif (Str::endsWith($fieldName, '_gt')) {
+                    $field = Str::replace('_gt', '', $fieldName);
+                    $this->filterGreater($field, true, $fieldName);
+                } elseif (Str::endsWith($fieldName, '_lte')) {
+                    $field = Str::replace('_lte', '', $fieldName);
+                    $this->filterLess($field, false, $fieldName);
+                } elseif (Str::endsWith($fieldName, '_lt')) {
+                    $field = Str::replace('_lt', '', $fieldName);
+                    $this->filterLess($field, true, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_from')) {
                     $field = Str::replace('_from', '', $fieldName);
                     $this->filterFrom($field, false, $fieldName);
@@ -201,7 +213,7 @@ trait SearchTrait
 
     protected function getDesc(bool $isDesc): string
     {
-        return $isDesc ? 'DESC' : 'ASC';
+        return ($isDesc) ? 'DESC' : 'ASC';
     }
 
     public function filterMoreThan(string $field, $value): self
@@ -270,10 +282,16 @@ trait SearchTrait
         };
     }
 
-    public function filterFrom(string $field, bool $strict = true, ?string $filterName = null): self
+    /** @deprecated use filterGreater instead */
+    public function filterFrom(string $field, bool $isStrict = true, ?string $filterName = null): self
+    {
+        return $this->filterGreater($field, $isStrict, $filterName);
+    }
+
+    public function filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
         $filterName = empty($filterName) ? 'from' : $filterName;
-        $sign = $strict ? '>' : '>=';
+        $sign = ($isStrict) ? '>' : '>=';
 
         if (isset($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
@@ -282,10 +300,16 @@ trait SearchTrait
         return $this;
     }
 
-    public function filterTo(string $field, bool $strict = true, ?string $filterName = null): self
+    /** @deprecated use filterLess instead */
+    public function filterTo(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
-        $filterName = empty($filterName) ? 'to' : $filterName;
-        $sign = $strict ? '<' : '<=';
+        return $this->filterLess($field, $isStrict, $filterName);
+    }
+
+    public function filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self
+    {
+        $filterName = (empty($filterName)) ? 'to' : $filterName;
+        $sign = ($isStrict) ? '<' : '<=';
 
         if (isset($this->filter[$filterName])) {
             $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
