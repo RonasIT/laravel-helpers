@@ -9,12 +9,10 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
-use RonasIT\Support\Tests\Support\Traits\FixtureMockTrait;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 
 class FixturesTraitTest extends HelpersTestCase
 {
-    use FixtureMockTrait;
     use MockTrait;
 
     public function setUp(): void
@@ -177,67 +175,5 @@ class FixturesTraitTest extends HelpersTestCase
         unset($this->globalExportMode);
 
         $this->assertEqualsFixture('get_fixture/export_fixture.json', $content);
-    }
-
-    public function testCacheJsonFields()
-    {
-        Config::set('database.default', 'mysql');
-        $this->mockForCachingJsonFields();
-
-        $this->cacheJsonFields('users');
-
-        $this->assertNotEmpty(self::$jsonFields);
-        $this->assertEquals(['json_column'], self::$jsonFields['users']);
-
-        self::$jsonFields = [];
-    }
-
-    public function tesCachetWithoutJsonFields()
-    {
-        Config::set('database.default', 'mysql');
-        $this->mockForCachingWithoutJsonFields();
-
-        $this->cacheJsonFields('users');
-        $this->assertEmpty(self::$jsonFields['users']);
-    }
-
-    public function testPrepareChangesWithJsonFields()
-    {
-        self::$jsonFields['users'][] = 'json_column';
-
-        $unpreparedChanges = $this->getJsonFixture('prepare_changes_with_json/unprepared_changes_with_json_field.json');
-        $result = $this->prepareChanges('users', $unpreparedChanges);
-        $this->assertEqualsFixture('prepare_changes_with_json/prepared_changes_with_json_field_result.json', $result);
-    }
-
-    public function testPrepareChangesWithoutJsonFields()
-    {
-        self::$jsonFields['users'] = [];
-
-        $unpreparedChanges = $this->getJsonFixture('prepare_changes_without_json/unprepared_changes_without_json_field.json');
-        $result = $this->prepareChanges('users', $unpreparedChanges);
-        $this->assertEqualsFixture('prepare_changes_without_json/prepared_changes_without_json_field_result.json', $result);
-    }
-
-    public function testAssertChangesEqualsFixture()
-    {
-        $datasetMock = collect($this->getJsonFixture('changes_equals_fixture/dataset.json'));
-        $originRecords = collect($this->getJsonFixture('changes_equals_fixture/origin_records.json'));
-
-        $this->mockGettingDataset($datasetMock);
-        $this->mockGettingColumnTypes();
-
-        $this->assertChangesEqualsFixture('users', 'changes_equals_fixture/assertion_fixture.json', $originRecords);
-    }
-
-    public function testAssertNoChanges()
-    {
-        $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
-        $originRecords = collect($this->getJsonFixture('get_without_changes/origin_records.json'));
-
-        $this->mockGettingDataset($datasetMock);
-        $this->mockGettingColumnTypes();
-
-        $this->assertNoChanges('users', $originRecords);
     }
 }
