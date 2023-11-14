@@ -258,6 +258,15 @@ trait EntityControlTrait
         return $result;
     }
 
+    public function last(string $column = null, array $where = []): ?Model
+    {
+        $column ??= 'created_at';
+
+        return $this->getQuery($where)
+            ->latest($column)
+            ->first();
+    }
+
     public function findBy(string $field, $value): ?Model
     {
         return $this->first([$field => $value]);
