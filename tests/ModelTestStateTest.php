@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use ReflectionClass;
 use RonasIT\Support\Tests\Support\Mock\TestModel;
 use RonasIT\Support\Tests\Support\Traits\ModelTestStateMockTrait;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
@@ -28,7 +29,12 @@ class ModelTestStateTest extends HelpersTestCase
         $this->mockGettingDataset($datasetMock);
 
         $modelTestState = new ModelTestState(TestModel::class);
-        $jsonFields = $modelTestState->getJSONFields();
+
+        $reflectionClass = new ReflectionClass($modelTestState);
+        $jsonFieldsProperty = $reflectionClass->getProperty('jsonFields');
+        $jsonFieldsProperty->setAccessible(true);
+
+        $jsonFields = $jsonFieldsProperty->getValue($modelTestState);
 
         $this->assertNotEmpty($jsonFields);
         $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
