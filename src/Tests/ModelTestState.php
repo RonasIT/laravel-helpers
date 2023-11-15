@@ -22,13 +22,6 @@ class ModelTestState extends Assert
         $this->jsonFields = $this->getModelJSONFields();
     }
 
-    # done
-    public function getJSONFields(): array
-    {
-        return $this->jsonFields;
-    }
-
-    # done
     public function getState(): Collection
     {
         return $this->state;
@@ -85,7 +78,7 @@ class ModelTestState extends Assert
 
     protected function prepareChanges(array $changes): array
     {
-        $jsonFields = Arr::wrap($this->getJSONFields());
+        $jsonFields = Arr::wrap($this->jsonFields);
 
         if (empty($jsonFields)) {
             return $changes;
@@ -102,7 +95,6 @@ class ModelTestState extends Assert
         }, $changes);
     }
 
-    # done
     protected function getModelJSONFields(): array
     {
         $casts = $this->model->getCasts();
@@ -112,7 +104,6 @@ class ModelTestState extends Assert
         return array_keys($jsonCasts);
     }
 
-    # done
     protected function isJsonCast(string $cast): bool
     {
         if ($cast === 'array') {
@@ -122,7 +113,6 @@ class ModelTestState extends Assert
         return class_exists($cast) && is_subclass_of($cast, CastsAttributes::class);
     }
 
-    # done
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
     {
         return DB::table($table)

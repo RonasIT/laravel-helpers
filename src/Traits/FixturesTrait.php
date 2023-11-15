@@ -3,8 +3,6 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
