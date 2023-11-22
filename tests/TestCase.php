@@ -51,7 +51,7 @@ abstract class TestCase extends BaseTest
         }
 
         if (config('database.default') === 'pgsql') {
-            $this->prepareSequences($this->getTables());
+            $this->prepareSequences();
         }
 
         Carbon::setTestNow(Carbon::parse($this->testNow));

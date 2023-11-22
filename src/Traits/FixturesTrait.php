@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
@@ -156,16 +157,21 @@ trait FixturesTrait
         return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
-    public function prepareSequences(array $tables, array $except = []): void
+    public function prepareSequences(array $except = []): void
     {
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
-        $query = array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
-                return '';
-            } else {
-                return "SELECT setval('{$table}_id_seq', (select coalesce(max(id), 1) from {$table}), (case when (select max(id) from {$table}) is NULL then false else true end));\n";
-            }
+        $data = app('db.connection')
+            ->table('information_schema.columns')
+            ->select('table_name', 'column_name', 'column_default')
+            ->whereNotIn('table_name', $except)
+            ->where('column_default', 'LIKE', 'nextval%')
+            ->get();
+
+        $query = array_concat($data, function ($item) use ($except) {
+            $sequenceName = str_replace(["nextval('", "'::regclass"], '', $item->column_default);
+
+            return "SELECT setval({$sequenceName}, (select max({$item->column_name}) from {$item->table_name}));\n";
         });
 
         app('db.connection')->unprepared($query);

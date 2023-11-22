@@ -145,19 +145,11 @@ class FixturesTraitTest extends HelpersTestCase
     public function testPrepareSequences()
     {
         $connection = $this->mockClass(Connection::class, [], true);
-        $mock = $this->mockClass(PostgreSQLSchemaManager::class, ['listTableNames'], true);
 
         $this->app->instance('db.connection', $connection);
+        $this->dumpFileName = 'clear_database/dump.sql';
 
-        $mock
-            ->expects($this->once())
-            ->method('listTableNames')
-            ->willReturn($this->getJsonFixture('prepare_sequences/tables.json'));
-
-        $connection
-            ->expects($this->once())
-            ->method('getDoctrineSchemaManager')
-            ->willReturn($mock);
+        Config::set('database.default', 'pgsql');
 
         $connection
             ->expects($this->once())
@@ -165,7 +157,7 @@ class FixturesTraitTest extends HelpersTestCase
             ->with($this->getFixture('prepare_sequences/sequences.sql'))
             ->willReturn(true);
 
-        $this->prepareSequences($this->getTables());
+        $this->prepareSequences();
     }
 
     public function testGetFixtureWithoutGlobalExportMode()
