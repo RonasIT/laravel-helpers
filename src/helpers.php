@@ -106,7 +106,10 @@ function mkdir_recursively($path)
         $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
 
-    $path = str_replace($currentPath, '', $path);
+    if (strpos($path, $currentPath) !== false) {
+        $path = substr_replace($path, '', strpos($currentPath, $path), strlen($currentPath));
+    }
+
     $explodedPath = explode('/', $path);
 
     array_walk($explodedPath, function ($dir) use (&$currentPath) {
