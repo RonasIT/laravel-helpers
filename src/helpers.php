@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * Round all values in list of floats.
@@ -106,14 +107,11 @@ function mkdir_recursively($path)
         $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
 
-    if (strpos($path, $currentPath) !== false) {
-        $path = substr_replace($path, '', strpos($currentPath, $path), strlen($currentPath));
-    }
-
+    $path = Str::replaceFirst($currentPath, '', $path);
     $explodedPath = explode('/', $path);
 
     array_walk($explodedPath, function ($dir) use (&$currentPath) {
-        if ($currentPath != '/') {
+        if ($currentPath !== '/') {
             $currentPath .= '/' . $dir;
         } else {
             $currentPath .= $dir;
