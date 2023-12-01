@@ -28,7 +28,7 @@ class CsvIteratorTest extends HelpersTestCase
     public function testOpenNotExistsFile()
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage('fopen(not_exists_file.csv): failed to open stream: No such file or directory');
+        $this->expectExceptionMessage('fopen(not_exists_file.csv): Failed to open stream: No such file or directory');
 
         new CsvIterator('not_exists_file.csv');
     }
