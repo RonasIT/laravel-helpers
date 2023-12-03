@@ -10,9 +10,11 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
+use RonasIT\Support\Traits\WithConsecutiveTrait;
 
 class FixturesTraitTest extends HelpersTestCase
 {
+    use WithConsecutiveTrait;
     use MockTrait;
 
     public function setUp(): void
@@ -112,9 +114,11 @@ class FixturesTraitTest extends HelpersTestCase
         $connection
             ->expects($this->exactly(2))
             ->method('unprepared')
-            ->withConsecutive(
-                [$this->getFixture('clear_database/clear_mysql_db_query.sql')],
-                [$this->getFixture('clear_database/dump.sql')],
+            ->with(
+                ...$this->withConsecutive(
+                    [$this->getFixture('clear_database/clear_mysql_db_query.sql')],
+                    [$this->getFixture('clear_database/dump.sql')],
+                )
             );
 
         $this->loadTestDump();
@@ -134,9 +138,11 @@ class FixturesTraitTest extends HelpersTestCase
         $connection
             ->expects($this->exactly(2))
             ->method('unprepared')
-            ->withConsecutive(
-                [$this->getFixture('clear_database/clear_pgsql_db_query.sql')],
-                [$this->getFixture('clear_database/dump.sql')],
+            ->with(
+                ...$this->withConsecutive(
+                    [$this->getFixture('clear_database/clear_pgsql_db_query.sql')],
+                    [$this->getFixture('clear_database/dump.sql')],
+                )
             );
 
         $this->loadTestDump();

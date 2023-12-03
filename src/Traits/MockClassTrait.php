@@ -4,6 +4,8 @@ namespace RonasIT\Support\Traits;
 
 trait MockClassTrait
 {
+    use WithConsecutiveTrait;
+
     /**
      * Mock selected class. Call chain should looks like:
      *
@@ -31,12 +33,14 @@ trait MockClassTrait
             $mock
                 ->expects($this->exactly($calls->count()))
                 ->method($method)
-                ->withConsecutive(...$calls->map(function ($call) {
-                    return $call['arguments'];
-                })->toArray())
-                ->willReturnOnConsecutiveCalls(...$calls->map(function ($call) {
-                    return $call['result'];
-                })->toArray());
+                ->with(
+                    ...$this->withConsecutive(
+                        ...$calls->map(fn ($call) => $call['arguments'])->toArray()
+                    )
+                )
+                ->willReturnOnConsecutiveCalls(
+                    ...$calls->map(fn ($call) => $call['result'])->toArray()
+                );
         });
 
         $this->app->instance($class, $mock);
