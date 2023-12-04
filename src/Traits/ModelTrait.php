@@ -83,8 +83,13 @@ trait ModelTrait
      *
      * @return mixed $query
      */
-    public function scopeOrderByRelated($query, $relations, string $desc = 'DESC', ?string $asField = null, string $manyToManyStrategy = 'max')
-    {
+    public function scopeOrderByRelated(
+        $query,
+        $relations,
+        string $desc = 'DESC',
+        ?string $asField = null,
+        string $manyToManyStrategy = 'max'
+    ) {
         if (version_compare(app()::VERSION, '5.5') <= 0) {
             return $query->legacyOrderByRelated($relations, $desc);
         }

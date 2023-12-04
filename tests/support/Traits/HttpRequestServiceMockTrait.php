@@ -8,8 +8,8 @@ use RonasIT\Support\Traits\WithConsecutiveTrait;
 
 trait HttpRequestServiceMockTrait
 {
-    use WithConsecutiveTrait;
     use MockTrait;
+    use WithConsecutiveTrait;
 
     protected function mockGuzzleClient($method, $arguments, $response = null): void
     {

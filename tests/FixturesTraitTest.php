@@ -14,8 +14,8 @@ use RonasIT\Support\Traits\WithConsecutiveTrait;
 
 class FixturesTraitTest extends HelpersTestCase
 {
-    use WithConsecutiveTrait;
     use MockTrait;
+    use WithConsecutiveTrait;
 
     public function setUp(): void
     {
