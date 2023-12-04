@@ -8,9 +8,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Assert;
+use RonasIT\Support\Traits\FixturesTrait;
 
 class ModelTestState extends Assert
 {
+    use FixturesTrait;
+
     protected Collection $state;
     protected Model $model;
     protected array $jsonFields;
@@ -22,38 +25,33 @@ class ModelTestState extends Assert
         $this->jsonFields = $this->getModelJSONFields();
     }
 
-    public function getState(): Collection
+    public function assertNotChanged(): void
     {
-        return $this->state;
-    }
+        $changes = $this->getChanges();
 
-    public function getFixturePath(string $fixture): string
-    {
-        $table = $this->model->getTable();
-
-        return "changes/{$table}/{$fixture}";
-    }
-
-    public function getExpectedEmptyState(): array
-    {
-        return [
+        $this->assertEquals([
             'updated' => [],
             'created' => [],
             'deleted' => []
-        ];
+        ], $changes);
     }
 
-    public function getChanges(): array
+    public function assertChangesEqualsFixture(string $fixture, bool $exportMode = false): void
+    {
+        $changes = $this->getChanges();
+
+        $this->assertEqualsFixture($fixture, $changes, $exportMode);
+    }
+
+    protected function getChanges(): array
     {
         $updatedData = $this->getDataSet($this->model->getTable());
 
         $updatedRecords = [];
         $deletedRecords = [];
 
-        $this->getState()->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords) {
-            $updatedItemIndex = $updatedData->search(function ($updatedItem) use ($originItem) {
-                return $updatedItem['id'] === $originItem['id'];
-            });
+        $this->state->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords) {
+            $updatedItemIndex = $updatedData->search(fn ($updatedItem) => $updatedItem['id'] === $originItem['id']);
 
             if ($updatedItemIndex === false) {
                 $deletedRecords[] = $originItem;
@@ -106,11 +104,17 @@ class ModelTestState extends Assert
 
     protected function isJsonCast(string $cast): bool
     {
-        if ($cast === 'array') {
-            return true;
-        }
+        return ($cast === 'array') || (class_exists($cast) && is_subclass_of($cast, CastsAttributes::class));
+    }
 
-        return class_exists($cast) && is_subclass_of($cast, CastsAttributes::class);
+    public function getFixturePath(string $fixtureName): string
+    {
+        $class = get_class($this);
+        $explodedClass = explode('\\', $class);
+        $className = Arr::last($explodedClass);
+        $table = $this->model->getTable();
+
+        return base_path("tests/fixtures/{$className}/changes/{$table}/{$fixtureName}");
     }
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection

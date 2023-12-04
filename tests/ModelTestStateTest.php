@@ -29,16 +29,14 @@ class ModelTestStateTest extends HelpersTestCase
         $this->mockGettingDataset($datasetMock);
 
         $modelTestState = new ModelTestState(TestModel::class);
-
         $reflectionClass = new ReflectionClass($modelTestState);
-        $jsonFieldsProperty = $reflectionClass->getProperty('jsonFields');
-        $jsonFieldsProperty->setAccessible(true);
 
-        $jsonFields = $jsonFieldsProperty->getValue($modelTestState);
+        $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
+        $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
         $this->assertNotEmpty($jsonFields);
         $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
-        $this->assertEquals($originRecords, $modelTestState->getState());
+        $this->assertEquals($originRecords, $state);
     }
 
     public function testAssertChangesEqualsFixture()
@@ -48,11 +46,7 @@ class ModelTestStateTest extends HelpersTestCase
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
 
         $modelTestState = new ModelTestState(TestModel::class);
-
-        $this->assertEqualsFixture(
-            $modelTestState->getFixturePath('changes_equals_fixture/assertion_fixture.json'),
-            $modelTestState->getChanges()
-        );
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
     }
 
     public function testAssertNoChanges()
@@ -61,6 +55,14 @@ class ModelTestStateTest extends HelpersTestCase
         $this->mockGettingDataset($datasetMock);
 
         $modelTestState = new ModelTestState(TestModel::class);
-        $this->assertEquals($modelTestState->getExpectedEmptyState(), $modelTestState->getChanges());
+        $modelTestState->assertNotChanged();
+    }
+
+    protected function getProtectedProperty(ReflectionClass $reflectionClass, string $methodName, $objectInstance)
+    {
+        $property = $reflectionClass->getProperty($methodName);
+        $property->setAccessible(true);
+
+        return $property->getValue($objectInstance);
     }
 }

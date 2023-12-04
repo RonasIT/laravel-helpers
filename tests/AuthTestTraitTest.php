@@ -11,15 +11,6 @@ class AuthTestTraitTest extends HelpersTestCase
 {
     use FixturesTrait, MockTrait, AuthTestTrait;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        self::$tables = [];
-
-        putenv('FAIL_EXPORT_JSON=false');
-    }
-
     public function testActingViaSession()
     {
         $userId = 1;
