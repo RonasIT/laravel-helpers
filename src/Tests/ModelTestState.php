@@ -107,7 +107,7 @@ class ModelTestState extends Assert
         return ($cast === 'array') || (class_exists($cast) && is_subclass_of($cast, CastsAttributes::class));
     }
 
-    public function getFixturePath(string $fixtureName): string
+    protected function getFixturePath(string $fixtureName): string
     {
         $class = get_class($this);
         $explodedClass = explode('\\', $class);

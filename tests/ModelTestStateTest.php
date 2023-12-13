@@ -57,12 +57,4 @@ class ModelTestStateTest extends HelpersTestCase
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertNotChanged();
     }
-
-    protected function getProtectedProperty(ReflectionClass $reflectionClass, string $methodName, $objectInstance)
-    {
-        $property = $reflectionClass->getProperty($methodName);
-        $property->setAccessible(true);
-
-        return $property->getValue($objectInstance);
-    }
 }
