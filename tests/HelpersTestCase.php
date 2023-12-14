@@ -2,8 +2,9 @@
 
 namespace RonasIT\Support\Tests;
 
-use RonasIT\Support\Traits\FixturesTrait;
+use ReflectionClass;
 use RonasIT\Support\HelpersServiceProvider;
+use RonasIT\Support\Traits\FixturesTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
 
 class HelpersTestCase extends BaseTest
@@ -44,5 +45,22 @@ class HelpersTestCase extends BaseTest
         $this->assertEquals(false, $forceMode);
         $this->assertEquals([], $attachedRelations);
         $this->assertEquals([], $attachedRelationsCount);
+    }
+
+    public function getLoginSession($session): array
+    {
+        return array_filter(
+            $session->all(),
+            fn ($key) => strpos($key, 'login_session_') === 0,
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+
+    protected function getProtectedProperty(ReflectionClass $reflectionClass, string $methodName, $objectInstance)
+    {
+        $property = $reflectionClass->getProperty($methodName);
+        $property->setAccessible(true);
+
+        return $property->getValue($objectInstance);
     }
 }

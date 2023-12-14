@@ -11,7 +11,16 @@ class TestModel extends Model
 {
     use ModelTrait, SoftDeletes;
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'json_field',
+        'castable_field'
+    ];
+
+    protected $casts = [
+        'json_field' => 'array',
+        'castable_field' => JSONCustomCast::class
+    ];
 
     public function relation(): HasMany
     {
