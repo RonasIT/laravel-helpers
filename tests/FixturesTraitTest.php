@@ -9,13 +9,11 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
-use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use RonasIT\Support\Traits\MockClassTrait;
 
 class FixturesTraitTest extends HelpersTestCase
 {
     use MockClassTrait;
-    use SqlMockTrait;
 
     public function setUp(): void
     {
