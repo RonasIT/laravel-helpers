@@ -33,6 +33,15 @@ trait SqlMockTrait
         $this->mockSelect('select * from `relation_models` where `relation_models`.`test_model_id` in (1)', [], [], $pdo);
     }
 
+    protected function mockLast(array $selectResult): void
+    {
+        $pdo = $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [
+            1
+        ], $selectResult);
+
+        $this->mockSelect('select * from `relation_models` where `relation_models`.`test_model_id` in (1)', [], [],$pdo);
+    }
+
     protected function mockFirstBy(array $selectResult): void
     {
         $pdo = $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [
