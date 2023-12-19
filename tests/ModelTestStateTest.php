@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
 use RonasIT\Support\Tests\Support\Mock\TestModel;
+use RonasIT\Support\Tests\Support\Mock\TestModelWithoutJsonFields;
 use RonasIT\Support\Tests\Support\Traits\ModelTestStateMockTrait;
 use RonasIT\Support\Tests\Support\Traits\MockTrait;
 
@@ -47,6 +48,16 @@ class ModelTestStateTest extends HelpersTestCase
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
+    }
+
+    public function testAssertChangesWithoutJsonFields()
+    {
+        $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset.json'));
+        $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'));
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
+
+        $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
     }
 
     public function testAssertNoChanges()

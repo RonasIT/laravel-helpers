@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert;
 use RonasIT\Support\Traits\FixturesTrait;
 
@@ -109,12 +110,11 @@ class ModelTestState extends Assert
 
     protected function getFixturePath(string $fixtureName): string
     {
-        $class = get_class($this);
-        $explodedClass = explode('\\', $class);
-        $className = Arr::last($explodedClass);
-        $table = $this->model->getTable();
+        $testClassTrace = Arr::first(debug_backtrace(), fn ($trace) => str_ends_with($trace['file'], 'Test.php'));
+        $testFileName = Arr::last(explode('/', $testClassTrace['file']));
+        $testClass = Str::remove('.php', $testFileName);
 
-        return base_path("tests/fixtures/{$className}/changes/{$table}/{$fixtureName}");
+        return base_path("tests/fixtures/{$testClass}/{$fixtureName}");
     }
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
