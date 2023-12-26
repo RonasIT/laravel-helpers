@@ -38,11 +38,10 @@ class HttpRequestServiceTest extends HelpersTestCase
             [
                 'method' => 'sendRequest',
                 'arguments' => [
-                    'get', 'https://some.url.com', [
-                        'some_key' => 'some_value'
-                    ], [
-                        'some_header_name' => 'some_header_value'
-                    ]
+                    'get',
+                    'https://some.url.com',
+                    ['some_key' => 'some_value'],
+                    ['some_header_name' => 'some_header_value']
                 ],
                 'result' => new GuzzleResponse(200, [], json_encode([])),
             ]
