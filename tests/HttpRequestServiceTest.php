@@ -7,12 +7,11 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
 
 class HttpRequestServiceTest extends HelpersTestCase
 {
-    use MockTrait, HttpRequestServiceMockTrait;
+    use HttpRequestServiceMockTrait;
 
     protected HttpRequestService $httpRequestServiceClass;
     protected ReflectionProperty $optionsProperty;
@@ -35,19 +34,20 @@ class HttpRequestServiceTest extends HelpersTestCase
 
     public function testSend()
     {
-        $mock = $this->mockClass(HttpRequestService::class, ['sendRequest']);
+        $this->mockClass(HttpRequestService::class, [
+            [
+                'method' => 'sendRequest',
+                'arguments' => [
+                    'get',
+                    'https://some.url.com',
+                    ['some_key' => 'some_value'],
+                    ['some_header_name' => 'some_header_value']
+                ],
+                'result' => new GuzzleResponse(200, [], json_encode([])),
+            ]
+        ]);
 
-        $mock
-            ->expects($this->once())
-            ->method('sendRequest')
-            ->with('get', 'https://some.url.com', [
-                'some_key' => 'some_value'
-            ], [
-                'some_header_name' => 'some_header_value'
-            ])
-            ->willReturn(new GuzzleResponse(200, [], json_encode([])));
-
-        $mock->get('https://some.url.com', [
+        app(HttpRequestService::class)->get('https://some.url.com', [
             'some_key' => 'some_value'
         ], [
             'some_header_name' => 'some_header_value'

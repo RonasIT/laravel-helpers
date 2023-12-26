@@ -18,7 +18,7 @@
     "doctrine/dbal": "^3.6"
   },
   "require-dev": {
-    "fzaninotto/faker": "~1.4",
+    "fakerphp/faker": "^1.23",
     "mockery/mockery": "1.*",
     "phpunit/phpunit": "9.*",
     "php-coveralls/php-coveralls": "^2.5",
