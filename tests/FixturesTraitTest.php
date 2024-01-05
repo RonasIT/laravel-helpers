@@ -6,10 +6,12 @@ use Doctrine\DBAL\Schema\PostgreSQLSchemaManager;
 use Illuminate\Database\Connection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Traits\MockClassTrait;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FixturesTraitTest extends HelpersTestCase
 {
@@ -67,6 +69,27 @@ class FixturesTraitTest extends HelpersTestCase
         $this->assertEquals($this->getJsonFixture('export_json/response.json'), $result);
 
         $this->assertFileExists($this->getFixturePath('export_json/response.json'));
+    }
+
+    public function testExportFile()
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        Storage::fake('files');
+        Storage::disk('files')->put('content_source.txt', 'some content is here');
+
+        $response = new TestResponse(
+            new BinaryFileResponse(
+                Storage::disk('files')->path('content_source.txt')
+            )
+        );
+
+        $this->exportFile($response, 'export_file/content_result.txt');
+
+        $this->assertEquals(
+            $this->getJsonFixture('export_file/result.txt'),
+            $this->getJsonFixture('export_file/content_result.txt')
+        );
     }
 
     public function testGetFixtureNotExistsWithoutException()
