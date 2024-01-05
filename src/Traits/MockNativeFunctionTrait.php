@@ -17,7 +17,8 @@ trait MockNativeFunctionTrait
      *         'function' => 'function_name',
      *         'arguments' => ['firstArgumentValue', 2, true],
      *         'result' => '123'
-     *     ]
+     *     ],
+     *     $this->functionCall('function_name', ['firstArgumentValue', 2, true], '123');
      * ]
      *
      * @param string $namespace
@@ -53,32 +54,6 @@ trait MockNativeFunctionTrait
                     return $expectedCall['result'];
                 });
         });
-        // ----
-
-        /*$mock = $this->getFunctionMock($namespace, $function);
-
-        $matcher = $this->exactly(count($callChain));
-
-        $mock
-            ->expects($matcher)
-            ->willReturnCallback(function (...$args) use ($callChain, $matcher, $namespace, $function) {
-                $callIndex = $matcher->getInvocationCount() - 1;
-                $expectedCall = $callChain[$callIndex];
-
-                $expectedArguments = Arr::get($expectedCall, 'arguments');
-
-                if (!empty($expectedArguments)) {
-                    $this->assertArguments(
-                        $args,
-                        $expectedArguments,
-                        $namespace,
-                        $function,
-                        $callIndex
-                    );
-                }
-
-                return $expectedCall['result'];
-            });*/
     }
 
     protected function assertArguments($actual, $expected, string $namespace, string $function, int $callIndex): void
@@ -91,5 +66,14 @@ trait MockNativeFunctionTrait
                 "Namespace '{$namespace}'\nFunction: '{$function}'\nCall index: {$callIndex}\nArgument index: {$index}"
             );
         }
+    }
+
+    public function functionCall(string $function, array $arguments = [], $result = true): array
+    {
+        return [
+            'function' => $function,
+            'arguments' => $arguments,
+            'result' => $result,
+        ];
     }
 }
