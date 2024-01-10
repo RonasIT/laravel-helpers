@@ -201,7 +201,7 @@ abstract class TestCase extends BaseTest
 
     protected function assertFixture(array $expectedMailData, Mailable $mail, bool $exportMode = false): void
     {
-        $mailContent = view($mail->view, $mail->viewData)->render();
+        $mailContent = view($mail->view, $mail->getData())->render();
 
         if ($exportMode) {
             $this->exportContent($mailContent, $expectedMailData['fixture']);
