@@ -4,12 +4,12 @@ namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
 use RonasIT\Support\HelpersServiceProvider;
-use RonasIT\Support\Traits\FixturesTrait;
+use RonasIT\Support\Traits\AssertTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
 
 class HelpersTestCase extends BaseTest
 {
-    use FixturesTrait;
+    use AssertTrait;
 
     protected $globalExportMode = false;
 

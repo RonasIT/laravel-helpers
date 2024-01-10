@@ -2,7 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
-use Schema;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
