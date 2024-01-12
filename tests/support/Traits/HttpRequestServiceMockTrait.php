@@ -13,11 +13,7 @@ trait HttpRequestServiceMockTrait
     protected function mockGuzzleClient($method, $arguments, $response = null): void
     {
         $this->mockClass(Client::class, [
-            [
-                'method' => $method,
-                'arguments' => $arguments,
-                'result' =>  $response ?? new GuzzleResponse(200, [])
-            ]
+            $this->methodCall($method, $arguments, $response ?? new GuzzleResponse(200, [])),
         ]);
     }
 }

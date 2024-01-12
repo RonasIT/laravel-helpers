@@ -120,16 +120,8 @@ class FixturesTraitTest extends HelpersTestCase
     public function testLoadTestDumpForMysql()
     {
         $connection = $this->mockClass(Connection::class, [
-            [
-                'method' => 'unprepared',
-                'arguments' => [$this->getFixture('clear_database/clear_mysql_db_query.sql')],
-                'result' => true,
-            ],
-            [
-                'method' => 'unprepared',
-                'arguments' => [$this->getFixture('clear_database/dump.sql')],
-                'result' => true,
-            ],
+            $this->methodCall('unprepared', [$this->getFixture('clear_database/clear_mysql_db_query.sql')]),
+            $this->methodCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
 
         $this->app->instance('db.connection', $connection);
@@ -145,16 +137,8 @@ class FixturesTraitTest extends HelpersTestCase
     public function testLoadTestDumpForPgsql()
     {
         $connection = $this->mockClass(Connection::class, [
-            [
-                'method' => 'unprepared',
-                'arguments' => [$this->getFixture('clear_database/clear_pgsql_db_query.sql')],
-                'result' => true,
-            ],
-            [
-                'method' => 'unprepared',
-                'arguments' => [$this->getFixture('clear_database/dump.sql')],
-                'result' => true,
-            ],
+            $this->methodCall('unprepared', [$this->getFixture('clear_database/clear_pgsql_db_query.sql')]),
+            $this->methodCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
 
         $this->app->instance('db.connection', $connection);
@@ -170,22 +154,12 @@ class FixturesTraitTest extends HelpersTestCase
     public function testPrepareSequences()
     {
         $mock = $this->mockClass(PostgreSQLSchemaManager::class, [
-            [
-                'method' => 'listTableNames',
-                'result' => $this->getJsonFixture('prepare_sequences/tables.json')
-            ],
+            $this->methodCall('listTableNames', [], $this->getJsonFixture('prepare_sequences/tables.json')),
         ], true);
 
         $connection = $this->mockClass(Connection::class, [
-            [
-                'method' => 'getDoctrineSchemaManager',
-                'result' => $mock,
-            ],
-            [
-                'method' => 'unprepared',
-                'arguments' => [$this->getFixture('prepare_sequences/sequences.sql')],
-                'result' => true,
-            ],
+            $this->methodCall('getDoctrineSchemaManager', [], $mock),
+            $this->methodCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
         $this->app->instance('db.connection', $connection);

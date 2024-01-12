@@ -106,4 +106,13 @@ trait MockClassTrait
 
         return $mock;
     }
+
+    public function methodCall(string $method, array $arguments = [], $result = true): array
+    {
+        return [
+            'method' => $method,
+            'arguments' => $arguments,
+            'result' => $result,
+        ];
+    }
 }
