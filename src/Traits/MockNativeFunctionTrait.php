@@ -18,7 +18,7 @@ trait MockNativeFunctionTrait
      *         'arguments' => ['firstArgumentValue', 2, true],
      *         'result' => '123'
      *     ],
-     *     $this->functionCall('function_name', ['firstArgumentValue', 2, true], '123');
+     *     $this->functionCall('function_name', ['firstArgumentValue', 2, true], '123')
      * ]
      *
      * @param string $namespace

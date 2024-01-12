@@ -16,13 +16,16 @@ trait MockClassTrait
      *         'method' => 'yourMethod',
      *         'arguments' => ['firstArgumentValue', 2, true],
      *         'result' => 'result_fixture.json'
-     *     ]
+     *     ],
+     *     $this->methodCall('yourMethod', ['firstArgumentValue', 2, true], 'result_fixture.json')
      * ]
      *
      * @param string $class
      * @param array $callChain
+     * @param bool $disableConstructor
+     * @return MockObject
      */
-    public function mockClass(string $class, array $callChain, $disableConstructor = false): MockObject
+    public function mockClass(string $class, array $callChain, bool $disableConstructor = false): MockObject
     {
         $this->app->offsetUnset($class);
 
