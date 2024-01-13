@@ -12,6 +12,10 @@ trait AssertTrait
 {
     use FixturesTrait;
 
+    private $requiredExpectationParameters = [
+        'emails',
+        'fixture'
+    ];
     /**
      * Email Chain should look like following construction:
      *   [
@@ -45,10 +49,10 @@ trait AssertTrait
      * Export mode will export html to fixture before assert
      *
      * @param string $mailableClass
-     * @param mixed $emailChain
+     * @param array|string $emailChain
      * @param mixed $exportMode
      */
-    protected function assertMailEquals(string $mailableClass, array $emailChain, bool $exportMode = false): void
+    protected function assertMailEquals(string $mailableClass, $emailChain, bool $exportMode = false): void
     {
         $emailChain = $this->prepareEmailChain($emailChain);
         $index = 0;
@@ -122,7 +126,7 @@ trait AssertTrait
             $this->assertContains(
                 $email,
                 $sentEmails,
-                "Block \"To\" on {$index} step don't contains {$email}. Contains only {$emailList}."
+                "Block \"To\" on {$index} step doesn't contain '{$email}'. It only contains '{$emailList}'."
             );
         }
     }

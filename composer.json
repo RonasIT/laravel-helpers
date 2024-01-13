@@ -39,7 +39,7 @@
   },
   "autoload-dev": {
     "files": [
-      "src/Tests/TestCase.php"
+      "tests/TestCase.php"
     ]
   },
   "minimum-stability": "alpha",
