@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\Response;
 
 trait AssertTrait
@@ -136,7 +137,7 @@ trait AssertTrait
         $expectedFrom = Arr::get($currentMail, 'from');
 
         if (!empty($expectedFrom)) {
-            $mail->assertFrom($expectedFrom);
+            $this->assertFrom($mail, $expectedFrom);
         }
     }
 
@@ -183,5 +184,13 @@ trait AssertTrait
         }
 
         return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
+    }
+
+    public function assertFrom(Mailable $mail, $address): void
+    {
+        $this->assertTrue(
+            $mail->hasFrom($address),
+            "Email was not from expected address [{$address}]."
+        );
     }
 }

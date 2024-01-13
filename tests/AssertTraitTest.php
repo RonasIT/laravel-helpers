@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMail;
@@ -15,7 +16,10 @@ class AssertTraitTest extends HelpersTestCase
         parent::setUp();
 
         Mail::fake();
+
         Config::set('view.paths', [base_path('tests/support/views')]);
+
+        putenv('MAIL_FROM_ADDRESS=noreply@mail.net');
     }
 
     public function testMail()
@@ -39,7 +43,6 @@ class AssertTraitTest extends HelpersTestCase
             ['name' => 'John Smith'],
             'emails.test',
             'Test Subject',
-            ['sender1@mail.com', 'sender2@mail.net'],
         ));
 
         $this->assertMailEquals(TestMail::class, [
@@ -47,7 +50,7 @@ class AssertTraitTest extends HelpersTestCase
                 'emails' => 'test@mail.com',
                 'fixture' => 'test_mail.html',
                 'subject' => 'Test Subject',
-                'from' => ['sender1@mail.com', 'sender2@mail.net'],
+                'from' => 'noreply@mail.net',
             ]
         ]);
     }
@@ -66,6 +69,25 @@ class AssertTraitTest extends HelpersTestCase
         ));
 
         $this->assertMailEquals(TestMail::class, 'email_chain.json');
+    }
+
+    public function testMailWithExport()
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        Mail::to('test@mail.com')->queue(new TestMail(
+            ['name' => 'John Smith'],
+            'emails.test'
+        ));
+
+        $this->assertMailEquals(TestMail::class, [
+            [
+                'emails' => 'test@mail.com',
+                'fixture' => 'test_mail_with_export.html',
+            ]
+        ], true);
+
+        $this->assertFileExists($this->getFixturePath('test_mail_with_export.html'));
     }
 
     public function testMailWithIncorrectSubject()
