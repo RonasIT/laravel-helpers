@@ -128,8 +128,8 @@ trait MockTrait
         $expected,
         string $class,
         string $function,
-        int    $callIndex,
-        bool   $isClass = true
+        int $callIndex,
+        bool $isClass = true
     ): void {
         $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
