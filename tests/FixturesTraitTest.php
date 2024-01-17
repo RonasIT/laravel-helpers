@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
-use RonasIT\Support\Traits\MockClassTrait;
+use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FixturesTraitTest extends HelpersTestCase
 {
-    use MockClassTrait;
+    use MockTrait;
 
     public function setUp(): void
     {

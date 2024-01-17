@@ -4,10 +4,13 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
 use Closure;
+use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\MockObject\MockObject;
 
-trait MockClassTrait
+trait MockTrait
 {
+    use PHPMock;
+
     /**
      * Mock selected class. Call chain should looks like:
      *
@@ -72,14 +75,70 @@ trait MockClassTrait
         return $mock;
     }
 
-    protected function assertArguments($actual, $expected, string $class, string $method, int $callIndex): void
+    /**
+     * Mock native function. Call chain should looks like:
+     *
+     * [
+     *     [
+     *         'function' => 'function_name',
+     *         'arguments' => ['firstArgumentValue', 2, true],
+     *         'result' => '123'
+     *     ],
+     *     $this->functionCall('function_name', ['firstArgumentValue', 2, true], '123')
+     * ]
+     *
+     * @param string $namespace
+     * @param array $callChain
+     */
+    public function mockNativeFunction(string $namespace, array $callChain)
     {
+        $methodsCalls = collect($callChain)->groupBy('function');
+
+        $methodsCalls->each(function ($calls, $function) use ($namespace) {
+            $matcher = $this->exactly($calls->count());
+
+            $mock = $this->getFunctionMock($namespace, $function);
+
+            $mock
+                ->expects($matcher)
+                ->willReturnCallback(function (...$args) use ($matcher, $calls, $namespace, $function) {
+                    $callIndex = $matcher->getInvocationCount() - 1;
+                    $expectedCall = $calls[$callIndex];
+
+                    $expectedArguments = Arr::get($expectedCall, 'arguments');
+
+                    if (!empty($expectedArguments)) {
+                        $this->assertArguments(
+                            $args,
+                            $expectedArguments,
+                            $namespace,
+                            $function,
+                            $callIndex,
+                            false
+                        );
+                    }
+
+                    return $expectedCall['result'];
+                });
+        });
+    }
+
+    protected function assertArguments(
+        $actual,
+        $expected,
+        string $class,
+        string $method,
+        int $callIndex,
+        bool $isClass = true
+    ): void {
         foreach ($actual as $index => $argument) {
             $this->assertEquals(
                 $expected[$index],
                 $argument,
                 "Failed asserting that arguments are equals to expected.\n" .
-                "Class '{$class}'\nMethod: '{$method}'\nMethod call index: {$callIndex}\nArgument index: {$index}"
+                ($isClass)
+                    ? "Class '{$class}'\nMethod: '{$method}'\nMethod call index: {$callIndex}\nArgument index: {$index}"
+                    : "Namespace '{$class}'\nFunction: '{$method}'\nCall index: {$callIndex}\nArgument index: {$index}"
             );
         }
     }
@@ -114,6 +173,15 @@ trait MockClassTrait
     {
         return [
             'method' => $method,
+            'arguments' => $arguments,
+            'result' => $result,
+        ];
+    }
+
+    public function functionCall(string $function, array $arguments = [], $result = true): array
+    {
+        return [
+            'function' => $function,
             'arguments' => $arguments,
             'result' => $result,
         ];
