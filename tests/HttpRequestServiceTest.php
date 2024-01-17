@@ -35,16 +35,16 @@ class HttpRequestServiceTest extends HelpersTestCase
     public function testSend()
     {
         $this->mockClass(HttpRequestService::class, [
-            [
-                'method' => 'sendRequest',
-                'arguments' => [
+            $this->functionCall(
+                'sendRequest',
+                [
                     'get',
                     'https://some.url.com',
                     ['some_key' => 'some_value'],
                     ['some_header_name' => 'some_header_value']
                 ],
-                'result' => new GuzzleResponse(200, [], json_encode([])),
-            ]
+                new GuzzleResponse(200, [], json_encode([]))
+            ),
         ]);
 
         app(HttpRequestService::class)->get('https://some.url.com', [

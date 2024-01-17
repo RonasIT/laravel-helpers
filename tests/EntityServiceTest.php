@@ -5,13 +5,10 @@ namespace RonasIT\Support\Tests;
 use ReflectionProperty;
 use RonasIT\Support\Services\EntityService;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use BadMethodCallException;
 
 class EntityServiceTest extends HelpersTestCase
 {
-    use MockTrait;
-
     protected EntityService $entityServiceClass;
     protected ReflectionProperty $repositoryProperty;
 

@@ -2,16 +2,16 @@
 
 namespace RonasIT\Support\Tests;
 
-use Closure;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
+use Closure;
+use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Traits\FixturesTrait;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Foundation\Testing\TestCase as BaseTest;
 
 abstract class TestCase extends BaseTest
 {

@@ -4,13 +4,12 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class EntityControlTraitTest extends HelpersTestCase
 {
-    use MockTrait, SqlMockTrait;
+    use SqlMockTrait;
 
     protected TestRepository $testRepositoryClass;
 
