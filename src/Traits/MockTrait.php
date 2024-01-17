@@ -16,11 +16,11 @@ trait MockTrait
      *
      * [
      *     [
-     *         'method' => 'yourMethod',
+     *         'function' => 'yourMethod',
      *         'arguments' => ['firstArgumentValue', 2, true],
      *         'result' => 'result_fixture.json'
      *     ],
-     *     $this->methodCall('yourMethod', ['firstArgumentValue', 2, true], 'result_fixture.json')
+     *     $this->functionCall('yourMethod', ['firstArgumentValue', 2, true], 'result_fixture.json')
      * ]
      *
      * @param string $class
@@ -32,7 +32,7 @@ trait MockTrait
     {
         $this->app->offsetUnset($class);
 
-        $methodsCalls = collect($callChain)->groupBy('method');
+        $methodsCalls = collect($callChain)->groupBy('function');
 
         $mock = $this
             ->getMockBuilder($class)
@@ -127,18 +127,19 @@ trait MockTrait
         $actual,
         $expected,
         string $class,
-        string $method,
-        int $callIndex,
-        bool $isClass = true
+        string $function,
+        int    $callIndex,
+        bool   $isClass = true
     ): void {
+        $message = ($isClass)
+            ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
+            : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
+
         foreach ($actual as $index => $argument) {
             $this->assertEquals(
                 $expected[$index],
                 $argument,
-                "Failed asserting that arguments are equals to expected.\n" .
-                ($isClass)
-                    ? "Class '{$class}'\nMethod: '{$method}'\nMethod call index: {$callIndex}\nArgument index: {$index}"
-                    : "Namespace '{$class}'\nFunction: '{$method}'\nCall index: {$callIndex}\nArgument index: {$index}"
+                "Failed asserting that arguments are equals to expected.\n{$message}\nArgument index: {$index}"
             );
         }
     }
@@ -169,19 +170,10 @@ trait MockTrait
         return $mock;
     }
 
-    public function methodCall(string $method, array $arguments = [], $result = true): array
+    public function functionCall(string $name, array $arguments = [], $result = true): array
     {
         return [
-            'method' => $method,
-            'arguments' => $arguments,
-            'result' => $result,
-        ];
-    }
-
-    public function functionCall(string $function, array $arguments = [], $result = true): array
-    {
-        return [
-            'function' => $function,
+            'function' => $name,
             'arguments' => $arguments,
             'result' => $result,
         ];
