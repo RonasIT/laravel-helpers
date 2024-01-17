@@ -229,16 +229,37 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
+                'user_id_in_list' => [1, 2],
+                'user_id_not_in_list' => [3, 4],
+                'name' => 'text_name',
                 'date_gte' => Carbon::now(),
                 'date_lte' => Carbon::now(),
                 'created_at_from' => Carbon::now(),
                 'created_at_to' => Carbon::now(),
                 'updated_at_gt' => Carbon::now(),
                 'updated_at_lt' => Carbon::now(),
+            ])
+            ->getSearchResults();
+    }
+
+    public function testSearchQueryWithFiltersFunctions()
+    {
+        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
+
+        $this->mockGetSearchResultWithFilters($this->selectResult);
+
+        $this->testRepositoryClass
+            ->searchQuery([
                 'user_id_in_list' => [1, 2],
                 'user_id_not_in_list' => [3, 4],
                 'name' => 'text_name',
             ])
+            ->filterMoreOrEqualThan('date', Carbon::now())
+            ->filterLessOrEqualThan('date', Carbon::now())
+            ->filterMoreOrEqualThan('created_at', Carbon::now())
+            ->filterLessOrEqualThan('created_at', Carbon::now())
+            ->filterMoreThan('updated_at', Carbon::now())
+            ->filterLessThan('updated_at', Carbon::now())
             ->getSearchResults();
     }
 }
