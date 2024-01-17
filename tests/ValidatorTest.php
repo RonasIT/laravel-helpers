@@ -3,13 +3,12 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Auth;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use Illuminate\Support\Facades\Validator;
 
 class ValidatorTest extends HelpersTestCase
 {
-    use MockTrait, SqlMockTrait;
+    use SqlMockTrait;
 
     public function setUp(): void
     {

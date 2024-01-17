@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 trait ModelTestStateMockTrait
 {
+    use MockTestTrait;
+
     protected function mockGettingDataset(Collection $responseMock): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);

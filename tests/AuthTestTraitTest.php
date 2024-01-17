@@ -3,13 +3,13 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Arr;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Traits\AuthTestTrait;
 use RonasIT\Support\Traits\FixturesTrait;
 
 class AuthTestTraitTest extends HelpersTestCase
 {
-    use FixturesTrait, MockTrait, AuthTestTrait;
+    use AuthTestTrait;
+    use FixturesTrait;
 
     public function testActingViaSession()
     {

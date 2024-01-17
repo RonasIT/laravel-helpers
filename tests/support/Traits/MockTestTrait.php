@@ -4,7 +4,7 @@ namespace RonasIT\Support\Tests\Support\Traits;
 
 use PHPUnit\Framework\MockObject\MockObject;
 
-trait MockTrait
+trait MockTestTrait
 {
     protected function mockClass($className, $methods = [], $disableConstructor = false): MockObject
     {
