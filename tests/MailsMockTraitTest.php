@@ -3,13 +3,12 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMail;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class AssertTraitTest extends HelpersTestCase
+class MailsMockTraitTest extends HelpersTestCase
 {
     public function setUp(): void
     {
@@ -30,10 +29,7 @@ class AssertTraitTest extends HelpersTestCase
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            [
-                'emails' => 'test@mail.com',
-                'fixture' => 'test_mail.html',
-            ]
+            $this->sentMail('test@mail.com', 'test_mail.html'),
         ]);
     }
 
@@ -81,10 +77,7 @@ class AssertTraitTest extends HelpersTestCase
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            [
-                'emails' => 'test@mail.com',
-                'fixture' => 'test_mail_with_export.html',
-            ]
+            $this->sentMail('test@mail.com', 'test_mail_with_export.html'),
         ], true);
 
         $this->assertFileExists($this->getFixturePath('test_mail_with_export.html'));
@@ -104,11 +97,7 @@ class AssertTraitTest extends HelpersTestCase
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            [
-                'emails' => 'test@mail.com',
-                'subject' => 'Incorrect Subject',
-                'fixture' => 'test_mail.html',
-            ]
+            $this->sentMail('test@mail.com', 'test_mail.html', 'Incorrect Subject'),
         ]);
     }
 
@@ -125,7 +114,7 @@ class AssertTraitTest extends HelpersTestCase
         $this->assertMailEquals(TestMail::class, [
             [
                 'emails' => 'test@mail.com',
-            ]
+            ],
         ]);
     }
 }

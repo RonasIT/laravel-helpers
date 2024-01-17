@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait ModelTrait
 {
-    protected $disableLazyLoading = true;
+    protected bool $disableLazyLoading = true;
 
     public static function getFields(): array
     {
@@ -43,7 +43,8 @@ trait ModelTrait
             $modelName = static::class;
 
             throw new BadMethodCallException(
-                "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. See property \$disableLazyLoading"
+                "Attempting to lazy-load relation '{$method}' "
+                . "on model '{$modelName}'. See property \$disableLazyLoading"
             );
         }
 
@@ -54,7 +55,7 @@ trait ModelTrait
      * This method was added, because native Laravel's method addSelect
      * overwrites existed select clause
      * @param $query
-     * @param $fields
+     * @param array $fields
      *
      * @return mixed
      */

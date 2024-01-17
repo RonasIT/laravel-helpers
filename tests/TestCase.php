@@ -7,27 +7,22 @@ use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
-use RonasIT\Support\Traits\AssertTrait;
+use RonasIT\Support\Traits\MailsMockTrait;
 
 abstract class TestCase extends BaseTest
 {
-    use AssertTrait;
+    use MailsMockTrait;
 
     protected $auth;
 
-    protected $testNow = '2018-11-11 11:11:11';
+    protected string $testNow = '2018-11-11 11:11:11';
 
-    protected static $startedTestSuite;
-    protected static $isWrappedIntoTransaction = true;
+    protected static string $startedTestSuite;
+    protected static bool $isWrappedIntoTransaction = true;
 
-    private $requiredExpectationParameters = [
-        'emails',
-        'fixture'
-    ];
+    protected bool $globalExportMode = false;
 
-    protected $globalExportMode = false;
-
-    protected function setGlobalExportMode()
+    protected function setGlobalExportMode(): void
     {
         $this->globalExportMode = true;
     }

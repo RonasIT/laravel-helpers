@@ -6,14 +6,13 @@ use Closure;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\Response;
 
-trait AssertTrait
+trait MailsMockTrait
 {
     use FixturesTrait;
 
-    private $requiredExpectationParameters = [
+    private array $requiredExpectationParameters = [
         'emails',
         'fixture'
     ];
@@ -25,6 +24,10 @@ trait AssertTrait
      *      'subject' => string|null, expected email subject from the step 1
      *   ]
      *
+     * or be a function call:
+     *
+     *   $this->sentMail($emails, $fixture, $subject, $from),
+     *
      * or be an array, if sent more than 1 email:
      *
      * [
@@ -32,10 +35,8 @@ trait AssertTrait
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
-     *   ]
-     * ],
-     * ...
-     * [
+     *   ],
+     *   ...
      *   [
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step N
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step N
@@ -137,7 +138,10 @@ trait AssertTrait
         $expectedFrom = Arr::get($currentMail, 'from');
 
         if (!empty($expectedFrom)) {
-            $this->assertFrom($mail, $expectedFrom);
+            $this->assertTrue(
+                $mail->hasFrom($expectedFrom),
+                "Email was not from expected address [{$expectedFrom}]."
+            );
         }
     }
 
@@ -186,11 +190,13 @@ trait AssertTrait
         return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
     }
 
-    public function assertFrom(Mailable $mail, $address): void
+    protected function sentMail($emails, string $fixture, string $subject = '', $from = ''): array
     {
-        $this->assertTrue(
-            $mail->hasFrom($address),
-            "Email was not from expected address [{$address}]."
-        );
+        return [
+            'emails' => $emails,
+            'fixture' => $fixture,
+            'subject' => $subject,
+            'from' => $from,
+        ];
     }
 }

@@ -50,8 +50,12 @@ class ModelTestStateTest extends HelpersTestCase
 
     public function testAssertChangesWithoutJsonFields()
     {
-        $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset.json'));
-        $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'));
+        $initialDatasetMock = collect(
+            $this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset.json')
+        );
+        $changedDatasetMock = collect(
+            $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json')
+        );
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
 
         $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
