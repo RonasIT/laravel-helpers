@@ -8,7 +8,7 @@ class TestMail extends Mailable
 {
     public function __construct(array $data, $view, $subject = '')
     {
-        $this->data = $data;
+        $this->viewData = $data;
         $this->view = $view;
         $this->subject = $subject;
 
