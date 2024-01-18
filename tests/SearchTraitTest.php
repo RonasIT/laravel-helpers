@@ -133,10 +133,10 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResultAggregateIsNull()
     {
-        $this->mockSelect(
+        $this->mockSelectWithAggregate(
             'select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null',
             [],
-            [['aggregate' => null]]
+            null
         );
 
         $this->testRepositoryClass->searchQuery()->getSearchResults();

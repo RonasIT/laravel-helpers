@@ -19,7 +19,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testUniqueExceptOfAuthorizedUserPass()
     {
-        $this->mockExistsUsersExceptAuthorized(false);
+        $this->mockExistsUsersExceptAuthorized();
 
         $validator = Validator::make(
             ['email' => 'mail@mail.com'],
