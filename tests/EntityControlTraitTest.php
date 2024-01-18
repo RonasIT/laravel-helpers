@@ -150,8 +150,7 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->mockSelectExists(
             'select exists(select `test_models`.*, (select count(*) from `relation_models` '
             . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
-            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`',
-            [2]
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`'
         );
 
         $this->testRepositoryClass
@@ -160,7 +159,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->force()
             ->with('relation')
             ->withCount('relation')
-            ->existsBy('id', 2);
+            ->existsBy('id', 1);
 
         $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }

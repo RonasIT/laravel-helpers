@@ -157,6 +157,9 @@ class HttpRequestService
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function logRequest(string $typeOfRequest, string $url, array $data, array $headers): void
     {
         if ($this->debug) {
@@ -172,6 +175,9 @@ class HttpRequestService
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function logResponse(?int $time = null): void
     {
         $endTime = (empty($time)) ? null : microtime(true) - $time;

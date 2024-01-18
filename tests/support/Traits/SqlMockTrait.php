@@ -127,11 +127,7 @@ trait SqlMockTrait
     {
         $this->mockInsert(
             'insert into `test_models` (`name`, `updated_at`, `created_at`) values (?, ?, ?)',
-            [
-                'test_name',
-                Carbon::now(),
-                Carbon::now()
-            ]
+            ['test_name', Carbon::now(), Carbon::now()]
         );
 
         $this->mockSelectById(
@@ -160,11 +156,7 @@ trait SqlMockTrait
 
         $this->mockUpdateSqlQuery(
             'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ?',
-            [
-                'test_name',
-                Carbon::now(),
-                1
-            ]
+            ['test_name', Carbon::now(), 1]
         );
 
         $this->mockSelectById(
@@ -186,8 +178,7 @@ trait SqlMockTrait
         $this->mockSelectExists(
             'select exists(select `test_models`.*, (select count(*) from `relation_models` '
             . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
-            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`',
-            [1]
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`'
         );
 
         $this->mockSelectById(
@@ -204,11 +195,7 @@ trait SqlMockTrait
 
         $this->mockUpdateSqlQuery(
             'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ?',
-            [
-                'test_name',
-                Carbon::now(),
-                1
-            ]
+            ['test_name', Carbon::now(), 1]
         );
 
         $this->mockSelectById(
@@ -231,18 +218,12 @@ trait SqlMockTrait
             'select exists(select `test_models`.*, (select count(*) from `relation_models` '
             . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
             . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`',
-            [1],
             false
         );
 
         $this->mockInsert(
             'insert into `test_models` (`name`, `id`, `updated_at`, `created_at`) values (?, ?, ?, ?)',
-            [
-                'test_name',
-                1,
-                Carbon::now(),
-                Carbon::now()
-            ]
+            ['test_name', 1, Carbon::now(), Carbon::now()]
         );
 
         $this->mockSelectById(
@@ -265,12 +246,7 @@ trait SqlMockTrait
 
         $this->mockInsert(
             'insert into `test_models` (`name`, `id`, `updated_at`, `created_at`) values (?, ?, ?, ?)',
-            [
-                'test_name',
-                1,
-                Carbon::now(),
-                Carbon::now()
-            ]
+            ['test_name', 1, Carbon::now(), Carbon::now()]
         );
 
         $this->mockSelectById(
@@ -421,8 +397,8 @@ trait SqlMockTrait
     {
         $this->mockSelectExists(
             "select exists(select * from `users` where `id` <> ? and `email` in (?)) as `exists`",
-            [1, 'mail@mail.com'],
-            false
+            false,
+            [1, 'mail@mail.com']
         );
     }
 
@@ -433,12 +409,8 @@ trait SqlMockTrait
     ): void {
         $this->mockSelectExists(
             "select exists(select * from `{$table}` where `{$keyField}` <> ? and `email` in (?, ?)) as `exists`",
-            [
-                1,
-                'mail@mail.com',
-                'mail@mail.net'
-            ],
-            $isExist
+            $isExist,
+            [1, 'mail@mail.com', 'mail@mail.net']
         );
     }
 
@@ -487,7 +459,7 @@ trait SqlMockTrait
         $this->mockSelect($query, $result, [1]);
     }
 
-    protected function mockSelectExists(string $query, array $bindings = [], bool $isExist = true): void
+    protected function mockSelectExists(string $query, bool $isExist = true, array $bindings = [1]): void
     {
         $this->mockSelect($query, [['exists' => $isExist]], $bindings);
     }
