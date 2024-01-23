@@ -38,6 +38,15 @@ class EntityServiceTest extends HelpersTestCase
         $this->assertSame('Correct result', $result);
     }
 
+    public function testCallRepositoryMethodReturnsSelf()
+    {
+        $this->entityServiceClass->setRepository(TestRepository::class);
+
+        $result = $this->entityServiceClass->getFilter();
+
+        $this->assertInstanceOf(EntityService::class, $result);
+    }
+
     public function testCallNotExistsRepositoryMethod()
     {
         $className = get_class($this->entityServiceClass);

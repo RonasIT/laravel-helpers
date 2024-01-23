@@ -6,9 +6,9 @@ use Illuminate\Mail\Mailable;
 
 class TestMail extends Mailable
 {
-    public function __construct(array $data, $view, $subject = '')
+    public function __construct(array $viewData, $view, $subject = '')
     {
-        $this->viewData = $data;
+        $this->viewData = $viewData;
         $this->view = $view;
         $this->subject = $subject;
 
