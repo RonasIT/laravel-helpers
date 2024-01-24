@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use GuzzleHttp\Exception\RequestException;
 use ReflectionProperty;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
@@ -268,11 +269,14 @@ class HttpRequestServiceTest extends HelpersTestCase
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
-                'connect_timeout' => 0
+                'connect_timeout' => 0,
+                'query' => ['user' => 'admin']
             ]
         ], new GuzzleResponse(200, [], $responseJson));
 
-        $this->httpRequestServiceClass->get('https://some.url.com', [], [
+        $this->httpRequestServiceClass->get('https://some.url.com', [
+            'user' => 'admin',
+        ], [
             'some_header' => 'some_header_value'
         ]);
 
@@ -304,5 +308,17 @@ class HttpRequestServiceTest extends HelpersTestCase
         ]);
 
         $this->httpRequestServiceClass->json();
+    }
+
+    public function testSendWithRequestException()
+    {
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage("An error was encountered during the on_headers event");
+
+        $this->httpRequestServiceClass->set('on_headers', function () {
+            throw new \Exception('Request exception');
+        });
+
+        $this->httpRequestServiceClass->get('http://localhost');
     }
 }
