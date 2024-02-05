@@ -2,8 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use PHPUnit\Framework\MockObject\MockBuilder;
-use RonasIT\Support\Tests\Support\Mock\TestMail;
 use RonasIT\Support\Traits\MockTrait;
 
 class MockTraitTest extends HelpersTestCase
