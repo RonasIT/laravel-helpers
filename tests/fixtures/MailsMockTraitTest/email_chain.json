@@ -1,0 +1,12 @@
+[
+  {
+    "emails": "test1@mail.com",
+    "fixture": "test_mail1.html",
+    "subject": "Test Subject1"
+  },
+  {
+    "emails": "test2@mail.com",
+    "fixture": "test_mail2.html",
+    "subject": "Test Subject2"
+  }
+]

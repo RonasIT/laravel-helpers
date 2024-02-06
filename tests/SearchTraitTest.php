@@ -46,10 +46,16 @@ class SearchTraitTest extends HelpersTestCase
         $this->attachedRelationsProperty = new ReflectionProperty(TestRepository::class, 'attachedRelations');
         $this->attachedRelationsProperty->setAccessible(true);
 
-        $this->attachedRelationsCountProperty = new ReflectionProperty(TestRepository::class, 'attachedRelationsCount');
+        $this->attachedRelationsCountProperty = new ReflectionProperty(
+            TestRepository::class,
+            'attachedRelationsCount'
+        );
         $this->attachedRelationsCountProperty->setAccessible(true);
 
-        $this->shouldSettablePropertiesBeResetProperty = new ReflectionProperty(TestRepository::class, 'shouldSettablePropertiesBeReset');
+        $this->shouldSettablePropertiesBeResetProperty = new ReflectionProperty(
+            TestRepository::class,
+            'shouldSettablePropertiesBeReset'
+        );
         $this->shouldSettablePropertiesBeResetProperty->setAccessible(true);
 
         $this->queryProperty = new ReflectionProperty(TestRepository::class, 'query');
@@ -81,9 +87,9 @@ class SearchTraitTest extends HelpersTestCase
         $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
         $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
 
-        $this->assertEquals(true, $onlyTrashed);
-        $this->assertEquals(false, $withTrashed);
-        $this->assertEquals(true, $forceMode);
+        $this->assertTrue($onlyTrashed);
+        $this->assertFalse($withTrashed);
+        $this->assertTrue($forceMode);
         $this->assertEquals(['relation'], $attachedRelations);
         $this->assertEquals(['relation'], $attachedRelationsCount);
 
@@ -122,12 +128,16 @@ class SearchTraitTest extends HelpersTestCase
 
         $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
 
-        $this->assertEquals(false, $withTrashed);
+        $this->assertFalse($withTrashed);
     }
 
     public function testGetSearchResultAggregateIsNull()
     {
-        $this->mockSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null', [], [['aggregate' => null]]);
+        $this->mockSelect(
+            'select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null',
+            [],
+            [['aggregate' => null]]
+        );
 
         $this->testRepositoryClass->searchQuery()->getSearchResults();
     }
@@ -153,9 +163,9 @@ class SearchTraitTest extends HelpersTestCase
         $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
         $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
 
-        $this->assertEquals(true, $onlyTrashed);
-        $this->assertEquals(false, $withTrashed);
-        $this->assertEquals(true, $forceMode);
+        $this->assertTrue($onlyTrashed);
+        $this->assertFalse($withTrashed);
+        $this->assertTrue($forceMode);
         $this->assertEquals(['relation'], $attachedRelations);
         $this->assertEquals(['relation'], $attachedRelationsCount);
     }

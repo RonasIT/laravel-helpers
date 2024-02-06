@@ -4,14 +4,12 @@ namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
 use RonasIT\Support\HelpersServiceProvider;
-use RonasIT\Support\Traits\FixturesTrait;
+use RonasIT\Support\Traits\MailsMockTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
 
 class HelpersTestCase extends BaseTest
 {
-    use FixturesTrait;
-
-    protected $globalExportMode = false;
+    use MailsMockTrait;
 
     public function setUp(): void
     {
@@ -40,9 +38,9 @@ class HelpersTestCase extends BaseTest
         $attachedRelations = $this->attachedRelationsProperty->getValue($class);
         $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($class);
 
-        $this->assertEquals(false, $onlyTrashed);
-        $this->assertEquals(false, $withTrashed);
-        $this->assertEquals(false, $forceMode);
+        $this->assertFalse($onlyTrashed);
+        $this->assertFalse($withTrashed);
+        $this->assertFalse($forceMode);
         $this->assertEquals([], $attachedRelations);
         $this->assertEquals([], $attachedRelationsCount);
     }
