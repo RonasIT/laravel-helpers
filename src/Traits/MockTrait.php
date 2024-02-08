@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Closure;
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 
 trait MockTrait
 {
@@ -51,7 +52,7 @@ trait MockTrait
                 ->expects($matcher)
                 ->method($method)
                 ->willReturnCallback(function (...$args) use ($matcher, $calls, $method, $class) {
-                    $callIndex = $matcher->getInvocationCount() - 1;
+                    $callIndex = $this->getInvocationCount($matcher) - 1;
                     $expectedCall = $calls[$callIndex];
 
                     $expectedArguments = Arr::get($expectedCall, 'arguments');
@@ -102,7 +103,7 @@ trait MockTrait
             $mock
                 ->expects($matcher)
                 ->willReturnCallback(function (...$args) use ($matcher, $calls, $namespace, $function) {
-                    $callIndex = $matcher->getInvocationCount() - 1;
+                    $callIndex = $this->getInvocationCount($matcher) - 1;
                     $expectedCall = $calls[$callIndex];
 
                     $expectedArguments = Arr::get($expectedCall, 'arguments');
@@ -177,5 +178,12 @@ trait MockTrait
             'arguments' => $arguments,
             'result' => $result,
         ];
+    }
+
+    protected function getInvocationCount(InvokedCount $matcher): int
+    {
+        return method_exists($matcher, 'getInvocationCount')
+            ? $matcher->getInvocationCount()
+            : $matcher->numberOfInvocations();
     }
 }

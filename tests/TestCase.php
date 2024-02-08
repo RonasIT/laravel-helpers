@@ -17,7 +17,7 @@ abstract class TestCase extends BaseTest
 
     protected string $testNow = '2018-11-11 11:11:11';
 
-    protected static string $startedTestSuite;
+    protected static string $startedTestSuite = '';
     protected static bool $isWrappedIntoTransaction = true;
 
     protected bool $globalExportMode = false;
