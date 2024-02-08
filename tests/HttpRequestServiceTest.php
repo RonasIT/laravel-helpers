@@ -319,6 +319,6 @@ class HttpRequestServiceTest extends HelpersTestCase
             throw new \Exception('Request exception');
         });
 
-        $this->httpRequestServiceClass->get('http://localhost');
+        $this->httpRequestServiceClass->get('http://127.0.0.1');
     }
 }
