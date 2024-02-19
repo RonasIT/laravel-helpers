@@ -14,41 +14,35 @@ trait ModelTestStateMockTrait
     protected function mockGettingDataset(Collection $responseMock): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
-        $connection = $this->mockClass(Connection::class, [], true);
 
-        DB::swap($connection);
+        DB::shouldReceive('connection')->once()->andReturnSelf();
+        DB::shouldReceive('table')->with('test_models')->once()->andReturn($builderMock);
 
         $builderMock
             ->method('orderBy')
-            ->willReturn($builderMock);
+            ->with('id')
+            ->willReturnSelf();
 
         $builderMock
             ->method('get')
             ->willReturn($responseMock);
-
-        $connection
-            ->method('table')
-            ->willReturn($builderMock);
     }
 
-    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState): void
+    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
-        $connection = $this->mockClass(Connection::class, [], true);
 
-        DB::swap($connection);
+        DB::shouldReceive('connection')->twice()->andReturnSelf();
+        DB::shouldReceive('table')->with($tableName)->twice()->andReturn($builderMock);
 
         $builderMock
             ->method('orderBy')
-            ->willReturn($builderMock);
+            ->with('id')
+            ->willReturnSelf();
 
         $builderMock
             ->expects($this->exactly(2))
             ->method('get')
             ->willReturnOnConsecutiveCalls($initialState, $responseMock);
-
-        $connection
-            ->method('table')
-            ->willReturn($builderMock);
     }
 }
