@@ -45,11 +45,11 @@ class HelpersTestCase extends BaseTest
         $this->assertEquals([], $attachedRelationsCount);
     }
 
-    public function getLoginSession($session): array
+    public function getLoginSession($session, $guard = 'session'): array
     {
         return array_filter(
             $session->all(),
-            fn ($key) => strpos($key, 'login_session_') === 0,
+            fn ($key) => strpos($key, "login_{$guard}_") === 0,
             ARRAY_FILTER_USE_KEY
         );
     }
