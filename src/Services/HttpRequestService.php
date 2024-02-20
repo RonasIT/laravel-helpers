@@ -159,6 +159,9 @@ class HttpRequestService
 
     /**
      * @codeCoverageIgnore
+     * @deprecated please use
+     * https://laravel.com/docs/10.x/telescope and
+     * https://packagist.org/packages/muhammadhuzaifa/telescope-guzzle-watcher instead
      */
     protected function logRequest(string $typeOfRequest, string $url, array $data, array $headers): void
     {
@@ -177,6 +180,9 @@ class HttpRequestService
 
     /**
      * @codeCoverageIgnore
+     * @deprecated please use
+     * https://laravel.com/docs/10.x/telescope and
+     * https://packagist.org/packages/muhammadhuzaifa/telescope-guzzle-watcher instead
      */
     protected function logResponse(?int $time = null): void
     {

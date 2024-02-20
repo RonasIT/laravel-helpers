@@ -314,6 +314,7 @@ class HttpRequestServiceTest extends HelpersTestCase
     public function testSendWithRequestException()
     {
         $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('Some exception message');
 
         $mock = $this->createPartialMock(HttpRequestService::class, ['sendRequest']);
         $mock
@@ -321,7 +322,7 @@ class HttpRequestServiceTest extends HelpersTestCase
             ->method('sendRequest')
             ->will($this->returnCallback(function() use ($mock) {
                 $response = new GuzzleResponse(200, [], null);
-                throw new RequestException($response->getReasonPhrase(), new Request('type', 'url'));
+                throw new RequestException('Some exception message', new Request('type', 'url'));
             }));
 
         $this->app->instance(HttpRequestService::class, $mock);

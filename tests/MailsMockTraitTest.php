@@ -4,9 +4,9 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMail;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MailsMockTraitTest extends HelpersTestCase
 {
@@ -29,7 +29,7 @@ class MailsMockTraitTest extends HelpersTestCase
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            $this->sentMail('test@mail.com', 'test_mail.html'),
+            $this->mockedMail('test@mail.com', 'test_mail.html'),
         ]);
     }
 
@@ -77,7 +77,7 @@ class MailsMockTraitTest extends HelpersTestCase
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            $this->sentMail('test@mail.com', 'test_mail_with_export.html'),
+            $this->mockedMail('test@mail.com', 'test_mail_with_export.html'),
         ], true);
 
         $this->assertFileExists($this->getFixturePath('test_mail_with_export.html'));
@@ -97,13 +97,13 @@ class MailsMockTraitTest extends HelpersTestCase
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            $this->sentMail('test@mail.com', 'test_mail.html', 'Incorrect Subject'),
+            $this->mockedMail('test@mail.com', 'test_mail.html', 'Incorrect Subject'),
         ]);
     }
 
     public function testMailWithoutRequiredParameters()
     {
-        $this->expectException(HttpException::class);
+        $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Missing required key "fixture" in the input data set on the step: 0.');
 
         Mail::to('test@mail.com')->queue(new TestMail(
