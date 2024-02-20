@@ -119,7 +119,8 @@ class ModelTestState extends Assert
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
     {
-        return DB::table($table)
+        return DB::connection($this->model->getConnectionName())
+            ->table($table)
             ->orderBy($orderField)
             ->get()
             ->map(fn ($record) => (array) $record);
