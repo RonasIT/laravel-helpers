@@ -27,7 +27,7 @@ trait MailsMockTrait
      *
      * or be a function call:
      *
-     *   $this->sentMail($emails, $fixture, $subject, $from),
+     *   $this->mockedMail($emails, $fixture, $subject, $from),
      *
      * or be an array, if sent more than 1 email:
      *
