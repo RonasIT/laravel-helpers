@@ -43,8 +43,8 @@ trait ModelTrait
             $modelName = static::class;
 
             throw new BadMethodCallException(
-                "Attempting to lazy-load relation '{$method}' "
-                . "on model '{$modelName}'. See property \$disableLazyLoading"
+                "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. "
+                . 'See property $disableLazyLoading.'
             );
         }
 

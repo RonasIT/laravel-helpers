@@ -16,6 +16,7 @@ trait MailsMockTrait
         'emails',
         'fixture'
     ];
+
     /**
      * Email Chain should look like following construction:
      *   [
@@ -26,7 +27,7 @@ trait MailsMockTrait
      *
      * or be a function call:
      *
-     *   $this->sentMail($emails, $fixture, $subject, $from),
+     *   $this->mockedMail($emails, $fixture, $subject, $from),
      *
      * or be an array, if sent more than 1 email:
      *
@@ -85,10 +86,7 @@ trait MailsMockTrait
     {
         foreach ($this->requiredExpectationParameters as $parameter) {
             if (!Arr::has($currentMail, $parameter)) {
-                abort(
-                    Response::HTTP_INTERNAL_SERVER_ERROR,
-                    "Missing required key \"{$parameter}\" in the input data set on the step: {$index}."
-                );
+                $this->fail("Missing required key \"{$parameter}\" in the input data set on the step: {$index}.");
             }
         }
     }
@@ -160,6 +158,7 @@ trait MailsMockTrait
     {
         $sentEmails = Arr::pluck($mail->to, 'address');
         $emails = Arr::wrap($expectedMailData['emails']);
+
         $this->assertAddressesCount($emails, $mail, $index);
         $this->assertSentToEmailsList($sentEmails, $emails, $index);
     }
@@ -191,7 +190,7 @@ trait MailsMockTrait
         return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
     }
 
-    protected function sentMail($emails, string $fixture, string $subject = '', $from = ''): array
+    protected function mockedMail($emails, string $fixture, string $subject = '', $from = ''): array
     {
         return [
             'emails' => $emails,

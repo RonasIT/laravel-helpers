@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Tests;
 
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
 use ReflectionProperty;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
@@ -268,11 +270,14 @@ class HttpRequestServiceTest extends HelpersTestCase
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
-                'connect_timeout' => 0
+                'connect_timeout' => 0,
+                'query' => ['user' => 'admin']
             ]
         ], new GuzzleResponse(200, [], $responseJson));
 
-        $this->httpRequestServiceClass->get('https://some.url.com', [], [
+        $this->httpRequestServiceClass->get('https://some.url.com', [
+            'user' => 'admin',
+        ], [
             'some_header' => 'some_header_value'
         ]);
 
@@ -304,5 +309,24 @@ class HttpRequestServiceTest extends HelpersTestCase
         ]);
 
         $this->httpRequestServiceClass->json();
+    }
+
+    public function testSendWithRequestException()
+    {
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessage('Some exception message');
+
+        $mock = $this->createPartialMock(HttpRequestService::class, ['sendRequest']);
+        $mock
+            ->expects($this->once())
+            ->method('sendRequest')
+            ->will($this->returnCallback(function() use ($mock) {
+                $response = new GuzzleResponse(200, [], null);
+                throw new RequestException('Some exception message', new Request('type', 'url'));
+            }));
+
+        $this->app->instance(HttpRequestService::class, $mock);
+
+        app(HttpRequestService::class)->get('https://some.url.com');
     }
 }
