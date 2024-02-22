@@ -96,12 +96,22 @@ trait MailsMockTrait
         $expectedSubject = Arr::get($currentMail, 'subject');
 
         if (!empty($expectedSubject)) {
-            $this->assertEquals(
-                $expectedSubject,
-                $mail->subject,
-                "Failed assert that the expected subject \"{$expectedSubject}\" equals "
-                . "to the actual \"{$mail->subject}\"."
-            );
+            if (method_exists($mail, 'hasSubject')) {
+                $subject = method_exists($mail, 'envelope') ? $mail->envelope()->subject : $mail->subject;
+
+                $this->assertTrue(
+                    $mail->hasSubject($expectedSubject),
+                    "Failed assert that the expected subject \"{$expectedSubject}\" equals "
+                    . "to the actual \"{$subject}\"."
+                );
+            } else {
+                $this->assertEquals(
+                    $expectedSubject,
+                    $mail->subject,
+                    "Failed assert that the expected subject \"{$expectedSubject}\" equals "
+                    . "to the actual \"{$mail->subject}\"."
+                );
+            }
         }
     }
 
