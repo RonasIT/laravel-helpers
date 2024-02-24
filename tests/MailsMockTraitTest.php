@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMail;
+use RonasIT\Support\Tests\Support\Mock\TestMailHasSubject;
 
 class MailsMockTraitTest extends HelpersTestCase
 {
@@ -35,13 +36,13 @@ class MailsMockTraitTest extends HelpersTestCase
 
     public function testMailWithAllParameters()
     {
-        Mail::to('test@mail.com')->queue(new TestMail(
+        Mail::to('test@mail.com')->queue(new TestMailHasSubject(
             ['name' => 'John Smith'],
             'emails.test',
             'Test Subject',
         ));
 
-        $this->assertMailEquals(TestMail::class, [
+        $this->assertMailEquals(TestMailHasSubject::class, [
             [
                 'emails' => 'test@mail.com',
                 'fixture' => 'test_mail.html',
