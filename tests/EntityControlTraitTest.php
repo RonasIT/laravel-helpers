@@ -4,13 +4,12 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class EntityControlTraitTest extends HelpersTestCase
 {
-    use MockTrait, SqlMockTrait;
+    use SqlMockTrait;
 
     protected TestRepository $testRepositoryClass;
 
@@ -54,7 +53,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
         $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
 
-        $this->assertEquals(true, $onlyTrashed);
+        $this->assertTrue($onlyTrashed);
     }
 
     public function testWithTrashed()
@@ -63,7 +62,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
         $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
 
-        $this->assertEquals(true, $withTrashed);
+        $this->assertTrue($withTrashed);
     }
 
     public function testForce()
@@ -72,7 +71,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
         $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
 
-        $this->assertEquals(true, $forceMode);
+        $this->assertTrue($forceMode);
     }
 
     public function testWith()
@@ -110,7 +109,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testAllEmptyResult()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null');
+        $this->mockSelect(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -125,7 +128,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testExists()
     {
-        $this->mockSelect('select exists(select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`', [1]);
+        $this->mockSelectById(
+            'select exists(select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`',
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -140,7 +147,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testExistsBy()
     {
-        $this->mockSelect('select exists(select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`', [2]);
+        $this->mockSelectExists(
+            'select exists(select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?) as `exists`'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -148,7 +159,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->force()
             ->with('relation')
             ->withCount('relation')
-            ->existsBy('id', 2);
+            ->existsBy('id', 1);
 
         $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
@@ -171,7 +182,8 @@ class EntityControlTraitTest extends HelpersTestCase
     public function testUpdateMany()
     {
         $this->mockUpdateSqlQuery(
-            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` = ?',
+            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? '
+            . 'where `test_models`.`deleted_at` is not null and `id` = ?',
             ['test_name', Carbon::now(), 1],
             1
         );
@@ -204,7 +216,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testUpdateDoesntExist()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1]);
+        $this->mockSelectById(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -249,7 +265,9 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testCount()
     {
-        $this->mockSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?', [1]);
+        $this->mockSelectById(
+            'select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -279,7 +297,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testGetEmptyResult()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?', [1]);
+        $this->mockSelectById(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ?'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -324,7 +346,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testFirstEmptyResult()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1]);
+        $this->mockSelectById(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -354,7 +380,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testFindByEmptyResult()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1]);
+        $this->mockSelectById(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -384,7 +414,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testFindEmptyResult()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1', [1]);
+        $this->mockSelectById(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -445,7 +479,8 @@ class EntityControlTraitTest extends HelpersTestCase
     public function testRestore()
     {
         $this->mockUpdateSqlQuery(
-            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` = ? and `test_models`.`deleted_at` is not null',
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? '
+            . 'where `test_models`.`deleted_at` is not null and `id` = ? and `test_models`.`deleted_at` is not null',
             [null, Carbon::now(), 1]
         );
 
@@ -477,7 +512,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testChunkEmptyResult()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null order by `id` asc limit 10 offset 0');
+        $this->mockSelect(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null order by `id` asc limit 10 offset 0'
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -512,7 +551,9 @@ class EntityControlTraitTest extends HelpersTestCase
     public function testRestoreByList()
     {
         $this->mockUpdateSqlQuery(
-            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
+            'update `test_models` set `deleted_at` = ?, `test_models`.`updated_at` = ? '
+            . 'where `test_models`.`deleted_at` is not null '
+            . 'and `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
             [null, Carbon::now(), 1, 2, 3],
             3
         );
@@ -545,7 +586,13 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testGetByListEmptyResult()
     {
-        $this->mockSelect('select `test_models`.*, (select count(*) from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` from `test_models` where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)', [1, 2, 3]);
+        $this->mockSelect(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
+            [],
+            [1, 2, 3]
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -560,7 +607,11 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testCountByList()
     {
-        $this->mockSelect('select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)', [1, 2, 3]);
+        $this->mockSelectWithAggregate(
+            'select count(*) as aggregate from `test_models` '
+            . 'where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
+            [1, 2, 3]
+        );
 
         $this->testRepositoryClass
             ->withTrashed()
@@ -576,7 +627,8 @@ class EntityControlTraitTest extends HelpersTestCase
     public function testUpdateByList()
     {
         $this->mockUpdateSqlQuery(
-            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
+            'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? '
+            . 'where `test_models`.`deleted_at` is not null and `id` in (?, ?, ?)',
             ['test_name', Carbon::now(), 1, 2, 3],
             3
         );

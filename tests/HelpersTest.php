@@ -297,4 +297,15 @@ class HelpersTest extends HelpersTestCase
 
         $this->assertEqualsFixture('array_remove_elements/result.json', $result);
     }
+
+    public function testMkDirRecursively()
+    {
+        mkdir_recursively('dir1/dir2/dir3');
+
+        $this->assertTrue(file_exists('dir1'));
+        $this->assertTrue(file_exists('dir1/dir2'));
+        $this->assertTrue(file_exists('dir1/dir2/dir3'));
+
+        rmdir_recursively('dir1');
+    }
 }
