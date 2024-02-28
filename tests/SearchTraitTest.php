@@ -21,7 +21,6 @@ class SearchTraitTest extends HelpersTestCase
     protected ReflectionProperty $forceModeProperty;
     protected ReflectionProperty $attachedRelationsProperty;
     protected ReflectionProperty $attachedRelationsCountProperty;
-    protected ReflectionProperty $queryProperty;
     protected ReflectionProperty $shouldSettablePropertiesBeResetProperty;
 
     protected ReflectionMethod $setAdditionalReservedFiltersMethod;
@@ -58,9 +57,6 @@ class SearchTraitTest extends HelpersTestCase
         );
         $this->shouldSettablePropertiesBeResetProperty->setAccessible(true);
 
-        $this->queryProperty = new ReflectionProperty(TestRepository::class, 'query');
-        $this->queryProperty->setAccessible(true);
-
         $reflectionClass = new ReflectionClass(TestRepository::class);
         $this->setAdditionalReservedFiltersMethod = $reflectionClass->getMethod('setAdditionalReservedFilters');
         $this->setAdditionalReservedFiltersMethod->setAccessible(true);
@@ -79,7 +75,7 @@ class SearchTraitTest extends HelpersTestCase
                 'with_count' => ['relation']
             ]);
 
-        $sql = $this->queryProperty->getValue($this->testRepositoryClass)->toSql();
+        $sql = $this->testRepositoryClass->getSearchQuery()->toSql();
 
         $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
         $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
@@ -218,6 +214,7 @@ class SearchTraitTest extends HelpersTestCase
             ])
             ->filterByQuery(['query_field', 'relation.another_query_field'])
             ->filterBy('relation.name', 'relation_name')
+            ->filterBy('relation.another_name')
             ->getSearchResults();
     }
 
