@@ -1,6 +1,7 @@
 <?php
 
 namespace RonasIT\Support\Tests;
+
 use ErrorException;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\IncorrectCSVFileException;

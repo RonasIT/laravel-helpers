@@ -15,4 +15,9 @@ class TestRepository extends BaseRepository
     {
         return 'Correct result';
     }
+
+    public function getFilter(): self
+    {
+        return $this;
+    }
 }

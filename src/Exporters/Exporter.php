@@ -67,7 +67,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
         return Storage::disk($this->disk)->path($filename);
     }
 
-    public function query(): Builder
+    public function query()
     {
         return $this->query;
     }

@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
@@ -166,13 +165,14 @@ trait FixturesTrait
             ->select('table_name', 'column_name', 'column_default')
             ->whereNotIn('table_name', $except)
             ->where('column_default', 'LIKE', 'nextval%')
-            ->get();
+            ->get()
+            ->toArray();
 
         $query = array_concat($data, function ($item) use ($except) {
-            $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item->column_default);
+            $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item['column_default']);
 
-            return "SELECT setval('{$sequenceName}', (select coalesce(max({$item->column_name}), 1) from " .
-                "{$item->table_name}), (case when (select max({$item->column_name}) from {$item->table_name}) " .
+            return "SELECT setval('{$sequenceName}', (select coalesce(max({$item['column_name']}), 1) from " .
+                "{$item['table_name']}), (case when (select max({$item['column_name']}) from {$item['table_name']}) " .
                 "is NULL then false else true end));\n";
         });
 

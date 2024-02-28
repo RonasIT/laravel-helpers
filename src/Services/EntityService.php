@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Services;
 
 use BadMethodCallException;
+use RonasIT\Support\Repositories\BaseRepository;
 
 /**
  * @property BaseRepository $repository

@@ -216,21 +216,25 @@ trait SearchTrait
         return ($isDesc) ? 'DESC' : 'ASC';
     }
 
+    /** @deprecated use filterGreater instead */
     public function filterMoreThan(string $field, $value): self
     {
         return $this->filterValue($field, '>', $value);
     }
 
+    /** @deprecated use filterLess instead */
     public function filterLessThan(string $field, $value): self
     {
         return $this->filterValue($field, '<', $value);
     }
 
+    /** @deprecated use filterGreater instead */
     public function filterMoreOrEqualThan(string $field, $value): self
     {
         return $this->filterValue($field, '>=', $value);
     }
 
+    /** @deprecated use filterLess instead */
     public function filterLessOrEqualThan(string $field, $value): self
     {
         return $this->filterValue($field, '<=', $value);
