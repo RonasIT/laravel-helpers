@@ -94,9 +94,23 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResultWithAll()
     {
-        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc');
+        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc', [
+            1, 2, 3
+        ]);
 
         $this->testRepositoryClass->searchQuery(['all' => true])->getSearchResults();
+    }
+
+    public function testGetSearchResultWithAllAndParams()
+    {
+        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc', []);
+
+        $this->testRepositoryClass
+            ->searchQuery([
+                'all' => true,
+                'per_page' => 20,
+            ])
+            ->getSearchResults();
     }
 
     public function testGetSearchResult()
