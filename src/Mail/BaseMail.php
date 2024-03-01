@@ -13,13 +13,14 @@ class BaseMail extends Mailable implements ShouldQueue
     use SerializesModels;
 
     public int $tries = 5;
+    public string $queue = 'mails';
 
     public function __construct(array $viewData, $view, $subject)
     {
         $this->viewData = $viewData;
         $this->subject = $subject;
         $this->view = $view;
-        $this->onQueue('mails');
+        $this->onQueue($this->queue);
     }
 
     /**
