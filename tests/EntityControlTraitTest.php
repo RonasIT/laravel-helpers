@@ -329,6 +329,21 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
+    public function testLast()
+    {
+        $this->mockLast($this->selectResult);
+
+        $this->testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->last(['id' => 1]);
+
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+    }
+
     public function testFirstEmptyResult()
     {
         $this->mockSelectById(
