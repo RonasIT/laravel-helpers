@@ -1,5 +1,11 @@
 [
-    "users",
-    "migrations",
-    "groups"
+  {
+    "table_name": "users"
+  },
+  {
+    "table_name": "migrations"
+  },
+  {
+    "table_name": "groups"
+  }
 ]

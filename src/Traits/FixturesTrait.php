@@ -61,9 +61,8 @@ trait FixturesTrait
         }
 
         $databaseTables = $this->getTables();
-        $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
+        $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
         app('db.connection')->unprepared($dump);
     }
@@ -117,8 +116,10 @@ trait FixturesTrait
         $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
 
-    public function clearDatabase(string $scheme, array $tables, array $except): void
+    public function clearDatabase(array $tables, array $except): void
     {
+        $scheme = config('database.default');
+
         if ($scheme === 'pgsql') {
             $query = $this->getClearPsqlDatabaseQuery($tables, $except);
         } elseif ($scheme === 'mysql') {
@@ -133,10 +134,10 @@ trait FixturesTrait
     public function getClearPsqlDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['table_name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE {$table['table_name']} RESTART IDENTITY CASCADE; \n";
             }
         });
     }
@@ -146,10 +147,10 @@ trait FixturesTrait
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
         $query .= array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['table_name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table}; \n";
+                return "TRUNCATE TABLE {$table['table_name']}; \n";
             }
         });
 
@@ -160,20 +161,16 @@ trait FixturesTrait
     {
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
-        $data = app('db.connection')
-            ->table('information_schema.columns')
-            ->select('table_name', 'column_name', 'column_default')
-            ->whereNotIn('table_name', $except)
-            ->where('column_default', 'LIKE', 'nextval%')
-            ->get()
-            ->toArray();
+        $query = array_concat($this->getTables(), function ($item) use ($except) {
+            if (in_array($item['table_name'], $except)) {
+                return '';
+            } else {
+                $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item['column_default']);
 
-        $query = array_concat($data, function ($item) use ($except) {
-            $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item['column_default']);
-
-            return "SELECT setval('{$sequenceName}', (select coalesce(max({$item['column_name']}), 1) from " .
-                "{$item['table_name']}), (case when (select max({$item['column_name']}) from {$item['table_name']}) " .
-                "is NULL then false else true end));\n";
+                return "SELECT setval('{$sequenceName}', (select coalesce(max({$item['column_name']}), 1) from " .
+                    "{$item['table_name']}), (case when (select max({$item['column_name']}) from {$item['table_name']}) " .
+                    "is NULL then false else true end));\n";
+            }
         });
 
         app('db.connection')->unprepared($query);
@@ -189,10 +186,23 @@ trait FixturesTrait
 
     protected function getTables(): array
     {
+        $scheme = config('database.default');
+
         if (empty(self::$tables)) {
-            self::$tables = app('db.connection')
-                ->getDoctrineSchemaManager()
-                ->listTableNames();
+            if ($scheme === 'mysql') {
+                $tables = app('db.connection')
+                    ->getDoctrineSchemaManager()
+                    ->listTableNames();
+
+                self::$tables = array_map(fn($value) => ['table_name' => $value], $tables);
+            } elseif ($scheme === 'pgsql') {
+                self::$tables = app('db.connection')
+                    ->table('information_schema.columns')
+                    ->select('table_name', 'column_name', 'column_default')
+                    ->where('column_default', 'LIKE', 'nextval%')
+                    ->get()
+                    ->toArray();
+            }
         }
 
         return self::$tables;

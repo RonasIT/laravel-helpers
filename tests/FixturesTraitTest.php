@@ -2,7 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
-use Doctrine\DBAL\Schema\PostgreSQLSchemaManager;
+use Doctrine\DBAL\Schema\MySQLSchemaManager;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -153,24 +153,55 @@ class FixturesTraitTest extends HelpersTestCase
         $this->loadTestDump();
     }
 
-    public function testPrepareSequences()
+    public function testGetTablesPgsql()
     {
-        $mock = $this->mockClass(PostgreSQLSchemaManager::class, [
-            $this->functionCall('listTableNames', [], $this->getJsonFixture('prepare_sequences/tables.json')),
+        $connection = $this->mockClass(Connection::class, [
+            $this->functionCall('getQueryGrammar', [], new Grammar),
+            $this->functionCall('getPostProcessor', [], new Processor),
+            $this->functionCall('select', [], collect($this->getJsonFixture('get_tables/information_schema.json'))),
+        ], true);
+
+        $this->app->instance('db.connection', $connection);
+
+        Config::set('database.default', 'pgsql');
+
+        $this->getTables();
+
+        $this->assertEqualsFixture('get_tables/pgsql.json', self::$tables);
+    }
+
+    public function testGetTablesMysql()
+    {
+        $mock = $this->mockClass(MySQLSchemaManager::class, [
+            $this->functionCall('listTableNames', [], $this->getJsonFixture('get_tables/tables.json')),
         ], true);
 
         $connection = $this->mockClass(Connection::class, [
             $this->functionCall('getDoctrineSchemaManager', [], $mock),
-            $this->functionCall('getQueryGrammar', [], new Grammar),
-            $this->functionCall('getPostProcessor', [], new Processor),
-            $this->functionCall('select', [], collect($this->getJsonFixture('prepare_sequences/information_schema.json'))),
+        ], true);
+
+        $this->app->instance('db.connection', $connection);
+
+        Config::set('database.default', 'mysql');
+
+        $this->getTables();
+
+        $this->assertEqualsFixture('get_tables/mysql.json', self::$tables);
+    }
+
+    public function testPrepareSequences()
+    {
+        $connection = $this->mockClass(Connection::class, [
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
         $this->app->instance('db.connection', $connection);
-        $this->dumpFileName = 'clear_database/dump.sql';
 
-        $this->prepareSequences($this->getTables());
+        Config::set('database.default', 'pgsql');
+
+        self::$tables = $this->getJsonFixture('prepare_sequences/information_schema.json');
+
+        $this->prepareSequences(['roles']);
     }
 
     public function testGetFixtureWithoutGlobalExportMode()
