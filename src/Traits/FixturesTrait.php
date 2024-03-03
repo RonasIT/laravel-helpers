@@ -9,6 +9,7 @@ use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 trait FixturesTrait
 {
     protected static $tables;
+    protected static $sequences;
     protected $postgisTables = [
         'tiger.addrfeat',
         'tiger.edges',
@@ -134,10 +135,10 @@ trait FixturesTrait
     public function getClearPsqlDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
-            if (in_array($table->table_name, $except)) {
+            if (in_array($table, $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table->table_name} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
             }
         });
     }
@@ -147,10 +148,10 @@ trait FixturesTrait
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
         $query .= array_concat($tables, function ($table) use ($except) {
-            if (in_array($table->table_name, $except)) {
+            if (in_array($table, $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table->table_name}; \n";
+                return "TRUNCATE TABLE {$table}; \n";
             }
         });
 
@@ -161,7 +162,7 @@ trait FixturesTrait
     {
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
-        $query = array_concat($this->getTables(), function ($item) use ($except) {
+        $query = array_concat($this->getSequences(), function ($item) use ($except) {
             if (in_array($item->table_name, $except)) {
                 return '';
             } else {
@@ -186,26 +187,27 @@ trait FixturesTrait
 
     protected function getTables(): array
     {
-        $scheme = config('database.default');
-
         if (empty(self::$tables)) {
-            if ($scheme === 'mysql') {
-                $tables = app('db.connection')
-                    ->getDoctrineSchemaManager()
-                    ->listTableNames();
-
-                self::$tables = array_map(fn($value) => (object) ['table_name' => $value], $tables);
-            } elseif ($scheme === 'pgsql') {
-                self::$tables = app('db.connection')
-                    ->table('information_schema.columns')
-                    ->select('table_name', 'column_name', 'column_default')
-                    ->where('column_default', 'LIKE', 'nextval%')
-                    ->get()
-                    ->toArray();
-            }
+            self::$tables = app('db.connection')
+                ->getDoctrineSchemaManager()
+                ->listTableNames();
         }
 
         return self::$tables;
+    }
+
+    protected function getSequences()
+    {
+        if (empty(self::$sequences)) {
+            self::$sequences = app('db.connection')
+                ->table('information_schema.columns')
+                ->select('table_name', 'column_name', 'column_default')
+                ->where('column_default', 'LIKE', 'nextval%')
+                ->get()
+                ->toArray();
+        }
+
+        return self::$sequences;
     }
 
     protected function exportContent($content, string $fixture): void

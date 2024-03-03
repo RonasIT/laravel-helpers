@@ -153,24 +153,7 @@ class FixturesTraitTest extends HelpersTestCase
         $this->loadTestDump();
     }
 
-    public function testGetTablesPgsql()
-    {
-        $connection = $this->mockClass(Connection::class, [
-            $this->functionCall('getQueryGrammar', [], new Grammar),
-            $this->functionCall('getPostProcessor', [], new Processor),
-            $this->functionCall('select', [], collect($this->getJsonFixture('get_tables/information_schema.json'))),
-        ], true);
-
-        $this->app->instance('db.connection', $connection);
-
-        Config::set('database.default', 'pgsql');
-
-        $this->getTables();
-
-        $this->assertEqualsFixture('get_tables/pgsql.json', self::$tables);
-    }
-
-    public function testGetTablesMysql()
+    public function testGetTables()
     {
         $mock = $this->mockClass(MySQLSchemaManager::class, [
             $this->functionCall('listTableNames', [], $this->getJsonFixture('get_tables/tables.json')),
@@ -186,20 +169,24 @@ class FixturesTraitTest extends HelpersTestCase
 
         $this->getTables();
 
-        $this->assertEqualsFixture('get_tables/mysql.json', self::$tables);
+        $this->assertEqualsFixture('get_tables/tables.json', self::$tables);
     }
 
     public function testPrepareSequences()
     {
+        $sequences = collect($this->getJsonFixture('prepare_sequences/information_schema.json'))
+            ->map(fn($item) => (object) $item);
+
         $connection = $this->mockClass(Connection::class, [
+            $this->functionCall('getQueryGrammar', [], new Grammar),
+            $this->functionCall('getPostProcessor', [], new Processor),
+            $this->functionCall('select', [], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
         $this->app->instance('db.connection', $connection);
 
         Config::set('database.default', 'pgsql');
-
-        self::$tables = $this->getJsonFixture('prepare_sequences/information_schema.json');
 
         $this->prepareSequences(['roles']);
     }
