@@ -134,10 +134,10 @@ trait FixturesTrait
     public function getClearPsqlDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
-            if (in_array($table['table_name'], $except)) {
+            if (in_array($table->table_name, $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table['table_name']} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE {$table->table_name} RESTART IDENTITY CASCADE; \n";
             }
         });
     }
@@ -147,10 +147,10 @@ trait FixturesTrait
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
         $query .= array_concat($tables, function ($table) use ($except) {
-            if (in_array($table['table_name'], $except)) {
+            if (in_array($table->table_name, $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table['table_name']}; \n";
+                return "TRUNCATE TABLE {$table->table_name}; \n";
             }
         });
 
@@ -162,13 +162,13 @@ trait FixturesTrait
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
         $query = array_concat($this->getTables(), function ($item) use ($except) {
-            if (in_array($item['table_name'], $except)) {
+            if (in_array($item->table_name, $except)) {
                 return '';
             } else {
-                $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item['column_default']);
+                $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item->column_default);
 
-                return "SELECT setval('{$sequenceName}', (select coalesce(max({$item['column_name']}), 1) from " .
-                    "{$item['table_name']}), (case when (select max({$item['column_name']}) from {$item['table_name']}) " .
+                return "SELECT setval('{$sequenceName}', (select coalesce(max({$item->column_name}), 1) from " .
+                    "{$item->table_name}), (case when (select max({$item->column_name}) from {$item->table_name}) " .
                     "is NULL then false else true end));\n";
             }
         });
@@ -194,7 +194,7 @@ trait FixturesTrait
                     ->getDoctrineSchemaManager()
                     ->listTableNames();
 
-                self::$tables = array_map(fn($value) => ['table_name' => $value], $tables);
+                self::$tables = array_map(fn($value) => (object) ['table_name' => $value], $tables);
             } elseif ($scheme === 'pgsql') {
                 self::$tables = app('db.connection')
                     ->table('information_schema.columns')
