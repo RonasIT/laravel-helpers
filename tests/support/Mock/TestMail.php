@@ -6,9 +6,9 @@ use RonasIT\Support\Mail\BaseMail;
 
 class TestMail extends BaseMail
 {
-    public function __construct(array $viewData, $view, $subject = '')
+    public function __construct(array $viewData, $subject, $view)
     {
-        parent::__construct($viewData, $view, $subject);
+        parent::__construct($viewData, $subject, $view);
 
         $this->setAddress('noreply@mail.net', null, 'from');
     }
