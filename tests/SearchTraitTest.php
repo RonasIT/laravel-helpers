@@ -21,7 +21,6 @@ class SearchTraitTest extends HelpersTestCase
     protected ReflectionProperty $forceModeProperty;
     protected ReflectionProperty $attachedRelationsProperty;
     protected ReflectionProperty $attachedRelationsCountProperty;
-    protected ReflectionProperty $queryProperty;
     protected ReflectionProperty $shouldSettablePropertiesBeResetProperty;
 
     protected ReflectionMethod $setAdditionalReservedFiltersMethod;
@@ -58,9 +57,6 @@ class SearchTraitTest extends HelpersTestCase
         );
         $this->shouldSettablePropertiesBeResetProperty->setAccessible(true);
 
-        $this->queryProperty = new ReflectionProperty(TestRepository::class, 'query');
-        $this->queryProperty->setAccessible(true);
-
         $reflectionClass = new ReflectionClass(TestRepository::class);
         $this->setAdditionalReservedFiltersMethod = $reflectionClass->getMethod('setAdditionalReservedFilters');
         $this->setAdditionalReservedFiltersMethod->setAccessible(true);
@@ -79,7 +75,7 @@ class SearchTraitTest extends HelpersTestCase
                 'with_count' => ['relation']
             ]);
 
-        $sql = $this->queryProperty->getValue($this->testRepositoryClass)->toSql();
+        $sql = $this->testRepositoryClass->getSearchQuery()->toSql();
 
         $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
         $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
@@ -98,9 +94,23 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResultWithAll()
     {
-        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc');
+        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc', [
+            1, 2, 3
+        ]);
 
         $this->testRepositoryClass->searchQuery(['all' => true])->getSearchResults();
+    }
+
+    public function testGetSearchResultWithAllAndParams()
+    {
+        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc', []);
+
+        $this->testRepositoryClass
+            ->searchQuery([
+                'all' => true,
+                'per_page' => 20,
+            ])
+            ->getSearchResults();
     }
 
     public function testGetSearchResult()
@@ -218,6 +228,7 @@ class SearchTraitTest extends HelpersTestCase
             ])
             ->filterByQuery(['query_field', 'relation.another_query_field'])
             ->filterBy('relation.name', 'relation_name')
+            ->filterBy('relation.another_name')
             ->getSearchResults();
     }
 

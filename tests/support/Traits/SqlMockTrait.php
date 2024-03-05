@@ -20,7 +20,9 @@ trait SqlMockTrait
         );
 
         $this->mockSelect(
-            'select * from `relation_models` where `relation_models`.`test_model_id` in (1)'
+            'select `relation_models`.*, (select count(*) from `child_relation_models` '
+            . 'where `relation_models`.`id` = `child_relation_models`.`relation_model_id`) as `child_relation_count` '
+            . 'from `relation_models` where `relation_models`.`test_model_id` in (1)',
         );
     }
 
