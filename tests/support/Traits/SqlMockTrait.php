@@ -20,7 +20,9 @@ trait SqlMockTrait
         );
 
         $this->mockSelect(
-            'select * from `relation_models` where `relation_models`.`test_model_id` in (1)'
+            'select `relation_models`.*, (select count(*) from `child_relation_models` '
+            . 'where `relation_models`.`id` = `child_relation_models`.`relation_model_id`) as `child_relation_count` '
+            . 'from `relation_models` where `relation_models`.`test_model_id` in (1)',
         );
     }
 
@@ -58,6 +60,21 @@ trait SqlMockTrait
             'select `test_models`.*, (select count(*) from `relation_models` '
             . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
             . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? limit 1',
+            $selectResult
+        );
+
+        $this->mockSelect(
+            'select * from `relation_models` where `relation_models`.`test_model_id` in (1)'
+        );
+    }
+
+    protected function mockLast(array $selectResult): void
+    {
+        $this->mockSelectById(
+            'select `test_models`.*, (select count(*) from `relation_models` '
+            . 'where `test_models`.`id` = `relation_models`.`test_model_id`) as `relation_count` '
+            . 'from `test_models` where `test_models`.`deleted_at` is not null and `id` = ? '
+            . 'order by `created_at` desc limit 1',
             $selectResult
         );
 

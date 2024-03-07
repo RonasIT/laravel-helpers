@@ -2,8 +2,10 @@
 
 namespace RonasIT\Support\Tests;
 
-use Doctrine\DBAL\Schema\PostgreSQLSchemaManager;
+use Doctrine\DBAL\Schema\MySQLSchemaManager;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
@@ -151,20 +153,42 @@ class FixturesTraitTest extends HelpersTestCase
         $this->loadTestDump();
     }
 
-    public function testPrepareSequences()
+    public function testGetTables()
     {
-        $mock = $this->mockClass(PostgreSQLSchemaManager::class, [
-            $this->functionCall('listTableNames', [], $this->getJsonFixture('prepare_sequences/tables.json')),
+        $mock = $this->mockClass(MySQLSchemaManager::class, [
+            $this->functionCall('listTableNames', [], $this->getJsonFixture('get_tables/tables.json')),
         ], true);
 
         $connection = $this->mockClass(Connection::class, [
             $this->functionCall('getDoctrineSchemaManager', [], $mock),
+        ], true);
+
+        $this->app->instance('db.connection', $connection);
+
+        Config::set('database.default', 'mysql');
+
+        $this->getTables();
+
+        $this->assertEqualsFixture('get_tables/tables.json', self::$tables);
+    }
+
+    public function testPrepareSequences()
+    {
+        $sequences = collect($this->getJsonFixture('prepare_sequences/information_schema.json'))
+            ->map(fn($item) => (object) $item);
+
+        $connection = $this->mockClass(Connection::class, [
+            $this->functionCall('getQueryGrammar', [], new Grammar),
+            $this->functionCall('getPostProcessor', [], new Processor),
+            $this->functionCall('select', [], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
         $this->app->instance('db.connection', $connection);
 
-        $this->prepareSequences($this->getTables());
+        Config::set('database.default', 'pgsql');
+
+        $this->prepareSequences(['roles']);
     }
 
     public function testGetFixtureWithoutGlobalExportMode()

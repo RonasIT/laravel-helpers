@@ -83,7 +83,7 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->assertEquals(['relation'], $attachedRelations);
     }
 
-    public function withCount()
+    public function testWithCount()
     {
         $this->testRepositoryClass->withCount('relation');
 
@@ -100,7 +100,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withTrashed()
             ->onlyTrashed()
             ->with('relation')
-            ->withCount('relation')
+            ->withCount(['relation', 'relation.child_relation'])
             ->force()
             ->all();
 
@@ -325,6 +325,21 @@ class EntityControlTraitTest extends HelpersTestCase
             ->with('relation')
             ->withCount('relation')
             ->first(1);
+
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+    }
+
+    public function testLast()
+    {
+        $this->mockLast($this->selectResult);
+
+        $this->testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->last(['id' => 1]);
 
         $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
