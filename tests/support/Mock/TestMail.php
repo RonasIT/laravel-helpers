@@ -2,17 +2,14 @@
 
 namespace RonasIT\Support\Tests\Support\Mock;
 
-use Illuminate\Mail\Mailable;
+use RonasIT\Support\Mail\BaseMail;
 
-class TestMail extends Mailable
+class TestMail extends BaseMail
 {
-    public function __construct(array $viewData, $view, $subject = '')
+    public function __construct(array $viewData, $subject, $view)
     {
-        $this->viewData = $viewData;
-        $this->view = $view;
-        $this->subject = $subject;
+        parent::__construct($viewData, $subject, $view);
 
-        $this->queue = 'mails';
         $this->setAddress('noreply@mail.net', null, 'from');
     }
 }

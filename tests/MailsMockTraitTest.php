@@ -26,11 +26,12 @@ class MailsMockTraitTest extends HelpersTestCase
     {
         Mail::to('test@mail.com')->queue(new TestMail(
             ['name' => 'John Smith'],
+            'subject',
             'emails.test'
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            $this->mockedMail('test@mail.com', 'test_mail.html'),
+            $this->mockedMail('test@mail.com', 'test_mail.html', 'subject'),
         ]);
     }
 
@@ -38,9 +39,13 @@ class MailsMockTraitTest extends HelpersTestCase
     {
         Mail::to('test@mail.com')->queue(new TestMailHasSubject(
             ['name' => 'John Smith'],
-            'emails.test',
             'Test Subject',
+            'emails.test'
         ));
+
+        Mail::assertQueued(function (TestMailHasSubject $mail) {
+            return ($mail->queue === 'different_queue');
+        });
 
         $this->assertMailEquals(TestMailHasSubject::class, [
             [
@@ -56,13 +61,13 @@ class MailsMockTraitTest extends HelpersTestCase
     {
         Mail::to('test1@mail.com')->queue(new TestMail(
             ['name' => 'John Smith'],
-            'emails.test',
             'Test Subject1',
+            'emails.test'
         ));
         Mail::to('test2@mail.com')->queue(new TestMail(
             ['name' => 'Alex Jameson'],
-            'emails.test',
             'Test Subject2',
+            'emails.test'
         ));
 
         $this->assertMailEquals(TestMail::class, 'email_chain.json');
@@ -74,11 +79,12 @@ class MailsMockTraitTest extends HelpersTestCase
 
         Mail::to('test@mail.com')->queue(new TestMail(
             ['name' => 'John Smith'],
+            'subject',
             'emails.test'
         ));
 
         $this->assertMailEquals(TestMail::class, [
-            $this->mockedMail('test@mail.com', 'test_mail_with_export.html'),
+            $this->mockedMail('test@mail.com', 'test_mail_with_export.html', 'subject'),
         ], true);
 
         $this->assertFileExists($this->getFixturePath('test_mail_with_export.html'));
@@ -93,8 +99,8 @@ class MailsMockTraitTest extends HelpersTestCase
 
         Mail::to('test@mail.com')->queue(new TestMail(
             ['name' => 'John Smith'],
-            'emails.test',
             'Test Subject',
+            'emails.test'
         ));
 
         $this->assertMailEquals(TestMail::class, [
@@ -109,8 +115,13 @@ class MailsMockTraitTest extends HelpersTestCase
 
         Mail::to('test@mail.com')->queue(new TestMail(
             ['name' => 'John Smith'],
+            'subject',
             'emails.test'
         ));
+
+        Mail::assertQueued(function (TestMail $mail) {
+            return ($mail->queue === 'mails');
+        });
 
         $this->assertMailEquals(TestMail::class, [
             [
