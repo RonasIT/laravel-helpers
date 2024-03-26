@@ -105,4 +105,26 @@ class ValidatorTest extends HelpersTestCase
 
         $this->assertTrue($validator->passes());
     }
+
+    public function testListExistsFailedValidation()
+    {
+        $this->mockListExists(false);
+
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3]],
+            ['ids' => 'list_exists:clients,user_id'],
+        );
+
+        $this->assertTrue($validator->fails());
+    }
+
+    public function testListExistsWithoutArgs()
+    {
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3]],
+            ['ids' => 'list_exists'],
+        );
+
+        $this->assertTrue($validator->fails());
+    }
 }

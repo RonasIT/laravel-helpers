@@ -2,14 +2,13 @@
 
 namespace RonasIT\Support;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use InvalidArgumentException;
+use Illuminate\Support\ServiceProvider;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Middleware\SecurityMiddleware;
-use Illuminate\Support\Arr;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -20,6 +19,20 @@ class HelpersServiceProvider extends ServiceProvider
         $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
         $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
 
+        $this->extendValidator();
+
+        app(ExcelServiceProvider::class, ['app' => app()])->boot();
+
+        $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
+    }
+
+    public function register()
+    {
+        app(ExcelServiceProvider::class, ['app' => app()])->register();
+    }
+
+    protected function extendValidator()
+    {
         Validator::extend('unique_except_of_authorized_user', function ($attribute, $value, $parameters = []) {
             $table = Arr::get($parameters, 0, 'users');
             $keyField = Arr::get($parameters, 1, 'id');
@@ -36,7 +49,7 @@ class HelpersServiceProvider extends ServiceProvider
         Validator::extend('list_exists', function ($attribute, $value, $parameters) {
 
             if (count($parameters) < 1) {
-                throw new InvalidArgumentException("Validation rule `list_exists` requires at least 1 parameters.");
+                return false;
             }
 
             $table = Arr::get($parameters, 0);
@@ -50,14 +63,5 @@ class HelpersServiceProvider extends ServiceProvider
                 ->whereIn($keyField, $value)
                 ->exists();
         });
-
-        app(ExcelServiceProvider::class, ['app' => app()])->boot();
-
-        $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
-    }
-
-    public function register()
-    {
-        app(ExcelServiceProvider::class, ['app' => app()])->register();
     }
 }
