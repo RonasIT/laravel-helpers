@@ -431,6 +431,19 @@ trait SqlMockTrait
         );
     }
 
+    protected function mockListExists(
+        bool $isExist,
+        string $table = 'clients',
+        string $keyField = 'user_id'
+    ): void
+    {
+        $this->mockSelectExists(
+            "select exists(select * from `{$table}` where `{$keyField}` in (?, ?, ?)) as `exists`",
+            $isExist,
+            [1, 2, 3]
+        );
+    }
+
     protected function mockUpdateSqlQuery(string $sql, array $bindings = [], ?int $rowCount = null): void
     {
         if (!empty($rowCount)) {
