@@ -6,15 +6,12 @@ use Illuminate\Auth\SessionGuard;
 
 trait AuthTestTrait
 {
-    public function actingViaSession(int $userId): self
+    public function actingViaSession(int $userId, string $guard = 'session'): self
     {
-        $guard = 'session';
         $hash = sha1(SessionGuard::class);
 
-        $this->withSession([
+        return $this->withSession([
             "login_{$guard}_{$hash}" => $userId,
         ]);
-
-        return $this;
     }
 }

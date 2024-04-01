@@ -5,13 +5,10 @@ namespace RonasIT\Support\Tests;
 use ReflectionProperty;
 use RonasIT\Support\Services\EntityService;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use BadMethodCallException;
 
 class EntityServiceTest extends HelpersTestCase
 {
-    use MockTrait;
-
     protected EntityService $entityServiceClass;
     protected ReflectionProperty $repositoryProperty;
 
@@ -39,6 +36,15 @@ class EntityServiceTest extends HelpersTestCase
         $result = $this->entityServiceClass->getUser();
 
         $this->assertSame('Correct result', $result);
+    }
+
+    public function testCallRepositoryMethodReturnsSelf()
+    {
+        $this->entityServiceClass->setRepository(TestRepository::class);
+
+        $result = $this->entityServiceClass->getFilter();
+
+        $this->assertInstanceOf(EntityService::class, $result);
     }
 
     public function testCallNotExistsRepositoryMethod()

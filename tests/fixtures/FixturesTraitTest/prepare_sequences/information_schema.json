@@ -1,0 +1,37 @@
+[
+  {
+    "table_name": "articles",
+    "column_name": "id",
+    "column_default": "nextval('articles_id_seq'::regclass)"
+  },
+  {
+    "table_name": "workers",
+    "column_name": "id",
+    "column_default": "nextval('workers_id_seq'::regclass)"
+  },
+  {
+    "table_name": "groups",
+    "column_name": "id",
+    "column_default": "nextval('groups_id_seq'::regclass)"
+  },
+  {
+    "table_name": "homes",
+    "column_name": "id",
+    "column_default": "nextval('homes_id_seq'::regclass)"
+  },
+  {
+    "table_name": "users",
+    "column_name": "id",
+    "column_default": "nextval('users_id_seq'::regclass)"
+  },
+  {
+    "table_name": "roles",
+    "column_name": "id",
+    "column_default": "nextval('roles_id_seq'::regclass)"
+  },
+  {
+    "table_name": "telescope_entries",
+    "column_name": "sequence",
+    "column_default": "nextval('telescope_entries_sequence_seq'::regclass)"
+  }
+]

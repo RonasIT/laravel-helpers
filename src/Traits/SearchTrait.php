@@ -176,7 +176,7 @@ trait SearchTrait
 
         $perPage = $this->calculatePerPage($total);
 
-        $paginator = new LengthAwarePaginator($data, count($data), $perPage, 1, [
+        $paginator = new LengthAwarePaginator($data, $total, $perPage, 1, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => 'page'
         ]);
@@ -216,21 +216,25 @@ trait SearchTrait
         return ($isDesc) ? 'DESC' : 'ASC';
     }
 
+    /** @deprecated use filterGreater instead */
     public function filterMoreThan(string $field, $value): self
     {
         return $this->filterValue($field, '>', $value);
     }
 
+    /** @deprecated use filterLess instead */
     public function filterLessThan(string $field, $value): self
     {
         return $this->filterValue($field, '<', $value);
     }
 
+    /** @deprecated use filterGreater instead */
     public function filterMoreOrEqualThan(string $field, $value): self
     {
         return $this->filterValue($field, '>=', $value);
     }
 
+    /** @deprecated use filterLess instead */
     public function filterLessOrEqualThan(string $field, $value): self
     {
         return $this->filterValue($field, '<=', $value);
@@ -366,11 +370,9 @@ trait SearchTrait
             return $total;
         }
 
-        if (!empty($this->filter['per_page'])) {
-            return $this->filter['per_page'];
-        }
+        $defaultPerPage = config('defaults.items_per_page', 1);
 
-        return config('defaults.items_per_page', 1);
+        return Arr::get($this->filter, 'per_page', $defaultPerPage);
     }
 
     protected function postQueryHook(): void

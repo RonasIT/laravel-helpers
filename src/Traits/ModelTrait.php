@@ -2,7 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
-use Schema;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait ModelTrait
 {
-    protected $disableLazyLoading = true;
+    protected bool $disableLazyLoading = true;
 
     public static function getFields(): array
     {
@@ -43,7 +43,8 @@ trait ModelTrait
             $modelName = static::class;
 
             throw new BadMethodCallException(
-                "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. See property \$disableLazyLoading"
+                "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. "
+                . 'See property $disableLazyLoading.'
             );
         }
 
@@ -54,7 +55,7 @@ trait ModelTrait
      * This method was added, because native Laravel's method addSelect
      * overwrites existed select clause
      * @param $query
-     * @param $fields
+     * @param array $fields
      *
      * @return mixed
      */
@@ -83,8 +84,13 @@ trait ModelTrait
      *
      * @return mixed $query
      */
-    public function scopeOrderByRelated($query, $relations, string $desc = 'DESC', ?string $asField = null, string $manyToManyStrategy = 'max')
-    {
+    public function scopeOrderByRelated(
+        $query,
+        $relations,
+        string $desc = 'DESC',
+        ?string $asField = null,
+        string $manyToManyStrategy = 'max'
+    ) {
         if (version_compare(app()::VERSION, '5.5') <= 0) {
             return $query->legacyOrderByRelated($relations, $desc);
         }

@@ -9,6 +9,7 @@ use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 trait FixturesTrait
 {
     protected static $tables;
+    protected static $sequences;
     protected $postgisTables = [
         'tiger.addrfeat',
         'tiger.edges',
@@ -61,9 +62,8 @@ trait FixturesTrait
         }
 
         $databaseTables = $this->getTables();
-        $scheme = config('database.default');
 
-        $this->clearDatabase($scheme, $databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
+        $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
         app('db.connection')->unprepared($dump);
     }
@@ -121,8 +121,10 @@ trait FixturesTrait
         $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
 
-    public function clearDatabase(string $scheme, array $tables, array $except): void
+    public function clearDatabase(array $tables, array $except): void
     {
+        $scheme = config('database.default');
+
         if ($scheme === 'pgsql') {
             $query = $this->getClearPsqlDatabaseQuery($tables, $except);
         } elseif ($scheme === 'mysql') {
@@ -160,15 +162,19 @@ trait FixturesTrait
         return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
-    public function prepareSequences(array $tables, array $except = []): void
+    public function prepareSequences(array $except = []): void
     {
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
-        $query = array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+        $query = array_concat($this->getSequences(), function ($item) use ($except) {
+            if (in_array($item->table_name, $except)) {
                 return '';
             } else {
-                return "SELECT setval('{$table}_id_seq', (select coalesce(max(id), 1) from {$table}), (case when (select max(id) from {$table}) is NULL then false else true end));\n";
+                $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item->column_default);
+
+                return "SELECT setval('{$sequenceName}', (select coalesce(max({$item->column_name}), 1) from " .
+                    "{$item->table_name}), (case when (select max({$item->column_name}) from {$item->table_name}) " .
+                    "is NULL then false else true end));\n";
             }
         });
 
@@ -192,6 +198,20 @@ trait FixturesTrait
         }
 
         return self::$tables;
+    }
+
+    protected function getSequences()
+    {
+        if (empty(self::$sequences)) {
+            self::$sequences = app('db.connection')
+                ->table('information_schema.columns')
+                ->select('table_name', 'column_name', 'column_default')
+                ->where('column_default', 'LIKE', 'nextval%')
+                ->get()
+                ->toArray();
+        }
+
+        return self::$sequences;
     }
 
     protected function exportContent($content, string $fixture): void

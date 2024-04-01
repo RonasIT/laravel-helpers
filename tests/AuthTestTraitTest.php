@@ -3,13 +3,13 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Arr;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
 use RonasIT\Support\Traits\AuthTestTrait;
 use RonasIT\Support\Traits\FixturesTrait;
 
 class AuthTestTraitTest extends HelpersTestCase
 {
-    use FixturesTrait, MockTrait, AuthTestTrait;
+    use AuthTestTrait;
+    use FixturesTrait;
 
     public function testActingViaSession()
     {
@@ -19,6 +19,20 @@ class AuthTestTraitTest extends HelpersTestCase
 
         $session = $this->app['session']->getDrivers()['array'];
         $loginSession = $this->getLoginSession($session);
+
+        $this->assertNotEmpty($loginSession);
+        $this->assertEquals('laravel_session', $session->getName());
+        $this->assertEquals(array_values($loginSession), [$userId]);
+    }
+
+    public function testActingViaSessionDifferentGuard()
+    {
+        $userId = 1;
+
+        $this->actingViaSession($userId, 'some_guard');
+
+        $session = $this->app['session']->getDrivers()['array'];
+        $loginSession = $this->getLoginSession($session, 'some_guard');
 
         $this->assertNotEmpty($loginSession);
         $this->assertEquals('laravel_session', $session->getName());

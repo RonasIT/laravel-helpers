@@ -3,13 +3,12 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Auth;
-use RonasIT\Support\Tests\Support\Traits\MockTrait;
-use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use Illuminate\Support\Facades\Validator;
+use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class ValidatorTest extends HelpersTestCase
 {
-    use MockTrait, SqlMockTrait;
+    use SqlMockTrait;
 
     public function setUp(): void
     {
@@ -20,7 +19,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testUniqueExceptOfAuthorizedUserPass()
     {
-        $this->mockExistsUsersExceptAuthorized(false);
+        $this->mockExistsUsersExceptAuthorized();
 
         $validator = Validator::make(
             ['email' => 'mail@mail.com'],
@@ -61,6 +60,69 @@ class ValidatorTest extends HelpersTestCase
         $validator = Validator::make(
             ['email' => ['mail@mail.com', 'mail@mail.net']],
             ['email' => 'unique_except_of_authorized_user']
+        );
+
+        $this->assertTrue($validator->fails());
+    }
+
+    public function testListExists()
+    {
+        $this->mockListExists(true);
+
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3]],
+            ['ids' => 'list_exists:clients,user_id'],
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testListExistsByArray()
+    {
+        $this->mockListExists(true);
+
+        $validator = Validator::make(
+            [
+                'ids' => [
+                    [
+                        'id' => 1,
+                        'name' => 'name1',
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'name2',
+                    ],
+                    [
+                        'id' => 3,
+                        'name' => 'name3',
+                    ],
+                ]
+            ],
+            [
+                'ids' => 'list_exists:clients,user_id,id',
+            ],
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testListExistsFailedValidation()
+    {
+        $this->mockListExists(false);
+
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3]],
+            ['ids' => 'list_exists:clients,user_id'],
+        );
+
+        $this->assertTrue($validator->fails());
+    }
+
+    public function testListExistsWithoutArgs()
+    {
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3]],
+            ['ids' => 'list_exists'],
         );
 
         $this->assertTrue($validator->fails());
