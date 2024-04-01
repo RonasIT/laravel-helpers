@@ -105,7 +105,11 @@ trait FixturesTrait
             $this->exportJson($fixture, $data);
         }
 
-        $this->assertEquals($this->getJsonFixture($fixture), $data);
+        $fixturePath = $this->getFixturePath($fixture);
+
+        $assertFailedMessage = "Failed asserting that the provided data equal to \"{$fixturePath}:1\" fixture.";
+
+        $this->assertEquals($this->getJsonFixture($fixture), $data, $assertFailedMessage);
     }
 
     public function exportJson($fixture, $data): void
