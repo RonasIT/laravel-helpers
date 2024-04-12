@@ -129,6 +129,8 @@ class HttpRequestService
 
     protected function sendRequest($method, $url, array $data = [], array $headers = []): ResponseInterface
     {
+        $headers = array_change_key_case($headers);
+
         $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
@@ -222,15 +224,56 @@ class HttpRequestService
             return;
         }
 
-        $headers = array_change_key_case($headers);
         $contentType = Arr::get($headers, 'content-type');
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;
         } elseif (preg_match('/application\/x-www-form-urlencoded/', $contentType)) {
             $this->options['form_params'] = $data;
+        } elseif (preg_match('/multipart\/form-data/', $contentType)) {
+            $this->options['multipart'] = $this->getMultipartOptionReplacement($data);
         } else {
             $this->options['body'] = json_encode($data);
         }
+    }
+
+    protected function getMultipartOptionReplacement(array $data): array
+    {
+        Arr::forget($this->options, 'headers.content-type');
+
+        $options = [];
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $options = array_merge($options, $this->getArrayMultipartOptionReplacement($key, $value));
+            } else {
+                $options[] = [
+                    'name' => $key,
+                    'contents' => $value
+                ];
+            }
+        }
+
+        return $options;
+    }
+
+    protected function getArrayMultipartOptionReplacement(string $parentKey, array $items): array
+    {
+        $options = [];
+
+        foreach ($items as $key => $item) {
+            $preparedKey = "{$parentKey}[{$key}]";
+
+            if (is_array($item)) {
+                $options = array_merge($options, $this->getArrayMultipartOptionReplacement($preparedKey, $item));
+            } else {
+                $options[] = [
+                    'name' => $preparedKey,
+                    'contents' => $item
+                ];
+            }
+        }
+
+        return $options;
     }
 }
