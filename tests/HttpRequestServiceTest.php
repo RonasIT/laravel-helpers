@@ -144,7 +144,7 @@ class HttpRequestServiceTest extends HelpersTestCase
             [
                 'headers' => [
                     'some_header' => 'some_header_value',
-                    'Content-type' => 'application/x-www-form-urlencoded'
+                    'content-type' => 'application/x-www-form-urlencoded'
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
@@ -260,7 +260,7 @@ class HttpRequestServiceTest extends HelpersTestCase
         $this->mockGuzzleClient('put', [
             'https://some.url.com',
             [
-                'headers' => $headers,
+                'headers' => ['content-type' => 'application/json'],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
