@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
+use Riverline\MultiPartParser\StreamedPart;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
@@ -275,5 +276,14 @@ class HttpRequestService
         }
 
         return $options;
+    }
+
+    protected function parseMultipart(string $content): StreamedPart
+    {
+        $stream = fopen('php://temp', 'rw');
+        fwrite($stream, $content);
+        rewind($stream);
+
+        return app()->makeWith(StreamedPart::class, ['stream' => $stream]);
     }
 }

@@ -17,7 +17,8 @@
     "tecnickcom/tcpdf": "~6.2.22",
     "doctrine/dbal": "^3.6",
     "ext-json": "*",
-    "php-mock/php-mock-phpunit": "^2.9"
+    "php-mock/php-mock-phpunit": "^2.9",
+    "riverline/multipart-parser": "^2.1"
   },
   "require-dev": {
     "fakerphp/faker": "^1.23",
