@@ -163,6 +163,73 @@ class HttpRequestServiceTest extends HelpersTestCase
         ]);
     }
 
+    public function testSendPutMultipartContentTypeWithFiles(): void
+    {
+        $this->mockGuzzleClient('put', [
+            'https://some.url.com',
+            [
+                'headers' => [],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 0,
+                'multipart' => [
+                    [
+                        'name' => '0[first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '0[second_file][first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '0[second_file][second_file]',
+                        'contents' => 'second_file_content',
+                    ],
+                    [
+                        'name' => '1[first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '1[second_file]',
+                        'contents' => 'second_file_content',
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->httpRequestServiceClass->put('https://some.url.com', [
+            [
+                'first_file' => 'first_file_content',
+                'second_file' => [
+                    'first_file' => 'first_file_content',
+                    'second_file' => 'second_file_content'
+                ]
+            ],
+            [
+                'first_file' => 'first_file_content',
+                'second_file' => 'second_file_content'
+            ]
+        ], [
+            'Content-type' => 'multipart/form-data;'
+        ]);
+    }
+
+    public function testParseMultipartContent(): void
+    {
+        $multipartContent = $this->getFixture('multipart_content');
+
+        $multipartObject = $this->httpRequestServiceClass->parseMultipart($multipartContent);
+
+        $parsedData = [];
+
+        foreach ($multipartObject->getParts() as $part)
+        {
+            $parsedData[] = [$part->getName(), $part->getBody()];
+        }
+
+        $this->assertEqualsFixture('parsed_multipart_content.json', $parsedData);
+    }
+
     public function sendPutAsJSONData(): array
     {
         return [

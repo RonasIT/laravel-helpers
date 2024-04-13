@@ -128,6 +128,15 @@ class HttpRequestService
         }
     }
 
+    public function parseMultipart(string $content): StreamedPart
+    {
+        $stream = fopen('php://temp', 'rw');
+        fwrite($stream, $content);
+        rewind($stream);
+
+        return app()->makeWith(StreamedPart::class, ['stream' => $stream]);
+    }
+
     protected function sendRequest($method, $url, array $data = [], array $headers = []): ResponseInterface
     {
         $headers = array_change_key_case($headers);
@@ -276,14 +285,5 @@ class HttpRequestService
         }
 
         return $options;
-    }
-
-    protected function parseMultipart(string $content): StreamedPart
-    {
-        $stream = fopen('php://temp', 'rw');
-        fwrite($stream, $content);
-        rewind($stream);
-
-        return app()->makeWith(StreamedPart::class, ['stream' => $stream]);
     }
 }
