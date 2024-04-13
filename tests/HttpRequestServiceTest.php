@@ -222,8 +222,7 @@ class HttpRequestServiceTest extends HelpersTestCase
 
         $parsedData = [];
 
-        foreach ($multipartObject->getParts() as $part)
-        {
+        foreach ($multipartObject->getParts() as $part) {
             $parsedData[] = [$part->getName(), $part->getBody()];
         }
 
