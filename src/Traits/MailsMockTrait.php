@@ -75,6 +75,7 @@ trait MailsMockTrait
             $this->assertEmailsList($expectedMailData, $mail, $index);
             $this->assertFixture($expectedMailData, $mail, $exportMode);
             $this->assertEmailFrom($expectedMailData, $mail);
+            $this->assertAttachments($expectedMailData, $mail, $index);
 
             $index++;
 
@@ -200,13 +201,36 @@ trait MailsMockTrait
         return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
     }
 
-    protected function mockedMail($emails, string $fixture, string $subject = '', $from = ''): array
+    protected function mockedMail($emails, string $fixture, string $subject = '', $from = '', $attachments = []): array
     {
         return [
             'emails' => $emails,
             'fixture' => $fixture,
             'subject' => $subject,
             'from' => $from,
+            'attachments' => $attachments,
         ];
+    }
+
+    protected function assertAttachments(array $currentMail, Mailable $mail, int $index): void
+    {
+        $expectedAttachments = Arr::get($currentMail, 'attachments');
+
+        if (!empty($expectedAttachments)) {
+            $expectedAttachmentsCount = count($expectedAttachments);
+
+            if (method_exists($mail, 'attachments')) {
+                $attachmentsCount = count($mail->attachments);
+
+                $this->assertCount(
+                    $expectedAttachmentsCount,
+                    $mail->attachments,
+                    "Mail contains {$attachmentsCount} attachments instead of {$expectedAttachmentsCount}"
+                    . " on the step: {$index}."
+                );
+            } else {
+                $this->fail("Mail contains 0 attachments instead of {$expectedAttachmentsCount} on the step: {$index}.");
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMail;
 use RonasIT\Support\Tests\Support\Mock\TestMailHasSubject;
+use RonasIT\Support\Tests\Support\Mock\TestMailWithAttachments;
 
 class MailsMockTraitTest extends HelpersTestCase
 {
@@ -127,6 +128,22 @@ class MailsMockTraitTest extends HelpersTestCase
             [
                 'emails' => 'test@mail.com',
             ],
+        ]);
+    }
+
+    public function testMailWithUnwantedAttachments()
+    {
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Missing required key "fixture" in the input data set on the step: 0.');
+
+        Mail::to('test@mail.com')->queue(new TestMailWithAttachments(
+            ['name' => 'John Smith'],
+            'subject',
+            'emails.test'
+        ));
+
+        $this->assertMailEquals(TestMail::class, [
+            $this->mockedMail('test@mail.com', 'test_mail.html', 'subject', []),
         ]);
     }
 }
