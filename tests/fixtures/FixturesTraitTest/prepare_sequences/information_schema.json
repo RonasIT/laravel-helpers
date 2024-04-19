@@ -1,37 +1,56 @@
 [
   {
     "table_name": "articles",
+    "table_schema": "public",
     "column_name": "id",
     "column_default": "nextval('articles_id_seq'::regclass)"
   },
   {
     "table_name": "workers",
+    "table_schema": "public",
     "column_name": "id",
     "column_default": "nextval('workers_id_seq'::regclass)"
   },
   {
     "table_name": "groups",
+    "table_schema": "public",
     "column_name": "id",
     "column_default": "nextval('groups_id_seq'::regclass)"
   },
   {
     "table_name": "homes",
+    "table_schema": "public",
     "column_name": "id",
     "column_default": "nextval('homes_id_seq'::regclass)"
   },
   {
     "table_name": "users",
+    "table_schema": "public",
     "column_name": "id",
     "column_default": "nextval('users_id_seq'::regclass)"
   },
   {
     "table_name": "roles",
+    "table_schema": "public",
     "column_name": "id",
     "column_default": "nextval('roles_id_seq'::regclass)"
   },
   {
     "table_name": "telescope_entries",
+    "table_schema": "public",
     "column_name": "sequence",
     "column_default": "nextval('telescope_entries_sequence_seq'::regclass)"
+  },
+  {
+    "table_name": "state",
+    "table_schema": "tiger",
+    "column_name": "gid",
+    "column_default": "nextval('tiger.state_gid_seq'::regclass)"
+  },
+  {
+    "table_name": "topology",
+    "table_schema": "topology",
+    "column_name": "id",
+    "column_default": "nextval('topology.topology_id_seq'::regclass)"
   }
 ]
