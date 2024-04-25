@@ -130,17 +130,7 @@ class MailsMockTraitTest extends HelpersTestCase
             ],
         ]);
     }
-    /*
-             * $this->assertMailEquals(BaseMail::class, [
-                [
-                    'subject' => 'Soenaw',
-                    'from' => 'sdfs',
-                    'attachments' => function ($mail) {
-                        return true;
-                    }
-                ]
-            ]);
-             */
+
     public function testMailWithCallback()
     {
         Mail::to('test@mail.com')->queue(new TestMailWithAttachments(
