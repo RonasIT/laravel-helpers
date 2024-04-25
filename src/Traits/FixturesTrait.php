@@ -163,7 +163,10 @@ trait FixturesTrait
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
         $query = array_concat($this->getSequences(), function ($item) use ($except) {
-            if (in_array($item->table_name, $except)) {
+            if (
+                in_array($item->table_name, $except)
+                || in_array("{$item->table_schema}.{$item->table_name}", $except)
+            ) {
                 return '';
             } else {
                 $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item->column_default);
@@ -201,7 +204,7 @@ trait FixturesTrait
         if (empty(self::$sequences)) {
             self::$sequences = app('db.connection')
                 ->table('information_schema.columns')
-                ->select('table_name', 'column_name', 'column_default')
+                ->select('table_name', 'table_schema', 'column_name', 'column_default')
                 ->where('column_default', 'LIKE', 'nextval%')
                 ->get()
                 ->toArray();
