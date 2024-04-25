@@ -130,20 +130,29 @@ class MailsMockTraitTest extends HelpersTestCase
             ],
         ]);
     }
-
-    public function testMailWithUnwantedAttachments()
+    /*
+             * $this->assertMailEquals(BaseMail::class, [
+                [
+                    'subject' => 'Soenaw',
+                    'from' => 'sdfs',
+                    'attachments' => function ($mail) {
+                        return true;
+                    }
+                ]
+            ]);
+             */
+    public function testMailWithCallback()
     {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Missing required key "fixture" in the input data set on the step: 0.');
-
         Mail::to('test@mail.com')->queue(new TestMailWithAttachments(
             ['name' => 'John Smith'],
             'subject',
             'emails.test'
         ));
 
-        $this->assertMailEquals(TestMail::class, [
-            $this->mockedMail('test@mail.com', 'test_mail.html', 'subject', []),
+        $this->assertMailEquals(TestMailWithAttachments::class, [
+            $this->mockedMail('test@mail.com', 'test_mail.html', 'subject', '', function ($mail) {
+                return !empty($mail->attachments());
+            }),
         ]);
     }
 }

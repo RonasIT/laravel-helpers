@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\HttpFoundation\Response;
 
 trait MailsMockTrait
 {
@@ -23,11 +22,13 @@ trait MailsMockTrait
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
+     *      'from' => string|null, expected email sender address the step 1
+     *      'callback' => callable|null, callback function for additional cases
      *   ]
      *
      * or be a function call:
      *
-     *   $this->mockedMail($emails, $fixture, $subject, $from),
+     *   $this->mockedMail($emails, $fixture, $subject, $from, $callback),
      *
      * or be an array, if sent more than 1 email:
      *
@@ -36,12 +37,14 @@ trait MailsMockTrait
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
+     *      'from' => string|null, expected email sender address the step 1
      *   ],
      *   ...
      *   [
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step N
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step N
      *      'subject' => string|null, expected email subject from the step N
+     *      'callback' => callable|null, callback function for additional cases
      *   ]
      * ]
      *
@@ -75,7 +78,7 @@ trait MailsMockTrait
             $this->assertEmailsList($expectedMailData, $mail, $index);
             $this->assertFixture($expectedMailData, $mail, $exportMode);
             $this->assertEmailFrom($expectedMailData, $mail);
-            $this->assertAttachments($expectedMailData, $mail, $index);
+            $this->assertCallback($expectedMailData, $mail, $index);
 
             $index++;
 
@@ -201,36 +204,23 @@ trait MailsMockTrait
         return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
     }
 
-    protected function mockedMail($emails, string $fixture, string $subject = '', $from = '', $attachments = []): array
+    protected function mockedMail($emails, string $fixture, string $subject = '', $from = '', $callback = null): array
     {
         return [
             'emails' => $emails,
             'fixture' => $fixture,
             'subject' => $subject,
             'from' => $from,
-            'attachments' => $attachments,
+            'callback' => $callback,
         ];
     }
 
-    protected function assertAttachments(array $currentMail, Mailable $mail, int $index): void
+    protected function assertCallback(array $currentMail, Mailable $mail, int $index): void
     {
-        $expectedAttachments = Arr::get($currentMail, 'attachments');
+        $callback = Arr::get($currentMail, 'callback');
 
-        if (!empty($expectedAttachments)) {
-            $expectedAttachmentsCount = count($expectedAttachments);
-
-            if (method_exists($mail, 'attachments')) {
-                $attachmentsCount = count($mail->attachments);
-
-                $this->assertCount(
-                    $expectedAttachmentsCount,
-                    $mail->attachments,
-                    "Mail contains {$attachmentsCount} attachments instead of {$expectedAttachmentsCount}"
-                    . " on the step: {$index}."
-                );
-            } else {
-                $this->fail("Mail contains 0 attachments instead of {$expectedAttachmentsCount} on the step: {$index}.");
-            }
+        if (is_callable($callback)) {
+            $this->assertTrue($callback($mail, $index));
         }
     }
 }
