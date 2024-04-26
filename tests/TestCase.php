@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
+use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Traits\MailsMockTrait;
 
 abstract class TestCase extends BaseTest
@@ -66,6 +67,13 @@ abstract class TestCase extends BaseTest
         $server = $this->transformHeadersToServerVars($headers);
 
         return $this->call($method, $uri, [], [], [], $server, $content);
+    }
+
+    public function json($method, $uri, array $data = [], array $headers = [], ?VersionEnumContract $apiVersion = null): TestResponse
+    {
+        $apiVersion = (empty($apiVersion)) ? last(VersionEnumContract::values()) : $apiVersion->value;
+
+        return parent::json($method, "/v{$apiVersion}{$uri}", $data, $headers);
     }
 
     protected function dontWrapIntoTransaction(): void

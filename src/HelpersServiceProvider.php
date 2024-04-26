@@ -2,12 +2,15 @@
 
 namespace RonasIT\Support;
 
+use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Maatwebsite\Excel\ExcelServiceProvider;
+use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Middleware\SecurityMiddleware;
 
 class HelpersServiceProvider extends ServiceProvider
@@ -24,6 +27,40 @@ class HelpersServiceProvider extends ServiceProvider
         app(ExcelServiceProvider::class, ['app' => app()])->boot();
 
         $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
+
+        /**
+         * Specify that the route version must be in the range of given values inclusive.
+         *
+         * @param VersionEnumContract|null $start
+         * @param VersionEnumContract|null $end
+         * @param string $param (default is 'version')
+         * @return Route
+         */
+        Route::macro('versionRange', function (?VersionEnumContract $start, ?VersionEnumContract $end, string $param = 'version') {
+            $versions = array_diff(VersionEnumContract::values(), config('app.disabled_api_versions'));
+
+            $versions = array_filter($versions, function ($version) use ($start, $end) {
+                $result = true;
+
+                if (!empty($start)) {
+                    $result &= version_compare($version, $start->value, '>=');
+                }
+
+                if (!empty($end)) {
+                    $result &= version_compare($version, $end->value, '<=');
+                }
+
+                return $result;
+            });
+
+            return $this->whereIn($param, $versions);
+        });
+
+        Route::macro('versionFrom', fn (VersionEnumContract $from) => $this::versionRange($from, null));
+
+        Route::macro('versionTo', fn (VersionEnumContract $to) => $this::versionRange(null, $to));
+
+        RouteFacade::macro('version', fn (VersionEnumContract $version) => RouteFacade::prefix('v' . $version->value));
     }
 
     public function register()
