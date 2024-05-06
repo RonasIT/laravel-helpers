@@ -17,16 +17,7 @@ class HelpersServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        $router = $this->app['router'];
-
-        $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
-        $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
-
-        $this->extendValidator();
-
-        app(ExcelServiceProvider::class, ['app' => app()])->boot();
-
-        $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
+        $this->extendRouter();
 
         /**
          * Specify that the route version must be in the range of given values inclusive.
@@ -100,5 +91,19 @@ class HelpersServiceProvider extends ServiceProvider
                 ->whereIn($keyField, $value)
                 ->exists();
         });
+    }
+
+    protected function extendRouter()
+    {
+        $router = $this->app['router'];
+
+        $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
+        $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
+
+        $this->extendValidator();
+
+        app(ExcelServiceProvider::class, ['app' => app()])->boot();
+
+        $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
     }
 }

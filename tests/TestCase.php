@@ -69,13 +69,6 @@ abstract class TestCase extends BaseTest
         return $this->call($method, $uri, [], [], [], $server, $content);
     }
 
-    public function json($method, $uri, array $data = [], array $headers = [], ?VersionEnumContract $apiVersion = null): TestResponse
-    {
-        $apiVersion = (empty($apiVersion)) ? last(VersionEnumContract::values()) : $apiVersion->value;
-
-        return parent::json($method, "/v{$apiVersion}{$uri}", $data, $headers);
-    }
-
     protected function dontWrapIntoTransaction(): void
     {
         $this->rollbackTransaction();
