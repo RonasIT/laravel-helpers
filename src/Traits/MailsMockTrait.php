@@ -23,12 +23,12 @@ trait MailsMockTrait
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
      *      'from' => string|null, expected email sender address the step 1
-     *      'callback' => callable|null, callback function for additional cases
+     *      'attachments' => array, expected attachments
      *   ]
      *
      * or be a function call:
      *
-     *   $this->mockedMail($emails, $fixture, $subject, $from, $callback),
+     *   $this->mockedMail($emails, $fixture, $subject, $from, $attachments),
      *
      * or be an array, if sent more than 1 email:
      *
@@ -44,7 +44,7 @@ trait MailsMockTrait
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step N
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step N
      *      'subject' => string|null, expected email subject from the step N
-     *      'callback' => callable|null, callback function for additional cases
+     *      'attachments' => array, expected attachments
      *   ]
      * ]
      *
@@ -78,7 +78,7 @@ trait MailsMockTrait
             $this->assertEmailsList($expectedMailData, $mail, $index);
             $this->assertFixture($expectedMailData, $mail, $exportMode);
             $this->assertEmailFrom($expectedMailData, $mail);
-            $this->assertCallback($expectedMailData, $mail, $index);
+            $this->assertAttachments($expectedMailData, $mail, $index);
 
             $index++;
 
@@ -204,23 +204,31 @@ trait MailsMockTrait
         return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
     }
 
-    protected function mockedMail($emails, string $fixture, string $subject = '', $from = '', $callback = null): array
+    protected function mockedMail($emails, string $fixture, string $subject = '', $from = '', $attachments = []): array
     {
         return [
             'emails' => $emails,
             'fixture' => $fixture,
             'subject' => $subject,
             'from' => $from,
-            'callback' => $callback,
+            'attachments' => $attachments,
         ];
     }
 
-    protected function assertCallback(array $currentMail, Mailable $mail, int $index): void
+    protected function assertAttachments(array $currentMail, Mailable $mail, int $index): void
     {
-        $callback = Arr::get($currentMail, 'callback');
+        $attachments = Arr::get($currentMail, 'attachments', []);
+        $className = get_class($mail);
 
-        if (is_callable($callback)) {
-            $this->assertTrue($callback($mail, $index));
+        if (count($attachments)) {
+            $this->assertTrue(
+                method_exists($mail, 'assertHasAttachment'),
+                "Class {$className} doesn't have method `assertHasAttachment` to check an attachment.",
+            );
+
+            foreach ($attachments as $attachment) {
+                $mail->assertHasAttachment($attachment);
+            }
         }
     }
 }

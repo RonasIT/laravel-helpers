@@ -16,8 +16,13 @@ class TestMailWithAttachments extends BaseMail
     public function attachments(): array
     {
         return [
-            new \stdClass(),
-            new \stdClass(),
+            ['file' => 'attachment1', 'options' => []],
+            ['file' => new \stdClass(), 'options' => ['some_options']],
         ];
+    }
+
+    public function assertHasAttachment($file, array $options = []): bool
+    {
+        return true;
     }
 }
