@@ -163,17 +163,15 @@ trait FixturesTrait
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
         $query = array_concat($this->getSequences(), function ($item) use ($except) {
-            if (
-                in_array($item->table_name, $except)
-                || in_array("{$item->table_schema}.{$item->table_name}", $except)
-            ) {
+            if (in_array("{$item->table_schema}.{$item->table_name}", $except)) {
                 return '';
             } else {
                 $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item->column_default);
 
                 return "SELECT setval('{$sequenceName}', (select coalesce(max({$item->column_name}), 1) from " .
-                    "{$item->table_name}), (case when (select max({$item->column_name}) from {$item->table_name}) " .
+                    "{$item->table_schema}.{$item->table_name}), (case when (select max({$item->column_name}) from {$item->table_schema}.{$item->table_name}) " .
                     "is NULL then false else true end));\n";
+
             }
         });
 
