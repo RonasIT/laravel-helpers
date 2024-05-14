@@ -7,7 +7,6 @@ use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
-use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Traits\MailsMockTrait;
 
 abstract class TestCase extends BaseTest
