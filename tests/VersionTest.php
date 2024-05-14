@@ -140,7 +140,8 @@ class VersionTest extends HelpersTestCase
     /**
      * @dataProvider getTestBetweenData
      */
-    public function testBetween(string $from, string $to, bool $assert) {
+    public function testBetween(string $from, string $to, bool $assert)
+    {
         $checkedVersionFrom = $this->createMock(VersionEnumContract::class);
         $checkedVersionFrom->value = $from;
 
@@ -184,7 +185,8 @@ class VersionTest extends HelpersTestCase
     /**
      * @dataProvider getTestGteData
      */
-    public function testGte(string $version, bool $assert) {
+    public function testGte(string $version, bool $assert)
+    {
         $checkedVersion = $this->createMock(VersionEnumContract::class);
         $checkedVersion->value = $version;
 
@@ -225,7 +227,8 @@ class VersionTest extends HelpersTestCase
     /**
      * @dataProvider getTestLteData
      */
-    public function testLte(string $version, bool $assert) {
+    public function testLte(string $version, bool $assert)
+    {
         $checkedVersion = $this->createMock(VersionEnumContract::class);
         $checkedVersion->value = $version;
 
