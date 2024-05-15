@@ -87,6 +87,10 @@ class HelpersServiceProvider extends ServiceProvider
             RouteFacade::macro('whereIn', function ($parameters, array $values) {
                 return static::getFacadeRoot()->assignExpressionToParameters($parameters, implode('|', $values));
             });
+
+            RouteFacade::macro('prefix', function (string $prefix) {
+                return static::getFacadeRoot()->prefix($prefix);
+            });
         }
 
         /**

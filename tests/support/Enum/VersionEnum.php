@@ -9,12 +9,11 @@ class VersionEnum implements VersionEnumContract
 {
     const v1 = '1';
     const v2 = '2';
-    const v11 = '11';
-    const v12 = '12';
+    const v3 = '3';
 
     public static function values(): array
     {
-        return [static::v1, static::v2, static::v11, static::v12];
+        return [static::v1, static::v2, static::v3];
     }
 
     public static function toString(string $separator = ','): string

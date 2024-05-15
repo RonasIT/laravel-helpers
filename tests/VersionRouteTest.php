@@ -2,113 +2,232 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Support\Facades\Route;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
-use RonasIT\Support\Routing\RouteFacade;
+use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
 
 class VersionRouteTest extends HelpersTestCase
 {
-    protected const ROUTE_FACADE = '/test-facade';
-    protected const ROUTE_OBJECT = '/test-object';
+    use RouteMockTrait;
+
+    protected const ROUTE_FACADE_RANGE = '/test-facade-range';
+    protected const ROUTE_FACADE_FROM = '/test-facade-from';
+    protected const ROUTE_FACADE_TO = '/test-facade-to';
+    protected const ROUTE_OBJECT_RANGE = '/test-object-range';
+    protected const ROUTE_OBJECT_FROM = '/test-object-from';
+    protected const ROUTE_OBJECT_TO = '/test-object-to';
+
+    protected const ROUTE_FACADE_VERSION = '/test-facade-version';
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->app->bind(VersionEnumContract::class, VersionEnum::class);
-
-        switch ($this->getProvidedData()['route']) {
-            case static::ROUTE_FACADE:
-                $versionFrom = $this->createMock(VersionEnumContract::class);
-                $versionFrom->value = VersionEnum::v11;
-                $versionTo = $this->createMock(VersionEnumContract::class);
-                $versionTo->value = VersionEnum::v12;
-                Route::group(['prefix' => 'v{version}'], function () use ($versionTo, $versionFrom) {
-                    RouteFacade::versionRange($versionFrom, $versionTo)->group(function () {
-                        Route::get(static::ROUTE_FACADE, function () {
-                            return 'RouteFacade';
-                        });
-                    });
-                });
-                break;
-            case static::ROUTE_OBJECT:
-                $versionFrom = $this->createMock(VersionEnumContract::class);
-                $versionFrom->value = VersionEnum::v1;
-                $versionTo = $this->createMock(VersionEnumContract::class);
-                $versionTo->value = VersionEnum::v2;
-                Route::group(['prefix' => 'v{version}'], function () use ($versionTo, $versionFrom) {
-                    Route::get(static::ROUTE_OBJECT, function () {
-                        return 'Route';
-                    })->versionRange($versionFrom, $versionTo);
-                });
-                break;
-        }
     }
 
     public function getTestVersionRangeData(): array
     {
         return [
+            // Range
             [
                 'version' => '1',
                 'is_correct_version' => true,
-                'route' => static::ROUTE_OBJECT,
+                'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '1.0',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_OBJECT,
+                'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '0.5',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_OBJECT,
+                'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '4',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_OBJECT,
+                'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '2',
                 'is_correct_version' => true,
-                'route' => static::ROUTE_OBJECT,
+                'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '2.0',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_OBJECT,
+                'route' => static::ROUTE_OBJECT_RANGE,
+            ],
+            [
+                'version' => '1.5',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_OBJECT_RANGE,
             ],
 
             [
-                'version' => '11',
+                'version' => '1',
                 'is_correct_version' => true,
-                'route' => static::ROUTE_FACADE,
+                'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
-                'version' => '11.0',
+                'version' => '1.0',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_FACADE,
+                'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
-                'version' => '10.5',
+                'version' => '0.5',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_FACADE,
+                'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
-                'version' => '14',
+                'version' => '4',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_FACADE,
+                'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
-                'version' => '12',
+                'version' => '2',
                 'is_correct_version' => true,
-                'route' => static::ROUTE_FACADE,
+                'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
-                'version' => '12.0',
+                'version' => '2.0',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_FACADE,
+                'route' => static::ROUTE_FACADE_RANGE,
+            ],
+            [
+                'version' => '1.5',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_RANGE,
+            ],
+
+            // From
+            [
+                'version' => '1',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_OBJECT_FROM,
+            ],
+            [
+                'version' => '2.0',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_OBJECT_FROM,
+            ],
+            [
+                'version' => '2',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_OBJECT_FROM,
+            ],
+            [
+                'version' => '3',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_OBJECT_FROM,
+            ],
+            [
+                'version' => '3.5',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_OBJECT_FROM,
+            ],
+
+            [
+                'version' => '1',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '2.0',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '2',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '3',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '3.5',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+
+            // To
+            [
+                'version' => '1',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_OBJECT_TO,
+            ],
+            [
+                'version' => '2.0',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_OBJECT_TO,
+            ],
+            [
+                'version' => '2',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_OBJECT_TO,
+            ],
+            [
+                'version' => '3',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_OBJECT_TO,
+            ],
+            [
+                'version' => '1.5',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_OBJECT_TO,
+            ],
+
+            [
+                'version' => '1',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '2.0',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '2',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '3',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+            [
+                'version' => '3.5',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_FROM,
+            ],
+
+            // Version
+            [
+                'version' => '2',
+                'is_correct_version' => true,
+                'route' => static::ROUTE_FACADE_VERSION,
+            ],
+            [
+                'version' => '2.0',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_VERSION,
+            ],
+            [
+                'version' => '1',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_VERSION,
+            ],
+            [
+                'version' => '3',
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_VERSION,
             ],
         ];
     }
@@ -118,6 +237,8 @@ class VersionRouteTest extends HelpersTestCase
      */
     public function testVersionRange(string $version, bool $isCorrectVersion, string $route): void
     {
+        $this->mockRoutes();
+
         $response = $this->get("/v{$version}{$route}");
 
         $status = ($isCorrectVersion) ? 200 : 404;
