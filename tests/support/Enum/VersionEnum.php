@@ -1,9 +1,10 @@
 <?php
 
-namespace RonasIT\Support\Enum;
+namespace RonasIT\Support\Tests\Support\Enum;
 
 use RonasIT\Support\Contracts\VersionEnumContract;
 
+// Backward compatibility with PHP < 8
 class VersionEnum implements VersionEnumContract
 {
     const v1 = '1';

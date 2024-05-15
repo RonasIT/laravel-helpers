@@ -73,16 +73,15 @@ class HelpersServiceProvider extends ServiceProvider
 
     protected function extendRouter()
     {
+        // Backward compatibility with Laravel < 9
         if (!method_exists(Route::class, 'whereIn')) {
-            Route::macro('whereIn', function ($parameters, array $values) {
-                return $this->assignExpressionToParameters($parameters, implode('|', $values));
-            });
+            Route::macro('whereIn', fn ($parameters, array $values) => $this->assignExpressionToParameters($parameters, implode('|', $values)));
 
             Router::macro('assignExpressionToParameters', function($parameters, $expression) {
-                return $this->where(collect(Arr::wrap($parameters))
-                    ->mapWithKeys(function ($parameter) use ($expression) {
-                        return [$parameter => $expression];
-                    })->all());
+                return $this
+                    ->where(collect(Arr::wrap($parameters))
+                    ->mapWithKeys(fn ($parameter) => [$parameter => $expression])
+                    ->all());
             });
 
             RouteFacade::macro('whereIn', function ($parameters, array $values) {
@@ -129,22 +128,12 @@ class HelpersServiceProvider extends ServiceProvider
         };
 
         Route::macro('versionRange', fn (VersionEnumContract $from, VersionEnumContract $to, $param = null) => $versionRange($from, $to, $param, $this));
-        Route::macro('versionFrom', function (VersionEnumContract $from, $param = null) use ($versionRange) {
-            $versionRange($from, null, $param, $this);
-        });
-        Route::macro('versionTo', function (VersionEnumContract $to, $param = null) use ($versionRange) {
-            $versionRange(null, $to, $param, $this);
-        });
+        Route::macro('versionFrom', fn (VersionEnumContract $from, $param = null) => $versionRange($from, null, $param, $this));
+        Route::macro('versionTo', fn (VersionEnumContract $to, $param = null) => $versionRange(null, $to, $param, $this));
 
-        RouteFacade::macro('versionRange', function (VersionEnumContract $from, VersionEnumContract $to, string $param = null) use ($versionRange) {
-            return $versionRange($from, $to, $param);
-        });
-        RouteFacade::macro('versionFrom', function (VersionEnumContract $from, $param = null) use ($versionRange) {
-            return $versionRange($from, null, $param);
-        });
-        RouteFacade::macro('versionTo', function (VersionEnumContract $to, $param = null) use ($versionRange) {
-            return $versionRange(null, $to, $param);
-        });
+        RouteFacade::macro('versionRange', fn (VersionEnumContract $from, VersionEnumContract $to, string $param = null) => $versionRange($from, $to, $param));
+        RouteFacade::macro('versionFrom', fn (VersionEnumContract $from, $param = null) => $versionRange($from, null, $param));
+        RouteFacade::macro('versionTo', fn (VersionEnumContract $to, $param = null) => $versionRange(null, $to, $param));
 
         RouteFacade::macro('version', fn (VersionEnumContract $version) => RouteFacade::prefix('v' . $version->value));
     }
