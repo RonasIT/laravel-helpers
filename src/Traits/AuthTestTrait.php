@@ -16,8 +16,8 @@ trait AuthTestTrait
         ]);
     }
 
-    public function actingAs(Authenticatable $user): self
+    public function actingAs(Authenticatable $user, $guard = null): self
     {
-        return parent::actingAs(clone $user);
+        return parent::actingAs(clone $user, $guard);
     }
 }
