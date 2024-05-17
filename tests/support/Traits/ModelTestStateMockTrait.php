@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests\Support\Traits;
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;

@@ -29,7 +29,6 @@ class VersionRouteTest extends HelpersTestCase
     public function getTestVersionRangeData(): array
     {
         return [
-            // Range
             [
                 'version' => '1',
                 'is_correct_version' => true,
@@ -101,8 +100,26 @@ class VersionRouteTest extends HelpersTestCase
                 'is_correct_version' => false,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
+        ];
+    }
 
-            // From
+    /**
+     * @dataProvider getTestVersionRangeData
+     */
+    public function testVersionRange(string $version, bool $isCorrectVersion, string $route): void
+    {
+        $this->mockRoutes();
+
+        $response = $this->get("/v{$version}{$route}");
+
+        $status = ($isCorrectVersion) ? 200 : 404;
+
+        $response->assertStatus($status);
+    }
+
+    public function getTestVersionFromData(): array
+    {
+        return [
             [
                 'version' => '1',
                 'is_correct_version' => false,
@@ -154,8 +171,26 @@ class VersionRouteTest extends HelpersTestCase
                 'is_correct_version' => false,
                 'route' => static::ROUTE_FACADE_FROM,
             ],
+        ];
+    }
 
-            // To
+    /**
+     * @dataProvider getTestVersionFromData
+     */
+    public function testVersionFrom(string $version, bool $isCorrectVersion, string $route): void
+    {
+        $this->mockRoutes();
+
+        $response = $this->get("/v{$version}{$route}");
+
+        $status = ($isCorrectVersion) ? 200 : 404;
+
+        $response->assertStatus($status);
+    }
+
+    public function getTestVersionToData(): array
+    {
+        return [
             [
                 'version' => '1',
                 'is_correct_version' => true,
@@ -184,31 +219,49 @@ class VersionRouteTest extends HelpersTestCase
 
             [
                 'version' => '1',
-                'is_correct_version' => false,
-                'route' => static::ROUTE_FACADE_FROM,
+                'is_correct_version' => true,
+                'route' => static::ROUTE_FACADE_TO,
             ],
             [
                 'version' => '2.0',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_FACADE_FROM,
+                'route' => static::ROUTE_FACADE_TO,
             ],
             [
                 'version' => '2',
                 'is_correct_version' => true,
-                'route' => static::ROUTE_FACADE_FROM,
+                'route' => static::ROUTE_FACADE_TO,
             ],
             [
                 'version' => '3',
-                'is_correct_version' => true,
-                'route' => static::ROUTE_FACADE_FROM,
+                'is_correct_version' => false,
+                'route' => static::ROUTE_FACADE_TO,
             ],
             [
-                'version' => '3.5',
+                'version' => '1.5',
                 'is_correct_version' => false,
-                'route' => static::ROUTE_FACADE_FROM,
+                'route' => static::ROUTE_FACADE_TO,
             ],
+        ];
+    }
 
-            // Version
+    /**
+     * @dataProvider getTestVersionToData
+     */
+    public function testVersionTo(string $version, bool $isCorrectVersion, string $route): void
+    {
+        $this->mockRoutes();
+
+        $response = $this->get("/v{$version}{$route}");
+
+        $status = ($isCorrectVersion) ? 200 : 404;
+
+        $response->assertStatus($status);
+    }
+
+    public function getTestVersionData(): array
+    {
+        return [
             [
                 'version' => '2',
                 'is_correct_version' => true,
@@ -233,9 +286,9 @@ class VersionRouteTest extends HelpersTestCase
     }
 
     /**
-     * @dataProvider getTestVersionRangeData
+     * @dataProvider getTestVersionData
      */
-    public function testVersionRange(string $version, bool $isCorrectVersion, string $route): void
+    public function testVersion(string $version, bool $isCorrectVersion, string $route): void
     {
         $this->mockRoutes();
 
