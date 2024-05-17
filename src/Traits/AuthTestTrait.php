@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 trait AuthTestTrait
 {
@@ -13,5 +14,10 @@ trait AuthTestTrait
         return $this->withSession([
             "login_{$guard}_{$hash}" => $userId,
         ]);
+    }
+
+    public function actingAs(Authenticatable $user): self
+    {
+        return parent::actingAs(clone $user);
     }
 }
