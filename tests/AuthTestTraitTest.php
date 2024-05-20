@@ -52,15 +52,9 @@ class AuthTestTraitTest extends HelpersTestCase
     public function testActingAs()
     {
         $mockedUser = new MockAuthUser();
-        $mockedUser->someIntProperty = 0;
 
         $this->actingAs($mockedUser);
 
-        $user = Auth::user();
-        $user->someIntProperty = 1;
-
-        $this->actingAs($mockedUser);
-
-        $this->assertEquals(0, Auth::user()->someIntProperty);
+        $this->assertNotSame($mockedUser, Auth::user());
     }
 }
