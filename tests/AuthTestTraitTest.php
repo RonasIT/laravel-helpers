@@ -3,6 +3,8 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use RonasIT\Support\Tests\Support\Mock\MockAuthUser;
 use RonasIT\Support\Traits\AuthTestTrait;
 use RonasIT\Support\Traits\FixturesTrait;
 
@@ -45,5 +47,14 @@ class AuthTestTraitTest extends HelpersTestCase
         $loginSession = $this->getLoginSession($session);
 
         $this->assertEmpty($loginSession);
+    }
+
+    public function testActingAs()
+    {
+        $mockedUser = new MockAuthUser();
+
+        $this->actingAs($mockedUser);
+
+        $this->assertNotSame($mockedUser, Auth::user());
     }
 }
