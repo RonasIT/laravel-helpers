@@ -64,7 +64,6 @@ class VersionRouteTest extends HelpersTestCase
                 'is_correct_version' => false,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
-
             [
                 'version' => '1',
                 'is_correct_version' => true,
@@ -145,7 +144,6 @@ class VersionRouteTest extends HelpersTestCase
                 'is_correct_version' => false,
                 'route' => static::ROUTE_OBJECT_FROM,
             ],
-
             [
                 'version' => '1',
                 'is_correct_version' => false,
