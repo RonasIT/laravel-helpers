@@ -6,8 +6,6 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class MockAuthUser implements Authenticatable
 {
-    public int $someIntProperty;
-
     public function getAuthIdentifierName()
     {
         return 'some_auth_identifier_name';
