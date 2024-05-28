@@ -152,12 +152,11 @@ trait MailsMockTrait
         if (!empty($expectedFrom)) {
             $expectedFrom = Arr::wrap($expectedFrom);
             foreach ($expectedFrom as $expected) {
-                $hasFrom = (is_string($expected))
-                    ? $mail->hasFrom($expected)
-                    : $mail->hasFrom($expected['address'], $expected['name'] ?? null);
-
-                $expectedString = json_encode($expected);
-                $this->assertTrue($hasFrom, "Email was not from expected address [{$expectedString}].");
+                $expectedJson = json_encode($expected);
+                $this->assertTrue(
+                    $mail->hasFrom($expected['address'] ?? $expected, $expected['name'] ?? null),
+                    "Email was not from expected address [{$expectedJson}]."
+                );
             }
         }
     }
