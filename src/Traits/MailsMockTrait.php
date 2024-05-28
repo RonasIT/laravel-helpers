@@ -151,6 +151,7 @@ trait MailsMockTrait
 
         if (!empty($expectedFrom)) {
             $expectedFrom = Arr::wrap($expectedFrom);
+
             foreach ($expectedFrom as $expected) {
                 $expectedJson = json_encode($expected);
                 $this->assertTrue(

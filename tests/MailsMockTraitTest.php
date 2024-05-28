@@ -90,7 +90,7 @@ class MailsMockTraitTest extends HelpersTestCase
                         'name' => null
                     ],
                 ],
-            ]
+            ],
         ]);
     }
 
