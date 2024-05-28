@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMail;
+use RonasIT\Support\Tests\Support\Mock\TestMailManyFromWithName;
 use RonasIT\Support\Tests\Support\Mock\TestMailHasSubject;
 use RonasIT\Support\Tests\Support\Mock\TestMailLegacy;
 use RonasIT\Support\Tests\Support\Mock\TestMailWithAttachments;
@@ -55,6 +56,36 @@ class MailsMockTraitTest extends HelpersTestCase
                 'fixture' => 'test_mail.html',
                 'subject' => 'Test Subject',
                 'from' => 'noreply@mail.net',
+            ]
+        ]);
+    }
+
+    public function testMailFromManyWithName()
+    {
+        Mail::to('test@mail.com')->queue(new TestMailManyFromWithName(
+            ['name' => 'John Smith'],
+            'Test Subject',
+            'emails.test'
+        ));
+
+        $this->assertMailEquals(TestMailManyFromWithName::class, [
+            [
+                'emails' => 'test@mail.com',
+                'fixture' => 'test_mail.html',
+                'subject' => 'Test Subject',
+                'from' => [
+                    [
+                        'address' => 'noreply@mail.net',
+                        'name' => 'Some sender'
+                    ],
+                    [
+                        'address' => 'noreply-second@mail.net',
+                        'name' => 'Some sender second case'
+                    ],
+                    [
+                        'address' => 'noreply-withoutsender@mail.net'
+                    ]
+                ],
             ]
         ]);
     }
