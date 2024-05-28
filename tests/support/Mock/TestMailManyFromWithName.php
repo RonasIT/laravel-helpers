@@ -13,5 +13,6 @@ class TestMailManyFromWithName extends BaseMail
         $this->from('noreply@mail.net', 'Some sender');
         $this->from('noreply-second@mail.net', 'Some sender second case');
         $this->from('noreply-withoutsender@mail.net');
+        $this->from('noreply-withoutsender-second@mail.net');
     }
 }

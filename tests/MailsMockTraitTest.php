@@ -84,7 +84,11 @@ class MailsMockTraitTest extends HelpersTestCase
                     ],
                     [
                         'address' => 'noreply-withoutsender@mail.net'
-                    ]
+                    ],
+                    [
+                        'address' => 'noreply-withoutsender-second@mail.net',
+                        'name' => null
+                    ],
                 ],
             ]
         ]);
