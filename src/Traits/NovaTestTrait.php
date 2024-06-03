@@ -9,7 +9,7 @@ trait NovaTestTrait
         return [
             'search' => $search,
             'filters' => base64_encode(json_encode($filters)),
-            'perPage' => $perPage
+            'perPage' => $perPage,
         ];
     }
 }

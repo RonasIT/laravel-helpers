@@ -19,7 +19,7 @@ class NovaTestTraitTest extends HelpersTestCase
         $this->assertEquals($result, [
             'search' => '',
             'filters' => 'eyJCYWRnZTpreWNfc3RhdHVzIjpbIkNvbXBsZXRlZCJdfQ==',
-            'perPage' => 25
+            'perPage' => 25,
         ]);
     }
 }
