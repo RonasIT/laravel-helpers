@@ -6,12 +6,15 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Testing\Concerns\TestDatabases;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Traits\MailsMockTrait;
 
 abstract class TestCase extends BaseTest
 {
     use MailsMockTrait;
+    use TestDatabases;
 
     protected $auth;
 
@@ -30,6 +33,14 @@ abstract class TestCase extends BaseTest
     public function setUp(): void
     {
         parent::setUp();
+
+        if (ParallelTesting::token()) {
+            $this->whenNotUsingInMemoryDatabase(function ($database) {
+                [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
+
+                $this->switchToDatabase($testDatabase);
+            });
+        }
 
         $this->artisan('cache:clear');
 
