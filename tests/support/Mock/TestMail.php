@@ -10,6 +10,6 @@ class TestMail extends BaseMail
     {
         parent::__construct($viewData, $subject, $view);
 
-        $this->setAddress('noreply@mail.net', null, 'from');
+        $this->from('noreply@mail.net');
     }
 }
