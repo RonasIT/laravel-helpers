@@ -5,10 +5,13 @@ namespace RonasIT\Support\Tests;
 use ReflectionClass;
 use RonasIT\Support\Tests\Support\Mock\TestModel;
 use RonasIT\Support\Tests\Support\Mock\TestModelWithoutJsonFields;
+use RonasIT\Support\Tests\Support\SampleTest;
 use RonasIT\Support\Tests\Support\Traits\ModelTestStateMockTrait;
+use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class ModelTestStateTest extends HelpersTestCase
 {
+    use SqlMockTrait;
     use ModelTestStateMockTrait;
 
     public function setUp(): void
@@ -72,5 +75,16 @@ class ModelTestStateTest extends HelpersTestCase
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertNotChanged();
+    }
+
+    public function testPrepareTestState()
+    {
+        $this->mockSelect('select * from `test_models` order by `id` asc');
+
+        $sampleTest = new SampleTest();
+
+        $modelTestState = $sampleTest->prepareTestState(TestModel::class, true);
+
+        $this->assertTrue($modelTestState->globalExportMode);
     }
 }
