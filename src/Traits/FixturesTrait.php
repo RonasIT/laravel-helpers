@@ -66,7 +66,6 @@ trait FixturesTrait
 
         $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
-        //app('db.connection')->unprepared($dump);
         Schema::getConnection()->unprepared($dump);
     }
 
@@ -194,10 +193,7 @@ trait FixturesTrait
     protected function getTables(): array
     {
         if (empty(self::$tables)) {
-            /*self::$tables = app('db.connection')
-                ->getDoctrineSchemaManager()
-                ->listTableNames();*/
-            self::$tables = Schema::getAllTables();
+            self::$tables = Schema::getTables();
         }
 
         return self::$tables;

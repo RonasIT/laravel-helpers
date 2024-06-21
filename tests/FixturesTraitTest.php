@@ -174,7 +174,7 @@ class FixturesTraitTest extends HelpersTestCase
     public function testGetTables()
     {
         $mock = $this->mockClass(MySqlBuilder::class, [
-            $this->functionCall('getAllTables', [], $this->getJsonFixture('get_tables/tables.json')),
+            $this->functionCall('getTables', [], $this->getJsonFixture('get_tables/tables.json')),
         ], true);
 
         $connection = $this->mockClass(MySqlConnection::class, [
