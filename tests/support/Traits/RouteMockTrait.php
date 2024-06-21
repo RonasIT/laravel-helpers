@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests\Support\Traits;
 
 use Illuminate\Support\Facades\Route;
 use RonasIT\Support\Contracts\VersionEnumContract;
-use RonasIT\Support\Routing\RouteFacade;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 
 trait RouteMockTrait
@@ -30,7 +29,7 @@ trait RouteMockTrait
         $versionTo->value = VersionEnum::v2;
 
         Route::group(['prefix' => 'v{version}'], function () use ($versionTo, $versionFrom) {
-            RouteFacade::versionRange($versionFrom, $versionTo)->group(function () {
+            Route::versionRange($versionFrom, $versionTo)->group(function () {
                 Route::get(static::ROUTE_FACADE_RANGE, function () {
                     return 'ROUTE_FACADE_RANGE';
                 });
@@ -44,7 +43,7 @@ trait RouteMockTrait
         $versionFrom->value = VersionEnum::v2;
 
         Route::group(['prefix' => 'v{version}'], function () use ($versionFrom) {
-            RouteFacade::versionFrom($versionFrom)->group(function () {
+            Route::versionFrom($versionFrom)->group(function () {
                 Route::get(static::ROUTE_FACADE_FROM, function () {
                     return 'ROUTE_FACADE_FROM';
                 });
@@ -58,7 +57,7 @@ trait RouteMockTrait
         $versionTo->value = VersionEnum::v2;
 
         Route::group(['prefix' => 'v{version}'], function () use ($versionTo) {
-            RouteFacade::versionTo($versionTo)->group(function () {
+            Route::versionTo($versionTo)->group(function () {
                 Route::get(static::ROUTE_FACADE_TO, function () {
                     return 'ROUTE_FACADE_TO';
                 });
@@ -109,7 +108,7 @@ trait RouteMockTrait
         $version = $this->createMock(VersionEnumContract::class);
         $version->value = VersionEnum::v2;
 
-        RouteFacade::version($version)->group(function () use ($version) {
+        Route::version($version)->group(function () use ($version) {
             Route::get(static::ROUTE_FACADE_VERSION, function () {
                 return 'ROUTE_FACADE_VERSION';
             });

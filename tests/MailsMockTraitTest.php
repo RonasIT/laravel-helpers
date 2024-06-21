@@ -9,7 +9,6 @@ use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMail;
 use RonasIT\Support\Tests\Support\Mock\TestMailManyFromWithName;
 use RonasIT\Support\Tests\Support\Mock\TestMailHasSubject;
-use RonasIT\Support\Tests\Support\Mock\TestMailLegacy;
 use RonasIT\Support\Tests\Support\Mock\TestMailWithAttachments;
 
 class MailsMockTraitTest extends HelpersTestCase
@@ -164,27 +163,6 @@ class MailsMockTraitTest extends HelpersTestCase
             [
                 'emails' => 'test@mail.com',
             ],
-        ]);
-    }
-
-    public function testMailWithAttachmentForLegacyVersion()
-    {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(
-            "Class RonasIT\Support\Tests\Support\Mock\TestMailLegacy doesn't have method "
-            . "`assertHasAttachment` to check an attachment."
-        );
-
-        Mail::to('test@mail.com')->queue(new TestMailLegacy(
-            ['name' => 'John Smith'],
-            'subject',
-            'emails.test'
-        ));
-
-        $this->assertMailEquals(TestMailLegacy::class, [
-            $this->mockedMail('test@mail.com', 'test_mail.html', 'subject', '', [
-                'attachment1',
-            ]),
         ]);
     }
 

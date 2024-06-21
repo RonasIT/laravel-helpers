@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
@@ -65,7 +66,8 @@ trait FixturesTrait
 
         $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
-        app('db.connection')->unprepared($dump);
+        //app('db.connection')->unprepared($dump);
+        Schema::getConnection()->unprepared($dump);
     }
 
     public function getFixturePath(string $fixtureName): string
@@ -192,9 +194,10 @@ trait FixturesTrait
     protected function getTables(): array
     {
         if (empty(self::$tables)) {
-            self::$tables = app('db.connection')
+            /*self::$tables = app('db.connection')
                 ->getDoctrineSchemaManager()
-                ->listTableNames();
+                ->listTableNames();*/
+            self::$tables = Schema::getAllTables();
         }
 
         return self::$tables;

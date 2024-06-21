@@ -1,5 +1,6 @@
 services:
   nginx:
+    image: webdevops/php-nginx-dev:8.1
     build: .
     working_dir: /app
     ports:
