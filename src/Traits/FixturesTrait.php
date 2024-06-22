@@ -136,10 +136,10 @@ trait FixturesTrait
     public function getClearPsqlDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE {$table['name']} RESTART IDENTITY CASCADE; \n";
             }
         });
     }
@@ -149,10 +149,10 @@ trait FixturesTrait
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
         $query .= array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table}; \n";
+                return "TRUNCATE TABLE {$table['name']}; \n";
             }
         });
 

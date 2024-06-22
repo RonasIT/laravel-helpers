@@ -1,5 +1,26 @@
 [
-  "users",
-  "migrations",
-  "groups"
+  {
+    "schema": "public",
+    "name": "users",
+    "size": 24576,
+    "comment": null,
+    "collation": null,
+    "engine": null
+  },
+  {
+    "schema": "public",
+    "name": "migrations",
+    "size": 12345,
+    "comment": null,
+    "collation": null,
+    "engine": null
+  },
+  {
+    "schema": "public",
+    "name": "groups",
+    "size": 20000,
+    "comment": null,
+    "collation": null,
+    "engine": null
+  }
 ]

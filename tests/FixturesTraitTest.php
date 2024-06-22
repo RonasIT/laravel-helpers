@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
@@ -114,11 +113,6 @@ class FixturesTraitTest extends HelpersTestCase
 
     public function testLoadEmptyTestDump()
     {
-        //$connection = $this->mockNoCalls(DatabaseManager::class, null, true);
-
-        /*$db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-        ], true);*/
         $db = $this->mockNoCalls(DatabaseManager::class, null, true);
 
         $this->app->instance('db', $db);
