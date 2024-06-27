@@ -24,12 +24,12 @@ class DBIterator implements Iterator
         $this->loadSample();
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->sample['data'][$this->position];
     }
 
-    public function key()
+    public function key(): mixed
     {
         return $this->sample['data'][$this->position]['id'];
     }
