@@ -28,12 +28,12 @@ function array_round(array $array): array
 /**
  * Get list of element which placed in $path in $array
  *
- * @param array|string $array
- * @param string $path
+ * @param array|string|null $array
+ * @param array|string $path
  *
  * @return mixed
  */
-function array_get_list($array, $path)
+function array_get_list(array|string|null $array, array|string $path): mixed
 {
     if (is_string($path)) {
         $path = explode('.', $path);
@@ -75,7 +75,7 @@ function array_get_list($array, $path)
  *
  * @return boolean
  */
-function is_associative($array)
+function is_associative(array $array): bool
 {
     return $array !== array_values($array);
 }
@@ -98,13 +98,16 @@ function is_multidimensional(array $array): bool
  *
  * @param string $path
  */
-function mkdir_recursively($path)
+function mkdir_recursively(string $path): void
 {
     $currentPath = getcwd();
 
+    // handling Windows paths
     if (DIRECTORY_SEPARATOR === '\\') {
+        // @codeCoverageIgnoreStart
         $currentPath = str_replace(DIRECTORY_SEPARATOR, '/', $currentPath);
         $path = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+        // @codeCoverageIgnoreEnd
     }
 
     $path = Str::replaceFirst($currentPath, '', $path);
@@ -114,7 +117,9 @@ function mkdir_recursively($path)
         if ($currentPath !== '/') {
             $currentPath .= '/' . $dir;
         } else {
+            // @codeCoverageIgnoreStart
             $currentPath .= $dir;
+            // @codeCoverageIgnoreEnd
         }
 
         if (!file_exists($currentPath)) {
@@ -131,7 +136,7 @@ function mkdir_recursively($path)
  *
  * @return boolean
  */
-function array_equals($array1, $array2)
+function array_equals(array $array1, array $array2): bool
 {
     if (is_associative($array1)) {
         return array_equals_assoc($array1, $array2);
@@ -151,7 +156,7 @@ function array_equals($array1, $array2)
  *
  * @return boolean
  */
-function array_equals_assoc($array1, $array2)
+function array_equals_assoc(array $array1, array $array2): bool
 {
     $array1 = (new Collection($array1))->sortKeys()->toArray();
     $array2 = (new Collection($array2))->sortKeys()->toArray();
@@ -167,7 +172,7 @@ function array_equals_assoc($array1, $array2)
  *
  * @return array
  */
-function array_subtraction($array1, $array2)
+function array_subtraction(array $array1, array $array2): array
 {
     $intersection = array_intersect($array1, $array2);
 
@@ -181,7 +186,7 @@ function array_subtraction($array1, $array2)
  *
  * @codeCoverageIgnore
  */
-function getGUID()
+function getGUID(): string
 {
     mt_srand((double)microtime() * 10000);//optional for php 4.2.0 and up.
     $charId = strtoupper(md5(uniqid(rand(), true)));
@@ -195,7 +200,7 @@ function getGUID()
         . chr(125);// "}"
 }
 
-function array_concat($array, $callback)
+function array_concat(array $array, callable $callback): string
 {
     $content = '';
 
@@ -206,7 +211,7 @@ function array_concat($array, $callback)
     return $content;
 }
 
-function rmdir_recursively($dir)
+function rmdir_recursively(string $dir): void
 {
     if ($objs = glob($dir . "/*")) {
         foreach ($objs as $obj) {
@@ -216,7 +221,7 @@ function rmdir_recursively($dir)
     rmdir($dir);
 }
 
-function fPutQuotedCsv($handle, $row, $fd = ',', $quot = '"')
+function fPutQuotedCsv($handle, array $row, string $fd = ',', string $quot = '"'): int
 {
     $cells = array_map(function ($cell) use ($quot) {
         if (preg_match("/[;.\",\n]/", $cell)) {
@@ -233,7 +238,7 @@ function fPutQuotedCsv($handle, $row, $fd = ',', $quot = '"')
     return strlen($str);
 }
 
-function clear_folder($path)
+function clear_folder(string $path): void
 {
     $files = glob("$path/*");
 
@@ -301,7 +306,7 @@ function array_get_duplicates(array $array): array
  *
  * @return array
  */
-function array_unique_objects($objectsList, $filter = 'id')
+function array_unique_objects(array $objectsList, string|callable|array $filter = 'id'): array
 {
     $uniqueKeys = [];
 
@@ -341,7 +346,7 @@ function array_trim(array $array): array
     );
 }
 
-function array_remove_by_field($array, $fieldName, $fieldValue)
+function array_remove_by_field(array $array, string|int $fieldName, mixed $fieldValue): array
 {
     $array = array_values($array);
     $key = array_search($fieldValue, array_column($array, $fieldName));
@@ -352,11 +357,15 @@ function array_remove_by_field($array, $fieldName, $fieldValue)
     return array_values($array);
 }
 
-function array_remove_elements($array, $elements)
+function array_remove_elements(array $array, array $elements): array
 {
     return array_diff($array, $elements);
 }
 
+/**
+ * @deprecated use str_pad and mb_str_pad instead
+ * @codeCoverageIgnore
+ */
 function prepend_symbols($string, $expectedLength, $symbol)
 {
     while (strlen($string) < $expectedLength) {
@@ -366,7 +375,7 @@ function prepend_symbols($string, $expectedLength, $symbol)
     return $string;
 }
 
-function array_default(&$array, $key, $default)
+function array_default(array &$array, string|int $key, mixed $default): void
 {
     $array[$key] = Arr::get($array, $key, $default);
 }
