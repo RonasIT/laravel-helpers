@@ -56,21 +56,6 @@ $data = [
 $result = array_get_list($data, 'nested_values.*.next_level_of_nesting.*.value'); //['h', 'e', 'l', 'l', 'o'];
 ````
 
-### is_associative($array): bool
-
-Verifies whether `$array` is associative array or a list
-
-```php
-$associative = [
-    'key' => 'value'
-];
- 
-$list = ['some', 'values'];
-
-is_associative($associative); //true
-is_associative($list); //false
-````
-
 ### array_subtraction($array1, $array2): array
 
 Return subtraction of `$array2` from `$array1`

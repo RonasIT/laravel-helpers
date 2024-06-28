@@ -53,7 +53,7 @@ function array_get_list(array|string|null $array, array|string $path): mixed
         $values = array_map(function ($item) use ($path) {
             $value = array_get_list($item, $path);
 
-            if (!is_array($value) || is_associative($value)) {
+            if (!is_array($value) || Arr::isAssoc($value)) {
                 return [$value];
             }
 
@@ -66,18 +66,6 @@ function array_get_list(array|string|null $array, array|string $path): mixed
 
         return array_get_list($value, $path);
     }
-}
-
-/**
- * Verifies whether input is associative array or a list
- *
- * @param array $array
- *
- * @return boolean
- */
-function is_associative(array $array): bool
-{
-    return $array !== array_values($array);
 }
 
 /**
@@ -138,7 +126,7 @@ function mkdir_recursively(string $path): void
  */
 function array_equals(array $array1, array $array2): bool
 {
-    if (is_associative($array1)) {
+    if (Arr::isAssoc($array1)) {
         return array_equals_assoc($array1, $array2);
     }
 
