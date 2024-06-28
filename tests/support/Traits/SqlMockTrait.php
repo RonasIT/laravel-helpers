@@ -140,11 +140,11 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockCreate(array $selectResult): void
+    protected function mockCreate(array $selectResult, $notFillableValue): void
     {
         $this->mockInsert(
             'insert into `test_models` (`name`, `updated_at`, `created_at`) values (?, ?, ?)',
-            ['test_name', Carbon::now(), Carbon::now()]
+            ['test_name', $notFillableValue, Carbon::now()]
         );
 
         $this->mockSelectById(
@@ -157,7 +157,7 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockUpdate(array $selectResult): void
+    protected function mockUpdate(array $selectResult, $notFillableValue): void
     {
         $this->mockSelectById(
             'select `test_models`.*, (select count(*) from `relation_models` '
@@ -173,7 +173,7 @@ trait SqlMockTrait
 
         $this->mockUpdateSqlQuery(
             'update `test_models` set `name` = ?, `test_models`.`updated_at` = ? where `id` = ?',
-            ['test_name', Carbon::now(), 1]
+            ['test_name', $notFillableValue, 1]
         );
 
         $this->mockSelectById(

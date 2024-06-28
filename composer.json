@@ -10,22 +10,21 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
-    "laravel/framework": ">=8.83",
+    "php": ">=8.1",
+    "laravel/framework": ">=10.48",
     "guzzlehttp/guzzle": ">=6.0",
     "maatwebsite/excel": "3.*",
     "tecnickcom/tcpdf": "~6.7.4",
     "ext-json": "*",
-    "php-mock/php-mock-phpunit": "^2.9",
-    "doctrine/dbal": "^3.8"
+    "php-mock/php-mock-phpunit": "^2.9"
   },
   "require-dev": {
     "fakerphp/faker": "^1.23",
     "mockery/mockery": "1.*",
     "phpunit/phpunit": "9.*",
     "php-coveralls/php-coveralls": "^2.5",
-    "orchestra/testbench": "^6.25",
-    "mpyw/laravel-database-mock": "0.0.1-alpha4"
+    "orchestra/testbench": "^8.23",
+    "mpyw/laravel-database-mock": "0.0.1-alpha5"
   },
   "autoload": {
     "psr-4": {

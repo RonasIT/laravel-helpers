@@ -20,4 +20,9 @@ class TestRepository extends BaseRepository
     {
         return $this;
     }
+
+    public function getModelName(): string
+    {
+        return $this->getEntityName();
+    }
 }

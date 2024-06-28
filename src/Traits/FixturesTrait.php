@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
@@ -65,7 +66,7 @@ trait FixturesTrait
 
         $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
-        app('db.connection')->unprepared($dump);
+        Schema::getConnection()->unprepared($dump);
     }
 
     public function getFixturePath(string $fixtureName): string
@@ -135,10 +136,10 @@ trait FixturesTrait
     public function getClearPsqlDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE {$table['name']} RESTART IDENTITY CASCADE; \n";
             }
         });
     }
@@ -148,10 +149,10 @@ trait FixturesTrait
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
         $query .= array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table}; \n";
+                return "TRUNCATE TABLE {$table['name']}; \n";
             }
         });
 
@@ -192,9 +193,7 @@ trait FixturesTrait
     protected function getTables(): array
     {
         if (empty(self::$tables)) {
-            self::$tables = app('db.connection')
-                ->getDoctrineSchemaManager()
-                ->listTableNames();
+            self::$tables = Schema::getTables();
         }
 
         return self::$tables;

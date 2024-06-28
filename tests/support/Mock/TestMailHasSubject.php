@@ -11,7 +11,7 @@ class TestMailHasSubject extends TestMail
         $this->queue = 'different_queue';
     }
 
-    public function hasSubject(string $subject): bool
+    public function hasSubject($subject): bool
     {
         return ($this->subject === $subject);
     }

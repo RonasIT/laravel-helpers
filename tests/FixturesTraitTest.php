@@ -2,10 +2,12 @@
 
 namespace RonasIT\Support\Tests;
 
-use Doctrine\DBAL\Schema\MySQLSchemaManager;
-use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
@@ -111,9 +113,9 @@ class FixturesTraitTest extends HelpersTestCase
 
     public function testLoadEmptyTestDump()
     {
-        $connection = $this->mockNoCalls(Connection::class, null, true);
+        $db = $this->mockNoCalls(DatabaseManager::class, null, true);
 
-        $this->app->instance('db.connection', $connection);
+        $this->app->instance('db', $db);
         $this->dumpFileName = 'clear_database/empty_dump.sql';
 
         $this->loadTestDump();
@@ -121,12 +123,17 @@ class FixturesTraitTest extends HelpersTestCase
 
     public function testLoadTestDumpForMysql()
     {
-        $connection = $this->mockClass(Connection::class, [
+        $connection = $this->mockClass(MysqlConnection::class, [
             $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_mysql_db_query.sql')]),
             $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
 
-        $this->app->instance('db.connection', $connection);
+        $db = $this->mockClass(DatabaseManager::class, [
+            $this->functionCall('connection', [null], $connection),
+            $this->functionCall('connection', [null], $connection),
+        ], true);
+
+        $this->app->instance('db', $db);
         $this->dumpFileName = 'clear_database/dump.sql';
 
         Config::set('database.default', 'mysql');
@@ -138,12 +145,17 @@ class FixturesTraitTest extends HelpersTestCase
 
     public function testLoadTestDumpForPgsql()
     {
-        $connection = $this->mockClass(Connection::class, [
+        $connection = $this->mockClass(PostgresConnection::class, [
             $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_pgsql_db_query.sql')]),
             $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
 
-        $this->app->instance('db.connection', $connection);
+        $db = $this->mockClass(DatabaseManager::class, [
+            $this->functionCall('connection', [null], $connection),
+            $this->functionCall('connection', [null], $connection),
+        ], true);
+
+        $this->app->instance('db', $db);
         $this->dumpFileName = 'clear_database/dump.sql';
 
         Config::set('database.default', 'pgsql');
@@ -155,15 +167,19 @@ class FixturesTraitTest extends HelpersTestCase
 
     public function testGetTables()
     {
-        $mock = $this->mockClass(MySQLSchemaManager::class, [
-            $this->functionCall('listTableNames', [], $this->getJsonFixture('get_tables/tables.json')),
+        $mock = $this->mockClass(MySqlBuilder::class, [
+            $this->functionCall('getTables', [], $this->getJsonFixture('get_tables/tables.json')),
         ], true);
 
-        $connection = $this->mockClass(Connection::class, [
-            $this->functionCall('getDoctrineSchemaManager', [], $mock),
+        $connection = $this->mockClass(MySqlConnection::class, [
+            $this->functionCall('getSchemaBuilder', [], $mock),
         ], true);
 
-        $this->app->instance('db.connection', $connection);
+        $db = $this->mockClass(DatabaseManager::class, [
+            $this->functionCall('connection', [null], $connection),
+        ], true);
+
+        $this->app->instance('db', $db);
 
         Config::set('database.default', 'mysql');
 
@@ -177,14 +193,19 @@ class FixturesTraitTest extends HelpersTestCase
         $sequences = collect($this->getJsonFixture('prepare_sequences/information_schema.json'))
             ->map(fn($item) => (object) $item);
 
-        $connection = $this->mockClass(Connection::class, [
+        $connection = $this->mockClass(PostgresConnection::class, [
             $this->functionCall('getQueryGrammar', [], new Grammar),
             $this->functionCall('getPostProcessor', [], new Processor),
             $this->functionCall('select', [], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
-        $this->app->instance('db.connection', $connection);
+        $db = $this->mockClass(DatabaseManager::class, [
+            $this->functionCall('connection', [null], $connection),
+            $this->functionCall('connection', [null], $connection),
+        ], true);
+
+        $this->app->instance('db', $db);
 
         Config::set('database.default', 'pgsql');
 
