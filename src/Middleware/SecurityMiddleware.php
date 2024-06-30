@@ -10,8 +10,8 @@ class SecurityMiddleware
 {
     protected $cache;
 
-    const MAINTENANCE_MODE_KEY = 'maintenance_activated';
-    const MAINTENANCE_MODE_HEADER = 'maintenance';
+    public const MAINTENANCE_MODE_KEY = 'maintenance_activated';
+    public const MAINTENANCE_MODE_HEADER = 'maintenance';
 
     public function __construct(Repository $cache)
     {
@@ -66,7 +66,7 @@ class SecurityMiddleware
             Response::HTTP_INSUFFICIENT_STORAGE,
             Response::HTTP_LOOP_DETECTED,
             Response::HTTP_NOT_EXTENDED,
-            Response::HTTP_NETWORK_AUTHENTICATION_REQUIRED
+            Response::HTTP_NETWORK_AUTHENTICATION_REQUIRED,
         ];
     }
 }

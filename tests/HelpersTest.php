@@ -14,38 +14,38 @@ class HelpersTest extends HelpersTestCase
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods.*.zips.*.state',
-                'expected' => 'states.json'
+                'expected' => 'states.json',
             ],
             [
                 'input' => 'neighborhood.json',
                 'key' => 'zips.*.code',
-                'expected' => 'neighborhood.zips.codes.json'
+                'expected' => 'neighborhood.zips.codes.json',
             ],
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods.*.zips.*.code',
-                'expected' => 'city.neighborhoods.zips.codes.json'
+                'expected' => 'city.neighborhoods.zips.codes.json',
             ],
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods.*.zips',
-                'expected' => 'city.neighborhoods.zips.json'
+                'expected' => 'city.neighborhoods.zips.json',
             ],
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods',
-                'expected' => 'city.neighborhoods.json'
+                'expected' => 'city.neighborhoods.json',
             ],
             [
                 'input' => 'neighborhood.json',
                 'key' => 'zips',
-                'expected' => 'neighborhood.zips.json'
+                'expected' => 'neighborhood.zips.json',
             ],
             [
                 'input' => 'areas.json',
                 'key' => 'zips.*.area.houses.*.number',
-                'expected' => 'areas.houses.json'
-            ]
+                'expected' => 'areas.houses.json',
+            ],
         ];
     }
 
@@ -70,16 +70,16 @@ class HelpersTest extends HelpersTestCase
         return [
             [
                 'input' => 'areas.houses.json',
-                'expected' => false
+                'expected' => false,
             ],
             [
                 'input' => 'areas.json',
-                'expected' => false
+                'expected' => false,
             ],
             [
                 'input' => 'city.neighborhoods.json',
-                'expected' => true
-            ]
+                'expected' => true,
+            ],
         ];
     }
 
@@ -104,23 +104,23 @@ class HelpersTest extends HelpersTestCase
             [
                 'first_array' => 'array_equals/settings.json',
                 'second_array' => 'array_equals/settings_diff.json',
-                'expected' => false
+                'expected' => false,
             ],
             [
                 'first_array' => 'array_equals/settings_rather_types.json',
                 'second_array' => 'array_equals/settings_rather_types_diff_order.json',
-                'expected' => true
+                'expected' => true,
             ],
             [
                 'first_array' => 'array_equals/settings.json',
                 'second_array' => 'array_equals/settings_diff_order.json',
-                'expected' => true
+                'expected' => true,
             ],
             [
                 'first_array' => 'areas.houses.json',
                 'second_array' => 'array_equals/non_associative.json',
-                'expected' => true
-            ]
+                'expected' => true,
+            ],
         ];
     }
 
@@ -164,7 +164,7 @@ class HelpersTest extends HelpersTestCase
             [
                 'input' => 'array_get_duplicates/complex_array.json',
                 'expected' => 'array_get_duplicates/complex_array_duplicates.json',
-            ]
+            ],
         ];
     }
 
@@ -195,11 +195,11 @@ class HelpersTest extends HelpersTestCase
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key.json',
             ],
             [
-                'filter' => function($objet) {
+                'filter' => function ($objet) {
                     return $objet['id'];
                 },
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key.json',
-            ]
+            ],
         ];
     }
 
@@ -239,7 +239,7 @@ class HelpersTest extends HelpersTestCase
                 'field' => 'name',
                 'value' => 'test2',
                 'expected' => 'array_remove_by_field/result_remove_by_name.json',
-            ]
+            ],
         ];
     }
 
@@ -275,7 +275,7 @@ class HelpersTest extends HelpersTestCase
         $result = array_associate($input, function ($value, $key) {
             return [
                 'key' => "prepared_{$key}",
-                'value' => $value
+                'value' => $value,
             ];
         });
 

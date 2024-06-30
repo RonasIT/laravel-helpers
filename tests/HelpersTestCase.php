@@ -21,7 +21,7 @@ class HelpersTestCase extends BaseTest
     protected function getPackageProviders($app): array
     {
         return [
-            HelpersServiceProvider::class
+            HelpersServiceProvider::class,
         ];
     }
 

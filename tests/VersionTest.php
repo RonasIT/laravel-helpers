@@ -31,23 +31,23 @@ class VersionTest extends HelpersTestCase
         return [
             [
                 'version' => '1',
-                'assert' => true
+                'assert' => true,
             ],
             [
                 'version' => '1.0',
-                'assert' => false
+                'assert' => false,
             ],
             [
                 'version' => '0.99',
-                'assert' => false
+                'assert' => false,
             ],
             [
                 'version' => '1.01',
-                'assert' => false
+                'assert' => false,
             ],
             [
                 'version' => '10',
-                'assert' => false
+                'assert' => false,
             ],
         ];
     }
@@ -72,11 +72,11 @@ class VersionTest extends HelpersTestCase
         return [
             [
                 'version' => '1',
-                'assert' => true
+                'assert' => true,
             ],
             [
                 'version' => '10',
-                'assert' => false
+                'assert' => false,
             ],
         ];
     }

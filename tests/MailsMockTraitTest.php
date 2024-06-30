@@ -55,7 +55,7 @@ class MailsMockTraitTest extends HelpersTestCase
                 'fixture' => 'test_mail.html',
                 'subject' => 'Test Subject',
                 'from' => 'noreply@mail.net',
-            ]
+            ],
         ]);
     }
 
@@ -75,18 +75,18 @@ class MailsMockTraitTest extends HelpersTestCase
                 'from' => [
                     [
                         'address' => 'noreply@mail.net',
-                        'name' => 'Some sender'
+                        'name' => 'Some sender',
                     ],
                     [
                         'address' => 'noreply-second@mail.net',
-                        'name' => 'Some sender second case'
+                        'name' => 'Some sender second case',
                     ],
                     [
-                        'address' => 'noreply-withoutsender@mail.net'
+                        'address' => 'noreply-withoutsender@mail.net',
                     ],
                     [
                         'address' => 'noreply-withoutsender-second@mail.net',
-                        'name' => null
+                        'name' => null,
                     ],
                 ],
             ],
@@ -177,7 +177,7 @@ class MailsMockTraitTest extends HelpersTestCase
         $this->assertMailEquals(TestMailWithAttachments::class, [
             $this->mockedMail('test@mail.com', 'test_mail.html', 'subject', '', [
                 'attachment1',
-                ['file' => new \stdClass(), 'options' => ['some_options']]
+                ['file' => new \stdClass(), 'options' => ['some_options']],
             ]),
         ]);
     }

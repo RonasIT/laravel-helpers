@@ -9,17 +9,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TestModel extends Model
 {
-    use ModelTrait, SoftDeletes;
+    use ModelTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
         'json_field',
-        'castable_field'
+        'castable_field',
     ];
 
     protected $casts = [
         'json_field' => 'array',
-        'castable_field' => JSONCustomCast::class
+        'castable_field' => JSONCustomCast::class,
     ];
 
     public function relation(): HasMany

@@ -33,7 +33,7 @@ class ModelTestState extends Assert
         $this->assertEquals([
             'updated' => [],
             'created' => [],
-            'deleted' => []
+            'deleted' => [],
         ], $changes);
     }
 
@@ -71,7 +71,7 @@ class ModelTestState extends Assert
         return [
             'updated' => $this->prepareChanges($updatedRecords),
             'created' => $this->prepareChanges($updatedData->values()->toArray()),
-            'deleted' => $this->prepareChanges($deletedRecords)
+            'deleted' => $this->prepareChanges($deletedRecords),
         ];
     }
 

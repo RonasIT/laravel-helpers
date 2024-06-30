@@ -28,5 +28,3 @@ interface ExporterInterface
      */
     public function setType(string $type): self;
 }
-
-

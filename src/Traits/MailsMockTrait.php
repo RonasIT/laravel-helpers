@@ -13,7 +13,7 @@ trait MailsMockTrait
 
     private array $requiredExpectationParameters = [
         'emails',
-        'fixture'
+        'fixture',
     ];
 
     /**
