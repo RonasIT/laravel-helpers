@@ -1,3 +1,8 @@
-.idea
-.phpunit.result.cache
+/.phpunit.cache
+/.idea
+/.vscode
 vendor/
+.phpstorm.meta.php
+.phpunit.result.cache
+.php-cs-fixer.cache
+cghooks.lock
