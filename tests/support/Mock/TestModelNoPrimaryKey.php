@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TestModelNoPrimaryKey extends Model
 {
-    use ModelTrait, SoftDeletes;
+    use ModelTrait;
+    use SoftDeletes;
 
     protected $primaryKey = null;
 
     protected $fillable = [
         'name',
         'json_field',
-        'castable_field'
+        'castable_field',
     ];
 }

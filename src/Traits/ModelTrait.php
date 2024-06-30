@@ -14,7 +14,7 @@ trait ModelTrait
 
     public static function getFields(): array
     {
-        $model = (new static);
+        $model = (new static());
 
         $keyName = $model->getKeyName();
         $guarded = $model->getGuarded();
@@ -132,7 +132,7 @@ trait ModelTrait
             return explode('.', $relations);
         } else {
             return [
-                $relations
+                $relations,
             ];
         }
     }

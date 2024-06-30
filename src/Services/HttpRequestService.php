@@ -150,7 +150,7 @@ class HttpRequestService
             case 'delete':
                 $response = $client->delete($url, $this->options);
                 break;
-            default :
+            default:
                 throw new UnknownRequestMethodException($method);
         }
 
@@ -172,7 +172,7 @@ class HttpRequestService
             logger("sending {$typeOfRequest} request:", [
                 'url' => $url,
                 'data' => $data,
-                'headers' => $headers
+                'headers' => $headers,
             ]);
             logger('');
         }

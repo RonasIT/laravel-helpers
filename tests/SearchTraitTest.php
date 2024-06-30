@@ -72,7 +72,7 @@ class SearchTraitTest extends HelpersTestCase
                 'with_trashed' => true,
                 'only_trashed' => true,
                 'with' => ['relation'],
-                'with_count' => ['relation']
+                'with_count' => ['relation'],
             ]);
 
         $sql = $this->testRepositoryClass->getSearchQuery()->toSql();
@@ -95,7 +95,7 @@ class SearchTraitTest extends HelpersTestCase
     public function testGetSearchResultWithAll()
     {
         $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc', [
-            1, 2, 3
+            1, 2, 3,
         ]);
 
         $this->testRepositoryClass->searchQuery(['all' => true])->getSearchResults();
@@ -123,7 +123,7 @@ class SearchTraitTest extends HelpersTestCase
                 'with_trashed' => true,
                 'only_trashed' => true,
                 'with' => 'relation',
-                'with_count' => 'relation'
+                'with_count' => 'relation',
             ])
             ->getSearchResults();
 
@@ -188,7 +188,7 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
-                'query' => 'search_string'
+                'query' => 'search_string',
             ])
             ->filterByQuery(['query_field', 'another_query_field'])
             ->getSearchResults();
@@ -204,7 +204,7 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
-                'query' => 'search_string'
+                'query' => 'search_string',
             ])
             ->filterByQuery(['query_field', 'another_query_field'], "'%' || unaccent('{{ value }}') || '%'")
             ->getSearchResults();
@@ -217,14 +217,14 @@ class SearchTraitTest extends HelpersTestCase
         $this->mockGetSearchResultWithRelations($this->selectResult);
 
         $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
-            'relation_name'
+            'relation_name',
         ]);
 
         $this->testRepositoryClass
             ->searchQuery([
                 'query' => 'search_string',
                 'order_by' => 'relation.id',
-                'relation_name' => 'some_value'
+                'relation_name' => 'some_value',
             ])
             ->filterByQuery(['query_field', 'relation.another_query_field'])
             ->filterBy('relation.name', 'relation_name')

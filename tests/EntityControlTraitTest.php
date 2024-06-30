@@ -288,7 +288,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateOrCreate(1, ['name' => 'test_name']);
 
-       $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset($this->testRepositoryClass);
     }
 
     public function testUpdateOrCreateEntityDoesntExist()

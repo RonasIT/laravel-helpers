@@ -32,7 +32,7 @@ class FixturesTraitTest extends HelpersTestCase
     {
         return [
             [
-                'input' => 'get_fixture/exists_fixture.json'
+                'input' => 'get_fixture/exists_fixture.json',
             ],
         ];
     }
@@ -63,7 +63,7 @@ class FixturesTraitTest extends HelpersTestCase
         putenv('FAIL_EXPORT_JSON=false');
 
         $result = [
-            'value' => 1234567890
+            'value' => 1234567890,
         ];
 
         $this->exportJson('export_json/response.json', new TestResponse(
@@ -191,11 +191,11 @@ class FixturesTraitTest extends HelpersTestCase
     public function testPrepareSequences()
     {
         $sequences = collect($this->getJsonFixture('prepare_sequences/information_schema.json'))
-            ->map(fn($item) => (object) $item);
+            ->map(fn ($item) => (object) $item);
 
         $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('getQueryGrammar', [], new Grammar),
-            $this->functionCall('getPostProcessor', [], new Processor),
+            $this->functionCall('getQueryGrammar', [], new Grammar()),
+            $this->functionCall('getPostProcessor', [], new Processor()),
             $this->functionCall('select', [], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);

@@ -43,16 +43,16 @@ class HttpRequestServiceTest extends HelpersTestCase
                     'get',
                     'https://some.url.com',
                     ['some_key' => 'some_value'],
-                    ['some_header_name' => 'some_header_value']
+                    ['some_header_name' => 'some_header_value'],
                 ],
                 new GuzzleResponse(200, [], json_encode([]))
             ),
         ]);
 
         app(HttpRequestService::class)->get('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
-            'some_header_name' => 'some_header_value'
+            'some_header_name' => 'some_header_value',
         ]);
     }
 
@@ -63,7 +63,7 @@ class HttpRequestServiceTest extends HelpersTestCase
         $actualOptions = $this->optionsProperty->getValue($this->httpRequestServiceClass);
 
         $this->assertEquals([
-            'allow_redirects' => false
+            'allow_redirects' => false,
         ], $actualOptions);
     }
 
@@ -75,19 +75,19 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => false,
                 'connect_timeout' => 0,
-                'body' => '{"some_key":"some_value"}'
-            ]
+                'body' => '{"some_key":"some_value"}',
+            ],
         ]);
 
         $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
     }
 
@@ -99,19 +99,19 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 999,
-                'body' => '{"some_key":"some_value"}'
-            ]
+                'body' => '{"some_key":"some_value"}',
+            ],
         ]);
 
         $this->httpRequestServiceClass->post('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
     }
 
@@ -121,19 +121,19 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
-                'body' => '{"some_key":"some_value"}'
-            ]
+                'body' => '{"some_key":"some_value"}',
+            ],
         ]);
 
         $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
     }
 
@@ -144,22 +144,22 @@ class HttpRequestServiceTest extends HelpersTestCase
             [
                 'headers' => [
                     'some_header' => 'some_header_value',
-                    'Content-type' => 'application/x-www-form-urlencoded'
+                    'Content-type' => 'application/x-www-form-urlencoded',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
                 'form_params' => [
-                    'some_key' => 'some_value'
-                ]
-            ]
+                    'some_key' => 'some_value',
+                ],
+            ],
         ]);
 
         $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
             'some_header' => 'some_header_value',
-            'Content-type' => 'application/x-www-form-urlencoded'
+            'Content-type' => 'application/x-www-form-urlencoded',
         ]);
     }
 
@@ -167,19 +167,19 @@ class HttpRequestServiceTest extends HelpersTestCase
     {
         return [
             [
-                'headers' => ['content-type' => 'application/json']
+                'headers' => ['content-type' => 'application/json'],
             ],
             [
-                'headers' => ['Content-Type' => 'application/json']
+                'headers' => ['Content-Type' => 'application/json'],
             ],
             [
-                'headers' => ['CONTENT-TYPE' => 'application/json']
+                'headers' => ['CONTENT-TYPE' => 'application/json'],
             ],
             [
-                'headers' => ['Content-type' => 'application/json']
+                'headers' => ['Content-type' => 'application/json'],
             ],
             [
-                'headers' => ['CoNtEnT-TyPe' => 'application/json']
+                'headers' => ['CoNtEnT-TyPe' => 'application/json'],
             ],
         ];
     }
@@ -199,13 +199,13 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
                 'json' => [
-                    'some_key' => 'some_value'
-                ]
-            ]
+                    'some_key' => 'some_value',
+                ],
+            ],
         ]);
 
         $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], $headers);
     }
 
@@ -215,16 +215,16 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
-                'connect_timeout' => 0
-            ]
+                'connect_timeout' => 0,
+            ],
         ]);
 
         $this->httpRequestServiceClass->delete('https://some.url.com', [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
     }
 
@@ -234,19 +234,19 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
-                'body' => '{"some_key":"some_value"}'
-            ]
+                'body' => '{"some_key":"some_value"}',
+            ],
         ]);
 
         $this->httpRequestServiceClass->patch('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
     }
 
@@ -266,19 +266,19 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
-                'query' => ['user' => 'admin']
-            ]
+                'query' => ['user' => 'admin'],
+            ],
         ], new GuzzleResponse(200, [], $responseJson));
 
         $this->httpRequestServiceClass->get('https://some.url.com', [
             'user' => 'admin',
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
 
         $resultRaw = $this->httpRequestServiceClass->getResponse()->getBody();
@@ -296,16 +296,16 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
-                'connect_timeout' => 0
-            ]
+                'connect_timeout' => 0,
+            ],
         ], new GuzzleResponse(200, [], 'Some not json string'));
 
         $this->httpRequestServiceClass->get('https://some.url.com', [], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
 
         $this->httpRequestServiceClass->json();
@@ -320,7 +320,7 @@ class HttpRequestServiceTest extends HelpersTestCase
         $mock
             ->expects($this->once())
             ->method('sendRequest')
-            ->will($this->returnCallback(function() use ($mock) {
+            ->will($this->returnCallback(function () use ($mock) {
                 $response = new GuzzleResponse(200, [], null);
                 throw new RequestException('Some exception message', new Request('type', 'url'));
             }));

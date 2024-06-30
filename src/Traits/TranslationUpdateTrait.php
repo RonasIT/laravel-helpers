@@ -2,7 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
-use Illuminate\Support\Arr; 
+use Illuminate\Support\Arr;
 
 trait TranslationUpdateTrait
 {
@@ -14,7 +14,7 @@ trait TranslationUpdateTrait
             return $this->update(['id' => $id], $data);
         }
 
-        $modelInstance = new $this->model;
+        $modelInstance = new $this->model();
 
         $foreignKey = $modelInstance->allTranslations()->getForeignKeyName();
 
@@ -23,7 +23,7 @@ trait TranslationUpdateTrait
         foreach ($translations as $translation) {
             $translationModel::where([
                 $foreignKey => $id,
-                'locale' => $translation['locale']
+                'locale' => $translation['locale'],
             ])->update($translation);
         }
 

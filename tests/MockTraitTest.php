@@ -11,7 +11,7 @@ class MockTraitTest extends HelpersTestCase
     public function testMockSingleCall()
     {
         $this->mockNativeFunction('RonasIT\Support\Tests', [
-            $this->functionCall('random_bytes', [20], '1234567890')
+            $this->functionCall('random_bytes', [20], '1234567890'),
         ]);
 
         $this->assertEquals('1234567890', random_bytes(20));
@@ -26,7 +26,7 @@ class MockTraitTest extends HelpersTestCase
             $this->functionCall('rand', [0, 9], 2),
         ]);
 
-        $generate = function(int $length): string {
+        $generate = function (int $length): string {
             $code = '';
 
             for ($i = 0; $i < $length; $i++) {

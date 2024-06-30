@@ -81,7 +81,7 @@ trait EntityControlTrait
 
         if (!empty($this->attachedRelationsCount)) {
             foreach ($this->attachedRelationsCount as $requestedRelations) {
-                list ($countRelation, $relation) = extract_last_part($requestedRelations);
+                list($countRelation, $relation) = extract_last_part($requestedRelations);
 
                 if (empty($relation)) {
                     $query->withCount($countRelation);
@@ -89,7 +89,7 @@ trait EntityControlTrait
                     $query->with([
                         $relation => function ($query) use ($countRelation) {
                             $query->withCount($countRelation);
-                        }
+                        },
                     ]);
                 }
             }

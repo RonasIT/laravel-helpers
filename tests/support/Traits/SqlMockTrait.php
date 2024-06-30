@@ -435,8 +435,7 @@ trait SqlMockTrait
         bool $isExist,
         string $table = 'clients',
         string $keyField = 'user_id'
-    ): void
-    {
+    ): void {
         $this->mockSelectExists(
             "select exists(select * from `{$table}` where `{$keyField}` in (?, ?, ?)) as `exists`",
             $isExist,

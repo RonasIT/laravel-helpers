@@ -96,7 +96,7 @@ class ValidatorTest extends HelpersTestCase
                         'id' => 3,
                         'name' => 'name3',
                     ],
-                ]
+                ],
             ],
             [
                 'ids' => 'list_exists:clients,user_id,id',

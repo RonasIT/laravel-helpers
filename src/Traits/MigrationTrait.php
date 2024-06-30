@@ -24,7 +24,8 @@ trait MigrationTrait
                     ->references('id')
                     ->on($this->getTableName($toEntity))
                     ->onDelete($onDelete);
-            });
+            }
+        );
     }
 
     public function dropForeignKey($fromEntity, $toEntity, $needDropField = false)
