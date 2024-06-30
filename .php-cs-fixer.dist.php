@@ -1,8 +1,7 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude(['docker', 'k8s', 'vendor', 'bootstrap/cache'])
-    ->notPath(['_ide_helper.php', '_ide_helper_models.php'])
+    ->exclude(['docker', 'vendor', 'bootstrap/cache'])
     ->in(__DIR__);
 
 $config = new PhpCsFixer\Config();

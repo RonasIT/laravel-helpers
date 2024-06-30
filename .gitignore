@@ -2,6 +2,7 @@
 /.idea
 /.vscode
 vendor/
+storage/app
 .phpstorm.meta.php
 .phpunit.result.cache
 .php-cs-fixer.cache
