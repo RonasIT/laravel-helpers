@@ -253,6 +253,44 @@ class SearchTraitTest extends HelpersTestCase
             ->getSearchResults();
     }
 
+    public function testSearchQueryWithNullFilters()
+    {
+        $this->mockSelectWithAggregate(
+            'select count(*) as aggregate from `test_models` where `user_id` is null and `test_models`.`deleted_at` is null'
+        );
+
+        $this->mockSelect(
+            'select * from `test_models` where `user_id` is null and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0'
+        );
+
+        $this->testRepositoryClass
+            ->searchQuery(['user_id' => null])
+            ->getSearchResults();
+    }
+
+    public function testSearchQueryWithListFilters()
+    {
+        $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
+            'user_id'
+        ]);
+
+        $this->mockSelectWithAggregate(
+            'select count(*) as aggregate from `test_models` where `user_id` in (?, ?, ?) and `test_models`.`deleted_at` is null',
+            [1, 2, 3]
+        );
+
+        $this->mockSelect(
+            'select * from `test_models` where `user_id` in (?, ?, ?) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0',
+            [],
+            [1, 2, 3]
+        );
+
+        $this->testRepositoryClass
+            ->searchQuery(['user_id' => [1, 2, 3]])
+            ->filterByList('user_id')
+            ->getSearchResults();
+    }
+
     public function testSearchQueryWithFiltersFunctions()
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
