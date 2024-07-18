@@ -57,9 +57,7 @@ trait SearchTrait
      */
     public function filterBy(string $field, ?string $filterName = null): self
     {
-        if (empty($filterName)) {
-            $filterName = $this->getFilterName($field);
-        }
+        $filterName ??= $this->getFilterName($field);
 
         if (Arr::has($this->filter, $filterName)) {
             $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
@@ -72,9 +70,7 @@ trait SearchTrait
 
     public function filterByList(string $field, ?string $filterName = null): self
     {
-        if (empty($filterName)) {
-            $filterName = $this->getFilterName($field);
-        }
+        $filterName ??= $this->getFilterName($field);
 
         if (Arr::has($this->filter, $filterName)) {
             $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
@@ -398,11 +394,9 @@ trait SearchTrait
     protected function getFilterName(string $field): string
     {
         if (Str::contains($field, '.')) {
-            list ($filterName) = extract_last_part($field);
-        } else {
-            $filterName = $field;
+            [$field] = extract_last_part($field);
         }
 
-        return $filterName;
+        return $field;
     }
 }
