@@ -57,19 +57,24 @@ trait SearchTrait
      */
     public function filterBy(string $field, ?string $filterName = null): self
     {
-        if (empty($filterName)) {
-            if (Str::contains($field, '.')) {
-                list ($filterName) = extract_last_part($field);
-            } else {
-                $filterName = $field;
-            }
-        }
+        $filterName ??= $this->getFilterName($field);
 
         if (Arr::has($this->filter, $filterName)) {
-            $values = Arr::wrap($this->filter[$filterName]);
+            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
+                $query->where($conditionField, $this->filter[$filterName]);
+            });
+        }
 
-            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($values) {
-                $query->whereIn($conditionField, $values);
+        return $this;
+    }
+
+    public function filterByList(string $field, ?string $filterName = null): self
+    {
+        $filterName ??= $this->getFilterName($field);
+
+        if (Arr::has($this->filter, $filterName)) {
+            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
+                $query->whereIn($conditionField, $this->filter[$filterName]);
             });
         }
 
@@ -145,7 +150,7 @@ trait SearchTrait
                     $this->filterTo($field, false, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_in_list')) {
                     $field = Str::replace('_in_list', '', $fieldName);
-                    $this->query->whereIn($field, $value);
+                    $this->filterByList($field, $fieldName);
                 } else {
                     $this->filterBy($fieldName);
                 }
@@ -384,5 +389,14 @@ trait SearchTrait
             $this->with([]);
             $this->withCount([]);
         }
+    }
+
+    protected function getFilterName(string $field): string
+    {
+        if (Str::contains($field, '.')) {
+            [$field] = extract_last_part($field);
+        }
+
+        return $field;
     }
 }

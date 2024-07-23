@@ -346,7 +346,7 @@ trait SqlMockTrait
             . "where ((`query_field` like '%search_string%') or exists (select * from `relation_models` "
             . "where `test_models`.`id` = `relation_models`.`test_model_id` "
             . "and (`another_query_field` like '%search_string%'))) and exists (select * from `relation_models` "
-            . "where `test_models`.`id` = `relation_models`.`test_model_id` and `name` in (?)) "
+            . "where `test_models`.`id` = `relation_models`.`test_model_id` and `name` = ?) "
             . "and `test_models`.`deleted_at` is null",
             ['some_value']
         );
@@ -359,7 +359,7 @@ trait SqlMockTrait
             . "where `test_models`.`id` = `relation_models`.`test_model_id` "
             . "and (`another_query_field` like '%search_string%'))) and "
             . "exists (select * from `relation_models` where `test_models`.`id` = `relation_models`.`test_model_id` "
-            . "and `name` in (?)) and `test_models`.`deleted_at` is null "
+            . "and `name` = ?) and `test_models`.`deleted_at` is null "
             . "order by `relation_id` asc, `id` asc limit 15 offset 0",
             $selectResult,
             ['some_value'],
@@ -370,7 +370,7 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             "select count(*) as aggregate from `test_models` where `user_id` in (?, ?) and `user_id` "
-            . "not in (?, ?) and `name` in (?) and `date` >= ? and `date` <= ? "
+            . "not in (?, ?) and `name` = ? and `date` >= ? and `date` <= ? "
             . "and `created_at` >= ? and `created_at` <= ? and `updated_at` > ? "
             . "and `updated_at` < ? and `test_models`.`deleted_at` is null",
             [
@@ -390,7 +390,7 @@ trait SqlMockTrait
 
         $this->mockSelect(
             "select * from `test_models` where `user_id` in (?, ?) and `user_id` not in (?, ?) "
-            . "and `name` in (?) and `date` >= ? and `date` <= ? and `created_at` >= ? and `created_at` <= ? "
+            . "and `name` = ? and `date` >= ? and `date` <= ? and `created_at` >= ? and `created_at` <= ? "
             . "and `updated_at` > ? and `updated_at` < ? and `test_models`.`deleted_at` is null "
             . "order by `id` asc limit 15 offset 0",
             $selectResult,
