@@ -85,8 +85,8 @@ class HelpersServiceProvider extends ServiceProvider
         $versionRange = function (
             ?Version $start,
             ?Version $end,
-            ?string  $param,
-            Route    $instance = null
+            ?string $param,
+            Route $instance = null
         ) {
             if (!$param) {
                 $param = 'version';
@@ -125,7 +125,7 @@ class HelpersServiceProvider extends ServiceProvider
 
         RouteFacade::macro(
             'versionRange',
-            fn (Version $from, Version $to, string  $param = null) => $versionRange($from, $to, $param)
+            fn (Version $from, Version $to, string $param = null) => $versionRange($from, $to, $param)
         );
         RouteFacade::macro('versionFrom', fn (Version $from, $param = null) => $versionRange($from, null, $param));
         RouteFacade::macro('versionTo', fn (Version $to, $param = null) => $versionRange(null, $to, $param));
