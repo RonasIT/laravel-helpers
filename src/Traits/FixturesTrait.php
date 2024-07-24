@@ -139,7 +139,7 @@ trait FixturesTrait
             if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table['name']} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE \"{$table['name']}\" RESTART IDENTITY CASCADE;\n";
             }
         });
     }
@@ -152,7 +152,7 @@ trait FixturesTrait
             if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table['name']}; \n";
+                return "TRUNCATE TABLE \"{$table['name']}\";\n";
             }
         });
 
