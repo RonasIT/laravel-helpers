@@ -282,7 +282,10 @@ trait SearchTrait
     {
         return function ($query) use ($field, $mask) {
             $databaseDriver = config('database.default');
-            $value = str_replace('{{ value }}', $this->filter['query'], $mask);
+            $value = ($databaseDriver === 'pgsql')
+                ? pg_escape_string($this->filter['query'])
+                : addslashes($this->filter['query']);
+            $value = str_replace('{{ value }}', $value, $mask);
             $operator = ($databaseDriver === 'pgsql')
                 ? 'ilike'
                 : 'like';

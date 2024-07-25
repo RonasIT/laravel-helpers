@@ -309,13 +309,13 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             "select count(*) as aggregate from `test_models` "
-            . "where ((`query_field` like '%search_string%') or (`another_query_field` like '%search_string%')) "
-            . "and `test_models`.`deleted_at` is null"
+            . "where ((`query_field` like '%search_\'string%') or (`another_query_field` like '%search_\'string%')) "
+            . 'and `test_models`.`deleted_at` is null'
         );
 
         $this->mockSelect(
-            "select * from `test_models` where ((`query_field` like '%search_string%') "
-            . "or (`another_query_field` like '%search_string%')) and `test_models`.`deleted_at` is null "
+            "select * from `test_models` where ((`query_field` like '%search_\'string%') "
+            . "or (`another_query_field` like '%search_\'string%')) and `test_models`.`deleted_at` is null "
             . "order by `id` asc limit 15 offset 0",
             $selectResult
         );
@@ -325,15 +325,15 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
-            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\') '
-            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\')) '
+            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
+            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null'
         );
 
         $this->mockSelect(
             'select * from "test_models" '
-            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\') '
-            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_string\') || \'%\')) '
+            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
+            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
             $selectResult
         );

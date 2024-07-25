@@ -188,7 +188,7 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
-                'query' => 'search_string'
+                'query' => 'search_\'string'
             ])
             ->filterByQuery(['query_field', 'another_query_field'])
             ->getSearchResults();
@@ -204,7 +204,7 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
-                'query' => 'search_string'
+                'query' => 'search_\'string'
             ])
             ->filterByQuery(['query_field', 'another_query_field'], "'%' || unaccent('{{ value }}') || '%'")
             ->getSearchResults();
