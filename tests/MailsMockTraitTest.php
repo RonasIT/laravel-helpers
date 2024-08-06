@@ -43,9 +43,7 @@ class MailsMockTraitTest extends HelpersTestCase
         $mail = (new TestMail(['name' => 'John Smith']))->onQueue('different_queue');
         Mail::to('test@mail.com')->queue($mail);
 
-        Mail::assertQueued(function (TestMail $mail) {
-            return ($mail->queue === 'different_queue');
-        });
+        Mail::assertQueued(fn (TestMail $mail) => $mail->queue === 'different_queue');
     }
 
     public function testLegacyMail()
