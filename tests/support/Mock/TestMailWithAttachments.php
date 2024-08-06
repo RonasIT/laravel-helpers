@@ -2,13 +2,11 @@
 
 namespace RonasIT\Support\Tests\Support\Mock;
 
-use RonasIT\Support\Mail\BaseMail;
-
-class TestMailWithAttachments extends BaseMail
+class TestMailWithAttachments extends TestMail
 {
-    public function __construct(array $viewData, $subject, $view)
+    public function __construct(array $viewData)
     {
-        parent::__construct($viewData, $subject, $view);
+        parent::__construct($viewData);
 
         $this->setAddress('noreply@mail.net', null, 'from');
     }
