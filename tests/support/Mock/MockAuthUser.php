@@ -6,22 +6,22 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class MockAuthUser implements Authenticatable
 {
-    public function getAuthIdentifierName()
+    public function getAuthIdentifierName(): string
     {
         return 'some_auth_identifier_name';
     }
 
-    public function getAuthIdentifier()
+    public function getAuthIdentifier(): string
     {
         return 'some_auth_identifier';
     }
 
-    public function getAuthPassword()
+    public function getAuthPassword(): string
     {
         return 'some_auth_password';
     }
 
-    public function getRememberToken()
+    public function getRememberToken(): string
     {
         return 'some_remember_token';
     }
@@ -30,8 +30,13 @@ class MockAuthUser implements Authenticatable
     {
     }
 
-    public function getRememberTokenName()
+    public function getRememberTokenName(): string
     {
         return 'some_remember_token_name';
+    }
+
+    public function getAuthPasswordName(): string
+    {
+        return 'password';
     }
 }

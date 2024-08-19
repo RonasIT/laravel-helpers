@@ -10,8 +10,8 @@
     }
   ],
   "require": {
-    "php": ">=8.1",
-    "laravel/framework": ">=10.48",
+    "php": ">=8.2",
+    "laravel/framework": ">=11.0",
     "guzzlehttp/guzzle": ">=6.0",
     "maatwebsite/excel": "3.*",
     "tecnickcom/tcpdf": "~6.7.4",
@@ -21,9 +21,9 @@
   "require-dev": {
     "fakerphp/faker": "^1.23",
     "mockery/mockery": "1.*",
-    "phpunit/phpunit": "9.*",
-    "php-coveralls/php-coveralls": "^2.5",
-    "orchestra/testbench": "^8.23",
+    "phpunit/phpunit": "^10.1",
+    "php-coveralls/php-coveralls": "^2.7",
+    "orchestra/testbench": "^9.1",
     "mpyw/laravel-database-mock": "0.0.1-alpha5",
     "friendsofphp/php-cs-fixer": "^3.59",
     "brainmaestro/composer-git-hooks": "^3.0"

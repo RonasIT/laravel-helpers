@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
@@ -43,7 +44,7 @@ class HttpRequestServiceTest extends HelpersTestCase
                     'get',
                     'https://some.url.com',
                     ['some_key' => 'some_value'],
-                    ['some_header_name' => 'some_header_value']
+                    ['some_header_name' => 'some_header_value'],
                 ],
                 new GuzzleResponse(200, [], json_encode([]))
             ),
@@ -62,9 +63,7 @@ class HttpRequestServiceTest extends HelpersTestCase
 
         $actualOptions = $this->optionsProperty->getValue($this->httpRequestServiceClass);
 
-        $this->assertEquals([
-            'allow_redirects' => false
-        ], $actualOptions);
+        $this->assertEquals(['allow_redirects' => false], $actualOptions);
     }
 
     public function testAllowRedirects()
@@ -75,19 +74,19 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => false,
                 'connect_timeout' => 0,
-                'body' => '{"some_key":"some_value"}'
-            ]
+                'body' => '{"some_key":"some_value"}',
+            ],
         ]);
 
         $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
     }
 
@@ -99,19 +98,19 @@ class HttpRequestServiceTest extends HelpersTestCase
             'https://some.url.com',
             [
                 'headers' => [
-                    'some_header' => 'some_header_value'
+                    'some_header' => 'some_header_value',
                 ],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 999,
-                'body' => '{"some_key":"some_value"}'
-            ]
+                'body' => '{"some_key":"some_value"}',
+            ],
         ]);
 
         $this->httpRequestServiceClass->post('https://some.url.com', [
-            'some_key' => 'some_value'
+            'some_key' => 'some_value',
         ], [
-            'some_header' => 'some_header_value'
+            'some_header' => 'some_header_value',
         ]);
     }
 
@@ -163,7 +162,7 @@ class HttpRequestServiceTest extends HelpersTestCase
         ]);
     }
 
-    public function sendPutAsJSONData(): array
+    public static function sendPutAsJSONData(): array
     {
         return [
             [
@@ -184,11 +183,7 @@ class HttpRequestServiceTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendPutAsJSONData
-     *
-     * @param array $headers
-     */
+    #[DataProvider('sendPutAsJSONData')]
     public function testSendPutAsJSON(array $headers)
     {
         $this->mockGuzzleClient('put', [
@@ -199,9 +194,9 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
                 'json' => [
-                    'some_key' => 'some_value'
-                ]
-            ]
+                    'some_key' => 'some_value',
+                ],
+            ],
         ]);
 
         $this->httpRequestServiceClass->put('https://some.url.com', [

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -28,20 +29,16 @@ class FixturesTraitTest extends HelpersTestCase
         self::$tables = null;
     }
 
-    public function getFixtureData(): array
+    public static function getFixtureData(): array
     {
         return [
             [
-                'input' => 'get_fixture/exists_fixture.json'
+                'input' => 'get_fixture/exists_fixture.json',
             ],
         ];
     }
 
-    /**
-     * @dataProvider getFixtureData
-     *
-     * @param string $input
-     */
+    #[DataProvider('getFixtureData')]
     public function testGetFixture(string $input)
     {
         $response = $this->getJsonFixture($input);
@@ -63,7 +60,7 @@ class FixturesTraitTest extends HelpersTestCase
         putenv('FAIL_EXPORT_JSON=false');
 
         $result = [
-            'value' => 1234567890
+            'value' => 1234567890,
         ];
 
         $this->exportJson('export_json/response.json', new TestResponse(
@@ -91,8 +88,8 @@ class FixturesTraitTest extends HelpersTestCase
         $this->exportFile($response, 'export_file/content_result.txt');
 
         $this->assertEquals(
-            $this->getJsonFixture('export_file/result.txt'),
-            $this->getJsonFixture('export_file/content_result.txt')
+            expected: $this->getJsonFixture('export_file/result.txt'),
+            actual: $this->getJsonFixture('export_file/content_result.txt'),
         );
     }
 
