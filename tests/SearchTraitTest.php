@@ -72,7 +72,7 @@ class SearchTraitTest extends HelpersTestCase
                 'with_trashed' => true,
                 'only_trashed' => true,
                 'with' => ['relation'],
-                'with_count' => ['relation']
+                'with_count' => ['relation'],
             ]);
 
         $sql = $this->testRepositoryClass->getSearchQuery()->toSql();
@@ -94,7 +94,7 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResultWithAll()
     {
-        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc', [
+        $this->mockSelect('select * from "test_models" where "test_models"."deleted_at" is null order by "id" asc', [
             1, 2, 3
         ]);
 
@@ -103,7 +103,7 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResultWithAllAndParams()
     {
-        $this->mockSelect('select * from `test_models` where `test_models`.`deleted_at` is null order by `id` asc', []);
+        $this->mockSelect('select * from "test_models" where "test_models"."deleted_at" is null order by "id" asc', []);
 
         $this->testRepositoryClass
             ->searchQuery([
@@ -123,7 +123,7 @@ class SearchTraitTest extends HelpersTestCase
                 'with_trashed' => true,
                 'only_trashed' => true,
                 'with' => 'relation',
-                'with_count' => 'relation'
+                'with_count' => 'relation',
             ])
             ->getSearchResults();
 
@@ -144,7 +144,7 @@ class SearchTraitTest extends HelpersTestCase
     public function testGetSearchResultAggregateIsNull()
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from `test_models` where `test_models`.`deleted_at` is null',
+            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is null',
             [],
             null
         );
@@ -188,7 +188,7 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
-                'query' => 'search_\'string'
+                'query' => 'search_\'string',
             ])
             ->filterByQuery(['query_field', 'another_query_field'])
             ->getSearchResults();
@@ -204,7 +204,7 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->testRepositoryClass
             ->searchQuery([
-                'query' => 'search_\'string'
+                'query' => 'search_\'string',
             ])
             ->filterByQuery(['query_field', 'another_query_field'], "'%' || unaccent('{{ value }}') || '%'")
             ->getSearchResults();
@@ -217,14 +217,14 @@ class SearchTraitTest extends HelpersTestCase
         $this->mockGetSearchResultWithRelations($this->selectResult);
 
         $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
-            'relation_name'
+            'relation_name',
         ]);
 
         $this->testRepositoryClass
             ->searchQuery([
                 'query' => 'search_string',
                 'order_by' => 'relation.id',
-                'relation_name' => 'some_value'
+                'relation_name' => 'some_value',
             ])
             ->filterByQuery(['query_field', 'relation.another_query_field'])
             ->filterBy('relation.name', 'relation_name')
@@ -256,11 +256,11 @@ class SearchTraitTest extends HelpersTestCase
     public function testSearchQueryWithNullFilters()
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from `test_models` where `user_id` is null and `test_models`.`deleted_at` is null'
+            'select count(*) as aggregate from "test_models" where "user_id" is null and "test_models"."deleted_at" is null'
         );
 
         $this->mockSelect(
-            'select * from `test_models` where `user_id` is null and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0'
+            'select * from "test_models" where "user_id" is null and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0'
         );
 
         $this->testRepositoryClass
@@ -271,16 +271,16 @@ class SearchTraitTest extends HelpersTestCase
     public function testSearchQueryWithListFilters()
     {
         $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
-            'user_id'
+            'user_id',
         ]);
 
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from `test_models` where `user_id` in (?, ?, ?) and `test_models`.`deleted_at` is null',
+            'select count(*) as aggregate from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null',
             [1, 2, 3]
         );
 
         $this->mockSelect(
-            'select * from `test_models` where `user_id` in (?, ?, ?) and `test_models`.`deleted_at` is null order by `id` asc limit 15 offset 0',
+            'select * from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
             [],
             [1, 2, 3]
         );
