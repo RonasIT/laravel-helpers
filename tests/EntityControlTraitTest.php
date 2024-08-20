@@ -13,7 +13,9 @@ class EntityControlTraitTest extends HelpersTestCase
 {
     use SqlMockTrait;
 
-    protected TestRepository $testRepositoryClass;
+    protected static array $selectResult;
+
+    protected static TestRepository $testRepositoryClass;
 
     protected ReflectionProperty $onlyTrashedProperty;
     protected ReflectionProperty $withTrashedProperty;
@@ -21,84 +23,77 @@ class EntityControlTraitTest extends HelpersTestCase
     protected ReflectionProperty $attachedRelationsProperty;
     protected ReflectionProperty $attachedRelationsCountProperty;
 
-    protected array $selectResult;
-
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->testRepositoryClass = new TestRepository();
+        self::$testRepositoryClass ??= new TestRepository();
 
         $this->onlyTrashedProperty = new ReflectionProperty(TestRepository::class, 'onlyTrashed');
-        $this->onlyTrashedProperty->setAccessible(true);
 
         $this->withTrashedProperty = new ReflectionProperty(TestRepository::class, 'withTrashed');
-        $this->withTrashedProperty->setAccessible(true);
 
         $this->forceModeProperty = new ReflectionProperty(TestRepository::class, 'forceMode');
-        $this->forceModeProperty->setAccessible(true);
 
         $this->attachedRelationsProperty = new ReflectionProperty(TestRepository::class, 'attachedRelations');
-        $this->attachedRelationsProperty->setAccessible(true);
 
         $this->attachedRelationsCountProperty = new ReflectionProperty(TestRepository::class, 'attachedRelationsCount');
-        $this->attachedRelationsCountProperty->setAccessible(true);
 
-        $this->selectResult = $this->getJsonFixture('select_query_result.json');
+        self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
 
         Carbon::setTestNow('2020-01-01 00:00:00');
     }
 
     public function testOnlyTrashed()
     {
-        $this->testRepositoryClass->onlyTrashed();
+        self::$testRepositoryClass->onlyTrashed();
 
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue(self::$testRepositoryClass);
 
         $this->assertTrue($onlyTrashed);
     }
 
     public function testWithTrashed()
     {
-        $this->testRepositoryClass->withTrashed();
+        self::$testRepositoryClass->withTrashed();
 
-        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
+        $withTrashed = $this->withTrashedProperty->getValue(self::$testRepositoryClass);
 
         $this->assertTrue($withTrashed);
     }
 
     public function testForce()
     {
-        $this->testRepositoryClass->force();
+        self::$testRepositoryClass->force();
 
-        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
+        $forceMode = $this->forceModeProperty->getValue(self::$testRepositoryClass);
 
         $this->assertTrue($forceMode);
     }
 
     public function testWith()
     {
-        $this->testRepositoryClass->with('relation');
+        self::$testRepositoryClass->with('relation');
 
-        $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
+        $attachedRelations = $this->attachedRelationsProperty->getValue(self::$testRepositoryClass);
 
         $this->assertEquals(['relation'], $attachedRelations);
     }
 
     public function testWithCount()
     {
-        $this->testRepositoryClass->withCount('relation');
+        self::$testRepositoryClass->withCount('relation');
 
-        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
+        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue(self::$testRepositoryClass);
 
         $this->assertEquals(['relation'], $attachedRelationsCount);
     }
 
     public function testAll()
     {
-        $this->mockAll($this->selectResult);
+        $this->mockAll(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->with('relation')
@@ -106,7 +101,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->force()
             ->all();
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testAllEmptyResult()
@@ -117,7 +112,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->with('relation')
@@ -125,7 +120,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->force()
             ->all();
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testExists()
@@ -136,7 +131,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -144,7 +139,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->exists(['id' => 1]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testExistsBy()
@@ -155,7 +150,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -163,14 +158,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->existsBy('id', 1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testCreate()
     {
-        $this->mockCreate($this->selectResult, null);
+        $this->mockCreate(self::$selectResult, null);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -181,14 +176,14 @@ class EntityControlTraitTest extends HelpersTestCase
                 'updated_at' => null,
             ]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testCreateOnlyFillable()
     {
-        $this->mockCreate($this->selectResult, Carbon::now());
+        $this->mockCreate(self::$selectResult, Carbon::now());
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->with('relation')
@@ -198,7 +193,7 @@ class EntityControlTraitTest extends HelpersTestCase
                 'updated_at' => null,
             ]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testUpdateMany()
@@ -210,7 +205,7 @@ class EntityControlTraitTest extends HelpersTestCase
             1
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -218,14 +213,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateMany(1, ['name' => 'test_name']);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testUpdate()
     {
-        $this->mockUpdate($this->selectResult, null);
+        $this->mockUpdate(self::$selectResult, null);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -236,14 +231,14 @@ class EntityControlTraitTest extends HelpersTestCase
                 'updated_at' => null,
             ]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testUpdateOnlyFillable()
     {
-        $this->mockUpdate($this->selectResult, Carbon::now());
+        $this->mockUpdate(self::$selectResult, Carbon::now());
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->with('relation')
@@ -253,7 +248,7 @@ class EntityControlTraitTest extends HelpersTestCase
                 'updated_at' => null,
             ]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testUpdateDoesntExist()
@@ -264,7 +259,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -272,14 +267,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->update(1, ['name' => 'test_name']);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testUpdateOrCreateEntityExists()
     {
-        $this->mockUpdateOrCreateEntityExists($this->selectResult);
+        $this->mockUpdateOrCreateEntityExists(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -287,14 +282,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateOrCreate(1, ['name' => 'test_name']);
 
-       $this->assertSettablePropertiesReset($this->testRepositoryClass);
+       $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testUpdateOrCreateEntityDoesntExist()
     {
-        $this->mockUpdateOrCreateEntityDoesntExist($this->selectResult);
+        $this->mockUpdateOrCreateEntityDoesntExist(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -302,7 +297,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateOrCreate(1, ['name' => 'test_name']);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testCount()
@@ -311,7 +306,7 @@ class EntityControlTraitTest extends HelpersTestCase
             'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null and "id" = ?'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -319,14 +314,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->count(['id' => 1]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testGet()
     {
-        $this->mockGet($this->selectResult);
+        $this->mockGet(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -334,7 +329,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->get(['id' => 1]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testGetEmptyResult()
@@ -345,7 +340,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -353,14 +348,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->get(['id' => 1]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFirst()
     {
-        $this->mockFirst($this->selectResult);
+        $this->mockFirst(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -368,14 +363,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->first(1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testLast()
     {
-        $this->mockLast($this->selectResult);
+        $this->mockLast(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -383,7 +378,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->last(['id' => 1]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFirstEmptyResult()
@@ -394,7 +389,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -402,14 +397,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->first(1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFindBy()
     {
-        $this->mockFirstBy($this->selectResult);
+        $this->mockFirstBy(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -417,7 +412,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->findBy('id', 1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFindByEmptyResult()
@@ -428,7 +423,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -436,14 +431,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->findBy('id', 1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFind()
     {
-        $this->mockFind($this->selectResult);
+        $this->mockFind(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -451,7 +446,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->find(1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFindEmptyResult()
@@ -462,7 +457,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -470,14 +465,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->find(1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFirstOrCreateEntityExists()
     {
-        $this->mockFirstOrCreateEntityExists($this->selectResult);
+        $this->mockFirstOrCreateEntityExists(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -485,14 +480,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->firstOrCreate(['id' => 1], ['name' => 'test_name']);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testFirstOrCreateEntityDoesntExists()
     {
-        $this->mockFirstOrCreateEntityDoesntExists($this->selectResult);
+        $this->mockFirstOrCreateEntityDoesntExists(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -500,14 +495,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->firstOrCreate(['id' => 1], ['name' => 'test_name']);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testForceDelete()
     {
         $this->mockDelete('delete from "test_models" where "test_models"."deleted_at" is not null and "id" = ?', [1]);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -515,7 +510,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->delete(1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testDelete()
@@ -526,13 +521,13 @@ class EntityControlTraitTest extends HelpersTestCase
             [Carbon::now(), Carbon::now(), 1]
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->with('relation')
             ->withCount('relation')
             ->delete(1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testRestore()
@@ -543,7 +538,7 @@ class EntityControlTraitTest extends HelpersTestCase
             [null, Carbon::now(), 1]
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -551,14 +546,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->restore(1);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testChunk()
     {
-        $this->mockChunk($this->selectResult);
+        $this->mockChunk(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -566,7 +561,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->chunk(10, function () {});
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testChunkEmptyResult()
@@ -577,7 +572,7 @@ class EntityControlTraitTest extends HelpersTestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 10 offset 0'
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -585,7 +580,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->chunk(10, function () {});
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testForceDeleteByList()
@@ -596,7 +591,7 @@ class EntityControlTraitTest extends HelpersTestCase
             3
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -604,7 +599,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->deleteByList([1, 2, 3]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testDeleteByList()
@@ -614,13 +609,13 @@ class EntityControlTraitTest extends HelpersTestCase
             [Carbon::now(), Carbon::now(), 1, 2, 3]
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->with('relation')
             ->withCount('relation')
             ->deleteByList([1, 2, 3]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testRestoreByList()
@@ -633,7 +628,7 @@ class EntityControlTraitTest extends HelpersTestCase
             3
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -641,14 +636,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->restoreByList([1, 2, 3]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testGetByList()
     {
-        $this->mockGetByList($this->selectResult);
+        $this->mockGetByList(self::$selectResult);
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -656,7 +651,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->getByList([1, 2, 3]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testGetByListEmptyResult()
@@ -669,7 +664,7 @@ class EntityControlTraitTest extends HelpersTestCase
             [1, 2, 3]
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -677,7 +672,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->getByList([1, 2, 3]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testCountByList()
@@ -688,7 +683,7 @@ class EntityControlTraitTest extends HelpersTestCase
             [1, 2, 3]
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -696,7 +691,7 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->countByList([1, 2, 3]);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testUpdateByList()
@@ -708,7 +703,7 @@ class EntityControlTraitTest extends HelpersTestCase
             3
         );
 
-        $this->testRepositoryClass
+        self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -716,14 +711,14 @@ class EntityControlTraitTest extends HelpersTestCase
             ->withCount('relation')
             ->updateByList([1, 2, 3], ['name' => 'test_name']);
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testTruncate()
     {
         $this->mockTruncate('test_models');
 
-        $this->testRepositoryClass->truncate();
+        self::$testRepositoryClass->truncate();
     }
 
     public function testModelWithoutPrimaryKey()
@@ -738,7 +733,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testGetEntityName()
     {
-        $name = $this->testRepositoryClass->getModelName();
+        $name = self::$testRepositoryClass->getModelName();
 
         $this->assertEquals('TestModel', $name);
     }

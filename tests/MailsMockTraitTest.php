@@ -34,7 +34,7 @@ class MailsMockTraitTest extends HelpersTestCase
                 'fixture' => 'test_mail.html',
                 'subject' => 'Test Subject',
                 'from' => 'noreply@mail.net',
-            ]
+            ],
         ]);
     }
 
@@ -51,7 +51,7 @@ class MailsMockTraitTest extends HelpersTestCase
         Mail::to('test@mail.com')->queue(new LegacyTestMail(
             ['name' => 'John Smith'],
             'Test Subject',
-            'emails.test'
+            'emails.test',
         ));
 
         $this->assertMailEquals(LegacyTestMail::class, [
@@ -60,7 +60,7 @@ class MailsMockTraitTest extends HelpersTestCase
                 'fixture' => 'test_mail.html',
                 'subject' => 'Test Subject',
                 'from' => 'noreply@mail.net',
-            ]
+            ],
         ]);
     }
 
@@ -76,18 +76,18 @@ class MailsMockTraitTest extends HelpersTestCase
                 'from' => [
                     [
                         'address' => 'noreply@mail.net',
-                        'name' => 'Some sender'
+                        'name' => 'Some sender',
                     ],
                     [
                         'address' => 'noreply-second@mail.net',
-                        'name' => 'Some sender second case'
+                        'name' => 'Some sender second case',
                     ],
                     [
-                        'address' => 'noreply-withoutsender@mail.net'
+                        'address' => 'noreply-withoutsender@mail.net',
                     ],
                     [
                         'address' => 'noreply-withoutsender-second@mail.net',
-                        'name' => null
+                        'name' => null,
                     ],
                 ],
             ],
@@ -155,10 +155,15 @@ class MailsMockTraitTest extends HelpersTestCase
         Mail::to('test@mail.com')->queue(new TestMailWithAttachments(['name' => 'John Smith']));
 
         $this->assertMailEquals(TestMailWithAttachments::class, [
-            $this->mockedMail('test@mail.com', 'test_mail.html', 'Test Subject', '', [
-                'attachment1',
-                ['file' => new \stdClass(), 'options' => ['some_options']]
-            ]),
+            $this->mockedMail(
+                emails: 'test@mail.com',
+                fixture: 'test_mail.html',
+                subject: 'Test Subject',
+                attachments: [
+                    'attachment1',
+                    ['file' => new \stdClass(), 'options' => ['some_options']],
+                ],
+            ),
         ]);
     }
 }

@@ -82,7 +82,7 @@ class FixturesTraitTest extends HelpersTestCase
         $response = new TestResponse(
             new BinaryFileResponse(
                 Storage::disk('files')->path('content_source.txt')
-            )
+            ),
         );
 
         $this->exportFile($response, 'export_file/content_result.txt');
@@ -188,11 +188,11 @@ class FixturesTraitTest extends HelpersTestCase
     public function testPrepareSequences()
     {
         $sequences = collect($this->getJsonFixture('prepare_sequences/information_schema.json'))
-            ->map(fn($item) => (object) $item);
+            ->map(fn ($item) => (object) $item);
 
         $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('getQueryGrammar', [], new Grammar),
-            $this->functionCall('getPostProcessor', [], new Processor),
+            $this->functionCall('getQueryGrammar', [], new Grammar()),
+            $this->functionCall('getPostProcessor', [], new Processor()),
             $this->functionCall('select', [], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);

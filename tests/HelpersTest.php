@@ -174,7 +174,7 @@ class HelpersTest extends HelpersTestCase
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key.json',
             ],
             [
-                'filter' => fn($objet) => $objet['id'],
+                'filter' => fn ($objet) => $objet['id'],
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key.json',
             ],
         ];

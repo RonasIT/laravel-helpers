@@ -14,6 +14,8 @@ class SearchTraitTest extends HelpersTestCase
 {
     use SqlMockTrait;
 
+    protected static array $selectResult;
+
     protected TestRepository $testRepositoryClass;
 
     protected ReflectionProperty $onlyTrashedProperty;
@@ -25,8 +27,6 @@ class SearchTraitTest extends HelpersTestCase
 
     protected ReflectionMethod $setAdditionalReservedFiltersMethod;
 
-    protected array $selectResult;
-
     public function setUp(): void
     {
         parent::setUp();
@@ -34,34 +34,27 @@ class SearchTraitTest extends HelpersTestCase
         $this->testRepositoryClass = new TestRepository();
 
         $this->onlyTrashedProperty = new ReflectionProperty(TestRepository::class, 'onlyTrashed');
-        $this->onlyTrashedProperty->setAccessible(true);
 
         $this->withTrashedProperty = new ReflectionProperty(TestRepository::class, 'withTrashed');
-        $this->withTrashedProperty->setAccessible(true);
 
         $this->forceModeProperty = new ReflectionProperty(TestRepository::class, 'forceMode');
-        $this->forceModeProperty->setAccessible(true);
 
         $this->attachedRelationsProperty = new ReflectionProperty(TestRepository::class, 'attachedRelations');
-        $this->attachedRelationsProperty->setAccessible(true);
 
         $this->attachedRelationsCountProperty = new ReflectionProperty(
             TestRepository::class,
             'attachedRelationsCount'
         );
-        $this->attachedRelationsCountProperty->setAccessible(true);
 
         $this->shouldSettablePropertiesBeResetProperty = new ReflectionProperty(
             TestRepository::class,
             'shouldSettablePropertiesBeReset'
         );
-        $this->shouldSettablePropertiesBeResetProperty->setAccessible(true);
 
         $reflectionClass = new ReflectionClass(TestRepository::class);
         $this->setAdditionalReservedFiltersMethod = $reflectionClass->getMethod('setAdditionalReservedFilters');
-        $this->setAdditionalReservedFiltersMethod->setAccessible(true);
 
-        $this->selectResult = $this->getJsonFixture('select_query_result.json');
+        self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
     }
 
     public function testSearchQuery()
@@ -94,16 +87,19 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResultWithAll()
     {
-        $this->mockSelect('select * from "test_models" where "test_models"."deleted_at" is null order by "id" asc', [
-            1, 2, 3
-        ]);
+        $this->mockSelect(
+            query: 'select * from "test_models" where "test_models"."deleted_at" is null order by "id" asc',
+            result: [
+                1, 2, 3,
+            ],
+        );
 
         $this->testRepositoryClass->searchQuery(['all' => true])->getSearchResults();
     }
 
     public function testGetSearchResultWithAllAndParams()
     {
-        $this->mockSelect('select * from "test_models" where "test_models"."deleted_at" is null order by "id" asc', []);
+        $this->mockSelect('select * from "test_models" where "test_models"."deleted_at" is null order by "id" asc');
 
         $this->testRepositoryClass
             ->searchQuery([
@@ -115,7 +111,7 @@ class SearchTraitTest extends HelpersTestCase
 
     public function testGetSearchResult()
     {
-        $this->mockGetSearchResult($this->selectResult);
+        $this->mockGetSearchResult(self::$selectResult);
 
         $this->testRepositoryClass
             ->force()
@@ -144,9 +140,8 @@ class SearchTraitTest extends HelpersTestCase
     public function testGetSearchResultAggregateIsNull()
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is null',
-            [],
-            null
+            query: 'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is null',
+            result: null,
         );
 
         $this->testRepositoryClass->searchQuery()->getSearchResults();
@@ -156,7 +151,7 @@ class SearchTraitTest extends HelpersTestCase
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->mockGetSearchResult($this->selectResult);
+        $this->mockGetSearchResult(self::$selectResult);
 
         $this->testRepositoryClass
             ->onlyTrashed()
@@ -184,7 +179,7 @@ class SearchTraitTest extends HelpersTestCase
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->mockGetSearchResultWithQuery($this->selectResult);
+        $this->mockGetSearchResultWithQuery(self::$selectResult);
 
         $this->testRepositoryClass
             ->searchQuery([
@@ -200,7 +195,7 @@ class SearchTraitTest extends HelpersTestCase
 
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->mockGetSearchResultWithCustomQuery($this->selectResult);
+        $this->mockGetSearchResultWithCustomQuery(self::$selectResult);
 
         $this->testRepositoryClass
             ->searchQuery([
@@ -214,7 +209,7 @@ class SearchTraitTest extends HelpersTestCase
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->mockGetSearchResultWithRelations($this->selectResult);
+        $this->mockGetSearchResultWithRelations(self::$selectResult);
 
         $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
             'relation_name',
@@ -236,7 +231,7 @@ class SearchTraitTest extends HelpersTestCase
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->mockGetSearchResultWithFilters($this->selectResult);
+        $this->mockGetSearchResultWithFilters(self::$selectResult);
 
         $this->testRepositoryClass
             ->searchQuery([
@@ -275,14 +270,13 @@ class SearchTraitTest extends HelpersTestCase
         ]);
 
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null',
-            [1, 2, 3]
+            query: 'select count(*) as aggregate from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null',
+            bindings: [1, 2, 3]
         );
 
         $this->mockSelect(
-            'select * from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
-            [],
-            [1, 2, 3]
+            query: 'select * from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
+            bindings: [1, 2, 3]
         );
 
         $this->testRepositoryClass
@@ -295,7 +289,7 @@ class SearchTraitTest extends HelpersTestCase
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->mockGetSearchResultWithFilters($this->selectResult);
+        $this->mockGetSearchResultWithFilters(self::$selectResult);
 
         $this->testRepositoryClass
             ->searchQuery([
