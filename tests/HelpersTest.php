@@ -2,60 +2,55 @@
 
 namespace RonasIT\Support\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Traits\MockTrait;
 
 class HelpersTest extends HelpersTestCase
 {
     use MockTrait;
 
-    public function getGetListData(): array
+    public static function getGetListData(): array
     {
         return [
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods.*.zips.*.state',
-                'expected' => 'states.json'
+                'expected' => 'states.json',
             ],
             [
                 'input' => 'neighborhood.json',
                 'key' => 'zips.*.code',
-                'expected' => 'neighborhood.zips.codes.json'
+                'expected' => 'neighborhood.zips.codes.json',
             ],
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods.*.zips.*.code',
-                'expected' => 'city.neighborhoods.zips.codes.json'
+                'expected' => 'city.neighborhoods.zips.codes.json',
             ],
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods.*.zips',
-                'expected' => 'city.neighborhoods.zips.json'
+                'expected' => 'city.neighborhoods.zips.json',
             ],
             [
                 'input' => 'city.json',
                 'key' => 'neighborhoods',
-                'expected' => 'city.neighborhoods.json'
+                'expected' => 'city.neighborhoods.json',
             ],
             [
                 'input' => 'neighborhood.json',
                 'key' => 'zips',
-                'expected' => 'neighborhood.zips.json'
+                'expected' => 'neighborhood.zips.json',
             ],
             [
                 'input' => 'areas.json',
                 'key' => 'zips.*.area.houses.*.number',
-                'expected' => 'areas.houses.json'
-            ]
+                'expected' => 'areas.houses.json',
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getGetListData
-     *
-     * @param string $input
-     * @param string $key
-     * @param string $expected
-     */
+    #[DataProvider('getGetListData')]
     public function testGetList(string $input, string $key, string $expected)
     {
         $input = $this->getJsonFixture($input);
@@ -65,30 +60,25 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture($expected, $result);
     }
 
-    public function getIsMultidimensionalData(): array
+    public static function getIsMultidimensionalData(): array
     {
         return [
             [
                 'input' => 'areas.houses.json',
-                'expected' => false
+                'expected' => false,
             ],
             [
                 'input' => 'areas.json',
-                'expected' => false
+                'expected' => false,
             ],
             [
                 'input' => 'city.neighborhoods.json',
-                'expected' => true
-            ]
+                'expected' => true,
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getIsMultidimensionalData
-     *
-     * @param string $input
-     * @param bool $expected
-     */
+    #[DataProvider('getIsMultidimensionalData')]
     public function testIsMultidimensional(string $input, bool $expected)
     {
         $input = $this->getJsonFixture($input);
@@ -98,39 +88,33 @@ class HelpersTest extends HelpersTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function getEqualsData(): array
+    public static function getEqualsData(): array
     {
         return [
             [
-                'first_array' => 'array_equals/settings.json',
-                'second_array' => 'array_equals/settings_diff.json',
-                'expected' => false
+                'firstArray' => 'array_equals/settings.json',
+                'secondArray' => 'array_equals/settings_diff.json',
+                'expected' => false,
             ],
             [
-                'first_array' => 'array_equals/settings_rather_types.json',
-                'second_array' => 'array_equals/settings_rather_types_diff_order.json',
-                'expected' => true
+                'firstArray' => 'array_equals/settings_rather_types.json',
+                'secondArray' => 'array_equals/settings_rather_types_diff_order.json',
+                'expected' => true,
             ],
             [
-                'first_array' => 'array_equals/settings.json',
-                'second_array' => 'array_equals/settings_diff_order.json',
-                'expected' => true
+                'firstArray' => 'array_equals/settings.json',
+                'secondArray' => 'array_equals/settings_diff_order.json',
+                'expected' => true,
             ],
             [
-                'first_array' => 'areas.houses.json',
-                'second_array' => 'array_equals/non_associative.json',
-                'expected' => true
-            ]
+                'firstArray' => 'areas.houses.json',
+                'secondArray' => 'array_equals/non_associative.json',
+                'expected' => true,
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getEqualsData
-     *
-     * @param string $firstArray
-     * @param string $secondArray
-     * @param bool $expected
-     */
+    #[DataProvider('getEqualsData')]
     public function testEquals(string $firstArray, string $secondArray, bool $expected)
     {
         $firstArray = $this->getJsonFixture($firstArray);
@@ -150,7 +134,7 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture('array_round/rounded_values.json', $result);
     }
 
-    public function getArrayDuplicatesData(): array
+    public static function getArrayDuplicatesData(): array
     {
         return [
             [
@@ -164,16 +148,11 @@ class HelpersTest extends HelpersTestCase
             [
                 'input' => 'array_get_duplicates/complex_array.json',
                 'expected' => 'array_get_duplicates/complex_array_duplicates.json',
-            ]
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getArrayDuplicatesData
-     *
-     * @param string $input
-     * @param string $expected
-     */
+    #[DataProvider('getArrayDuplicatesData')]
     public function testArrayGetDuplicate(string $input, string $expected)
     {
         $input = $this->getJsonFixture($input);
@@ -183,7 +162,7 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture($expected, $result);
     }
 
-    public function getArrayUniqueObjectsData(): array
+    public static function getArrayUniqueObjectsData(): array
     {
         return [
             [
@@ -195,20 +174,13 @@ class HelpersTest extends HelpersTestCase
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key.json',
             ],
             [
-                'filter' => function($objet) {
-                    return $objet['id'];
-                },
+                'filter' => fn ($objet) => $objet['id'],
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key.json',
-            ]
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getArrayUniqueObjectsData
-     *
-     * @param string|callable|array $filter
-     * @param string $expected
-     */
+    #[DataProvider('getArrayUniqueObjectsData')]
     public function testArrayUniqueObjects(string|callable|array $filter, string $expected)
     {
         $input = $this->getJsonFixture('array_unique_objects/array_with_duplicates.json');
@@ -227,7 +199,7 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture('array_trim/result.json', $result);
     }
 
-    public function getArrayRemoveByFieldData(): array
+    public static function getArrayRemoveByFieldData(): array
     {
         return [
             [
@@ -239,17 +211,11 @@ class HelpersTest extends HelpersTestCase
                 'field' => 'name',
                 'value' => 'test2',
                 'expected' => 'array_remove_by_field/result_remove_by_name.json',
-            ]
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getArrayRemoveByFieldData
-     *
-     * @param string  $field
-     * @param string|int $value
-     * @param string $expected
-     */
+    #[DataProvider('getArrayRemoveByFieldData')]
     public function testArrayRemoveByField(string $field, string|int $value, string $expected)
     {
         $input = $this->getJsonFixture('array_remove_by_field/data.json');
@@ -275,7 +241,7 @@ class HelpersTest extends HelpersTestCase
         $result = array_associate($input, function ($value, $key) {
             return [
                 'key' => "prepared_{$key}",
-                'value' => $value
+                'value' => $value,
             ];
         });
 

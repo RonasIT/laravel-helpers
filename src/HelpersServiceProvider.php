@@ -27,8 +27,6 @@ class HelpersServiceProvider extends ServiceProvider
 
         app(ExcelServiceProvider::class, ['app' => app()])->boot();
 
-        $this->loadViewsFrom(__DIR__ . '/Stubs', 'ronasit');
-
         $this->extendRouter();
     }
 

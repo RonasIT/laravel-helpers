@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Support\Version;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use Illuminate\Http\Request;
@@ -26,35 +27,33 @@ class VersionTest extends HelpersTestCase
         $this->app->instance('request', $this->request);
     }
 
-    public function getTestCurrentData(): array
+    public static function getTestCurrentData(): array
     {
         return [
             [
                 'version' => '1',
-                'assert' => true
+                'assert' => true,
             ],
             [
                 'version' => '1.0',
-                'assert' => false
+                'assert' => false,
             ],
             [
                 'version' => '0.99',
-                'assert' => false
+                'assert' => false,
             ],
             [
                 'version' => '1.01',
-                'assert' => false
+                'assert' => false,
             ],
             [
                 'version' => '10',
-                'assert' => false
+                'assert' => false,
             ],
         ];
     }
 
-    /**
-     * @dataProvider getTestCurrentData
-     */
+    #[DataProvider('getTestCurrentData')]
     public function testCurrent(string $version, bool $assert)
     {
         switch ($assert) {
@@ -67,23 +66,21 @@ class VersionTest extends HelpersTestCase
         }
     }
 
-    public function getTestIsData(): array
+    public static function getTestIsData(): array
     {
         return [
             [
                 'version' => '1',
-                'assert' => true
+                'assert' => true,
             ],
             [
                 'version' => '10',
-                'assert' => false
+                'assert' => false,
             ],
         ];
     }
 
-    /**
-     * @dataProvider getTestIsData
-     */
+    #[DataProvider('getTestIsData')]
     public function testIs(string $version, bool $assert)
     {
         $checkedVersion = $this->createMock(VersionEnumContract::class);
@@ -101,7 +98,7 @@ class VersionTest extends HelpersTestCase
         }
     }
 
-    public function getTestBetweenData(): array
+    public static function getTestBetweenData(): array
     {
         return [
             [
@@ -137,9 +134,7 @@ class VersionTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getTestBetweenData
-     */
+    #[DataProvider('getTestBetweenData')]
     public function testBetween(string $from, string $to, bool $assert)
     {
         $checkedVersionFrom = $this->createMock(VersionEnumContract::class);
@@ -160,7 +155,7 @@ class VersionTest extends HelpersTestCase
         }
     }
 
-    public function getTestGteData(): array
+    public static function getTestGteData(): array
     {
         return [
             [
@@ -182,9 +177,7 @@ class VersionTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getTestGteData
-     */
+    #[DataProvider('getTestGteData')]
     public function testGte(string $version, bool $assert)
     {
         $checkedVersion = $this->createMock(VersionEnumContract::class);
@@ -202,7 +195,7 @@ class VersionTest extends HelpersTestCase
         }
     }
 
-    public function getTestLteData(): array
+    public static function getTestLteData(): array
     {
         return [
             [
@@ -224,9 +217,7 @@ class VersionTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getTestLteData
-     */
+    #[DataProvider('getTestLteData')]
     public function testLte(string $version, bool $assert)
     {
         $checkedVersion = $this->createMock(VersionEnumContract::class);

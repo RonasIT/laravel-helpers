@@ -10,22 +10,22 @@
     }
   ],
   "require": {
-    "php": ">=8.1",
-    "laravel/framework": ">=10.48",
-    "guzzlehttp/guzzle": ">=6.0",
-    "maatwebsite/excel": "3.*",
-    "tecnickcom/tcpdf": "~6.7.4",
+    "php": ">=8.3",
+    "laravel/framework": "^11.20",
+    "guzzlehttp/guzzle": "^7.9.2",
+    "maatwebsite/excel": "^3.1.55",
+    "tecnickcom/tcpdf": "^6.7.5",
     "ext-json": "*",
-    "php-mock/php-mock-phpunit": "^2.9"
+    "php-mock/php-mock-phpunit": "^2.10"
   },
   "require-dev": {
-    "fakerphp/faker": "^1.23",
-    "mockery/mockery": "1.*",
-    "phpunit/phpunit": "9.*",
-    "php-coveralls/php-coveralls": "^2.5",
-    "orchestra/testbench": "^8.23",
-    "mpyw/laravel-database-mock": "0.0.1-alpha5",
-    "friendsofphp/php-cs-fixer": "^3.59",
+    "fakerphp/faker": "^1.23.1",
+    "mockery/mockery": "^1.6.12",
+    "phpunit/phpunit": "^10.5.30",
+    "php-coveralls/php-coveralls": "^2.7",
+    "orchestra/testbench": "^9.3",
+    "mpyw/laravel-database-mock": "^0.0.1-alpha5",
+    "friendsofphp/php-cs-fixer": "^3.62",
     "brainmaestro/composer-git-hooks": "^3.0"
   },
   "autoload": {

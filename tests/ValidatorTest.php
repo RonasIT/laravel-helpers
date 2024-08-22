@@ -23,7 +23,7 @@ class ValidatorTest extends HelpersTestCase
 
         $validator = Validator::make(
             ['email' => 'mail@mail.com'],
-            ['email' => 'unique_except_of_authorized_user']
+            ['email' => 'unique_except_of_authorized_user'],
         );
 
         $this->assertTrue($validator->passes());
@@ -35,7 +35,7 @@ class ValidatorTest extends HelpersTestCase
 
         $validator = Validator::make(
             ['email' => [['mail@mail.com'], ['mail@mail.net']]],
-            ['email' => 'unique_except_of_authorized_user:clients']
+            ['email' => 'unique_except_of_authorized_user:clients'],
         );
 
         $this->assertTrue($validator->passes());
@@ -47,7 +47,7 @@ class ValidatorTest extends HelpersTestCase
 
         $validator = Validator::make(
             ['email' => [['mail@mail.com'], ['mail@mail.net']]],
-            ['email' => 'unique_except_of_authorized_user:clients,user_id']
+            ['email' => 'unique_except_of_authorized_user:clients,user_id'],
         );
 
         $this->assertTrue($validator->passes());
@@ -59,7 +59,7 @@ class ValidatorTest extends HelpersTestCase
 
         $validator = Validator::make(
             ['email' => ['mail@mail.com', 'mail@mail.net']],
-            ['email' => 'unique_except_of_authorized_user']
+            ['email' => 'unique_except_of_authorized_user'],
         );
 
         $this->assertTrue($validator->fails());
@@ -96,7 +96,7 @@ class ValidatorTest extends HelpersTestCase
                         'id' => 3,
                         'name' => 'name3',
                     ],
-                ]
+                ],
             ],
             [
                 'ids' => 'list_exists:clients,user_id,id',

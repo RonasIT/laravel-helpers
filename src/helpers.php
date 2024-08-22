@@ -179,6 +179,7 @@ function getGUID(): string
     mt_srand((double)microtime() * 10000);//optional for php 4.2.0 and up.
     $charId = strtoupper(md5(uniqid(rand(), true)));
     $hyphen = chr(45);// "-"
+
     return chr(123)// "{"
         . substr($charId, 0, 8) . $hyphen
         . substr($charId, 8, 4) . $hyphen
@@ -243,7 +244,7 @@ function clear_folder(string $path): void
 
 /**
  * Builds an associative array by gotten keys and values
- * 
+ *
  * @param array $array
  * @param callable $callback - should return associate array with "key" and "value" keys
  *
@@ -256,7 +257,7 @@ function clear_folder(string $path): void
  *  }
  *
  * @return array
- * 
+ *
  * @deprecated Use array_walk, forEach or mapWithKeys instead
  */
 function array_associate(array $array, callable $callback): array

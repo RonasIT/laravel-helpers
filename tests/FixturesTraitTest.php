@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -28,20 +29,16 @@ class FixturesTraitTest extends HelpersTestCase
         self::$tables = null;
     }
 
-    public function getFixtureData(): array
+    public static function getFixtureData(): array
     {
         return [
             [
-                'input' => 'get_fixture/exists_fixture.json'
+                'input' => 'get_fixture/exists_fixture.json',
             ],
         ];
     }
 
-    /**
-     * @dataProvider getFixtureData
-     *
-     * @param string $input
-     */
+    #[DataProvider('getFixtureData')]
     public function testGetFixture(string $input)
     {
         $response = $this->getJsonFixture($input);
@@ -63,7 +60,7 @@ class FixturesTraitTest extends HelpersTestCase
         putenv('FAIL_EXPORT_JSON=false');
 
         $result = [
-            'value' => 1234567890
+            'value' => 1234567890,
         ];
 
         $this->exportJson('export_json/response.json', new TestResponse(
@@ -85,14 +82,14 @@ class FixturesTraitTest extends HelpersTestCase
         $response = new TestResponse(
             new BinaryFileResponse(
                 Storage::disk('files')->path('content_source.txt')
-            )
+            ),
         );
 
         $this->exportFile($response, 'export_file/content_result.txt');
 
         $this->assertEquals(
-            $this->getJsonFixture('export_file/result.txt'),
-            $this->getJsonFixture('export_file/content_result.txt')
+            expected: $this->getJsonFixture('export_file/result.txt'),
+            actual: $this->getJsonFixture('export_file/content_result.txt'),
         );
     }
 
@@ -191,11 +188,11 @@ class FixturesTraitTest extends HelpersTestCase
     public function testPrepareSequences()
     {
         $sequences = collect($this->getJsonFixture('prepare_sequences/information_schema.json'))
-            ->map(fn($item) => (object) $item);
+            ->map(fn ($item) => (object) $item);
 
         $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('getQueryGrammar', [], new Grammar),
-            $this->functionCall('getPostProcessor', [], new Processor),
+            $this->functionCall('getQueryGrammar', [], new Grammar()),
+            $this->functionCall('getPostProcessor', [], new Processor()),
             $this->functionCall('select', [], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
