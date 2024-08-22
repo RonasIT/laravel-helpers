@@ -9,13 +9,13 @@ use RonasIT\Support\Exceptions\IncorrectImportLineException;
 
 class Importer
 {
-    const DELETED_AT_FIELD = 'deleted_at';
+    public const DELETED_AT_FIELD = 'deleted_at';
 
-    const ITEMS_TO_CREATE = 'create';
-    const ITEMS_TO_UPDATE = 'update';
+    public const ITEMS_TO_CREATE = 'create';
+    public const ITEMS_TO_UPDATE = 'update';
 
-    const CREATED_REPORTS = 'created';
-    const UPDATED_REPORTS = 'updated';
+    public const CREATED_REPORTS = 'created';
+    public const UPDATED_REPORTS = 'updated';
 
     protected $input;
 
@@ -27,13 +27,13 @@ class Importer
 
     protected $items = [
         self::ITEMS_TO_CREATE => [],
-        self::ITEMS_TO_UPDATE => []
+        self::ITEMS_TO_UPDATE => [],
     ];
 
     protected $report = [
         self::UPDATED_REPORTS => 0,
         self::CREATED_REPORTS => 0,
-        'errors' => []
+        'errors' => [],
     ];
 
     public function setInput($input): self
@@ -190,7 +190,7 @@ class Importer
         }
 
         return $this->service->withTrashed()->exists([
-            'id' => $item['id']
+            'id' => $item['id'],
         ]);
     }
 

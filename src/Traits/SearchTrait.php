@@ -32,7 +32,7 @@ trait SearchTrait
         'all',
         'per_page',
         'page',
-        'desc'
+        'desc',
     ];
 
     protected function setAdditionalReservedFilters(...$filterNames)
@@ -87,7 +87,7 @@ trait SearchTrait
             $this->query->where(function ($query) use ($fields, $mask) {
                 foreach ($fields as $field) {
                     if (Str::contains($field, '.')) {
-                        list ($fieldName, $relations) = extract_last_part($field);
+                        list($fieldName, $relations) = extract_last_part($field);
 
                         $query->orWhereHas($relations, function ($query) use ($fieldName, $mask) {
                             $query->where(
@@ -183,7 +183,7 @@ trait SearchTrait
 
         $paginator = new LengthAwarePaginator($data, $total, $perPage, 1, [
             'path' => Paginator::resolveCurrentPath(),
-            'pageName' => 'page'
+            'pageName' => 'page',
         ]);
 
         return $this->getModifiedPaginator($paginator);
@@ -348,7 +348,7 @@ trait SearchTrait
             $field = (empty($field)) ? $this->primaryKey : $field;
 
             $where = [
-                $field => $where
+                $field => $where,
             ];
         }
 
@@ -362,7 +362,7 @@ trait SearchTrait
     protected function applyWhereCallback(Query $query, string $field, Closure $callback): void
     {
         if (Str::contains($field, '.')) {
-            list ($conditionField, $relations) = extract_last_part($field);
+            list($conditionField, $relations) = extract_last_part($field);
 
             $query->whereHas($relations, function ($q) use ($callback, $conditionField) {
                 $callback($q, $conditionField);

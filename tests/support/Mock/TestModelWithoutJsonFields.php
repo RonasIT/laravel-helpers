@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TestModelWithoutJsonFields extends Model
 {
-    use ModelTrait, SoftDeletes;
+    use ModelTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
