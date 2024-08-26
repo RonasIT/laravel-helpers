@@ -112,4 +112,13 @@ abstract class TestCase extends BaseTest
             $connection->disconnect();
         }
     }
+
+    public function prepareTestState(string $modelName, bool $exportMode = false): ModelTestState
+    {
+        $modelTestState = new ModelTestState($modelName);
+
+        $modelTestState->globalExportMode = $exportMode;
+
+        return $modelTestState;
+    }
 }
