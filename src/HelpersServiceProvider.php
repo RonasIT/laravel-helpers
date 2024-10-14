@@ -6,9 +6,11 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Middleware\SecurityMiddleware;
@@ -16,6 +18,8 @@ use Illuminate\Routing\Router;
 
 class HelpersServiceProvider extends ServiceProvider
 {
+    use TestDatabases;
+
     public function boot(): void
     {
         $router = $this->app['router'];
@@ -28,6 +32,18 @@ class HelpersServiceProvider extends ServiceProvider
         app(ExcelServiceProvider::class, ['app' => app()])->boot();
 
         $this->extendRouter();
+
+        if ($this->app->runningUnitTests()) {
+            $this->whenNotUsingInMemoryDatabase(function ($database) {
+                [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
+
+                $this->switchToDatabase($testDatabase);
+
+                if ($created) {
+                    ParallelTesting::callSetUpTestDatabaseCallbacks($testDatabase);
+                }
+            });
+        }
     }
 
     public function register(): void
