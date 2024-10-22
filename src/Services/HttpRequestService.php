@@ -47,7 +47,7 @@ class HttpRequestService
         return $result;
     }
 
-    public function getResponse(): ResponseInterface
+    public function getResponse(): ResponseInterface|array
     {
         return $this->response;
     }
