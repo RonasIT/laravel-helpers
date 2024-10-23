@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Traits;
+namespace RonasIT\Support\Tests;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase;

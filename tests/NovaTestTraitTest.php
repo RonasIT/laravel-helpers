@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Tests;
 
 use RonasIT\Support\Traits\MockTrait;
-use RonasIT\Support\Traits\NovaTestTrait;
 
 class NovaTestTraitTest extends HelpersTestCase
 {
