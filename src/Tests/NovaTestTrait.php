@@ -43,7 +43,7 @@ trait NovaTestTrait
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
-        return $this->getJson($resourceUri, $request);
+        return $this->json('get', $resourceUri, $request);
     }
 
     protected function novaGetCreationFields(string $resourceClass): TestResponse
@@ -59,7 +59,7 @@ trait NovaTestTrait
 
         $actionUri = app($action)->uriKey();
 
-        return $this->postJson("{$resourceUri}/action?action={$actionUri}", $request);
+        return $this->json('POST', "{$resourceUri}/action?action={$actionUri}", $request);
     }
 
     protected function novaGetActions(string $resourceClass, array $resourceIds): TestResponse
@@ -93,7 +93,9 @@ trait NovaTestTrait
 
     protected function novaActingAs(?Authenticatable $user = null): TestCase|self
     {
-        return (empty($user)) ? $this : $this->actingAs($user, 'web');
+        return (empty($user))
+            ? $this
+            : $this->actingAs($user, 'web');
     }
 
     protected function getNovaResourceUri(string $modelClass): string
