@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests;
+namespace RonasIT\Support\Traits;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase;
@@ -18,51 +18,51 @@ trait NovaTestTrait
         ];
     }
 
-    protected function novaCreateResource(string $resourceClass, ?array $data = []): TestResponse
+    protected function novaCreateResourceAPICall(string $resourceClass, ?array $data = []): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
         return $this->postJson($resourceUri, $data);
     }
 
-    protected function novaUpdateResource(string $resourceClass, int $resourceId, ?array $data = []): TestResponse
+    protected function novaUpdateResourceAPICall(string $resourceClass, int $resourceId, ?array $data = []): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
         return $this->putJson("{$resourceUri}/{$resourceId}", $data);
     }
 
-    protected function novaGetResource(string $resourceClass, int $resourceId, ?array $data = []): TestResponse
+    protected function novaGetResourceAPICall(string $resourceClass, int $resourceId, ?array $data = []): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
         return $this->getJson("{$resourceUri}/{$resourceId}", $data);
     }
 
-    protected function novaSearchResource(string $resourceClass, ?array $request = []): TestResponse
+    protected function novaSearchResourceAPICall(string $resourceClass, ?array $request = []): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
         return $this->json('get', $resourceUri, $request);
     }
 
-    protected function novaGetCreationFields(string $resourceClass): TestResponse
+    protected function novaGetCreationFieldsAPICall(string $resourceClass): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
         return $this->getJson("{$resourceUri}/creation-fields");
     }
 
-    protected function novaRunAction(string $resourceClass, string $action, ?array $request = []): TestResponse
+    protected function novaRunActionAPICall(string $resourceClass, string $actionClass, ?array $request = []): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
-        $actionUri = app($action)->uriKey();
+        $actionUri = app($actionClass)->uriKey();
 
         return $this->json('POST', "{$resourceUri}/action?action={$actionUri}", $request);
     }
 
-    protected function novaGetActions(string $resourceClass, array $resourceIds): TestResponse
+    protected function novaGetActionsAPICall(string $resourceClass, array $resourceIds): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
@@ -73,7 +73,7 @@ trait NovaTestTrait
         return $this->json('get', "{$resourceUri}/actions", $request);
     }
 
-    protected function novaDeleteResource(string $resourceClass, array $resourceIds): TestResponse
+    protected function novaDeleteResourceAPICall(string $resourceClass, array $resourceIds): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 
@@ -84,7 +84,7 @@ trait NovaTestTrait
         return $this->deleteJson($resourceUri, $request);
     }
 
-    protected function novaGetUpdatableFields(string $resourceClass, int $resourceId): TestResponse
+    protected function novaGetUpdatableFieldsAPICall(string $resourceClass, int $resourceId): TestResponse
     {
         $resourceUri = $this->getNovaResourceUri($resourceClass);
 

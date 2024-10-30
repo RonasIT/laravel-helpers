@@ -9,6 +9,7 @@ use RonasIT\Support\Tests\Support\Mock\MockAuthUser;
 use RonasIT\Support\Tests\Support\Mock\TestModel;
 use RonasIT\Support\Tests\Support\Mock\TestNovaAction;
 use RonasIT\Support\Traits\MockTrait;
+use RonasIT\Support\Traits\NovaTestTrait;
 use Symfony\Component\HttpFoundation\Response;
 
 class NovaTestTraitTest extends HelpersTestCase
@@ -46,7 +47,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response('', Response::HTTP_CREATED);
         });
 
-        $result = $this->novaCreateResource(TestModel::class, ['key' => 'value']);
+        $result = $this->novaCreateResourceAPICall(TestModel::class, ['key' => 'value']);
 
         $result->assertCreated();
     }
@@ -61,7 +62,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response($request->all(), Response::HTTP_OK);
         });
 
-        $result = $this->novaUpdateResource(TestModel::class, 1, ['key' => 'value']);
+        $result = $this->novaUpdateResourceAPICall(TestModel::class, 1, ['key' => 'value']);
 
         $result->assertOk();
     }
@@ -72,7 +73,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response('', Response::HTTP_OK);
         });
 
-        $result = $this->novaGetResource(TestModel::class, 1);
+        $result = $this->novaGetResourceAPICall(TestModel::class, 1);
 
         $result->assertOk();
     }
@@ -87,7 +88,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response($request->all(), Response::HTTP_OK);
         });
 
-        $result = $this->novaSearchResource(TestModel::class,  ['key' => 'value']);
+        $result = $this->novaSearchResourceAPICall(TestModel::class,  ['key' => 'value']);
 
         $result->assertOk();
     }
@@ -98,7 +99,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response('', Response::HTTP_OK);
         });
 
-        $result = $this->novaGetCreationFields(TestModel::class);
+        $result = $this->novaGetCreationFieldsAPICall(TestModel::class);
 
         $result->assertOk();
     }
@@ -113,7 +114,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response($request->all(), Response::HTTP_OK);
         });
 
-        $result = $this->novaGetActions(TestModel::class, [1, 2]);
+        $result = $this->novaGetActionsAPICall(TestModel::class, [1, 2]);
 
         $result->assertOk();
 
@@ -130,7 +131,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response($request->all(), Response::HTTP_OK);
         });
 
-        $result = $this->novaDeleteResource(TestModel::class, [1, 2]);
+        $result = $this->novaDeleteResourceAPICall(TestModel::class, [1, 2]);
 
         $result->assertOk();
 
@@ -143,7 +144,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response('', Response::HTTP_OK);
         });
 
-        $result = $this->novaGetUpdatableFields(TestModel::class, 1);
+        $result = $this->novaGetUpdatableFieldsAPICall(TestModel::class, 1);
 
         $result->assertOk();
     }
@@ -154,7 +155,7 @@ class NovaTestTraitTest extends HelpersTestCase
             return response($request->all(), Response::HTTP_OK);
         });
 
-        $result = $this->novaRunAction(TestModel::class, TestNovaAction::class, ['key' => 'value']);
+        $result = $this->novaRunActionAPICall(TestModel::class, TestNovaAction::class, ['key' => 'value']);
 
         $result->assertOk();
 
