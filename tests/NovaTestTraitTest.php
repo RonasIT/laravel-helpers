@@ -32,7 +32,7 @@ class NovaTestTraitTest extends HelpersTestCase
 
     public function testGetNovaResourceUri()
     {
-        $result = $this->getNovaResourceUri(TestModel::class);
+        $result = $this->generateNovaUri(TestModel::class);
 
         $this->assertEquals($result, '/nova-api/test-model-resources');
     }

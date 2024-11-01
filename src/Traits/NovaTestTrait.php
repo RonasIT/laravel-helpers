@@ -20,75 +20,75 @@ trait NovaTestTrait
 
     protected function novaCreateResourceAPICall(string $resourceClass, ?array $data = []): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass);
 
-        return $this->postJson($resourceUri, $data);
+        return $this->json('post', $uri, $data);
     }
 
     protected function novaUpdateResourceAPICall(string $resourceClass, int $resourceId, ?array $data = []): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass);
 
-        return $this->putJson("{$resourceUri}/{$resourceId}", $data);
+        return $this->json('put', "{$uri}/{$resourceId}", $data);
     }
 
     protected function novaGetResourceAPICall(string $resourceClass, int $resourceId, ?array $data = []): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass);
 
-        return $this->getJson("{$resourceUri}/{$resourceId}", $data);
+        return $this->json('get', "{$uri}/{$resourceId}", $data);
     }
 
     protected function novaSearchResourceAPICall(string $resourceClass, ?array $request = []): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass);
 
-        return $this->json('get', $resourceUri, $request);
+        return $this->json('get', $uri, $request);
     }
 
     protected function novaGetCreationFieldsAPICall(string $resourceClass): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass, '/creation-fields');
 
-        return $this->getJson("{$resourceUri}/creation-fields");
+        return $this->json('get', $uri);
     }
 
     protected function novaRunActionAPICall(string $resourceClass, string $actionClass, ?array $request = []): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
-
         $actionUri = app($actionClass)->uriKey();
 
-        return $this->json('POST', "{$resourceUri}/action?action={$actionUri}", $request);
+        $uri = $this->generateNovaUri($resourceClass, "/action?action={$actionUri}");
+
+        return $this->json('post', $uri, $request);
     }
 
     protected function novaGetActionsAPICall(string $resourceClass, array $resourceIds): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass, '/actions');
 
         $request = [
             'resources' => implode(',', $resourceIds),
         ];
 
-        return $this->json('get', "{$resourceUri}/actions", $request);
+        return $this->json('get', $uri, $request);
     }
 
     protected function novaDeleteResourceAPICall(string $resourceClass, array $resourceIds): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass);
 
         $request = [
             'resources' => $resourceIds,
         ];
 
-        return $this->deleteJson($resourceUri, $request);
+        return $this->json('delete', $uri, $request);
     }
 
     protected function novaGetUpdatableFieldsAPICall(string $resourceClass, int $resourceId): TestResponse
     {
-        $resourceUri = $this->getNovaResourceUri($resourceClass);
+        $uri = $this->generateNovaUri($resourceClass, "/{$resourceId}/update-fields");
 
-        return $this->getJson("{$resourceUri}/{$resourceId}/update-fields");
+        return $this->json('get', $uri);
     }
 
     protected function novaActingAs(?Authenticatable $user = null): TestCase|self
@@ -98,12 +98,12 @@ trait NovaTestTrait
             : $this->actingAs($user, 'web');
     }
 
-    protected function getNovaResourceUri(string $modelClass): string
+    protected function generateNovaUri(string $modelClass, string $path = ''): string
     {
         $modelName = Str::afterLast($modelClass, '\\');
 
         $modelName = Str::kebab($modelName);
 
-        return "/nova-api/{$modelName}-resources";
+        return "/nova-api/{$modelName}-resources{$path}";
     }
 }
