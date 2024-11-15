@@ -144,5 +144,6 @@ class HelpersServiceProvider extends ServiceProvider
         RouteFacade::macro('versionFrom', fn (Version $from, $param = null) => $versionRange($from, null, $param));
         RouteFacade::macro('versionTo', fn (Version $to, $param = null) => $versionRange(null, $to, $param));
         RouteFacade::macro('version', fn (Version $version) => RouteFacade::prefix('v' . $version->value));
+        RouteFacade::macro('when', fn (bool $condition, callable $callback) => when($condition, $callback));
     }
 }
