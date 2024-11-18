@@ -47,7 +47,6 @@ trait MockTrait
 
         $methodsCalls->each(function ($calls, $method) use ($mock, $class) {
             $matcher = $this->exactly($calls->count());
-
             $mock
                 ->expects($matcher)
                 ->method($method)
@@ -135,6 +134,12 @@ trait MockTrait
         $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
             : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
+        $expectedCount = count($expected);
+        $actualCount = count($actual);
+
+        if($expectedCount != $actualCount) {
+            $this->fail("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments");
+        }
 
         foreach ($actual as $index => $argument) {
             $this->assertEquals(
