@@ -53,4 +53,18 @@ class MockTraitTest extends HelpersTestCase
         $this->assertEquals(7, rand(6, 10));
         $this->assertEquals('0987654321', uniqid());
     }
+
+    public function testAssertArgumentMismatchBetweenExpectedAndActualArguments()
+    {
+        $message = 'Failed assert that function testfunction was called with 2 arguments, actually it calls with 1 arguments';
+
+        try{
+            $this->assertArguments(['test'],['test',''], 'testclass','testfunction', 0);
+        }catch (\Exception $e){
+            $this->assertEquals($message, $e->getMessage());
+            return;
+        }
+
+        $this->fail('Exception was not thrown');
+    }
 }

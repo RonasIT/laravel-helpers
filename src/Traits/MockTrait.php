@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Exception;
 use Illuminate\Support\Arr;
 use Closure;
 use phpmock\phpunit\PHPMock;
@@ -139,8 +140,8 @@ trait MockTrait
         $expectedCount = count($expected);
         $actualCount = count($actual);
 
-        if($expectedCount != $actualCount) {
-            $this->fail("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments");
+        if ($expectedCount != $actualCount) {
+            throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments");
         }
 
         foreach ($actual as $index => $argument) {
