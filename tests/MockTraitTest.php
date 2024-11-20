@@ -56,7 +56,7 @@ class MockTraitTest extends HelpersTestCase
 
     public function testAssertArgumentMismatchBetweenExpectedAndActualArguments()
     {
-        $message = 'Failed assert that function testfunction was called with 2 arguments, actually it calls with 1 arguments';
+        $message = 'Failed assert that function testfunction was called with 2 arguments, actually it calls with 1 arguments.';
 
         try{
             $this->assertArguments(['test'],['test',''], 'testclass','testfunction', 0);
