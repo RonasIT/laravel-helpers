@@ -141,7 +141,7 @@ trait MockTrait
         $actualCount = count($actual);
 
         if ($expectedCount != $actualCount) {
-            throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments");
+            throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
         }
 
         foreach ($actual as $index => $argument) {
