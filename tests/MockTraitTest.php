@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests;
 
 use RonasIT\Support\Traits\MockTrait;
+use Exception;
 
 class MockTraitTest extends HelpersTestCase
 {
@@ -54,17 +55,14 @@ class MockTraitTest extends HelpersTestCase
         $this->assertEquals('0987654321', uniqid());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAssertArgumentMismatchBetweenExpectedAndActualArguments()
     {
-        $message = 'Failed assert that function testfunction was called with 2 arguments, actually it calls with 1 arguments.';
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Failed assert that function testFunction was called with 2 arguments, actually it calls with 1 arguments.');
 
-        try{
-            $this->assertArguments(['test'],['test',''], 'testclass','testfunction', 0);
-        }catch (\Exception $e){
-            $this->assertEquals($message, $e->getMessage());
-            return;
-        }
-
-        $this->fail('Exception was not thrown');
+        $this->assertArguments(['test'], ['test', ''], 'TestClass', 'testFunction', 0);
     }
 }
