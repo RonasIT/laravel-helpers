@@ -55,9 +55,6 @@ class MockTraitTest extends HelpersTestCase
         $this->assertEquals('0987654321', uniqid());
     }
 
-    /**
-     * @throws Exception
-     */
     public function testAssertArgumentMismatchBetweenExpectedAndActualArguments()
     {
         $this->expectException(Exception::class);
