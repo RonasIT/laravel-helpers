@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Exception;
 use Illuminate\Support\Arr;
 use Closure;
 use phpmock\phpunit\PHPMock;
@@ -135,6 +136,13 @@ trait MockTrait
         $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
             : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
+
+        $expectedCount = count($expected);
+        $actualCount = count($actual);
+
+        if ($expectedCount != $actualCount) {
+            throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
+        }
 
         foreach ($actual as $index => $argument) {
             $this->assertEquals(
