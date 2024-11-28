@@ -113,8 +113,9 @@ class ModelTestState extends Assert
         $testClassTrace = Arr::first(debug_backtrace(), fn ($trace) => str_ends_with($trace['file'], 'Test.php'));
         $testFileName = Arr::last(explode('/', $testClassTrace['file']));
         $testClass = Str::remove('.php', $testFileName);
+        $tableName = $this->model->getTable();
 
-        return base_path("tests/fixtures/{$testClass}/{$fixtureName}");
+        return base_path("tests/fixtures/{$testClass}/changes/{$tableName}/{$fixtureName}");
     }
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
