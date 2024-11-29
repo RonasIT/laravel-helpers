@@ -8,20 +8,20 @@ class TableTestState extends ModelTestState
 {
     protected string $tableName;
 
-    public function __construct(string $tableName, $namespace = 'App\Models\\')
+    public function __construct(string $tableName, string $namespace = 'App\Models\\')
     {
         $this->tableName = $tableName;
 
-        $modelClassName = $this->getModelName($tableName);
+        $modelClassName = $this->getModelName($this->tableName);
 
         $class = $namespace . $modelClassName;
 
         parent::__construct($class);
     }
 
-    function getModelName($string): string
+    protected function getModelName(string $tableName): string
     {
-        $words = explode('_', $string);
+        $words = explode('_', $tableName);
 
         $pascalWords = array_map('ucfirst', $words);
 
