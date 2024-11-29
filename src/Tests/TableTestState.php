@@ -13,7 +13,6 @@ class TableTestState extends ModelTestState
         $this->tableName = $tableName;
 
         $modelClassName = $this->getModelName($this->tableName);
-
         $class = $namespace . $modelClassName;
 
         parent::__construct($class);
@@ -22,7 +21,6 @@ class TableTestState extends ModelTestState
     protected function getModelName(string $tableName): string
     {
         $words = explode('_', $tableName);
-
         $pascalWords = array_map('ucfirst', $words);
 
         return Str::singular(implode('', $pascalWords));
