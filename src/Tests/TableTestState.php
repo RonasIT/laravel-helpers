@@ -2,27 +2,16 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
-class TableTestState extends ModelTestState
+class TableTestState extends BaseTestState
 {
-    protected string $tableName;
-
-    public function __construct(string $tableName, string $namespace = 'App\Models\\')
+    public function __construct(string $tableName, array $jsonFields = [])
     {
-        $this->tableName = $tableName;
-
-        $modelClassName = $this->getModelName($this->tableName);
-        $class = $namespace . $modelClassName;
-
-        parent::__construct($class);
-    }
-
-    protected function getModelName(string $tableName): string
-    {
-        $words = explode('_', $tableName);
-        $pascalWords = array_map('ucfirst', $words);
-
-        return Str::singular(implode('', $pascalWords));
+        parent::__construct(
+            tableName: $tableName,
+            jsonFields: $jsonFields,
+            connectionName: DB::getDefaultConnection(),
+        );
     }
 }
