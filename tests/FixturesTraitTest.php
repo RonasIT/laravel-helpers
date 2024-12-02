@@ -11,6 +11,7 @@ use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -70,6 +71,31 @@ class FixturesTraitTest extends HelpersTestCase
         $this->assertEquals($this->getJsonFixture('export_json/response.json'), $result);
 
         $this->assertFileExists($this->getFixturePath('export_json/response.json'));
+    }
+
+    public function testExportJsonDirNotExists()
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        $result = [
+            'value' => 1234567890,
+        ];
+
+        $fixtureName = 'export_json/some_directory/response.json';
+
+        $this->exportJson($fixtureName, new TestResponse(
+            new Response(json_encode($result))
+        ));
+
+        $this->assertEquals($this->getJsonFixture($fixtureName), $result);
+
+        $fixturePath = $this->getFixturePath($fixtureName);
+
+        $this->assertFileExists($fixturePath);
+
+        unlink($fixturePath);
+
+        rmdir(Str::beforeLast($fixturePath, '/'));
     }
 
     public function testExportFile()

@@ -115,7 +115,7 @@ class ModelTestState extends Assert
         $testClass = Str::remove('.php', $testFileName);
         $tableName = $this->model->getTable();
 
-        return base_path("tests/fixtures/{$testClass}/changes/{$tableName}/{$fixtureName}");
+        return base_path("tests/fixtures/{$testClass}/db_changes/{$tableName}/{$fixtureName}");
     }
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
