@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
@@ -213,15 +214,28 @@ trait FixturesTrait
         return self::$sequences;
     }
 
-    protected function exportContent($content, string $fixture): void
+    protected function exportContent(string $content, string $fixture): void
     {
         if (env('FAIL_EXPORT_JSON', true)) {
             throw new ForbiddenExportModeException();
         }
 
-        file_put_contents(
-            $this->getFixturePath($fixture),
-            $content
-        );
+        $path = $this->getFixturePath($fixture);
+
+        $this->makeFixtureDir($path);
+
+        file_put_contents($path, $content);
+    }
+
+    protected function makeFixtureDir(string $path): void
+    {
+        $dir = Str::beforeLast($path, '/');
+
+        if (!is_dir($dir)) {
+            mkdir(
+                directory: $dir,
+                recursive: true,
+            );
+        }
     }
 }
