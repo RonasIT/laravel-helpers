@@ -214,7 +214,7 @@ trait FixturesTrait
         return self::$sequences;
     }
 
-    protected function exportContent($content, string $fixture): void
+    protected function exportContent(string $content, string $fixture): void
     {
         if (env('FAIL_EXPORT_JSON', true)) {
             throw new ForbiddenExportModeException();
