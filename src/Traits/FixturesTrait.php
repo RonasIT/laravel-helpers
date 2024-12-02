@@ -232,7 +232,10 @@ trait FixturesTrait
         $dir = Str::beforeLast($path, '/');
 
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            mkdir(
+                directory: $dir,
+                recursive: true,
+            );
         }
     }
 }

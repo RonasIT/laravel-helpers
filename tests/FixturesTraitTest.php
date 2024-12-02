@@ -83,9 +83,7 @@ class FixturesTraitTest extends HelpersTestCase
 
         $fixtureName = 'export_json/some_directory/response.json';
 
-        $this->exportJson($fixtureName, new TestResponse(
-            new Response(json_encode($result))
-        ));
+        $this->exportJson($fixtureName, $result);
 
         $this->assertEquals($this->getJsonFixture($fixtureName), $result);
 
