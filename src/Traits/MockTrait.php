@@ -57,16 +57,14 @@ trait MockTrait
                     $expectedCall = $calls[$callIndex];
 
                     $expectedArguments = Arr::get($expectedCall, 'arguments');
-
-                    if (!empty($expectedArguments)) {
-                        $this->assertArguments(
-                            $args,
-                            $expectedArguments,
-                            $class,
-                            $method,
-                            $callIndex
-                        );
-                    }
+dd(1);
+                    $this->assertArguments(
+                        $args,
+                        $expectedArguments,
+                        $class,
+                        $method,
+                        $callIndex
+                    );
 
                     return $expectedCall['result'];
                 });
@@ -109,16 +107,14 @@ trait MockTrait
 
                     $expectedArguments = Arr::get($expectedCall, 'arguments');
 
-                    if (!empty($expectedArguments)) {
-                        $this->assertArguments(
-                            $args,
-                            $expectedArguments,
-                            $namespace,
-                            $function,
-                            $callIndex,
-                            false
-                        );
-                    }
+                    $this->assertArguments(
+                        $args,
+                        $expectedArguments,
+                        $namespace,
+                        $function,
+                        $callIndex,
+                        false
+                    );
 
                     return $expectedCall['result'];
                 });
@@ -133,16 +129,23 @@ trait MockTrait
         int $callIndex,
         bool $isClass = true
     ): void {
-        $message = ($isClass)
-            ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
-            : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
-
         $expectedCount = count($expected);
         $actualCount = count($actual);
 
-        if ($expectedCount != $actualCount) {
-            throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
+        if ($expectedCount !== $actualCount) {
+            $optionalParametersCount = count(array_filter($actual, fn ($item) => $item === 'optionalParameter'));
+            $requiredParametersCount = $actualCount - $optionalParametersCount;
+
+            if ($expectedCount > $actualCount || $expectedCount < $requiredParametersCount) {
+                throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
+            }
         }
+dump($expected, $actualCount, $expectedCount);
+        $expected = array_merge($expected, array_fill(0, $actualCount - $expectedCount, 'optionalParameter'));
+dd($expected);
+        $message = ($isClass)
+            ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
+            : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
 
         foreach ($actual as $index => $argument) {
             $this->assertEquals(
