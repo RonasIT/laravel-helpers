@@ -57,7 +57,7 @@ trait MockTrait
                     $expectedCall = $calls[$callIndex];
 
                     $expectedArguments = Arr::get($expectedCall, 'arguments');
-dd(1);
+
                     $this->assertArguments(
                         $args,
                         $expectedArguments,
@@ -140,9 +140,9 @@ dd(1);
                 throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
             }
         }
-dump($expected, $actualCount, $expectedCount);
+
         $expected = array_merge($expected, array_fill(0, $actualCount - $expectedCount, 'optionalParameter'));
-dd($expected);
+
         $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
             : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
