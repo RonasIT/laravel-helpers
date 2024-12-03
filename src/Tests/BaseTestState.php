@@ -97,7 +97,7 @@ class BaseTestState extends Assert
         $testFileName = Arr::last(explode('/', $testClassTrace['file']));
         $testClass = Str::remove('.php', $testFileName);
 
-        return base_path("tests/fixtures/{$testClass}/{$fixtureName}");
+        return base_path("tests/fixtures/{$testClass}/db_changes/{$this->tableName}/{$fixtureName}");
     }
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
