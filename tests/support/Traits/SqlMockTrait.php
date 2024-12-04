@@ -432,14 +432,18 @@ trait SqlMockTrait
     }
 
     protected function mockListExists(
-        bool $isExist,
+        array $result,
         string $table = 'clients',
         string $keyField = 'user_id',
     ): void {
-        $this->mockSelectExists(
-            "select exists(select * from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)) as \"exists\"",
-            $isExist,
-            [1, 2, 3]
+        $formattedResult = array_map(function ($id) use ($keyField) {
+            return [$keyField => $id];
+        }, $result);
+
+        $this->mockSelect(
+            query: "select distinct \"{$keyField}\" from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
+            result: $formattedResult,
+            bindings: [1, 2, 3],
         );
     }
 

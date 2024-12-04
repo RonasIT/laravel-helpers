@@ -67,7 +67,6 @@ class HelpersServiceProvider extends ServiceProvider
         });
 
         Validator::extend('list_exists', function ($attribute, $value, $parameters) {
-
             if (count($parameters) < 1) {
                 return false;
             }
@@ -76,12 +75,20 @@ class HelpersServiceProvider extends ServiceProvider
             $keyField = Arr::get($parameters, 1, 'id');
 
             if (!empty(Arr::get($parameters, 2))) {
-                $value = collect($value)->pluck(Arr::get($parameters, 2));
+                $value = collect($value)
+                    ->pluck(Arr::get($parameters, 2))
+                    ->toArray();
             }
 
-            return DB::table($table)
+            $value = array_unique($value);
+
+            $existingValue = DB::table($table)
                 ->whereIn($keyField, $value)
-                ->exists();
+                ->distinct()
+                ->pluck($keyField)
+                ->toArray();
+
+            return count($existingValue) === count($value);
         });
     }
 
