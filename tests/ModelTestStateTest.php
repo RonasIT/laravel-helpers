@@ -5,11 +5,11 @@ namespace RonasIT\Support\Tests;
 use ReflectionClass;
 use RonasIT\Support\Tests\Support\Mock\TestModel;
 use RonasIT\Support\Tests\Support\Mock\TestModelWithoutJsonFields;
-use RonasIT\Support\Tests\Support\Traits\ModelTestStateMockTrait;
+use RonasIT\Support\Tests\Support\Traits\BaseTestStateMockTrait;
 
 class ModelTestStateTest extends HelpersTestCase
 {
-    use ModelTestStateMockTrait;
+    use BaseTestStateMockTrait;
 
     public function setUp(): void
     {
