@@ -13,6 +13,8 @@ trait MockTrait
 {
     use PHPMock;
 
+    protected const OPTIONAL_PARAMETER = 'optionalParameter';
+
     /**
      * Mock selected class. Call chain should looks like:
      *
@@ -133,7 +135,7 @@ trait MockTrait
         $actualCount = count($actual);
 
         if ($expectedCount !== $actualCount) {
-            $optionalParametersCount = count(array_filter($actual, fn ($item) => $item === 'optionalParameter'));
+            $optionalParametersCount = count(array_filter($actual, fn ($item) => $item === self::OPTIONAL_PARAMETER));
             $requiredParametersCount = $actualCount - $optionalParametersCount;
 
             if ($expectedCount > $actualCount || $expectedCount < $requiredParametersCount) {
@@ -141,7 +143,7 @@ trait MockTrait
             }
         }
 
-        $expected = array_merge($expected, array_fill(0, $actualCount - $expectedCount, 'optionalParameter'));
+        $expected = array_pad($expected, $actualCount, self::OPTIONAL_PARAMETER);
 
         $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
