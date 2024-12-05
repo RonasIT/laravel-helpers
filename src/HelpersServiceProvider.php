@@ -75,20 +75,18 @@ class HelpersServiceProvider extends ServiceProvider
             $keyField = Arr::get($parameters, 1, 'id');
 
             if (!empty(Arr::get($parameters, 2))) {
-                $value = collect($value)
-                    ->pluck(Arr::get($parameters, 2))
-                    ->toArray();
+                $value = Arr::pluck($value, Arr::get($parameters, 2));
             }
 
             $value = array_unique($value);
 
-            $existingValue = DB::table($table)
+            $existingValueCount = DB::table($table)
                 ->whereIn($keyField, $value)
                 ->distinct()
                 ->pluck($keyField)
-                ->toArray();
+                ->count();
 
-            return count($existingValue) === count($value);
+            return $existingValueCount === count($value);
         });
     }
 
