@@ -9,14 +9,14 @@ class ModelTestState extends BaseTestState
 {
     protected Model $model;
 
-    public function __construct(string $modelClassName, ?string $connectionName = null)
+    public function __construct(string $modelClassName)
     {
         $this->model = new $modelClassName();
 
         parent::__construct(
             tableName: $this->model->getTable(),
             jsonFields: $this->getModelJSONFields(),
-            connectionName: $connectionName ?? $this->model->getConnectionName(),
+            connectionName: $this->model->getConnectionName(),
         );
     }
 
