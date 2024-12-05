@@ -63,6 +63,10 @@ trait MailsMockTrait
         $emailChain = $this->prepareEmailChain($emailChain);
         $index = 0;
 
+        if ($this->globalExportMode ?? false) {
+            $exportMode = true;
+        }
+
         Mail::assertQueued($mailableClass, $this->assertSentCallback($emailChain, $index, $exportMode));
 
         $this->assertCountMails($emailChain, $index);
