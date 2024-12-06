@@ -13,7 +13,7 @@ trait MockTrait
 {
     use PHPMock;
 
-    protected const OPTIONAL_PARAMETER = 'optionalParameter';
+    protected const OPTIONAL_ARGUMENT_NAME = 'optionalParameter';
 
     /**
      * Mock selected class. Call chain should looks like:
@@ -135,14 +135,14 @@ trait MockTrait
         $actualCount = count($actual);
 
         if ($expectedCount !== $actualCount) {
-            $requiredParametersCount = count(array_filter($actual, fn ($item) => $item !== self::OPTIONAL_PARAMETER));
+            $requiredParametersCount = count(array_filter($actual, fn ($item) => $item !== self::OPTIONAL_ARGUMENT_NAME));
 
             if ($expectedCount > $actualCount || $expectedCount < $requiredParametersCount) {
                 throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
             }
         }
 
-        $expected = array_pad($expected, $actualCount, self::OPTIONAL_PARAMETER);
+        $expected = array_pad($expected, $actualCount, self::OPTIONAL_ARGUMENT_NAME);
 
         $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
