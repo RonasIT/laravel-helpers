@@ -13,6 +13,8 @@ trait MockTrait
 {
     use PHPMock;
 
+    protected const OPTIONAL_ARGUMENT_NAME = 'optionalParameter';
+
     /**
      * Mock selected class. Call chain should looks like:
      *
@@ -58,15 +60,13 @@ trait MockTrait
 
                     $expectedArguments = Arr::get($expectedCall, 'arguments');
 
-                    if (!empty($expectedArguments)) {
-                        $this->assertArguments(
-                            $args,
-                            $expectedArguments,
-                            $class,
-                            $method,
-                            $callIndex
-                        );
-                    }
+                    $this->assertArguments(
+                        $args,
+                        $expectedArguments,
+                        $class,
+                        $method,
+                        $callIndex
+                    );
 
                     return $expectedCall['result'];
                 });
@@ -109,16 +109,14 @@ trait MockTrait
 
                     $expectedArguments = Arr::get($expectedCall, 'arguments');
 
-                    if (!empty($expectedArguments)) {
-                        $this->assertArguments(
-                            $args,
-                            $expectedArguments,
-                            $namespace,
-                            $function,
-                            $callIndex,
-                            false
-                        );
-                    }
+                    $this->assertArguments(
+                        $args,
+                        $expectedArguments,
+                        $namespace,
+                        $function,
+                        $callIndex,
+                        false
+                    );
 
                     return $expectedCall['result'];
                 });
@@ -133,16 +131,22 @@ trait MockTrait
         int $callIndex,
         bool $isClass = true
     ): void {
-        $message = ($isClass)
-            ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
-            : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
-
         $expectedCount = count($expected);
         $actualCount = count($actual);
 
-        if ($expectedCount != $actualCount) {
-            throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
+        if ($expectedCount !== $actualCount) {
+            $requiredParametersCount = count(array_filter($actual, fn ($item) => $item !== self::OPTIONAL_ARGUMENT_NAME));
+
+            if ($expectedCount > $actualCount || $expectedCount < $requiredParametersCount) {
+                throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
+            }
         }
+
+        $expected = array_pad($expected, $actualCount, self::OPTIONAL_ARGUMENT_NAME);
+
+        $message = ($isClass)
+            ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
+            : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
 
         foreach ($actual as $index => $argument) {
             $this->assertEquals(

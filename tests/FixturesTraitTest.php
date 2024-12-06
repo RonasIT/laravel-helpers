@@ -217,7 +217,11 @@ class FixturesTraitTest extends HelpersTestCase
         $connection = $this->mockClass(PostgresConnection::class, [
             $this->functionCall('getQueryGrammar', [], new Grammar()),
             $this->functionCall('getPostProcessor', [], new Processor()),
-            $this->functionCall('select', [], $sequences),
+            $this->functionCall('select', [
+                'select "table_name", "table_schema", "column_name", "column_default" from "information_schema"."columns" where "column_default" LIKE ?',
+                ['nextval%'],
+                true,
+            ], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
