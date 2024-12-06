@@ -135,8 +135,7 @@ trait MockTrait
         $actualCount = count($actual);
 
         if ($expectedCount !== $actualCount) {
-            $optionalParametersCount = count(array_filter($actual, fn ($item) => $item === self::OPTIONAL_PARAMETER));
-            $requiredParametersCount = $actualCount - $optionalParametersCount;
+            $requiredParametersCount = count(array_filter($actual, fn ($item) => $item !== self::OPTIONAL_PARAMETER));
 
             if ($expectedCount > $actualCount || $expectedCount < $requiredParametersCount) {
                 throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
