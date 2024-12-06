@@ -436,13 +436,11 @@ trait SqlMockTrait
         string $table = 'clients',
         string $keyField = 'user_id',
     ): void {
-        $formattedResult = array_map(function ($id) use ($keyField) {
-            return [$keyField => $id];
-        }, $result);
+        $countResult = [[ 'aggregate' => count($result) ]];
 
         $this->mockSelect(
-            query: "select distinct \"{$keyField}\" from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
-            result: $formattedResult,
+            query: "select count(distinct \"{$keyField}\") as aggregate from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
+            result: $countResult,
             bindings: [1, 2, 3],
         );
     }

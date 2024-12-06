@@ -83,8 +83,7 @@ class HelpersServiceProvider extends ServiceProvider
             $existingValueCount = DB::table($table)
                 ->whereIn($keyField, $value)
                 ->distinct()
-                ->pluck($keyField)
-                ->count();
+                ->count($keyField);
 
             return $existingValueCount === count($value);
         });
