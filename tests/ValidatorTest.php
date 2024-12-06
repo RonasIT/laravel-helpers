@@ -67,7 +67,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExists()
     {
-        $this->mockListExists(true);
+        $this->mockListExists([1, 2, 3]);
 
         $validator = Validator::make(
             ['ids' => [1, 2, 3]],
@@ -79,7 +79,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExistsByArray()
     {
-        $this->mockListExists(true);
+        $this->mockListExists([1, 2, 3]);
 
         $validator = Validator::make(
             [
@@ -108,7 +108,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExistsFailedValidation()
     {
-        $this->mockListExists(false);
+        $this->mockListExists([1, 2]);
 
         $validator = Validator::make(
             ['ids' => [1, 2, 3]],
