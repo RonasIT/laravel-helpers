@@ -63,10 +63,6 @@ trait MailsMockTrait
         $emailChain = $this->prepareEmailChain($emailChain);
         $index = 0;
 
-        if (!$exportMode) {
-            $exportMode = $this->globalExportMode ?? false;
-        }
-
         Mail::assertQueued($mailableClass, $this->assertSentCallback($emailChain, $index, $exportMode));
 
         $this->assertCountMails($emailChain, $index);
@@ -183,7 +179,9 @@ trait MailsMockTrait
         $data = (method_exists($mail, 'content')) ? $mail->content()->with : $mail->viewData;
         $mailContent = view($view, $data)->render();
 
-        if ($exportMode) {
+        $globalExportMode = $this->globalExportMode ?? false;
+
+        if ($exportMode || $globalExportMode) {
             $this->exportContent($mailContent, $expectedMailData['fixture']);
         }
 
