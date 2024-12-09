@@ -47,12 +47,16 @@ class MockTraitTest extends HelpersTestCase
             $this->functionCall('is_array', [123]),
             $this->functionCall('rand', [6, 10], 7),
             $this->functionCall('uniqid', [], '0987654321'),
+            $this->functionCall('array_slice', [[1, 2, 3, 4, 5], 2, 2], [3, 4]),
+            $this->functionCall('array_slice', [[1, 2, 3, 4, 5], 2], [3, 4, 5]),
         ]);
 
         $this->assertEquals(2, rand(1, 5));
         $this->assertTrue(is_array(123));
         $this->assertEquals(7, rand(6, 10));
         $this->assertEquals('0987654321', uniqid());
+        $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2));
+        $this->assertEquals([3, 4, 5], array_slice([1, 2, 3, 4, 5], 2));
     }
 
     public function testAssertArgumentMismatchBetweenExpectedAndActualArguments()
