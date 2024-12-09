@@ -77,6 +77,18 @@ class ValidatorTest extends HelpersTestCase
         $this->assertTrue($validator->passes());
     }
 
+    public function testListExistsIfDuplicateValues()
+    {
+        $this->mockListExists([1, 2, 3]);
+
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3, 3]],
+            ['ids' => 'list_exists:clients,user_id'],
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
     public function testListExistsByArray()
     {
         $this->mockListExists([1, 2, 3]);
