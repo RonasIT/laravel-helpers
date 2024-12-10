@@ -14,15 +14,21 @@ class TableTestState extends Assert
     use FixturesTrait;
 
     protected string $tableName;
-    protected Collection $state;
-    protected ?string $connectionName;
     protected array $jsonFields;
+    protected ?string $connectionName;
+    protected bool $globalExportMode;
+    protected Collection $state;
 
-    public function __construct(string $tableName, array $jsonFields = [], ?string $connectionName = null)
-    {
+    public function __construct(
+        string $tableName,
+        array $jsonFields,
+        bool $globalExportMode = false,
+        ?string $connectionName = null,
+    ) {
         $this->tableName = $tableName;
         $this->jsonFields = $jsonFields;
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
+        $this->globalExportMode = $globalExportMode;
         $this->state = $this->getDataSet($tableName);
     }
 
@@ -40,6 +46,7 @@ class TableTestState extends Assert
     public function assertChangesEqualsFixture(string $fixture, bool $exportMode = false): void
     {
         $changes = $this->getChanges();
+        $exportMode = $this->globalExportMode || $exportMode;
 
         $this->assertEqualsFixture($fixture, $changes, $exportMode);
     }
