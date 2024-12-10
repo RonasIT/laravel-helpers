@@ -21,7 +21,7 @@ class TableTestState extends Assert
 
     public function __construct(
         string $tableName,
-        array $jsonFields,
+        array $jsonFields = [],
         bool $globalExportMode = false,
         ?string $connectionName = null,
     ) {
