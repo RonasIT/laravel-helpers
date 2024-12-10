@@ -118,14 +118,14 @@ class MailsMockTraitTest extends HelpersTestCase
         $this->assertFileExists($this->getFixturePath('test_mail_with_export.html'));
     }
 
-    public function testMailWithGlobalExportMod()
+    public function testMailWithGlobalExportMode()
     {
         putenv('FAIL_EXPORT_JSON=false');
 
         Mail::to('test@mail.com')->queue(new TestMail(['name' => 'John Smith']));
 
         $this->assertMailEquals(TestMail::class, [
-            $this->mockedMail('test@mail.com', 'test_mail_with_export.html', 'Test Subject'),
+            $this->mockedMail('test@mail.com', 'test_mail_with_global_export.html', 'Test Subject'),
         ]);
 
         $this->assertFileExists($this->getFixturePath('test_mail_with_export.html'));
