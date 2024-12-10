@@ -6,17 +6,15 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-trait BaseTestStateMockTrait
+trait TableTestStateMockTrait
 {
     use MockTestTrait;
 
-    protected function mockGettingDataset(Collection $responseMock, bool $isNeedDefaultConnection = false): void
+    protected function mockGettingDataset(Collection $responseMock): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 
-        if ($isNeedDefaultConnection) {
-            DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-        }
+        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
 
         DB::shouldReceive('connection')->once()->andReturnSelf();
         DB::shouldReceive('table')->with('test_models')->once()->andReturn($builderMock);
@@ -31,18 +29,10 @@ trait BaseTestStateMockTrait
             ->willReturn($responseMock);
     }
 
-    protected function mockGettingDatasetForChanges(
-        Collection $responseMock,
-        Collection $initialState,
-        string $tableName,
-        bool $isNeedDefaultConnection = false,
-    ): void {
+    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName): void {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 
-        if ($isNeedDefaultConnection) {
-            DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-        }
-
+        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
         DB::shouldReceive('connection')->twice()->andReturnSelf();
         DB::shouldReceive('table')->with($tableName)->twice()->andReturn($builderMock);
 

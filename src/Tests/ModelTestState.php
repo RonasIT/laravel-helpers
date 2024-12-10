@@ -5,24 +5,22 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
-class ModelTestState extends BaseTestState
+class ModelTestState extends TableTestState
 {
-    protected Model $model;
-
     public function __construct(string $modelClassName)
     {
-        $this->model = new $modelClassName();
+        $model = new $modelClassName();
 
         parent::__construct(
-            tableName: $this->model->getTable(),
-            jsonFields: $this->getModelJSONFields(),
-            connectionName: $this->model->getConnectionName(),
+            tableName: $model->getTable(),
+            jsonFields: $this->getModelJSONFields($model),
+            connectionName: $model->getConnectionName($model),
         );
     }
 
-    protected function getModelJSONFields(): array
+    protected function getModelJSONFields(Model $model): array
     {
-        $casts = $this->model->getCasts();
+        $casts = $model->getCasts();
 
         $jsonCasts = array_filter($casts, fn ($cast) => $this->isJsonCast($cast));
 

@@ -5,11 +5,11 @@ namespace RonasIT\Support\Tests;
 use ReflectionClass;
 use RonasIT\Support\Tests\Support\Mock\TestModel;
 use RonasIT\Support\Tests\Support\Mock\TestModelWithoutJsonFields;
-use RonasIT\Support\Tests\Support\Traits\BaseTestStateMockTrait;
+use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class ModelTestStateTest extends HelpersTestCase
 {
-    use BaseTestStateMockTrait;
+    use TableTestStateMockTrait;
 
     public function setUp(): void
     {
@@ -33,7 +33,6 @@ class ModelTestStateTest extends HelpersTestCase
         $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertNotEmpty($jsonFields);
         $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
     }
