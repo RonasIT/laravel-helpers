@@ -3,22 +3,11 @@
 namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
-use RonasIT\Support\Tests\Support\Mock\TestModel;
-use RonasIT\Support\Tests\Support\Mock\TestModelWithoutJsonFields;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
-class ModelTestStateTest extends HelpersTestCase
+class TableTestStateTest extends HelpersTestCase
 {
     use TableTestStateMockTrait;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        self::$tables = null;
-
-        putenv('FAIL_EXPORT_JSON=false');
-    }
 
     public function testInitialization()
     {
@@ -27,11 +16,11 @@ class ModelTestStateTest extends HelpersTestCase
 
         $this->mockGettingDataset($datasetMock);
 
-        $modelTestState = new ModelTestState(TestModel::class);
-        $reflectionClass = new ReflectionClass($modelTestState);
+        $tableTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
+        $reflectionClass = new ReflectionClass($tableTestState);
 
-        $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
-        $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
+        $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $tableTestState);
+        $state = $this->getProtectedProperty($reflectionClass, 'state', $tableTestState);
 
         $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
@@ -44,7 +33,7 @@ class ModelTestStateTest extends HelpersTestCase
 
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
 
-        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
     }
 
@@ -57,9 +46,9 @@ class ModelTestStateTest extends HelpersTestCase
             $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
         );
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_without_json_fields');
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
 
-        $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
+        $modelTestState = new TableTestState('test_models');
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
     }
 
@@ -69,7 +58,7 @@ class ModelTestStateTest extends HelpersTestCase
 
         $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
 
-        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertNotChanged();
     }
 }
