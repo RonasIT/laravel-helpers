@@ -4,6 +4,7 @@ namespace RonasIT\Support;
 
 use Illuminate\Support\Arr;
 use Illuminate\Foundation\Http\FormRequest;
+use RonasIT\Support\Exceptions\InvalidModelException;
 
 class BaseRequest extends FormRequest
 {
@@ -40,6 +41,17 @@ class BaseRequest extends FormRequest
         }
 
         return $validatedFields;
+    }
+
+    protected function getOrderableFields(string $modelName, array $additionalFields = []): string
+    {
+        if (!class_exists($modelName)) {
+            throw new InvalidModelException("The model {$modelName} does not exist.");
+        }
+
+        $fields = array_merge($modelName::getFields(), $additionalFields);
+
+        return implode(',', $fields);
     }
 
     protected function filterOnlyValidated($fields, $validation): array
