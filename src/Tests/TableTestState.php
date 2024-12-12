@@ -15,7 +15,7 @@ class TableTestState extends Assert
 
     protected string $tableName;
     protected Collection $state;
-    protected ?string $connectionName;
+    protected string $connectionName;
     protected array $jsonFields;
 
     public function __construct(string $tableName, array $jsonFields = [], ?string $connectionName = null)
