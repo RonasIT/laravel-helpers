@@ -58,7 +58,7 @@ trait MockTrait
                     $callIndex = $this->getInvocationCount($matcher) - 1;
                     $expectedCall = $calls[$callIndex];
 
-                    $expectedArguments = Arr::get($expectedCall, 'arguments');
+                    $expectedArguments = Arr::get($expectedCall, 'arguments', []);
 
                     $this->assertArguments(
                         $args,
@@ -107,7 +107,7 @@ trait MockTrait
                     $callIndex = $this->getInvocationCount($matcher) - 1;
                     $expectedCall = $calls[$callIndex];
 
-                    $expectedArguments = Arr::get($expectedCall, 'arguments');
+                    $expectedArguments = Arr::get($expectedCall, 'arguments', []);
 
                     $this->assertArguments(
                         $args,
