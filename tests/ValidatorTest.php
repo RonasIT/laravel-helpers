@@ -81,10 +81,11 @@ class ValidatorTest extends HelpersTestCase
     {
         $this->mockListExists([1, 2, 3]);
 
-        $validator = Validator::make(
-            ['ids' => [1, 2, 3, 3]],
-            ['ids' => 'list_exists:clients,user_id'],
-        );
+        $validator = Validator::make([
+            'ids' => [1, 2, 3, 3],
+        ] [
+            'ids' => 'list_exists:clients,user_id',
+        ]);
 
         $this->assertTrue($validator->passes());
     }
