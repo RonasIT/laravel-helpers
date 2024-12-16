@@ -17,11 +17,11 @@ class BaseRequestTest extends HelpersTestCase
         $reflectionClass = new ReflectionClass($baseRequest);
 
         $method = $reflectionClass->getMethod('getOrderableFields');
-        $orderableFields = $method->invoke($baseRequest, TestModel::class);
+        $result = $method->invoke($baseRequest, TestModel::class);
 
-        $modelFields = implode(',', TestModel::getFields());
+        $modelFields = 'id,name,json_field,castable_field,*,created_at,updated_at';
 
-        $this->assertEquals($orderableFields, $modelFields);
+        $this->assertEquals($modelFields, $result);
     }
 
     public function testGetOrderableFieldsWithAdditionalFields()
@@ -30,10 +30,10 @@ class BaseRequestTest extends HelpersTestCase
         $reflectionClass = new ReflectionClass($baseRequest);
 
         $method = $reflectionClass->getMethod('getOrderableFields');
-        $orderableFields = $method->invoke($baseRequest, TestModel::class, ['additional_field_1', 'additional_field_2']);
+        $result = $method->invoke($baseRequest, TestModel::class, ['additional_field_1', 'additional_field_2']);
 
-        $modelFields = implode(',', array_merge(TestModel::getFields(), ['additional_field_1', 'additional_field_2'])) ;
+        $modelAndAdditionalFields = 'id,name,json_field,castable_field,*,created_at,updated_at,additional_field_1,additional_field_2';
 
-        $this->assertEquals($orderableFields, $modelFields);
+        $this->assertEquals($modelAndAdditionalFields, $result);
     }
 }
