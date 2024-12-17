@@ -46,7 +46,6 @@ class TableTestState extends Assert
     public function assertChangesEqualsFixture(string $fixture, bool $exportMode = false): void
     {
         $changes = $this->getChanges();
-        $exportMode = $this->globalExportMode || $exportMode;
 
         $this->assertEqualsFixture($fixture, $changes, $exportMode);
     }
