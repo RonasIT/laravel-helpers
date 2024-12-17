@@ -19,9 +19,9 @@ class BaseRequestTest extends HelpersTestCase
         $method = $reflectionClass->getMethod('getOrderableFields');
         $result = $method->invoke($baseRequest, TestModel::class);
 
-        $modelFields = 'id,name,json_field,castable_field,*,created_at,updated_at';
+        $expectedResult = 'id,name,json_field,castable_field,*,created_at,updated_at';
 
-        $this->assertEquals($modelFields, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 
     public function testGetOrderableFieldsWithAdditionalFields()
