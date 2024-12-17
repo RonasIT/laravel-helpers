@@ -37,6 +37,28 @@ class ModelTestStateTest extends HelpersTestCase
         $this->assertEquals($originRecords, $state);
     }
 
+    public function testInitializationViaPrepareModelTestState()
+    {
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+        $this->mockGettingDataset($datasetMock);
+
+        $mock = $this->getMockBuilder(TestCase::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $reflection = new ReflectionClass($mock);
+
+        $this->assertFalse($reflection->getProperty('globalExportMode')->getValue($mock));
+
+        $setGlobalExportMode = $reflection->getMethod('setGlobalExportMode');
+        $setGlobalExportMode->invoke($mock);
+
+        $prepareModelTestState = $reflection->getMethod('prepareModelTestState');
+        $prepareModelTestState->invoke($mock, TestModel::class);
+
+        $this->assertTrue($reflection->getProperty('globalExportMode')->getValue($mock));
+    }
+
     public function testAssertChangesEqualsFixture()
     {
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
