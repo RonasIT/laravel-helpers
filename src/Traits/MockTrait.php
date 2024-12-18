@@ -134,21 +134,45 @@ trait MockTrait
         $expectedCount = count($expected);
         $actualCount = count($actual);
 
-        if ($expectedCount !== $actualCount) {
+        if ($isClass) {
+            $reflectionMethod = new \ReflectionMethod($class, $function);
+            $parameters = $reflectionMethod->getParameters();
+            $requiredParametersCount = count(array_filter($parameters, fn($param) => !$param->isOptional()));
+        } else {
+            $parameters = $actual;
             $requiredParametersCount = count(array_filter($actual, fn ($item) => $item !== self::OPTIONAL_ARGUMENT_NAME));
-
-            if ($expectedCount > $actualCount || $expectedCount < $requiredParametersCount) {
-                throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
-            }
         }
 
-        $expected = array_pad($expected, $actualCount, self::OPTIONAL_ARGUMENT_NAME);
+        if ($expectedCount !== $actualCount) {
+            $optionalParametersCount = $actualCount - $requiredParametersCount;
+
+            $this->assertFalse(
+                $expectedCount > $actualCount || $expectedCount < $requiredParametersCount,
+                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$requiredParametersCount} required and {$optionalParametersCount} optional arguments."
+            );
+        }
+
+        if ($isClass) {
+            foreach ($parameters as $index => $parameter) {
+                if (!isset($expected[$index]) && $parameter->isOptional()) {
+                    $expected[$index] = $parameter->getDefaultValue();
+                }
+            }
+        } else {
+            $expected = array_pad($expected, $actualCount, self::OPTIONAL_ARGUMENT_NAME);
+        }
 
         $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
             : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
 
         foreach ($actual as $index => $argument) {
+            $expectedArgument = $expected[$index] ?? null;
+
+            if ($isClass && $parameters[$index]->isOptional() && $argument !== $expectedArgument) {
+                $argument = $expected[$index];
+            }
+
             $this->assertEquals(
                 $expected[$index],
                 $argument,
