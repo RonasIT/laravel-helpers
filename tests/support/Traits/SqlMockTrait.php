@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests\Support\Traits;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use Mpyw\LaravelDatabaseMock\Proxies\SingleConnectionProxy;
 
@@ -436,11 +437,24 @@ trait SqlMockTrait
         string $table = 'clients',
         string $keyField = 'user_id',
     ): void {
-        $this->mockSelect(
-            query: "select count(distinct \"{$keyField}\") as aggregate from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
-            result: [[ 'aggregate' => count($result) ]],
-            bindings: [1, 2, 3],
-        );
+        DB::shouldReceive('getSchemaBuilder->getColumnListing')
+            ->with('clients')
+            ->andReturn(['id', 'user_id', 'name']);
+
+        DB::shouldReceive('table')
+            ->with($table)
+            ->andReturnSelf();
+
+        DB::shouldReceive('whereIn')
+            ->with($keyField, [1, 2, 3])
+            ->andReturnSelf();
+
+        DB::shouldReceive('distinct')
+            ->andReturnSelf();
+
+        DB::shouldReceive('count')
+            ->with($keyField)
+            ->andReturn(count($result));
     }
 
     protected function mockUpdateSqlQuery(string $sql, array $bindings = [], ?int $rowCount = null): void

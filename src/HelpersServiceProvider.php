@@ -66,13 +66,21 @@ class HelpersServiceProvider extends ServiceProvider
             return !$result;
         });
 
-        Validator::extend('list_exists', function ($attribute, $value, $parameters) {
+        Validator::extend('list_exists', function ($attribute, $value, $parameters, $validator) {
             if (count($parameters) < 1) {
                 return false;
             }
 
             $table = Arr::get($parameters, 0);
             $keyField = Arr::get($parameters, 1, 'id');
+
+            $tableFields = DB::getSchemaBuilder()->getColumnListing($table);
+
+            if (!in_array($keyField, $tableFields)) {
+                $validator->errors()->add($attribute, "Field `{$keyField}` does not exist in the `{$table}` table");
+
+                return false;
+            }
 
             if (!empty(Arr::get($parameters, 2))) {
                 $value = Arr::pluck($value, Arr::get($parameters, 2));
