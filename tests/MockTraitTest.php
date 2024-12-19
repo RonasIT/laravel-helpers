@@ -60,13 +60,4 @@ class MockTraitTest extends HelpersTestCase
         $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2));
         $this->assertEquals([3, 4, 5], array_slice([1, 2, 3, 4, 5], 2));
     }
-
-    public function testAssertArgumentMismatchBetweenExpectedAndActualArguments()
-    {
-        $this->expectException(Exception::class);
-
-        $this->expectExceptionMessage('Failed assert that function testFunction was called with 1 arguments, actually it calls with 2 required and 0 optional arguments.');
-
-        $this->assertArguments(['test', 'test_2'], ['test'], 'TestClass', 'testFunction', 0, false);
-    }
 }

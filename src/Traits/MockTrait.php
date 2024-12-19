@@ -144,11 +144,9 @@ trait MockTrait
         }
 
         if ($expectedCount !== $actualCount) {
-            $optionalParametersCount = $actualCount - $requiredParametersCount;
-
             $this->assertFalse(
                 $expectedCount > $actualCount || $expectedCount < $requiredParametersCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$requiredParametersCount} required and {$optionalParametersCount} optional arguments."
+                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments."
             );
         }
 
