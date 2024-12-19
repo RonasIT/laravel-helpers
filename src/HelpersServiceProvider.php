@@ -66,15 +66,37 @@ class HelpersServiceProvider extends ServiceProvider
             return !$result;
         });
 
-        Validator::extend('list_exists', function ($attribute, $value, $parameters) {
+        Validator::extend('list_exists', function ($attribute, $value, $parameters, $validator) {
             if (count($parameters) < 1) {
+                $validator->errors()->add($attribute, 'You must add at least 1 parameter');
+
                 return false;
             }
 
             $table = Arr::get($parameters, 0);
             $keyField = Arr::get($parameters, 1, 'id');
 
-            if (!empty(Arr::get($parameters, 2))) {
+            $tableFields = DB::getSchemaBuilder()->getColumnListing($table);
+
+            if (!in_array($keyField, $tableFields)) {
+                $validator->errors()->add($attribute, "Field `{$keyField}` does not exist in `{$table}` table or `{$table}` table does not exist.");
+
+                return false;
+            }
+
+            $isExistsParam = !empty(Arr::get($parameters, 2));
+
+            foreach ($value as $element) {
+                $isArray = is_array($element);
+
+                if ($isExistsParam && !$isArray || !$isExistsParam && $isArray) {
+                    $validator->errors()->add($attribute, 'Please check the `list_exists` rule parameters or incoming data.');
+
+                    return false;
+                }
+            }
+
+            if ($isExistsParam) {
                 $value = Arr::pluck($value, Arr::get($parameters, 2));
             }
 
