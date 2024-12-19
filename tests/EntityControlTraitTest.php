@@ -39,7 +39,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
         $this->attachedRelationsCountProperty = new ReflectionProperty(TestRepository::class, 'attachedRelationsCount');
 
-        self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
+        self::$selectResult ??= $this->getJsonFixture('select_query_result');
 
         Carbon::setTestNow('2020-01-01 00:00:00');
     }

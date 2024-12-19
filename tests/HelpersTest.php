@@ -13,39 +13,39 @@ class HelpersTest extends HelpersTestCase
     {
         return [
             [
-                'input' => 'city.json',
+                'input' => 'city',
                 'key' => 'neighborhoods.*.zips.*.state',
-                'expected' => 'states.json',
+                'expected' => 'states',
             ],
             [
-                'input' => 'neighborhood.json',
+                'input' => 'neighborhood',
                 'key' => 'zips.*.code',
-                'expected' => 'neighborhood.zips.codes.json',
+                'expected' => 'neighborhood.zips.codes',
             ],
             [
-                'input' => 'city.json',
+                'input' => 'city',
                 'key' => 'neighborhoods.*.zips.*.code',
-                'expected' => 'city.neighborhoods.zips.codes.json',
+                'expected' => 'city.neighborhoods.zips.codes',
             ],
             [
-                'input' => 'city.json',
+                'input' => 'city',
                 'key' => 'neighborhoods.*.zips',
-                'expected' => 'city.neighborhoods.zips.json',
+                'expected' => 'city.neighborhoods.zips',
             ],
             [
-                'input' => 'city.json',
+                'input' => 'city',
                 'key' => 'neighborhoods',
-                'expected' => 'city.neighborhoods.json',
+                'expected' => 'city.neighborhoods',
             ],
             [
-                'input' => 'neighborhood.json',
+                'input' => 'neighborhood',
                 'key' => 'zips',
-                'expected' => 'neighborhood.zips.json',
+                'expected' => 'neighborhood.zips',
             ],
             [
-                'input' => 'areas.json',
+                'input' => 'areas',
                 'key' => 'zips.*.area.houses.*.number',
-                'expected' => 'areas.houses.json',
+                'expected' => 'areas.houses',
             ],
         ];
     }
@@ -64,15 +64,15 @@ class HelpersTest extends HelpersTestCase
     {
         return [
             [
-                'input' => 'areas.houses.json',
+                'input' => 'areas.houses',
                 'expected' => false,
             ],
             [
-                'input' => 'areas.json',
+                'input' => 'areas',
                 'expected' => false,
             ],
             [
-                'input' => 'city.neighborhoods.json',
+                'input' => 'city.neighborhoods',
                 'expected' => true,
             ],
         ];
@@ -92,23 +92,23 @@ class HelpersTest extends HelpersTestCase
     {
         return [
             [
-                'firstArray' => 'array_equals/settings.json',
-                'secondArray' => 'array_equals/settings_diff.json',
+                'firstArray' => 'array_equals/settings',
+                'secondArray' => 'array_equals/settings_diff',
                 'expected' => false,
             ],
             [
-                'firstArray' => 'array_equals/settings_rather_types.json',
-                'secondArray' => 'array_equals/settings_rather_types_diff_order.json',
+                'firstArray' => 'array_equals/settings_rather_types',
+                'secondArray' => 'array_equals/settings_rather_types_diff_order',
                 'expected' => true,
             ],
             [
-                'firstArray' => 'array_equals/settings.json',
-                'secondArray' => 'array_equals/settings_diff_order.json',
+                'firstArray' => 'array_equals/settings',
+                'secondArray' => 'array_equals/settings_diff_order',
                 'expected' => true,
             ],
             [
-                'firstArray' => 'areas.houses.json',
-                'secondArray' => 'array_equals/non_associative.json',
+                'firstArray' => 'areas.houses',
+                'secondArray' => 'array_equals/non_associative',
                 'expected' => true,
             ],
         ];
@@ -127,27 +127,27 @@ class HelpersTest extends HelpersTestCase
 
     public function testArrayRound()
     {
-        $input = $this->getJsonFixture('array_round/values.json');
+        $input = $this->getJsonFixture('array_round/values');
 
         $result = array_round($input);
 
-        $this->assertEqualsFixture('array_round/rounded_values.json', $result);
+        $this->assertEqualsFixture('array_round/rounded_values', $result);
     }
 
     public static function getArrayDuplicatesData(): array
     {
         return [
             [
-                'input' => 'array_get_duplicates/numeric_array.json',
-                'expected' => 'array_get_duplicates/numeric_array_duplicates.json',
+                'input' => 'array_get_duplicates/numeric_array',
+                'expected' => 'array_get_duplicates/numeric_array_duplicates',
             ],
             [
-                'input' => 'array_get_duplicates/string_array.json',
-                'expected' => 'array_get_duplicates/string_array_duplicates.json',
+                'input' => 'array_get_duplicates/string_array',
+                'expected' => 'array_get_duplicates/string_array_duplicates',
             ],
             [
-                'input' => 'array_get_duplicates/complex_array.json',
-                'expected' => 'array_get_duplicates/complex_array_duplicates.json',
+                'input' => 'array_get_duplicates/complex_array',
+                'expected' => 'array_get_duplicates/complex_array_duplicates',
             ],
         ];
     }
@@ -167,15 +167,15 @@ class HelpersTest extends HelpersTestCase
         return [
             [
                 'filter' => 'id',
-                'expected' => 'array_unique_objects/unique_objects_filtered_by_string_key.json',
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_string_key',
             ],
             [
                 'filter' => ['name'],
-                'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key.json',
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key',
             ],
             [
                 'filter' => fn ($objet) => $objet['id'],
-                'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key.json',
+                'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key',
             ],
         ];
     }
@@ -183,7 +183,7 @@ class HelpersTest extends HelpersTestCase
     #[DataProvider('getArrayUniqueObjectsData')]
     public function testArrayUniqueObjects(string|callable|array $filter, string $expected)
     {
-        $input = $this->getJsonFixture('array_unique_objects/array_with_duplicates.json');
+        $input = $this->getJsonFixture('array_unique_objects/array_with_duplicates');
 
         $result = array_unique_objects($input, $filter);
 
@@ -192,11 +192,11 @@ class HelpersTest extends HelpersTestCase
 
     public function testArrayTrim()
     {
-        $input = $this->getJsonFixture('array_trim/data.json');
+        $input = $this->getJsonFixture('array_trim/data');
 
         $result = array_trim($input);
 
-        $this->assertEqualsFixture('array_trim/result.json', $result);
+        $this->assertEqualsFixture('array_trim/result', $result);
     }
 
     public static function getArrayRemoveByFieldData(): array
@@ -205,12 +205,12 @@ class HelpersTest extends HelpersTestCase
             [
                 'field' => 'id',
                 'value' => 1,
-                'expected' => 'array_remove_by_field/result_remove_by_id.json',
+                'expected' => 'array_remove_by_field/result_remove_by_id',
             ],
             [
                 'field' => 'name',
                 'value' => 'test2',
-                'expected' => 'array_remove_by_field/result_remove_by_name.json',
+                'expected' => 'array_remove_by_field/result_remove_by_name',
             ],
         ];
     }
@@ -218,7 +218,7 @@ class HelpersTest extends HelpersTestCase
     #[DataProvider('getArrayRemoveByFieldData')]
     public function testArrayRemoveByField(string $field, string|int $value, string $expected)
     {
-        $input = $this->getJsonFixture('array_remove_by_field/data.json');
+        $input = $this->getJsonFixture('array_remove_by_field/data');
 
         $result = array_remove_by_field($input, $field, $value);
 
@@ -227,16 +227,16 @@ class HelpersTest extends HelpersTestCase
 
     public function testArrayUndot()
     {
-        $input = $this->getJsonFixture('array_undot/data.json');
+        $input = $this->getJsonFixture('array_undot/data');
 
         $result = array_undot($input);
 
-        $this->assertEqualsFixture('array_undot/result.json', $result);
+        $this->assertEqualsFixture('array_undot/result', $result);
     }
 
     public function testArrayAssociate()
     {
-        $input = $this->getJsonFixture('array_associate/data.json');
+        $input = $this->getJsonFixture('array_associate/data');
 
         $result = array_associate($input, function ($value, $key) {
             return [
@@ -245,27 +245,27 @@ class HelpersTest extends HelpersTestCase
             ];
         });
 
-        $this->assertEqualsFixture('array_associate/result.json', $result);
+        $this->assertEqualsFixture('array_associate/result', $result);
     }
 
     public function testArraySubtraction()
     {
-        $input1 = $this->getJsonFixture('array_subtraction/data1.json');
-        $input2 = $this->getJsonFixture('array_subtraction/data2.json');
+        $input1 = $this->getJsonFixture('array_subtraction/data1');
+        $input2 = $this->getJsonFixture('array_subtraction/data2');
 
         $result = array_subtraction($input1, $input2);
 
-        $this->assertEqualsFixture('array_subtraction/result.json', $result);
+        $this->assertEqualsFixture('array_subtraction/result', $result);
     }
 
     public function testArrayRemoveElements()
     {
-        $input1 = $this->getJsonFixture('array_remove_elements/data1.json');
-        $input2 = $this->getJsonFixture('array_remove_elements/data2.json');
+        $input1 = $this->getJsonFixture('array_remove_elements/data1');
+        $input2 = $this->getJsonFixture('array_remove_elements/data2');
 
         $result = array_remove_elements($input1, $input2);
 
-        $this->assertEqualsFixture('array_remove_elements/result.json', $result);
+        $this->assertEqualsFixture('array_remove_elements/result', $result);
     }
 
     public function testMkDirRecursively()
@@ -303,7 +303,7 @@ class HelpersTest extends HelpersTestCase
 
     public function testFPutQuotedCsv()
     {
-        $input = $this->getJsonFixture('fPutQuotedCsv/input.json');
+        $input = $this->getJsonFixture('fPutQuotedCsv/input');
 
         $fp = fopen('test.csv', 'w');
 

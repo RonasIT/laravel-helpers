@@ -54,6 +54,7 @@ trait FixturesTrait
     protected array $prepareSequencesExceptTables = ['migrations', 'password_resets'];
 
     protected string $dumpFileName = 'dump.sql';
+    protected string $extension = '.json';
 
     protected function loadTestDump(): void
     {
@@ -96,7 +97,7 @@ trait FixturesTrait
 
     public function getJsonFixture(string $fixtureName, $assoc = true)
     {
-        return json_decode($this->getFixture($fixtureName), $assoc);
+        return json_decode($this->getFixture($fixtureName . $this->extension), $assoc);
     }
 
     public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
@@ -116,7 +117,7 @@ trait FixturesTrait
             $data = $data->json();
         }
 
-        $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
+        $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture . $this->extension);
     }
 
     public function clearDatabase(array $tables, array $except): void
