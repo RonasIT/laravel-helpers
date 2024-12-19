@@ -102,7 +102,7 @@ class MailsMockTraitTest extends HelpersTestCase
         Mail::to('test1@mail.com')->queue($mail1->subject('Test Subject1'));
         Mail::to('test2@mail.com')->queue($mail2->subject('Test Subject2'));
 
-        $this->assertMailEquals(TestMail::class, 'email_chain.json');
+        $this->assertMailEquals(TestMail::class, 'email_chain');
     }
 
     public function testMailWithExport()

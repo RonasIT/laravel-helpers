@@ -54,7 +54,7 @@ class SearchTraitTest extends HelpersTestCase
         $reflectionClass = new ReflectionClass(TestRepository::class);
         $this->setAdditionalReservedFiltersMethod = $reflectionClass->getMethod('setAdditionalReservedFilters');
 
-        self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
+        self::$selectResult ??= $this->getJsonFixture('select_query_result');
     }
 
     public function testSearchQuery()
@@ -82,7 +82,7 @@ class SearchTraitTest extends HelpersTestCase
         $this->assertEquals(['relation'], $attachedRelations);
         $this->assertEquals(['relation'], $attachedRelationsCount);
 
-        $this->assertEqualsFixture('search_query_sql.json', $sql);
+        $this->assertEqualsFixture('search_query_sql', $sql);
     }
 
     public function testGetSearchResultWithAll()

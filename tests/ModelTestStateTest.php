@@ -22,8 +22,8 @@ class ModelTestStateTest extends HelpersTestCase
 
     public function testInitialization()
     {
-        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-        $originRecords = collect($this->getJsonFixture('initialization/origin_records.json'));
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset'));
+        $originRecords = collect($this->getJsonFixture('initialization/origin_records'));
 
         $this->mockGettingDataset($datasetMock);
 
@@ -39,33 +39,33 @@ class ModelTestStateTest extends HelpersTestCase
 
     public function testAssertChangesEqualsFixture()
     {
-        $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
-        $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
+        $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset'));
+        $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset'));
 
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture');
     }
 
     public function testAssertChangesWithoutJsonFields()
     {
         $initialDatasetMock = collect(
-            $this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset.json'),
+            $this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset'),
         );
         $changedDatasetMock = collect(
-            $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
+            $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset'),
         );
 
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_without_json_fields');
 
         $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields');
     }
 
     public function testAssertNoChanges()
     {
-        $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
+        $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset'));
 
         $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
 
