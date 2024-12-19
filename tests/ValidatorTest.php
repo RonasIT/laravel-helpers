@@ -67,6 +67,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExists()
     {
+        $this->mockGetColumnListing();
         $this->mockListExists([1, 2, 3]);
 
         $validator = Validator::make(
@@ -79,6 +80,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExistsIfDuplicateValues()
     {
+        $this->mockGetColumnListing();
         $this->mockListExists([1, 2, 3]);
 
         $validator = Validator::make([
@@ -92,6 +94,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExistsByArray()
     {
+        $this->mockGetColumnListing();
         $this->mockListExists([1, 2, 3]);
 
         $validator = Validator::make(
@@ -121,6 +124,7 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExistsFailedValidation()
     {
+        $this->mockGetColumnListing();
         $this->mockListExists([1, 2]);
 
         $validator = Validator::make(
@@ -129,6 +133,7 @@ class ValidatorTest extends HelpersTestCase
         );
 
         $this->assertTrue($validator->fails());
+        $this->assertEquals('validation.list_exists' ,$validator->errors()->first('ids'));
     }
 
     public function testListExistsWithoutArgs()
@@ -139,17 +144,80 @@ class ValidatorTest extends HelpersTestCase
         );
 
         $this->assertTrue($validator->fails());
+        $this->assertEquals('You must add at least 1 parameter' ,$validator->errors()->first('ids'));
     }
 
     public function testListExistsNotExistsField()
     {
+        $this->mockGetColumnListing();
         $this->mockListExists([1, 2, 3]);
 
         $validator = Validator::make(
             ['ids' => [1, 2, 3]],
-            ['ids' => 'list_exists:clients,role_id'],
+            ['ids' => 'list_exists:clients,not_exists_field'],
         );
 
-        $this->assertFalse($validator->passes());
+        $this->assertTrue($validator->fails());
+        $this->assertEquals('Field `not_exists_field` does not exist in `clients` table or `clients` table does not exist.' ,$validator->errors()->first('ids'));
+    }
+
+    public function testListExistsNotExistsTable()
+    {
+        $this->mockGetColumnListing('not_exists_table', []);
+
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3]],
+            ['ids' => 'list_exists:not_exists_table,user_id'],
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertEquals('Field `user_id` does not exist in `not_exists_table` table or `not_exists_table` table does not exist.' ,$validator->errors()->first('ids'));
+    }
+
+    public function testListExistsIncorrectParameters()
+    {
+        $this->mockGetColumnListing();
+        $this->mockListExists([1, 2, 3]);
+
+        $validator = Validator::make(
+            [
+                'ids' => [
+                    [
+                        'id' => 1,
+                        'name' => 'name1',
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'name2',
+                    ],
+                    [
+                        'id' => 3,
+                        'name' => 'name3',
+                    ],
+                ],
+            ],
+            [
+                'ids' => 'list_exists:clients,user_id',
+            ],
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertEquals('Please check the `list_exists` rule parameters or incoming data.' ,$validator->errors()
+            ->first('ids'));
+    }
+
+    public function testListExistsIncorrectData()
+    {
+        $this->mockGetColumnListing();
+        $this->mockListExists([1, 2, 3]);
+
+        $validator = Validator::make(
+            ['ids' => [1, 2, 3]],
+            ['ids' => 'list_exists:clients,user_id,id'],
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertEquals('Please check the `list_exists` rule parameters or incoming data.' ,$validator->errors()
+            ->first('ids'));
     }
 }

@@ -437,10 +437,6 @@ trait SqlMockTrait
         string $table = 'clients',
         string $keyField = 'user_id',
     ): void {
-        DB::shouldReceive('getSchemaBuilder->getColumnListing')
-            ->with('clients')
-            ->andReturn(['id', 'user_id', 'name']);
-
         DB::shouldReceive('table')
             ->with($table)
             ->andReturnSelf();
@@ -455,6 +451,13 @@ trait SqlMockTrait
         DB::shouldReceive('count')
             ->with($keyField)
             ->andReturn(count($result));
+    }
+
+    protected function mockGetColumnListing(string $table = 'clients', array $result = ['id', 'user_id', 'name']): void
+    {
+        DB::shouldReceive('getSchemaBuilder->getColumnListing')
+            ->with($table)
+            ->andReturn($result);
     }
 
     protected function mockUpdateSqlQuery(string $sql, array $bindings = [], ?int $rowCount = null): void
