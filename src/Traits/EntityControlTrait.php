@@ -155,6 +155,29 @@ trait EntityControlTrait
         return $model;
     }
 
+    public function insert(array $data): bool
+    {
+        $fillableData = [];
+        $timestamps = [];
+
+        if ($this->model->timestamps) {
+            $now = now();
+
+            $timestamps = [
+                $this->model::CREATED_AT => $now,
+                $this->model::UPDATED_AT => $now
+            ];
+        }
+
+        foreach ($data as $value) {
+            $fillableFields = Arr::only($value, $this->model->getFillable());
+
+            $fillableData[] = array_merge($fillableFields, $timestamps);
+        }
+
+        return $this->model->insert($fillableData);
+    }
+
     /**
      * Update rows by condition or primary key
      *

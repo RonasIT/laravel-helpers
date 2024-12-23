@@ -157,6 +157,42 @@ trait SqlMockTrait
         );
     }
 
+    protected function mockInsertData(): void {
+        $now = Carbon::now();
+
+        $query = 'insert into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            $now, 'test_name_1', $now,
+            $now, 'test_name_2', $now,
+            $now, 'test_name_3', $now,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertDataWithoutTimestamps(): void {
+        $query = 'insert into "test_models" ("name") values (?), (?), (?)';
+
+        $values = ['test_name_1', 'test_name_2', 'test_name_3'];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertDataWithDifferentTimestampNames(): void {
+        $now = Carbon::now();
+
+        $query = 'insert into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            $now, 'test_name_1', $now,
+            $now, 'test_name_2', $now,
+            $now, 'test_name_3', $now,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
     protected function mockUpdate(array $selectResult, $notFillableValue): void
     {
         $this->mockSelectById(

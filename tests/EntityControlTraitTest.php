@@ -3,10 +3,12 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
+use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Mock\TestRepositoryNoPrimaryKey;
+use RonasIT\Support\Tests\Support\Mock\TestRepositoryWithDifferentTimestampNames;
+use RonasIT\Support\Tests\Support\Mock\TestRepositoryWithoutTimestamps;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class EntityControlTraitTest extends HelpersTestCase
@@ -16,6 +18,8 @@ class EntityControlTraitTest extends HelpersTestCase
     protected static array $selectResult;
 
     protected static TestRepository $testRepositoryClass;
+    protected static TestRepositoryWithoutTimestamps $testRepositoryClassWithoutTimestamps;
+    protected static TestRepositoryWithDifferentTimestampNames $testRepositoryWithDifferentTimestampNames;
 
     protected ReflectionProperty $onlyTrashedProperty;
     protected ReflectionProperty $withTrashedProperty;
@@ -28,6 +32,8 @@ class EntityControlTraitTest extends HelpersTestCase
         parent::setUp();
 
         self::$testRepositoryClass ??= new TestRepository();
+        self::$testRepositoryClassWithoutTimestamps ??= new TestRepositoryWithoutTimestamps();
+        self::$testRepositoryWithDifferentTimestampNames ??= new TestRepositoryWithDifferentTimestampNames();
 
         $this->onlyTrashedProperty = new ReflectionProperty(TestRepository::class, 'onlyTrashed');
 
@@ -194,6 +200,54 @@ class EntityControlTraitTest extends HelpersTestCase
             ]);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testInsert()
+    {
+        $this->mockInsertData();
+
+        $result = self::$testRepositoryClass
+            ->insert([
+                ['name' => 'test_name_1'],
+                ['name' => 'test_name_2'],
+                ['name' => 'test_name_3'],
+            ]);
+
+        $this->assertTrue($result);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testInsertWithoutTimestamps()
+    {
+        $this->mockInsertDataWithoutTimestamps();
+
+        $result = self::$testRepositoryClassWithoutTimestamps
+            ->insert([
+                ['name' => 'test_name_1'],
+                ['name' => 'test_name_2'],
+                ['name' => 'test_name_3'],
+            ]);
+
+        $this->assertTrue($result);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClassWithoutTimestamps);
+    }
+
+    public function testInsertWithDifferentTimestampNames()
+    {
+        $this->mockInsertDataWithDifferentTimestampNames();
+
+        $result = self::$testRepositoryWithDifferentTimestampNames
+            ->insert([
+                ['name' => 'test_name_1'],
+                ['name' => 'test_name_2'],
+                ['name' => 'test_name_3'],
+            ]);
+
+        $this->assertTrue($result);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryWithDifferentTimestampNames);
     }
 
     public function testUpdateMany()
