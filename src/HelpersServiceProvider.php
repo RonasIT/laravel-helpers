@@ -73,34 +73,22 @@ class HelpersServiceProvider extends ServiceProvider
                 return false;
             }
 
-            $table = Arr::get($parameters, 0);
-            $keyField = Arr::get($parameters, 1, 'id');
+            $hasFieldNameParam = !empty(Arr::get($parameters, 2));
 
-            $tableFields = DB::getSchemaBuilder()->getColumnListing($table);
-
-            if (!in_array($keyField, $tableFields)) {
-                $validator->errors()->add($attribute, "Field `{$keyField}` does not exist in `{$table}` table or `{$table}` table does not exist.");
+            if (is_multidimensional($value) && !$hasFieldNameParam) {
+                $validator->errors()->add($attribute, 'The third argument should be filled for collections input.');
 
                 return false;
             }
 
-            $isExistsParam = !empty(Arr::get($parameters, 2));
-
-            foreach ($value as $element) {
-                $isArray = is_array($element);
-
-                if ($isExistsParam && !$isArray || !$isExistsParam && $isArray) {
-                    $validator->errors()->add($attribute, 'Please check the `list_exists` rule parameters or incoming data.');
-
-                    return false;
-                }
-            }
-
-            if ($isExistsParam) {
+            if ($hasFieldNameParam) {
                 $value = Arr::pluck($value, Arr::get($parameters, 2));
             }
 
             $value = array_unique($value);
+
+            $table = Arr::get($parameters, 0);
+            $keyField = Arr::get($parameters, 1, 'id');
 
             $existingValueCount = DB::table($table)
                 ->whereIn($keyField, $value)
