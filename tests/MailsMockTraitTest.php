@@ -123,13 +123,21 @@ class MailsMockTraitTest extends HelpersTestCase
         putenv('FAIL_EXPORT_JSON=false');
         $this->globalExportMode = true;
 
+        $fixturePath = $this->getFixturePath('test_mail_with_global_export.html');
+
+        if (file_exists($fixturePath)) {
+            unlink($fixturePath);
+        }
+
         Mail::to('test@mail.com')->queue(new TestMail(['name' => 'John Smith']));
 
         $this->assertMailEquals(TestMail::class, [
             $this->mockedMail('test@mail.com', 'test_mail_with_global_export.html', 'Test Subject'),
         ]);
 
-        $this->assertFileExists($this->getFixturePath('test_mail_with_global_export.html'));
+        $this->assertEqualsFixture('test_mail_with_global_export.html', 'test_mail_with_global_export_example');
+
+        unlink($fixturePath);
     }
 
     public function testMailWithIncorrectSubject()
