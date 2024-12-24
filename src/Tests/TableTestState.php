@@ -13,10 +13,11 @@ class TableTestState extends Assert
 {
     use FixturesTrait;
 
+    public bool $globalExportMode;
+
     protected string $tableName;
     protected array $jsonFields;
     protected ?string $connectionName;
-    protected bool $globalExportMode;
     protected Collection $state;
 
     public function __construct(
