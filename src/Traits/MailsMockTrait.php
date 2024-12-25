@@ -179,7 +179,9 @@ trait MailsMockTrait
         $data = (method_exists($mail, 'content')) ? $mail->content()->with : $mail->viewData;
         $mailContent = view($view, $data)->render();
 
-        if ($exportMode) {
+        $globalExportMode = $this->globalExportMode ?? false;
+
+        if ($exportMode || $globalExportMode) {
             $this->exportContent($mailContent, $expectedMailData['fixture']);
         }
 
