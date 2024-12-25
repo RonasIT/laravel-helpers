@@ -157,6 +157,41 @@ trait SqlMockTrait
         );
     }
 
+    protected function mockInsertData(): void
+    {
+        $query = 'insert into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            $this->mockedNow, 'test_name_1', $this->mockedNow,
+            $this->mockedNow, 'test_name_2', $this->mockedNow,
+            $this->mockedNow, 'test_name_3', $this->mockedNow,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertDataWithoutTimestamps(): void
+    {
+        $query = 'insert into "test_models" ("name") values (?), (?), (?)';
+
+        $values = ['test_name_1', 'test_name_2', 'test_name_3'];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertDataWithDifferentTimestampNames(): void
+    {
+        $query = 'insert into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            $this->mockedNow, 'test_name_1', $this->mockedNow,
+            $this->mockedNow, 'test_name_2', $this->mockedNow,
+            $this->mockedNow, 'test_name_3', $this->mockedNow,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
     protected function mockUpdate(array $selectResult, $notFillableValue): void
     {
         $this->mockSelectById(
