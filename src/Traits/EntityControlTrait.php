@@ -157,7 +157,6 @@ trait EntityControlTrait
 
     public function insert(array $data): bool
     {
-        $fillableData = [];
         $timestamps = [];
 
         if ($this->model->timestamps) {
@@ -169,13 +168,15 @@ trait EntityControlTrait
             ];
         }
 
-        foreach ($data as $value) {
-            $fillableFields = Arr::only($value, $this->model->getFillable());
+        $data = array_map(function ($item) use ($timestamps) {
+            $fillableFields = Arr::only($item, $this->model->getFillable());
 
-            $fillableData[] = array_merge($fillableFields, $timestamps);
-        }
+            return array_merge($fillableFields, $timestamps);
+        }, $data);
 
-        return $this->model->insert($fillableData);
+        $this->postQueryHook();
+
+        return $this->model->insert($data);
     }
 
     /**

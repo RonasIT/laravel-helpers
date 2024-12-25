@@ -204,9 +204,25 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testInsert()
     {
-        $this->mockInsertData();
+        $this->mockInsertData(Carbon::now());
+
+        $result = self::$testRepositoryClass->insert([
+            ['name' => 'test_name_1'],
+            ['name' => 'test_name_2'],
+            ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertWithSettableProperties()
+    {
+        $this->mockInsertData(Carbon::now());
 
         $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
             ->insert([
                 ['name' => 'test_name_1'],
                 ['name' => 'test_name_2'],
@@ -222,32 +238,26 @@ class EntityControlTraitTest extends HelpersTestCase
     {
         $this->mockInsertDataWithoutTimestamps();
 
-        $result = self::$testRepositoryClassWithoutTimestamps
-            ->insert([
-                ['name' => 'test_name_1'],
-                ['name' => 'test_name_2'],
-                ['name' => 'test_name_3'],
-            ]);
+        $result = self::$testRepositoryClassWithoutTimestamps->insert([
+            ['name' => 'test_name_1'],
+            ['name' => 'test_name_2'],
+            ['name' => 'test_name_3'],
+        ]);
 
         $this->assertTrue($result);
-
-        $this->assertSettablePropertiesReset(self::$testRepositoryClassWithoutTimestamps);
     }
 
     public function testInsertWithDifferentTimestampNames()
     {
-        $this->mockInsertDataWithDifferentTimestampNames();
+        $this->mockInsertDataWithDifferentTimestampNames(Carbon::now());
 
-        $result = self::$testRepositoryWithDifferentTimestampNames
-            ->insert([
-                ['name' => 'test_name_1'],
-                ['name' => 'test_name_2'],
-                ['name' => 'test_name_3'],
-            ]);
+        $result = self::$testRepositoryWithDifferentTimestampNames->insert([
+            ['name' => 'test_name_1'],
+            ['name' => 'test_name_2'],
+            ['name' => 'test_name_3'],
+        ]);
 
         $this->assertTrue($result);
-
-        $this->assertSettablePropertiesReset(self::$testRepositoryWithDifferentTimestampNames);
     }
 
     public function testUpdateMany()
