@@ -13,6 +13,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
+use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Middleware\SecurityMiddleware;
 use Illuminate\Routing\Router;
 
@@ -68,9 +69,7 @@ class HelpersServiceProvider extends ServiceProvider
 
         Validator::extend('list_exists', function ($attribute, $value, $parameters, $validator) {
             if (count($parameters) < 1) {
-                $validator->errors()->add($attribute, 'You must add at least 1 parameter');
-
-                return false;
+                throw new InvalidValidationRuleUsageException('You must add at least 1 parameter.');
             }
 
             $hasFieldNameParam = !empty(Arr::get($parameters, 2));

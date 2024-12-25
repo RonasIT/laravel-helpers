@@ -437,20 +437,11 @@ trait SqlMockTrait
         string $table = 'clients',
         string $keyField = 'user_id',
     ): void {
-        DB::shouldReceive('table')
-            ->with($table)
-            ->andReturnSelf();
-
-        DB::shouldReceive('whereIn')
-            ->with($keyField, [1, 2, 3])
-            ->andReturnSelf();
-
-        DB::shouldReceive('distinct')
-            ->andReturnSelf();
-
-        DB::shouldReceive('count')
-            ->with($keyField)
-            ->andReturn(count($result));
+        $this->mockSelect(
+            query: "select count(distinct \"{$keyField}\") as aggregate from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
+            result: [['aggregate' => count($result)]],
+            bindings: [1, 2, 3]
+        );
     }
 
     protected function mockUpdateSqlQuery(string $sql, array $bindings = [], ?int $rowCount = null): void
