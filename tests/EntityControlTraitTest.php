@@ -3,19 +3,25 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
+use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Mock\TestRepositoryNoPrimaryKey;
+use RonasIT\Support\Tests\Support\Mock\TestRepositoryWithDifferentTimestampNames;
+use RonasIT\Support\Tests\Support\Mock\TestRepositoryWithoutTimestamps;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class EntityControlTraitTest extends HelpersTestCase
 {
     use SqlMockTrait;
 
+    protected string $mockedNow = '2020-01-01 00:00:00';
+
     protected static array $selectResult;
 
     protected static TestRepository $testRepositoryClass;
+    protected static TestRepositoryWithoutTimestamps $testRepositoryClassWithoutTimestamps;
+    protected static TestRepositoryWithDifferentTimestampNames $testRepositoryWithDifferentTimestampNames;
 
     protected ReflectionProperty $onlyTrashedProperty;
     protected ReflectionProperty $withTrashedProperty;
@@ -28,6 +34,8 @@ class EntityControlTraitTest extends HelpersTestCase
         parent::setUp();
 
         self::$testRepositoryClass ??= new TestRepository();
+        self::$testRepositoryClassWithoutTimestamps ??= new TestRepositoryWithoutTimestamps();
+        self::$testRepositoryWithDifferentTimestampNames ??= new TestRepositoryWithDifferentTimestampNames();
 
         $this->onlyTrashedProperty = new ReflectionProperty(TestRepository::class, 'onlyTrashed');
 
@@ -41,7 +49,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
         self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
 
-        Carbon::setTestNow('2020-01-01 00:00:00');
+        Carbon::setTestNow($this->mockedNow);
     }
 
     public function testOnlyTrashed()
@@ -194,6 +202,64 @@ class EntityControlTraitTest extends HelpersTestCase
             ]);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testInsert()
+    {
+        $this->mockInsertData();
+
+        $result = self::$testRepositoryClass->insert([
+            ['name' => 'test_name_1'],
+            ['name' => 'test_name_2'],
+            ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertWithSettableProperties()
+    {
+        $this->mockInsertData();
+
+        $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->insert([
+                ['name' => 'test_name_1'],
+                ['name' => 'test_name_2'],
+                ['name' => 'test_name_3'],
+            ]);
+
+        $this->assertTrue($result);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testInsertWithoutTimestamps()
+    {
+        $this->mockInsertDataWithoutTimestamps();
+
+        $result = self::$testRepositoryClassWithoutTimestamps->insert([
+            ['name' => 'test_name_1'],
+            ['name' => 'test_name_2'],
+            ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertWithDifferentTimestampNames()
+    {
+        $this->mockInsertDataWithDifferentTimestampNames();
+
+        $result = self::$testRepositoryWithDifferentTimestampNames->insert([
+            ['name' => 'test_name_1'],
+            ['name' => 'test_name_2'],
+            ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertTrue($result);
     }
 
     public function testUpdateMany()
