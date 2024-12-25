@@ -130,7 +130,7 @@ class ValidatorTest extends HelpersTestCase
         );
 
         $this->assertTrue($validator->fails());
-        $this->assertEquals('validation.list_exists', $validator->errors()->first('ids'));
+        $this->assertEquals('Some of the passed ids are not exists.', $validator->errors()->first('ids'));
     }
 
     public function testListExistsWithoutArgs()
@@ -148,6 +148,9 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExistsIncorrectParameters()
     {
+        $this->expectException(InvalidValidationRuleUsageException::class);
+        $this->expectExceptionMessage('The third argument should be filled for collections input.');
+
         $validator = Validator::make(
             [
                 'ids' => [
@@ -171,6 +174,5 @@ class ValidatorTest extends HelpersTestCase
         );
 
         $this->assertTrue($validator->fails());
-        $this->assertEquals('The third argument should be filled for collections input.', $validator->errors()->first('ids'));
     }
 }

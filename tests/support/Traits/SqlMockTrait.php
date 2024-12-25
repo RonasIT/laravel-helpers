@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Tests\Support\Traits;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use Mpyw\LaravelDatabaseMock\Proxies\SingleConnectionProxy;
 

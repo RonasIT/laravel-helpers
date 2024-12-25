@@ -75,9 +75,7 @@ class HelpersServiceProvider extends ServiceProvider
             $hasFieldNameParam = !empty(Arr::get($parameters, 2));
 
             if (is_multidimensional($value) && !$hasFieldNameParam) {
-                $validator->errors()->add($attribute, 'The third argument should be filled for collections input.');
-
-                return false;
+                throw new InvalidValidationRuleUsageException('The third argument should be filled for collections input.');
             }
 
             if ($hasFieldNameParam) {
@@ -94,7 +92,13 @@ class HelpersServiceProvider extends ServiceProvider
                 ->distinct()
                 ->count($keyField);
 
-            return $existingValueCount === count($value);
+            if ($existingValueCount !== count($value)) {
+                $validator->errors()->add($attribute, "Some of the passed {$attribute} are not exists.");
+
+                return false;
+            }
+
+            return true;
         });
     }
 
