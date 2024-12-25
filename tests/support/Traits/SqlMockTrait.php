@@ -157,14 +157,14 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockInsertData(Carbon $now): void
+    protected function mockInsertData(): void
     {
         $query = 'insert into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            $now, 'test_name_1', $now,
-            $now, 'test_name_2', $now,
-            $now, 'test_name_3', $now,
+            $this->mockedNow, 'test_name_1', $this->mockedNow,
+            $this->mockedNow, 'test_name_2', $this->mockedNow,
+            $this->mockedNow, 'test_name_3', $this->mockedNow,
         ];
 
         $this->getPdo()->shouldInsert($query, $values);
@@ -179,14 +179,14 @@ trait SqlMockTrait
         $this->getPdo()->shouldInsert($query, $values);
     }
 
-    protected function mockInsertDataWithDifferentTimestampNames(Carbon $now): void
+    protected function mockInsertDataWithDifferentTimestampNames(): void
     {
         $query = 'insert into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            $now, 'test_name_1', $now,
-            $now, 'test_name_2', $now,
-            $now, 'test_name_3', $now,
+            $this->mockedNow, 'test_name_1', $this->mockedNow,
+            $this->mockedNow, 'test_name_2', $this->mockedNow,
+            $this->mockedNow, 'test_name_3', $this->mockedNow,
         ];
 
         $this->getPdo()->shouldInsert($query, $values);

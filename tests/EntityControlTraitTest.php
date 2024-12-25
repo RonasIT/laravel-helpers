@@ -15,6 +15,8 @@ class EntityControlTraitTest extends HelpersTestCase
 {
     use SqlMockTrait;
 
+    protected string $mockedNow = '2020-01-01 00:00:00';
+
     protected static array $selectResult;
 
     protected static TestRepository $testRepositoryClass;
@@ -47,7 +49,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
         self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
 
-        Carbon::setTestNow('2020-01-01 00:00:00');
+        Carbon::setTestNow($this->mockedNow);
     }
 
     public function testOnlyTrashed()
@@ -204,7 +206,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testInsert()
     {
-        $this->mockInsertData(Carbon::now());
+        $this->mockInsertData();
 
         $result = self::$testRepositoryClass->insert([
             ['name' => 'test_name_1'],
@@ -217,7 +219,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testInsertWithSettableProperties()
     {
-        $this->mockInsertData(Carbon::now());
+        $this->mockInsertData();
 
         $result = self::$testRepositoryClass
             ->withTrashed()
@@ -249,7 +251,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
     public function testInsertWithDifferentTimestampNames()
     {
-        $this->mockInsertDataWithDifferentTimestampNames(Carbon::now());
+        $this->mockInsertDataWithDifferentTimestampNames();
 
         $result = self::$testRepositoryWithDifferentTimestampNames->insert([
             ['name' => 'test_name_1'],
