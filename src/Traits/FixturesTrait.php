@@ -10,6 +10,8 @@ use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
 trait FixturesTrait
 {
+    const string JSON_EXTENSION = '.json';
+
     protected static $tables;
     protected static $sequences;
     protected $postgisTables = [
@@ -96,6 +98,8 @@ trait FixturesTrait
 
     public function getJsonFixture(string $fixtureName, $assoc = true)
     {
+        $fixtureName = $this->checkFixtureExtension($fixtureName);
+
         return json_decode($this->getFixture($fixtureName), $assoc);
     }
 
@@ -115,6 +119,8 @@ trait FixturesTrait
         if ($data instanceof TestResponse) {
             $data = $data->json();
         }
+
+        $fixture = $this->checkFixtureExtension($fixture);
 
         $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
@@ -237,5 +243,12 @@ trait FixturesTrait
                 recursive: true,
             );
         }
+    }
+
+    protected function checkFixtureExtension(string $fixture): string
+    {
+        return str_contains($fixture, '.')
+            ? $fixture
+            : $fixture . self::JSON_EXTENSION;
     }
 }
