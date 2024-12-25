@@ -77,9 +77,7 @@ class FixturesTraitTest extends HelpersTestCase
     {
         putenv('FAIL_EXPORT_JSON=false');
 
-        $result = [
-            'value' => 1234567890,
-        ];
+        $result = ['value' => 1234567890];
 
         $this->exportJson('export_json/response', new TestResponse(
             new Response(json_encode($result))
