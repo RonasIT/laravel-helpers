@@ -136,8 +136,6 @@ class MailsMockTraitTest extends HelpersTestCase
         ]);
 
         $this->assertEqualsFixture('test_mail_with_global_export.html', 'test_mail_with_global_export_example');
-
-        unlink($fixturePath);
     }
 
     public function testMailWithIncorrectSubject()
