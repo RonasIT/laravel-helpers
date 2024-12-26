@@ -73,6 +73,32 @@ class FixturesTraitTest extends HelpersTestCase
         $this->assertFileExists($this->getFixturePath('export_json/response.json'));
     }
 
+    public function testGetJsonFixtureWithoutExtension()
+    {
+        $response = $this->getJsonFixture('get_fixture/exists_fixture');
+
+        $this->assertEqualsFixture('get_fixture/exists_fixture.json', $response);
+    }
+
+    public function testExportJsonWithoutExtension()
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        $fixturePath = $this->getFixturePath('export_json/response.json');
+
+        if (file_exists($fixturePath)) {
+            unlink($fixturePath);
+        }
+
+        $result = ['value' => 1234567890];
+
+        $this->exportJson('export_json/response', new TestResponse(
+            new Response(json_encode($result))
+        ));
+
+        $this->assertFileExists($this->getFixturePath('export_json/response.json'));
+    }
+
     public function testExportJsonDirNotExists()
     {
         putenv('FAIL_EXPORT_JSON=false');
@@ -112,8 +138,8 @@ class FixturesTraitTest extends HelpersTestCase
         $this->exportFile($response, 'export_file/content_result.txt');
 
         $this->assertEquals(
-            expected: $this->getJsonFixture('export_file/result.txt'),
-            actual: $this->getJsonFixture('export_file/content_result.txt'),
+            expected: $this->getFixture('export_file/result.txt'),
+            actual: $this->getFixture('export_file/content_result.txt'),
         );
     }
 

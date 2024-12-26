@@ -96,6 +96,8 @@ trait FixturesTrait
 
     public function getJsonFixture(string $fixtureName, $assoc = true)
     {
+        $fixtureName = $this->prepareFixtureName($fixtureName);
+
         return json_decode($this->getFixture($fixtureName), $assoc);
     }
 
@@ -115,6 +117,8 @@ trait FixturesTrait
         if ($data instanceof TestResponse) {
             $data = $data->json();
         }
+
+        $fixture = $this->prepareFixtureName($fixture);
 
         $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
@@ -237,5 +241,12 @@ trait FixturesTrait
                 recursive: true,
             );
         }
+    }
+
+    protected function prepareFixtureName(string $fixtureName): string
+    {
+        return (str_contains($fixtureName, '.'))
+            ? $fixtureName
+            : "{$fixtureName}.json";
     }
 }
