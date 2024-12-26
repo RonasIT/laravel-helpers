@@ -473,8 +473,8 @@ trait SqlMockTrait
     ): void {
         $this->mockSelect(
             query: "select count(distinct \"{$keyField}\") as aggregate from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
-            result: [[ 'aggregate' => count($result) ]],
-            bindings: [1, 2, 3],
+            result: [['aggregate' => count($result)]],
+            bindings: [1, 2, 3]
         );
     }
 

@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class ValidatorTest extends HelpersTestCase
@@ -129,13 +130,47 @@ class ValidatorTest extends HelpersTestCase
         );
 
         $this->assertTrue($validator->fails());
+        $this->assertEquals('Some of the passed ids are not exists.', $validator->errors()->first('ids'));
     }
 
     public function testListExistsWithoutArgs()
     {
+        $this->expectException(InvalidValidationRuleUsageException::class);
+        $this->expectExceptionMessage('You must add at least 1 parameter.');
+
         $validator = Validator::make(
             ['ids' => [1, 2, 3]],
             ['ids' => 'list_exists'],
+        );
+
+        $this->assertTrue($validator->fails());
+    }
+
+    public function testListExistsIncorrectParameters()
+    {
+        $this->expectException(InvalidValidationRuleUsageException::class);
+        $this->expectExceptionMessage('The third argument should be filled for collections input.');
+
+        $validator = Validator::make(
+            [
+                'ids' => [
+                    [
+                        'id' => 1,
+                        'name' => 'name1',
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'name2',
+                    ],
+                    [
+                        'id' => 3,
+                        'name' => 'name3',
+                    ],
+                ],
+            ],
+            [
+                'ids' => 'list_exists:clients,user_id',
+            ],
         );
 
         $this->assertTrue($validator->fails());

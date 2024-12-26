@@ -13,6 +13,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
+use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Middleware\SecurityMiddleware;
 use Illuminate\Routing\Router;
 
@@ -66,26 +67,38 @@ class HelpersServiceProvider extends ServiceProvider
             return !$result;
         });
 
-        Validator::extend('list_exists', function ($attribute, $value, $parameters) {
+        Validator::extend('list_exists', function ($attribute, $value, $parameters, $validator) {
             if (count($parameters) < 1) {
-                return false;
+                throw new InvalidValidationRuleUsageException('You must add at least 1 parameter.');
             }
 
-            $table = Arr::get($parameters, 0);
-            $keyField = Arr::get($parameters, 1, 'id');
+            $hasFieldNameParam = !empty(Arr::get($parameters, 2));
 
-            if (!empty(Arr::get($parameters, 2))) {
+            if (is_multidimensional($value) && !$hasFieldNameParam) {
+                throw new InvalidValidationRuleUsageException('The third argument should be filled for collections input.');
+            }
+
+            if ($hasFieldNameParam) {
                 $value = Arr::pluck($value, Arr::get($parameters, 2));
             }
 
             $value = array_unique($value);
+
+            $table = Arr::get($parameters, 0);
+            $keyField = Arr::get($parameters, 1, 'id');
 
             $existingValueCount = DB::table($table)
                 ->whereIn($keyField, $value)
                 ->distinct()
                 ->count($keyField);
 
-            return $existingValueCount === count($value);
+            $result = $existingValueCount === count($value);
+
+            if (!$result) {
+                $validator->errors()->add($attribute, "Some of the passed {$attribute} are not exists.");
+            }
+
+            return $result;
         });
     }
 
