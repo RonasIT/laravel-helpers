@@ -4,8 +4,8 @@ namespace RonasIT\Support\Tests\Support\Mock;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use RonasIT\Support\Traits\ModelTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RonasIT\Support\Traits\ModelTrait;
 
 class TestModel extends Model
 {

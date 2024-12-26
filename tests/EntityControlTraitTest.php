@@ -16,6 +16,7 @@ class EntityControlTraitTest extends HelpersTestCase
     use SqlMockTrait;
 
     protected string $mockedNow = '2020-01-01 00:00:00';
+    protected Carbon $mockedFillableDate;
 
     protected static array $selectResult;
 
@@ -50,6 +51,8 @@ class EntityControlTraitTest extends HelpersTestCase
         self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
 
         Carbon::setTestNow($this->mockedNow);
+
+        $this->mockedFillableDate = Carbon::parse('1999-01-01 00:00:00');
     }
 
     public function testOnlyTrashed()
@@ -241,9 +244,21 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->mockInsertDataWithoutTimestamps();
 
         $result = self::$testRepositoryClassWithoutTimestamps->insert([
-            ['name' => 'test_name_1'],
-            ['name' => 'test_name_2'],
-            ['name' => 'test_name_3'],
+            [
+                'name' => 'test_name_1',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_2',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_3',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
         ]);
 
         $this->assertTrue($result);
@@ -254,9 +269,21 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->mockInsertDataWithDifferentTimestampNames();
 
         $result = self::$testRepositoryWithDifferentTimestampNames->insert([
-            ['name' => 'test_name_1'],
-            ['name' => 'test_name_2'],
-            ['name' => 'test_name_3'],
+            [
+                'name' => 'test_name_1',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_2',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_3',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
         ]);
 
         $this->assertTrue($result);

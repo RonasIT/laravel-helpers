@@ -172,9 +172,13 @@ trait SqlMockTrait
 
     protected function mockInsertDataWithoutTimestamps(): void
     {
-        $query = 'insert into "test_models" ("name") values (?), (?), (?)';
+        $query = 'insert into "test_models" ("created_at", "name") values (?, ?), (?, ?), (?, ?)';
 
-        $values = ['test_name_1', 'test_name_2', 'test_name_3'];
+        $values = [
+            $this->mockedFillableDate, 'test_name_1',
+            $this->mockedFillableDate, 'test_name_2',
+            $this->mockedFillableDate, 'test_name_3',
+        ];
 
         $this->getPdo()->shouldInsert($query, $values);
     }
@@ -184,9 +188,9 @@ trait SqlMockTrait
         $query = 'insert into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            $this->mockedNow, 'test_name_1', $this->mockedNow,
-            $this->mockedNow, 'test_name_2', $this->mockedNow,
-            $this->mockedNow, 'test_name_3', $this->mockedNow,
+            $this->mockedFillableDate, 'test_name_1', $this->mockedNow,
+            $this->mockedFillableDate, 'test_name_2', $this->mockedNow,
+            $this->mockedFillableDate, 'test_name_3', $this->mockedNow,
         ];
 
         $this->getPdo()->shouldInsert($query, $values);

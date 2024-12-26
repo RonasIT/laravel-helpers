@@ -2,12 +2,13 @@
 
 namespace RonasIT\Support\Traits;
 
+use Carbon\Carbon;
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder as Query;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
@@ -157,19 +158,30 @@ trait EntityControlTrait
 
     public function insert(array $data): bool
     {
-        $timestamps = [];
+        $defaultTimestamps = [];
 
         if ($this->model->timestamps) {
             $now = now();
 
-            $timestamps = [
+            $defaultTimestamps = [
                 $this->model::CREATED_AT => $now,
                 $this->model::UPDATED_AT => $now
             ];
         }
 
-        $data = array_map(function ($item) use ($timestamps) {
+        $data = array_map(function ($item) use ($defaultTimestamps) {
             $fillableFields = Arr::only($item, $this->model->getFillable());
+
+            $timestamps = array_merge($defaultTimestamps, Arr::only($fillableFields, [
+                $this->model::CREATED_AT,
+                $this->model::UPDATED_AT
+            ]));
+
+            array_walk($timestamps, function (&$timestamp) {
+                $timestamp = $timestamp instanceof Carbon
+                    ? $timestamp
+                    : Carbon::parse($timestamp);
+            });
 
             return array_merge($fillableFields, $timestamps);
         }, $data);

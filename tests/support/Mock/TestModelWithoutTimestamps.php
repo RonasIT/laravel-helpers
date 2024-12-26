@@ -19,6 +19,7 @@ class TestModelWithoutTimestamps extends Model
         'name',
         'json_field',
         'castable_field',
+        'created_at',
     ];
 
     protected $casts = [
