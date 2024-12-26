@@ -75,7 +75,7 @@ class HelpersServiceProvider extends ServiceProvider
             $hasFieldNameParam = !empty(Arr::get($parameters, 2));
 
             if (is_multidimensional($value) && !$hasFieldNameParam) {
-                throw new InvalidValidationRuleUsageException('The third argument should be filled for collections input.');
+                throw new InvalidValidationRuleUsageException("list_exists: The third parameter should be filled when checking the {$attribute} field if we are using a collection in request.");
             }
 
             if ($hasFieldNameParam) {
