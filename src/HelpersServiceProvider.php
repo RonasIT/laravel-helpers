@@ -92,13 +92,13 @@ class HelpersServiceProvider extends ServiceProvider
                 ->distinct()
                 ->count($keyField);
 
-            if ($existingValueCount !== count($value)) {
-                $validator->errors()->add($attribute, "Some of the passed {$attribute} are not exists.");
+            $result = $existingValueCount !== count($value);
 
-                return false;
+            if (!$result) {
+                $validator->errors()->add($attribute, "Some of the passed {$attribute} are not exists.");
             }
 
-            return true;
+            return $result;
         });
     }
 
