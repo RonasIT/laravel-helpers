@@ -37,25 +37,27 @@ class ModelTestStateTest extends HelpersTestCase
         $this->assertEquals($originRecords, $state);
     }
 
-    public function testInitializationViaPrepareModelTestState()
+    public function testInitializationViaPrepareModelTestStateWithGlobalExportMode()
     {
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
         $this->mockGettingDataset($datasetMock);
 
-        $mock = $this
-            ->getMockBuilder(TestCase::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $testCaseGlobalExportMode = true;
 
-        $reflection = new ReflectionClass($mock);
+        $prepareModelTestState = $this->getTestState('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
 
-        $reflection->getMethod('setGlobalExportMode')->invoke($mock);
+        $this->assertEquals($prepareModelTestState->globalExportMode, $testCaseGlobalExportMode);
+    }
 
-        $prepareModelTestState = $reflection->getMethod('prepareModelTestState')->invoke($mock, TestModel::class);
+    public function testInitializationViaPrepareModelTestStateWithoutGlobalExportMode()
+    {
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+        $this->mockGettingDataset($datasetMock);
 
-        $testCaseGlobalExportMode = $reflection->getProperty('globalExportMode')->getValue($mock);
+        $testCaseGlobalExportMode = false;
 
-        $this->assertTrue($testCaseGlobalExportMode);
+        $prepareModelTestState = $this->getTestState('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
+
         $this->assertEquals($prepareModelTestState->globalExportMode, $testCaseGlobalExportMode);
     }
 

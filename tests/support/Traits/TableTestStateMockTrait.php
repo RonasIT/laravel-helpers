@@ -5,6 +5,9 @@ namespace RonasIT\Support\Tests\Support\Traits;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use ReflectionClass;
+use RonasIT\Support\Tests\TableTestState;
+use RonasIT\Support\Tests\TestCase;
 
 trait TableTestStateMockTrait
 {
@@ -45,5 +48,21 @@ trait TableTestStateMockTrait
             ->expects($this->exactly(2))
             ->method('get')
             ->willReturnOnConsecutiveCalls($initialState, $responseMock);
+    }
+
+    protected function getTestState(string $methodName, string $entity, bool $testCaseGlobalExportMode): TableTestState
+    {
+        $testCaseMock = $this
+            ->getMockBuilder(TestCase::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $testCase = new ReflectionClass($testCaseMock);
+
+        if ($testCaseGlobalExportMode) {
+            $testCase->getMethod('setGlobalExportMode')->invoke($testCaseMock);
+        }
+
+        return $testCase->getMethod($methodName)->invoke($testCaseMock, $entity);
     }
 }
