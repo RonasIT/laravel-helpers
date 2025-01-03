@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support;
+namespace RonasIT\Support\Http;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 

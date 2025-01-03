@@ -3,6 +3,7 @@
 namespace RonasIT\Support;
 
 use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,8 +15,7 @@ use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
-use RonasIT\Support\Middleware\SecurityMiddleware;
-use Illuminate\Routing\Router;
+use RonasIT\Support\Http\Middleware\SecurityMiddleware;
 
 class HelpersServiceProvider extends ServiceProvider
 {
