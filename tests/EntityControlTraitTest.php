@@ -791,7 +791,7 @@ class EntityControlTraitTest extends HelpersTestCase
     {
         $this->expectException(InvalidModelException::class);
         $this->expectExceptionMessage(
-            'Model RonasIT\Support\Tests\Support\Mock\TestModelNoPrimaryKey must have primary key.'
+            'Model RonasIT\Support\Tests\Support\Mock\Models\TestModelNoPrimaryKey must have primary key.'
         );
 
         new TestRepositoryNoPrimaryKey();
