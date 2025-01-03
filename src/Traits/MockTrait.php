@@ -2,12 +2,13 @@
 
 namespace RonasIT\Support\Traits;
 
-use Exception;
-use Illuminate\Support\Arr;
 use Closure;
+use Illuminate\Support\Arr;
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
+use ReflectionFunction;
+use ReflectionMethod;
 
 trait MockTrait
 {
@@ -129,30 +130,63 @@ trait MockTrait
         string $class,
         string $function,
         int $callIndex,
-        bool $isClass = true
+        bool $isClass = true,
     ): void {
+        $reflection = $isClass
+            ? new ReflectionMethod($class, $function)
+            : new ReflectionFunction($function);
+
         $expectedCount = count($expected);
         $actualCount = count($actual);
+        $parameters = $reflection->getParameters();
+        $requiredParametersCount = count(array_filter($parameters, fn ($param) => !$param->isOptional()));
 
-        if ($expectedCount !== $actualCount) {
-            $requiredParametersCount = count(array_filter($actual, fn ($item) => $item !== self::OPTIONAL_ARGUMENT_NAME));
+        $this->assertArgumentCount($expectedCount, $actualCount, $requiredParametersCount, $function);
 
-            if ($expectedCount > $actualCount || $expectedCount < $requiredParametersCount) {
-                throw new Exception("Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments.");
-            }
-        }
+        $this->fillOptionalArguments($parameters, $actual, $expected, $isClass);
 
-        $expected = array_pad($expected, $actualCount, self::OPTIONAL_ARGUMENT_NAME);
-
-        $message = ($isClass)
+        $message = $isClass
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
             : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
 
+        $this->compareArguments($actual, $expected, $message);
+    }
+
+    protected function assertArgumentCount(int $expectedCount, int $actualCount, int $requiredParametersCount, string $function): void
+    {
+        if ($expectedCount !== $actualCount) {
+            $this->assertFalse(
+                $expectedCount < $requiredParametersCount,
+                "Failed assert that function {$function} was called with {$expectedCount} require arguments, actually it calls with {$requiredParametersCount} require arguments."
+            );
+
+            $this->assertFalse(
+                $expectedCount > $actualCount,
+                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments."
+            );
+        }
+    }
+
+    protected function fillOptionalArguments(array $parameters, array &$actual, array &$expected, bool $isClass): void
+    {
+        foreach ($parameters as $index => $parameter) {
+            if (!isset($expected[$index]) && $parameter->isOptional()) {
+                $expected[$index] = $parameter->getDefaultValue();
+            }
+
+            if (!$isClass && $actual[$index] === 'optionalParameter') {
+                $actual[$index] = $expected[$index] ?? $parameter->getDefaultValue();
+            }
+        }
+    }
+
+    protected function compareArguments(array $actual, array $expected, string $message): void
+    {
         foreach ($actual as $index => $argument) {
             $this->assertEquals(
                 $expected[$index],
                 $argument,
-                "Failed asserting that arguments are equals to expected.\n{$message}\nArgument index: {$index}"
+                "Failed asserting that arguments are equal to expected.\n{$message}\nArgument index: {$index}"
             );
         }
     }
