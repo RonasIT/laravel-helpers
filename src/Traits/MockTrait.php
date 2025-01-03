@@ -132,16 +132,28 @@ trait MockTrait
         int $callIndex,
         bool $isClass = true,
     ): void {
-        $expectedCount = count($expected);
-        $actualCount = count($actual);
-
-        $reflectionClass = $isClass
+        $reflection = $isClass
             ? new ReflectionMethod($class, $function)
             : new ReflectionFunction($function);
 
-        $parameters = $reflectionClass->getParameters();
+        $expectedCount = count($expected);
+        $actualCount = count($actual);
+        $parameters = $reflection->getParameters();
         $requiredParametersCount = count(array_filter($parameters, fn ($param) => !$param->isOptional()));
 
+        $this->assertArgumentCount($expectedCount, $actualCount, $requiredParametersCount, $function);
+
+        $this->fillOptionalArguments($parameters, $actual, $expected, $isClass);
+
+        $message = $isClass
+            ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
+            : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
+
+        $this->compareArguments($actual, $expected, $message);
+    }
+
+    protected function assertArgumentCount(int $expectedCount, int $actualCount, int $requiredParametersCount, string $function): void
+    {
         if ($expectedCount !== $actualCount) {
             $this->assertFalse(
                 $expectedCount < $requiredParametersCount,
@@ -153,7 +165,10 @@ trait MockTrait
                 "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments."
             );
         }
+    }
 
+    protected function fillOptionalArguments(array $parameters, array &$actual, array &$expected, bool $isClass): void
+    {
         foreach ($parameters as $index => $parameter) {
             if (!isset($expected[$index]) && $parameter->isOptional()) {
                 $expected[$index] = $parameter->getDefaultValue();
@@ -163,16 +178,15 @@ trait MockTrait
                 $actual[$index] = $expected[$index] ?? $parameter->getDefaultValue();
             }
         }
+    }
 
-        $message = $isClass
-            ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
-            : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
-
+    protected function compareArguments(array $actual, array $expected, string $message): void
+    {
         foreach ($actual as $index => $argument) {
             $this->assertEquals(
                 $expected[$index],
                 $argument,
-                "Failed asserting that arguments are equals to expected.\n{$message}\nArgument index: {$index}"
+                "Failed asserting that arguments are equal to expected.\n{$message}\nArgument index: {$index}"
             );
         }
     }
