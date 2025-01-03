@@ -1,8 +1,9 @@
 <?php
 
-namespace RonasIT\Support\Tests\Support\Mock;
+namespace RonasIT\Support\Tests\Support\Mock\Repositories;
 
 use RonasIT\Support\Repositories\BaseRepository;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 
 class TestRepository extends BaseRepository
 {

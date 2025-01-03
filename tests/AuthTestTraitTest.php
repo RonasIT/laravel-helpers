@@ -4,7 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use RonasIT\Support\Tests\Support\Mock\MockAuthUser;
+use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
 use RonasIT\Support\Traits\AuthTestTrait;
 use RonasIT\Support\Traits\FixturesTrait;
 

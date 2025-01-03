@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
-use RonasIT\Support\Tests\Support\Mock\LegacyTestMail;
-use RonasIT\Support\Tests\Support\Mock\TestMail;
-use RonasIT\Support\Tests\Support\Mock\TestMailManyFromWithName;
-use RonasIT\Support\Tests\Support\Mock\TestMailWithAttachments;
+use RonasIT\Support\Tests\Support\Mock\Mails\LegacyTestMail;
+use RonasIT\Support\Tests\Support\Mock\Mails\TestMail;
+use RonasIT\Support\Tests\Support\Mock\Mails\TestMailManyFromWithName;
+use RonasIT\Support\Tests\Support\Mock\Mails\TestMailWithAttachments;
 
 class MailsMockTraitTest extends HelpersTestCase
 {

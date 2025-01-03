@@ -1,8 +1,8 @@
 <?php
 
-namespace RonasIT\Support\Interfaces;
+namespace RonasIT\Support\Contracts;
 
-interface ExporterInterface
+interface ExporterContract
 {
     /**
      * Set fields to export
