@@ -13,8 +13,6 @@ class TableTestState extends Assert
 {
     use FixturesTrait;
 
-    public bool $globalExportMode;
-
     protected string $tableName;
     protected array $jsonFields;
     protected ?string $connectionName;
@@ -23,13 +21,11 @@ class TableTestState extends Assert
     public function __construct(
         string $tableName,
         array $jsonFields = [],
-        bool $globalExportMode = false,
         ?string $connectionName = null,
     ) {
         $this->tableName = $tableName;
         $this->jsonFields = $jsonFields;
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
-        $this->globalExportMode = $globalExportMode;
         $this->state = $this->getDataSet($tableName);
     }
 
