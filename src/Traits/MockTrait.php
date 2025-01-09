@@ -132,28 +132,29 @@ trait MockTrait
         int $callIndex,
         bool $isClass = true,
     ): void {
-        $reflection = $isClass
+        $reflection = ($isClass)
             ? new ReflectionMethod($class, $function)
             : new ReflectionFunction($function);
 
-        $expectedCount = count($expected);
-        $actualCount = count($actual);
-        $parameters = $reflection->getParameters();
-        $requiredParametersCount = count(array_filter($parameters, fn ($param) => !$param->isOptional()));
+        $reflectionArgs = $reflection->getParameters();
 
-        $this->assertArgumentCount($expectedCount, $actualCount, $requiredParametersCount, $function);
+        $this->assertArgumentsCount($actual, $expected, $reflectionArgs, $function);
 
-        $this->fillOptionalArguments($parameters, $actual, $expected, $isClass);
+        $this->fillOptionalArguments($reflectionArgs, $actual, $expected, $isClass);
 
-        $message = $isClass
+        $message = ($isClass)
             ? "Class '{$class}'\nMethod: '{$function}'\nMethod call index: {$callIndex}"
             : "Namespace '{$class}'\nFunction: '{$function}'\nCall index: {$callIndex}";
 
         $this->compareArguments($actual, $expected, $message);
     }
 
-    protected function assertArgumentCount(int $expectedCount, int $actualCount, int $requiredParametersCount, string $function): void
+    protected function assertArgumentsCount(array $actual, array $expected, array $reflectionArgs, string $function): void
     {
+        $expectedCount = count($expected);
+        $actualCount = count($actual);
+        $requiredParametersCount = count(array_filter($reflectionArgs, fn ($param) => !$param->isOptional()));
+
         if ($expectedCount !== $actualCount) {
             $this->assertFalse(
                 $expectedCount < $requiredParametersCount,

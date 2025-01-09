@@ -103,21 +103,21 @@ class MockTraitTest extends HelpersTestCase
             $this->functionCall('mockFunction', ['firstRequired', 'secondRequired', 'firstOptional', 'secondOptional'], 'mockFunction'),
         ]);
 
-        $this->assertEquals('mockFunction', ($mock->mockFunction('firstRequired', 'secondRequired')));
-        $this->assertEquals('mockFunction', ($mock->mockFunction('firstRequired', 'secondRequired', 'firstOptional')));
-        $this->assertEquals('mockFunction', ($mock->mockFunction('firstRequired', 'secondRequired', 'firstOptional', 'secondOptional')));
+        $this->assertEquals('mockFunction', $mock->mockFunction('firstRequired', 'secondRequired'));
+        $this->assertEquals('mockFunction', $mock->mockFunction('firstRequired', 'secondRequired', 'firstOptional'));
+        $this->assertEquals('mockFunction', $mock->mockFunction('firstRequired', 'secondRequired', 'firstOptional', 'secondOptional'));
     }
 
-    public function testMockFunctionInClassWhenDifferentResult()
+    public function testMockClassMethodCheckMockedResult()
     {
         $mock = $this->mockClass(TestMockClass::class, [
-            $this->functionCall('mockFunction', ['firstRequired', 'secondRequired'], 'mockFunction'),
+            $this->functionCall('mockFunction', ['firstRequired', 'secondRequired'], 'mocked_result'),
         ]);
 
-        $this->assertNotEquals('result', $mock->mockFunction('firstRequired', 'secondRequired'));
+        $this->assertEquals('mocked_result', $mock->mockFunction('firstRequired', 'secondRequired'));
     }
 
-    public function testMockFunctionInClassWhenLessRequiredParameters()
+    public function testMockClassMethodWhenLessRequiredParameters()
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed assert that function mockFunction was called with 1 require arguments, actually it calls with 2 require arguments.');
@@ -131,7 +131,7 @@ class MockTraitTest extends HelpersTestCase
         );
     }
 
-    public function testMockFunctionInClassWhenMoreExpectedParameters()
+    public function testMockClassMethodWhenMoreExpectedParameters()
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed assert that function mockFunction was called with 5 arguments, actually it calls with 4 arguments.');
