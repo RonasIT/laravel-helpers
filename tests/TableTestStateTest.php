@@ -33,9 +33,9 @@ class TableTestStateTest extends HelpersTestCase
 
         $testCaseGlobalExportMode = true;
 
-        $prepareTableTestState = $this->getTestState('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
+        $actualGlobalExportModeValue = $this->getRetrieveGlobalExportModeState('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
 
-        $this->assertEquals($prepareTableTestState->globalExportMode, $testCaseGlobalExportMode);
+        $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
     }
 
     public function testInitializationViaPrepareTableTestStateWithoutGlobalExportMode()
@@ -45,9 +45,9 @@ class TableTestStateTest extends HelpersTestCase
 
         $testCaseGlobalExportMode = false;
 
-        $prepareTableTestState = $this->getTestState('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
+        $actualGlobalExportModeValue = $this->getRetrieveGlobalExportModeState('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
 
-        $this->assertEquals($prepareTableTestState->globalExportMode, $testCaseGlobalExportMode);
+        $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
     }
 
     public function testAssertChangesEqualsFixture()

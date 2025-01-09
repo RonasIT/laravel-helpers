@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
+use ReflectionMethod;
 use RonasIT\Support\Tests\TableTestState;
 use RonasIT\Support\Tests\TestCase;
 
@@ -50,19 +51,21 @@ trait TableTestStateMockTrait
             ->willReturnOnConsecutiveCalls($initialState, $responseMock);
     }
 
-    protected function getTestState(string $methodName, string $entity, bool $testCaseGlobalExportMode): TableTestState
+    protected function getRetrieveGlobalExportModeState(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool
     {
         $testCaseMock = $this
             ->getMockBuilder(TestCase::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $testCase = new ReflectionClass($testCaseMock);
+        $testCaseMock->setGlobalExportMode($testCaseGlobalExportMode);
 
-        if ($testCaseGlobalExportMode) {
-            $testCase->getMethod('setGlobalExportMode')->invoke($testCaseMock);
-        }
+        $reflectionMethod = new ReflectionMethod($testCaseMock, $methodName);
+        $instance = $reflectionMethod->invoke($testCaseMock, $entity);
 
-        return $testCase->getMethod($methodName)->invoke($testCaseMock, $entity);
+        $reflectionClass = new ReflectionClass($instance);
+        $globalExportMode = $reflectionClass->getProperty('globalExportMode');
+
+        return $globalExportMode->getValue($instance);
     }
 }
