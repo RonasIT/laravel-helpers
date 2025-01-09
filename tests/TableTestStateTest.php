@@ -26,28 +26,11 @@ class TableTestStateTest extends HelpersTestCase
         $this->assertEquals($originRecords, $state);
     }
 
-    public function testInitializationViaPrepareTableTestStateWithGlobalExportMode()
+
+    public function testInitializationViaPrepareTableTestState()
     {
-        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-        $this->mockGettingDataset($datasetMock);
-
-        $testCaseGlobalExportMode = true;
-
-        $actualGlobalExportModeValue = $this->getRetrieveGlobalExportModeState('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
-
-        $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
-    }
-
-    public function testInitializationViaPrepareTableTestStateWithoutGlobalExportMode()
-    {
-        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-        $this->mockGettingDataset($datasetMock);
-
-        $testCaseGlobalExportMode = false;
-
-        $actualGlobalExportModeValue = $this->getRetrieveGlobalExportModeState('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
-
-        $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
+        $this->executeGlobalExportModeTest('prepareTableTestState', 'test_models', true);
+        $this->executeGlobalExportModeTest('prepareTableTestState', 'test_models', false);
     }
 
     public function testAssertChangesEqualsFixture()

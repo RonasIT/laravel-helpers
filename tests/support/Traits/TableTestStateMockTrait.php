@@ -51,6 +51,16 @@ trait TableTestStateMockTrait
             ->willReturnOnConsecutiveCalls($initialState, $responseMock);
     }
 
+    protected function executeGlobalExportModeTest(string $methodName, string $entity, bool $testCaseGlobalExportMode): void
+    {
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+        $this->mockGettingDataset($datasetMock);
+
+        $actualGlobalExportModeValue = $this->getRetrieveGlobalExportModeState($methodName, $entity, $testCaseGlobalExportMode);
+
+        $this->assertEquals($testCaseGlobalExportMode, $actualGlobalExportModeValue);
+    }
+
     protected function getRetrieveGlobalExportModeState(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool
     {
         $testCaseMock = $this
