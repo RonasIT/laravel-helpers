@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Traits;
 
-use Carbon\Carbon;
 use Closure;
 use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Database\Eloquent\Model;
@@ -176,12 +175,6 @@ trait EntityControlTrait
                 $this->model::CREATED_AT,
                 $this->model::UPDATED_AT
             ]));
-
-            array_walk($timestamps, function (&$timestamp) {
-                $timestamp = $timestamp instanceof Carbon
-                    ? $timestamp
-                    : Carbon::parse($timestamp);
-            });
 
             return array_merge($fillableFields, $timestamps);
         }, $data);

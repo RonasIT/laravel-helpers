@@ -16,7 +16,7 @@ class EntityControlTraitTest extends HelpersTestCase
     use SqlMockTrait;
 
     protected string $mockedNow = '2020-01-01 00:00:00';
-    protected Carbon $mockedFillableDate;
+    protected string $mockedFillableDate;
 
     protected static array $selectResult;
 
@@ -52,7 +52,7 @@ class EntityControlTraitTest extends HelpersTestCase
 
         Carbon::setTestNow($this->mockedNow);
 
-        $this->mockedFillableDate = Carbon::parse('1999-01-01 00:00:00');
+        $this->mockedFillableDate = '1999-01-01';
     }
 
     public function testOnlyTrashed()
