@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests\Support\Mock\Actions;
+namespace RonasIT\Support\Tests\Support\Mock\NovaActions;
 
 class TestNovaAction
 {

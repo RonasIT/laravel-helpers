@@ -5,7 +5,7 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use RonasIT\Support\Tests\Support\Mock\Actions\TestNovaAction;
+use RonasIT\Support\Tests\Support\Mock\NovaActions\TestNovaAction;
 use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Traits\MockTrait;
