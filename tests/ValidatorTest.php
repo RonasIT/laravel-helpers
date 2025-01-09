@@ -136,7 +136,7 @@ class ValidatorTest extends HelpersTestCase
     public function testListExistsWithoutArgs()
     {
         $this->expectException(InvalidValidationRuleUsageException::class);
-        $this->expectExceptionMessage('You must add at least 1 parameter.');
+        $this->expectExceptionMessage('list_exists: At least 1 parameter must be added when checking the ids field in the request.');
 
         $validator = Validator::make(
             ['ids' => [1, 2, 3]],
@@ -149,7 +149,7 @@ class ValidatorTest extends HelpersTestCase
     public function testListExistsIncorrectParameters()
     {
         $this->expectException(InvalidValidationRuleUsageException::class);
-        $this->expectExceptionMessage('The third argument should be filled for collections input.');
+        $this->expectExceptionMessage('The third parameter should be filled when checking the ids field if we are using a collection in request.');
 
         $validator = Validator::make(
             [
