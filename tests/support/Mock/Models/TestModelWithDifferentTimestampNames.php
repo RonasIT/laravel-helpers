@@ -1,17 +1,21 @@
 <?php
 
-namespace RonasIT\Support\Tests\Support\Mock;
+namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
 use RonasIT\Support\Traits\ModelTrait;
 
-class TestModelWithoutTimestamps extends Model
+class TestModelWithDifferentTimestampNames extends Model
 {
     use ModelTrait;
     use SoftDeletes;
 
-    public $timestamps = false;
+    public const string CREATED_AT = 'creation_date';
+    public const string UPDATED_AT = 'updated_date';
+
+    public $timestamps = true;
 
     protected $table = 'test_models';
 
@@ -19,7 +23,7 @@ class TestModelWithoutTimestamps extends Model
         'name',
         'json_field',
         'castable_field',
-        'created_at',
+        'creation_date',
     ];
 
     protected $casts = [

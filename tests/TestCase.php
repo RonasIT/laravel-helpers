@@ -112,4 +112,14 @@ abstract class TestCase extends BaseTest
             $connection->disconnect();
         }
     }
+
+    protected function prepareModelTestState(string $modelClassName): ModelTestState
+    {
+        return new ModelTestState($modelClassName, $this->globalExportMode);
+    }
+
+    protected function prepareTableTestState(string $tableName, array $jsonFields = [], ?string $connectionName = null): TableTestState
+    {
+        return new TableTestState($tableName, $jsonFields, $this->globalExportMode, $connectionName);
+    }
 }

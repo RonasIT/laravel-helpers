@@ -7,14 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class ModelTestState extends TableTestState
 {
-    public function __construct(string $modelClassName)
+    public function __construct(string $modelClassName, bool $globalExportMode = false)
     {
         $model = new $modelClassName();
 
         parent::__construct(
             tableName: $model->getTable(),
             jsonFields: $this->getModelJSONFields($model),
-            connectionName: $model->getConnectionName(),
+            globalExportMode: $globalExportMode,
+            connectionName: $model->getConnectionName($model),
         );
     }
 

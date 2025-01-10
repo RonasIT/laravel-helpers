@@ -5,10 +5,10 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Support\Carbon;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidModelException;
-use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use RonasIT\Support\Tests\Support\Mock\TestRepositoryNoPrimaryKey;
-use RonasIT\Support\Tests\Support\Mock\TestRepositoryWithDifferentTimestampNames;
-use RonasIT\Support\Tests\Support\Mock\TestRepositoryWithoutTimestamps;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryNoPrimaryKey;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithDifferentTimestampNames;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithoutTimestamps;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class EntityControlTraitTest extends HelpersTestCase
@@ -818,7 +818,7 @@ class EntityControlTraitTest extends HelpersTestCase
     {
         $this->expectException(InvalidModelException::class);
         $this->expectExceptionMessage(
-            'Model RonasIT\Support\Tests\Support\Mock\TestModelNoPrimaryKey must have primary key.'
+            'Model RonasIT\Support\Tests\Support\Mock\Models\TestModelNoPrimaryKey must have primary key.'
         );
 
         new TestRepositoryNoPrimaryKey();

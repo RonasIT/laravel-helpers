@@ -1,9 +1,9 @@
 <?php
 
-namespace RonasIT\Support;
+namespace RonasIT\Support\Http;
 
-use Illuminate\Support\Arr;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 class BaseRequest extends FormRequest

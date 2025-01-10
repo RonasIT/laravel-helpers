@@ -3,8 +3,8 @@
 namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
-use RonasIT\Support\BaseRequest;
-use RonasIT\Support\Tests\Support\Mock\TestModel;
+use RonasIT\Support\Http\BaseRequest;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class BaseRequestTest extends HelpersTestCase

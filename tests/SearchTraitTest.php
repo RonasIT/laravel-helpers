@@ -6,8 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use ReflectionClass;
 use ReflectionMethod;
-use RonasIT\Support\Tests\Support\Mock\TestRepository;
 use ReflectionProperty;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class SearchTraitTest extends HelpersTestCase

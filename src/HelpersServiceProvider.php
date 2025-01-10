@@ -3,6 +3,7 @@
 namespace RonasIT\Support;
 
 use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,8 +15,7 @@ use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
-use RonasIT\Support\Middleware\SecurityMiddleware;
-use Illuminate\Routing\Router;
+use RonasIT\Support\Http\Middleware\SecurityMiddleware;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -69,13 +69,13 @@ class HelpersServiceProvider extends ServiceProvider
 
         Validator::extend('list_exists', function ($attribute, $value, $parameters, $validator) {
             if (count($parameters) < 1) {
-                throw new InvalidValidationRuleUsageException('You must add at least 1 parameter.');
+                throw new InvalidValidationRuleUsageException("list_exists: At least 1 parameter must be added when checking the {$attribute} field in the request.");
             }
 
             $hasFieldNameParam = !empty(Arr::get($parameters, 2));
 
             if (is_multidimensional($value) && !$hasFieldNameParam) {
-                throw new InvalidValidationRuleUsageException('The third argument should be filled for collections input.');
+                throw new InvalidValidationRuleUsageException("list_exists: The third parameter should be filled when checking the {$attribute} field if we are using a collection in request.");
             }
 
             if ($hasFieldNameParam) {

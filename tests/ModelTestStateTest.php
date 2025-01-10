@@ -3,8 +3,8 @@
 namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
-use RonasIT\Support\Tests\Support\Mock\TestModel;
-use RonasIT\Support\Tests\Support\Mock\TestModelWithoutJsonFields;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutJsonFields;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class ModelTestStateTest extends HelpersTestCase
@@ -35,6 +35,30 @@ class ModelTestStateTest extends HelpersTestCase
 
         $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
+    }
+
+    public function testInitializationViaPrepareModelTestStateWithGlobalExportMode()
+    {
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+        $this->mockGettingDataset($datasetMock);
+
+        $testCaseGlobalExportMode = true;
+
+        $prepareModelTestState = $this->getTestState('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
+
+        $this->assertEquals($prepareModelTestState->globalExportMode, $testCaseGlobalExportMode);
+    }
+
+    public function testInitializationViaPrepareModelTestStateWithoutGlobalExportMode()
+    {
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+        $this->mockGettingDataset($datasetMock);
+
+        $testCaseGlobalExportMode = false;
+
+        $prepareModelTestState = $this->getTestState('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
+
+        $this->assertEquals($prepareModelTestState->globalExportMode, $testCaseGlobalExportMode);
     }
 
     public function testAssertChangesEqualsFixture()

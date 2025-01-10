@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests\Support\Mock;
+namespace RonasIT\Support\Tests\Support\Mock\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 

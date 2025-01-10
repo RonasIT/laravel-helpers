@@ -1,10 +1,11 @@
 <?php
 
-namespace RonasIT\Support\Tests\Support\Mock;
+namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
 use RonasIT\Support\Traits\ModelTrait;
 
 class TestModel extends Model
