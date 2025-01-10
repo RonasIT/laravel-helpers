@@ -171,7 +171,7 @@ trait MockTrait
     protected function fillOptionalArguments(array $parameters, array &$actual, array &$expected, bool $isClass): void
     {
         foreach ($parameters as $index => $parameter) {
-            if (!$isClass && $actual[$index] === 'optionalParameter') {
+            if (!$isClass && $actual[$index] === self::OPTIONAL_ARGUMENT_NAME) {
                 $actual[$index] = $parameter->getDefaultValue();
             }
 
