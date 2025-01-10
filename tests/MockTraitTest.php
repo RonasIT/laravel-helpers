@@ -56,19 +56,23 @@ class MockTraitTest extends HelpersTestCase
         $this->assertEquals(2, rand(1, 5));
         $this->assertTrue(is_array(123));
         $this->assertEquals(7, rand(6, 10));
-        $this->assertEquals('0987654321', uniqid());
+        $this->assertEquals('0987654321', uniqid('prefix'));
         $this->assertEquals('0987654321', uniqid());
         $this->assertEquals([3, 4, 5], array_slice([1, 2, 3, 4, 5], 2));
-        $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2));
+        $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2, 'preserve_keys'));
     }
 
     public function testMockNativeFunctionWhenLessRequiredParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function array_slice was called with 1 require arguments, actually it calls with 2 require arguments.');
+        $this->expectExceptionMessage('Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.');
 
         $this->mockNativeFunction('RonasIT\Support\Tests', [
-            $this->functionCall('array_slice', [[1, 2, 3, 4, 5]], [3, 4]),
+            $this->functionCall(
+                name: 'array_slice',
+                arguments: [[1, 2, 3, 4, 5]],
+                result: [3, 4],
+            ),
         ]);
 
         array_slice([1, 2, 3, 4, 5], 2, 2);
@@ -77,22 +81,30 @@ class MockTraitTest extends HelpersTestCase
     public function testMockNativeFunctionWhenMoreExpectedParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function array_slice was called with 5 arguments, actually it calls with 4 arguments.');
+        $this->expectExceptionMessage('Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.');
 
         $this->mockNativeFunction('RonasIT\Support\Tests', [
-            $this->functionCall('array_slice', [[1, 2, 3, 4, 5], 2, 2, 'preserve_keys', 'extra_parameter'], [3, 4]),
+            $this->functionCall(
+                name: 'array_slice',
+                arguments: [[1, 2, 3, 4, 5], 2, 2, 'preserve_keys', 'extra_parameter'],
+                result: [3, 4],
+            ),
         ]);
 
         array_slice([1, 2, 3, 4, 5], 2, 2, 'preserve_keys');
     }
 
-    public function testMockNativeFunctionWhenDifferentResult()
+    public function testMockNativeFunctionCheckMockedResult()
     {
         $this->mockNativeFunction('RonasIT\Support\Tests', [
-            $this->functionCall('array_slice', [[1, 2, 3, 4, 5], 2, 2], [3, 4]),
+            $this->functionCall(
+                name: 'array_slice',
+                arguments: [[1, 2, 3, 4, 5], 2, 2],
+                result: [3, 4],
+            ),
         ]);
 
-        $this->assertNotEquals([3, 4, 5], array_slice([1, 2, 3, 4, 5], 2, 2));
+        $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2));
     }
 
     public function testMockFunctionInClass()
@@ -120,7 +132,7 @@ class MockTraitTest extends HelpersTestCase
     public function testMockClassMethodWhenLessRequiredParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 1 require arguments, actually it calls with 2 require arguments.');
+        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 1 arguments, actually it has 2 required arguments.');
 
         $this->assertArguments(
             actual: ['firstRequired', 'secondRequired', 'string', null],
@@ -134,7 +146,7 @@ class MockTraitTest extends HelpersTestCase
     public function testMockClassMethodWhenMoreExpectedParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 5 arguments, actually it calls with 4 arguments.');
+        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 5 arguments, actually has 4 arguments.');
 
         $this->assertArguments(
             actual: ['firstRequired', 'secondRequired', 'string', null],

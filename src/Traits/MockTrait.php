@@ -158,12 +158,12 @@ trait MockTrait
         if ($expectedCount !== $actualCount) {
             $this->assertFalse(
                 $expectedCount < $requiredParametersCount,
-                "Failed assert that function {$function} was called with {$expectedCount} require arguments, actually it calls with {$requiredParametersCount} require arguments."
+                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments."
             );
 
             $this->assertFalse(
                 $expectedCount > $actualCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it calls with {$actualCount} arguments."
+                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments."
             );
         }
     }
@@ -171,12 +171,12 @@ trait MockTrait
     protected function fillOptionalArguments(array $parameters, array &$actual, array &$expected, bool $isClass): void
     {
         foreach ($parameters as $index => $parameter) {
-            if (!isset($expected[$index]) && $parameter->isOptional()) {
-                $expected[$index] = $parameter->getDefaultValue();
+            if (!$isClass && $actual[$index] === 'optionalParameter') {
+                $actual[$index] = $parameter->getDefaultValue();
             }
 
-            if (!$isClass && $actual[$index] === 'optionalParameter') {
-                $actual[$index] = $expected[$index] ?? $parameter->getDefaultValue();
+            if (!isset($expected[$index]) && $parameter->isOptional()) {
+                $expected[$index] = $parameter->getDefaultValue();
             }
         }
     }
