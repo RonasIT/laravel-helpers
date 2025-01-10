@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
@@ -26,24 +27,23 @@ class TableTestStateTest extends HelpersTestCase
         $this->assertEquals($originRecords, $state);
     }
 
-    public function testInitializationViaPrepareTableTestStateWithGlobalExportMode()
+    public static function getInitializationViaPrepareTableTestStateFilters(): array
     {
-        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-        $this->mockGettingDataset($datasetMock);
-
-        $testCaseGlobalExportMode = true;
-
-        $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
-
-        $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
+        return [
+            [
+                'testCaseGlobalExportMode' => true,
+            ],
+            [
+                'testCaseGlobalExportMode' => false,
+            ],
+        ];
     }
 
-    public function testInitializationViaPrepareTableTestStateWithoutGlobalExportMode()
+    #[DataProvider('getInitializationViaPrepareTableTestStateFilters')]
+    public function testInitializationViaPrepareTableTestState(bool $testCaseGlobalExportMode)
     {
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
         $this->mockGettingDataset($datasetMock);
-
-        $testCaseGlobalExportMode = false;
 
         $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
 
