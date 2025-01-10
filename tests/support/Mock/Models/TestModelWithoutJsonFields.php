@@ -1,10 +1,10 @@
 <?php
 
-namespace RonasIT\Support\Tests\Support\Mock;
+namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Traits\ModelTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RonasIT\Support\Traits\ModelTrait;
 
 class TestModelWithoutJsonFields extends Model
 {

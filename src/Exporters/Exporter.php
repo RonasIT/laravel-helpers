@@ -4,13 +4,13 @@ namespace RonasIT\Support\Exporters;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use RonasIT\Support\Interfaces\ExporterInterface;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use RonasIT\Support\Contracts\ExporterContract;
 
-abstract class Exporter implements FromQuery, WithHeadings, WithMapping, ExporterInterface
+abstract class Exporter implements FromQuery, WithHeadings, WithMapping, ExporterContract
 {
     use Exportable;
 

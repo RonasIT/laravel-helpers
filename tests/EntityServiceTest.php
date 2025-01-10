@@ -2,10 +2,10 @@
 
 namespace RonasIT\Support\Tests;
 
+use BadMethodCallException;
 use ReflectionProperty;
 use RonasIT\Support\Services\EntityService;
-use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use BadMethodCallException;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
 
 class EntityServiceTest extends HelpersTestCase
 {
