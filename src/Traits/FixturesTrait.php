@@ -64,6 +64,21 @@ trait FixturesTrait
         return $this;
     }
 
+    protected function loadTestDump(): void
+    {
+        $dump = $this->getFixture($this->dumpFileName, false);
+
+        if (empty($dump)) {
+            return;
+        }
+
+        $databaseTables = $this->getTables();
+
+        $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
+
+        Schema::getConnection()->unprepared($dump);
+    }
+
     public function getFixturePath(string $fixtureName): string
     {
         $class = get_class($this);
@@ -240,20 +255,5 @@ trait FixturesTrait
         return (str_contains($fixtureName, '.'))
             ? $fixtureName
             : "{$fixtureName}.json";
-    }
-
-    protected function loadTestDump(): void
-    {
-        $dump = $this->getFixture($this->dumpFileName, false);
-
-        if (empty($dump)) {
-            return;
-        }
-
-        $databaseTables = $this->getTables();
-
-        $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
-
-        Schema::getConnection()->unprepared($dump);
     }
 }
