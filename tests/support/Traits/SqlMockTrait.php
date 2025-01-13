@@ -175,9 +175,9 @@ trait SqlMockTrait
         $query = 'insert into "test_models" ("created_at", "name") values (?, ?), (?, ?), (?, ?)';
 
         $values = [
-            $this->mockedFillableDate, 'test_name_1',
-            $this->mockedFillableDate, 'test_name_2',
-            $this->mockedFillableDate, 'test_name_3',
+            '1999-01-01', 'test_name_1',
+            '1999-01-01', 'test_name_2',
+            '1999-01-01', 'test_name_3',
         ];
 
         $this->getPdo()->shouldInsert($query, $values);
@@ -188,9 +188,9 @@ trait SqlMockTrait
         $query = 'insert into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            $this->mockedFillableDate, 'test_name_1', $this->mockedNow,
-            $this->mockedFillableDate, 'test_name_2', $this->mockedNow,
-            $this->mockedFillableDate, 'test_name_3', $this->mockedNow,
+            '1999-01-01', 'test_name_1', $this->mockedNow,
+            '1999-01-01', 'test_name_2', $this->mockedNow,
+            '1999-01-01', 'test_name_3', $this->mockedNow,
         ];
 
         $this->getPdo()->shouldInsert($query, $values);
