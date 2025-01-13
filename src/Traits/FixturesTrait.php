@@ -55,6 +55,15 @@ trait FixturesTrait
 
     protected string $dumpFileName = 'dump.sql';
 
+    protected bool $globalExportMode = false;
+
+    public function setGlobalExportMode(bool $value = true): self
+    {
+        $this->globalExportMode = $value;
+
+        return $this;
+    }
+
     protected function loadTestDump(): void
     {
         $dump = $this->getFixture($this->dumpFileName, false);
@@ -103,9 +112,7 @@ trait FixturesTrait
 
     public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
     {
-        $globalExportMode = $this->globalExportMode ?? false;
-
-        if ($globalExportMode || $exportMode) {
+        if ($this->globalExportMode || $exportMode) {
             $this->exportJson($fixture, $data);
         }
 

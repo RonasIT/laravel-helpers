@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutJsonFields;
@@ -37,28 +38,27 @@ class ModelTestStateTest extends HelpersTestCase
         $this->assertEquals($originRecords, $state);
     }
 
-    public function testInitializationViaPrepareModelTestStateWithGlobalExportMode()
+    public static function getInitializationViaPrepareModelTestStateFilters(): array
     {
-        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-        $this->mockGettingDataset($datasetMock);
-
-        $testCaseGlobalExportMode = true;
-
-        $prepareModelTestState = $this->getTestState('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
-
-        $this->assertEquals($prepareModelTestState->globalExportMode, $testCaseGlobalExportMode);
+        return [
+            [
+                'testCaseGlobalExportMode' => true,
+            ],
+            [
+                'testCaseGlobalExportMode' => false,
+            ],
+        ];
     }
 
-    public function testInitializationViaPrepareModelTestStateWithoutGlobalExportMode()
+    #[DataProvider('getInitializationViaPrepareModelTestStateFilters')]
+    public function testInitializationViaPrepareTableTestState(bool $testCaseGlobalExportMode)
     {
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
         $this->mockGettingDataset($datasetMock);
 
-        $testCaseGlobalExportMode = false;
+        $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
 
-        $prepareModelTestState = $this->getTestState('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
-
-        $this->assertEquals($prepareModelTestState->globalExportMode, $testCaseGlobalExportMode);
+        $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
     }
 
     public function testAssertChangesEqualsFixture()

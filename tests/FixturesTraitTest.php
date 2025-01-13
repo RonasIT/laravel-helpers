@@ -267,7 +267,7 @@ class FixturesTraitTest extends HelpersTestCase
     {
         $content = $this->getJsonFixture('get_fixture/export_fixture.json');
 
-        unset($this->globalExportMode);
+        $this->globalExportMode = false;
 
         $this->assertEqualsFixture('get_fixture/export_fixture.json', $content);
     }
