@@ -241,9 +241,21 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->mockInsertDataWithoutTimestamps();
 
         $result = self::$testRepositoryClassWithoutTimestamps->insert([
-            ['name' => 'test_name_1'],
-            ['name' => 'test_name_2'],
-            ['name' => 'test_name_3'],
+            [
+                'name' => 'test_name_1',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_2',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_3',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
         ]);
 
         $this->assertTrue($result);
@@ -254,9 +266,21 @@ class EntityControlTraitTest extends HelpersTestCase
         $this->mockInsertDataWithDifferentTimestampNames();
 
         $result = self::$testRepositoryWithDifferentTimestampNames->insert([
-            ['name' => 'test_name_1'],
-            ['name' => 'test_name_2'],
-            ['name' => 'test_name_3'],
+            [
+                'name' => 'test_name_1',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_2',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_3',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
         ]);
 
         $this->assertTrue($result);

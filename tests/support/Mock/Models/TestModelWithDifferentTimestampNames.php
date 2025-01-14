@@ -23,6 +23,7 @@ class TestModelWithDifferentTimestampNames extends Model
         'name',
         'json_field',
         'castable_field',
+        'creation_date',
     ];
 
     protected $casts = [
