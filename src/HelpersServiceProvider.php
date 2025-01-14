@@ -102,7 +102,6 @@ class HelpersServiceProvider extends ServiceProvider
 
             return $existingValueCount === count($value);
         });
-
     }
 
     protected function extendRouter(): void
