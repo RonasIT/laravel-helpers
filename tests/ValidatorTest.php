@@ -135,8 +135,6 @@ class ValidatorTest extends HelpersTestCase
 
     public function testListExistsIncorrectFieldType()
     {
-        $this->mockListExists([1, 2]);
-
         $validator = Validator::make(
             ['ids' => 1],
             ['ids' => 'list_exists:clients,user_id'],

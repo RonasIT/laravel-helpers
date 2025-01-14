@@ -98,7 +98,7 @@ class HelpersServiceProvider extends ServiceProvider
                 ->distinct()
                 ->count($keyField);
 
-            Validator::replacer('list_exists', fn ($message, $attribute) => "Some of the passed {$attribute} are not exists.");
+            $validator->addReplacer('list_exists', fn ($message, $attribute) => "Some of the passed {$attribute} are not exists.");
 
             return $existingValueCount === count($value);
         });
