@@ -133,6 +133,19 @@ class ValidatorTest extends HelpersTestCase
         $this->assertEquals('Some of the passed ids are not exists.', $validator->errors()->first('ids'));
     }
 
+    public function testListExistsIncorrectFieldType()
+    {
+        $this->mockListExists([1, 2]);
+
+        $validator = Validator::make(
+            ['ids' => 1],
+            ['ids' => 'list_exists:clients,user_id'],
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertEquals('The ids field must be an array.', $validator->errors()->first('ids'));
+    }
+
     public function testListExistsWithoutArgs()
     {
         $this->expectException(InvalidValidationRuleUsageException::class);
