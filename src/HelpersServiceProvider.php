@@ -67,7 +67,13 @@ class HelpersServiceProvider extends ServiceProvider
             return !$result;
         });
 
-        Validator::extend('list_exists', function ($attribute, $value, $parameters) {
+        Validator::extend('list_exists', function ($attribute, $value, $parameters, $validator) {
+            if (!is_array($value)) {
+                $validator->addReplacer('list_exists', fn ($message, $attribute) => "The {$attribute} field must be an array.");
+
+                return false;
+            }
+
             if (count($parameters) < 1) {
                 throw new InvalidValidationRuleUsageException("list_exists: At least 1 parameter must be added when checking the {$attribute} field in the request.");
             }
@@ -92,10 +98,10 @@ class HelpersServiceProvider extends ServiceProvider
                 ->distinct()
                 ->count($keyField);
 
+            $validator->addReplacer('list_exists', fn ($message, $attribute) => "Some of the passed {$attribute} are not exists.");
+
             return $existingValueCount === count($value);
         });
-
-        Validator::replacer('list_exists', fn ($message, $attribute) => "Some of the passed {$attribute} are not exists.");
     }
 
     protected function extendRouter(): void
