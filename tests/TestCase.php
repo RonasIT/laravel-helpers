@@ -20,7 +20,7 @@ abstract class TestCase extends BaseTest
     protected static string $startedTestSuite = '';
     protected static bool $isWrappedIntoTransaction = true;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
