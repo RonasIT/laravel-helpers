@@ -16,12 +16,13 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
+use RonasIT\Support\Tests\Support\Mock\FixutresTraitMock\FixtureTestTraitMock;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FixturesTraitTest extends HelpersTestCase
 {
-    use MockTrait;
+    use MockTrait, FixtureTestTraitMock;
 
     public function setUp(): void
     {
@@ -270,5 +271,15 @@ class FixturesTraitTest extends HelpersTestCase
         $this->globalExportMode = false;
 
         $this->assertEqualsFixture('get_fixture/export_fixture.json', $content);
+    }
+
+    public function testAssertEqualsErrorMessage(): void
+    {
+        Config::set('helpers.path_to_tests', '\\wsl.localhost\Ubuntu-22.04\home\container\laravel-helpers');
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that the provided data equal to "file:////wsl.localhost/Ubuntu-22.04/home/container/laravel-helpers/tests/fixtures/UnitTest/event_with_last_photos.json" fixture.');
+
+        $this->assertEqualsFixture('event_with_last_photos.json', ['some_data']);
     }
 }

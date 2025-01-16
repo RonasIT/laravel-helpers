@@ -45,6 +45,12 @@ class HelpersServiceProvider extends ServiceProvider
                 }
             });
         }
+
+        $this->mergeConfigFrom(__DIR__ . '/../config/helpers.php', 'helpers');
+
+        $this->publishes([
+            __DIR__ . '/../config/helpers.php.php' => config_path('helpers.php'),
+        ], 'config');
     }
 
     public function register(): void

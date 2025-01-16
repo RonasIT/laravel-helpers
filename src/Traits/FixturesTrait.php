@@ -116,7 +116,9 @@ trait FixturesTrait
             $this->exportJson($fixture, $data);
         }
 
-        $this->assertEquals($this->getJsonFixture($fixture), $data);
+        $assertFailedMessage = "Failed asserting that the provided data equal to \"{$this->getLocalPath($fixture)}\" fixture.";
+
+        $this->assertEquals($this->getJsonFixture($fixture), $data, $assertFailedMessage);
     }
 
     public function exportJson($fixture, $data): void
@@ -168,7 +170,7 @@ trait FixturesTrait
             }
         });
 
-        return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
+        return "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
     public function prepareSequences(array $except = []): void
@@ -255,5 +257,16 @@ trait FixturesTrait
         return (str_contains($fixtureName, '.'))
             ? $fixtureName
             : "{$fixtureName}.json";
+    }
+
+    public function getLocalPath(string $fixtureName): string
+    {
+        $path = Str::replace(
+            base_path(),
+            config('helpers.path_to_tests'),
+            $this->getFixturePath($fixtureName)
+        );
+
+        return strtr("file:///{$path}",'\\','/');
     }
 }
