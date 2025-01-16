@@ -3,6 +3,8 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
@@ -53,6 +55,15 @@ trait FixturesTrait
 
     protected string $dumpFileName = 'dump.sql';
 
+    protected bool $globalExportMode = false;
+
+    public function setGlobalExportMode(bool $value = true): self
+    {
+        $this->globalExportMode = $value;
+
+        return $this;
+    }
+
     protected function loadTestDump(): void
     {
         $dump = $this->getFixture($this->dumpFileName, false);
@@ -65,7 +76,7 @@ trait FixturesTrait
 
         $this->clearDatabase($databaseTables, array_merge($this->postgisTables, $this->truncateExceptTables));
 
-        app('db.connection')->unprepared($dump);
+        Schema::getConnection()->unprepared($dump);
     }
 
     public function getFixturePath(string $fixtureName): string
@@ -94,14 +105,14 @@ trait FixturesTrait
 
     public function getJsonFixture(string $fixtureName, $assoc = true)
     {
+        $fixtureName = $this->prepareFixtureName($fixtureName);
+
         return json_decode($this->getFixture($fixtureName), $assoc);
     }
 
     public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
     {
-        $globalExportMode = $this->globalExportMode ?? false;
-
-        if ($globalExportMode || $exportMode) {
+        if ($this->globalExportMode || $exportMode) {
             $this->exportJson($fixture, $data);
         }
 
@@ -117,6 +128,8 @@ trait FixturesTrait
         if ($data instanceof TestResponse) {
             $data = $data->json();
         }
+
+        $fixture = $this->prepareFixtureName($fixture);
 
         $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
@@ -139,10 +152,10 @@ trait FixturesTrait
     public function getClearPsqlDatabaseQuery(array $tables, array $except = ['migrations']): string
     {
         return array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE \"{$table['name']}\" RESTART IDENTITY CASCADE;\n";
             }
         });
     }
@@ -152,10 +165,10 @@ trait FixturesTrait
         $query = "SET FOREIGN_KEY_CHECKS = 0;\n";
 
         $query .= array_concat($tables, function ($table) use ($except) {
-            if (in_array($table, $except)) {
+            if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table}; \n";
+                return "TRUNCATE TABLE \"{$table['name']}\";\n";
             }
         });
 
@@ -167,13 +180,17 @@ trait FixturesTrait
         $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
 
         $query = array_concat($this->getSequences(), function ($item) use ($except) {
-            if (in_array($item->table_name, $except)) {
+            if (
+                in_array($item->table_name, $except)
+                || in_array("{$item->table_schema}.{$item->table_name}", $except)
+            ) {
                 return '';
             } else {
                 $sequenceName = str_replace(["nextval('", "'::regclass)"], '', $item->column_default);
+                $tableName = "{$item->table_schema}.{$item->table_name}";
 
                 return "SELECT setval('{$sequenceName}', (select coalesce(max({$item->column_name}), 1) from " .
-                    "{$item->table_name}), (case when (select max({$item->column_name}) from {$item->table_name}) " .
+                    "{$tableName}), (case when (select max({$item->column_name}) from {$tableName}) " .
                     "is NULL then false else true end));\n";
             }
         });
@@ -192,9 +209,7 @@ trait FixturesTrait
     protected function getTables(): array
     {
         if (empty(self::$tables)) {
-            self::$tables = app('db.connection')
-                ->getDoctrineSchemaManager()
-                ->listTableNames();
+            self::$tables = Schema::getTables();
         }
 
         return self::$tables;
@@ -205,7 +220,7 @@ trait FixturesTrait
         if (empty(self::$sequences)) {
             self::$sequences = app('db.connection')
                 ->table('information_schema.columns')
-                ->select('table_name', 'column_name', 'column_default')
+                ->select('table_name', 'table_schema', 'column_name', 'column_default')
                 ->where('column_default', 'LIKE', 'nextval%')
                 ->get()
                 ->toArray();
@@ -214,15 +229,35 @@ trait FixturesTrait
         return self::$sequences;
     }
 
-    protected function exportContent($content, string $fixture): void
+    protected function exportContent(string $content, string $fixture): void
     {
         if (env('FAIL_EXPORT_JSON', true)) {
             throw new ForbiddenExportModeException();
         }
 
-        file_put_contents(
-            $this->getFixturePath($fixture),
-            $content
-        );
+        $path = $this->getFixturePath($fixture);
+
+        $this->makeFixtureDir($path);
+
+        file_put_contents($path, $content);
+    }
+
+    protected function makeFixtureDir(string $path): void
+    {
+        $dir = Str::beforeLast($path, '/');
+
+        if (!is_dir($dir)) {
+            mkdir(
+                directory: $dir,
+                recursive: true,
+            );
+        }
+    }
+
+    protected function prepareFixtureName(string $fixtureName): string
+    {
+        return (str_contains($fixtureName, '.'))
+            ? $fixtureName
+            : "{$fixtureName}.json";
     }
 }

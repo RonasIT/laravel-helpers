@@ -1,3 +1,6 @@
 .idea
 .phpunit.result.cache
 vendor/
+.php-cs-fixer.cache
+cghooks.lock
+tests/fixtures/MailsMockTraitTest/test_mail_with_global_export.html

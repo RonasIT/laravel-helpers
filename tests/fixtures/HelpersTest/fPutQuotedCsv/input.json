@@ -1,0 +1,22 @@
+[
+  [
+    "field1",
+    "field2",
+    "field\nname"
+  ],
+  [
+    123,
+    "[123]",
+    "Some quoted \"text\" is here"
+  ],
+  [
+    "Just text",
+    "And another one text, but with comma",
+    "The last one text. The end!"
+  ],
+  [
+    "Forgot",
+    "about",
+    "text with ; here"
+  ]
+]

@@ -3,15 +3,14 @@
 namespace RonasIT\Support\Exporters;
 
 use Illuminate\Support\Arr;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use RonasIT\Support\Interfaces\ExporterInterface;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use RonasIT\Support\Contracts\ExporterContract;
 
-abstract class Exporter implements FromQuery, WithHeadings, WithMapping, ExporterInterface
+abstract class Exporter implements FromQuery, WithHeadings, WithMapping, ExporterContract
 {
     use Exportable;
 
@@ -74,7 +73,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
 
     public function headings(): array
     {
-        return is_associative($this->getFields()) ? array_keys($this->getFields()) : $this->getFields();
+        return Arr::isAssoc($this->getFields()) ? array_keys($this->getFields()) : $this->getFields();
     }
 
     public function map($row): array

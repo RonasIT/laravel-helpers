@@ -5,20 +5,23 @@ namespace RonasIT\Support\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class BaseMail extends Mailable implements ShouldQueue
+abstract class BaseMail extends Mailable implements ShouldQueue
 {
     use Queueable;
     use SerializesModels;
 
     public int $tries = 5;
 
-    public function __construct(array $viewData, $subject, $view)
+    public function __construct()
     {
-        $this->viewData = $viewData;
-        $this->subject = $subject;
-        $this->view = $view;
         $this->queue = 'mails';
     }
+
+    abstract public function envelope(): Envelope;
+
+    abstract public function content(): Content;
 }

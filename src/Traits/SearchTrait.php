@@ -32,7 +32,7 @@ trait SearchTrait
         'all',
         'per_page',
         'page',
-        'desc'
+        'desc',
     ];
 
     protected function setAdditionalReservedFilters(...$filterNames)
@@ -57,19 +57,24 @@ trait SearchTrait
      */
     public function filterBy(string $field, ?string $filterName = null): self
     {
-        if (empty($filterName)) {
-            if (Str::contains($field, '.')) {
-                list ($filterName) = extract_last_part($field);
-            } else {
-                $filterName = $field;
-            }
-        }
+        $filterName ??= $this->getFilterName($field);
 
         if (Arr::has($this->filter, $filterName)) {
-            $values = Arr::wrap($this->filter[$filterName]);
+            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
+                $query->where($conditionField, $this->filter[$filterName]);
+            });
+        }
 
-            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($values) {
-                $query->whereIn($conditionField, $values);
+        return $this;
+    }
+
+    public function filterByList(string $field, ?string $filterName = null): self
+    {
+        $filterName ??= $this->getFilterName($field);
+
+        if (Arr::has($this->filter, $filterName)) {
+            $this->applyWhereCallback($this->query, $field, function (&$query, $conditionField) use ($filterName) {
+                $query->whereIn($conditionField, $this->filter[$filterName]);
             });
         }
 
@@ -82,7 +87,7 @@ trait SearchTrait
             $this->query->where(function ($query) use ($fields, $mask) {
                 foreach ($fields as $field) {
                     if (Str::contains($field, '.')) {
-                        list ($fieldName, $relations) = extract_last_part($field);
+                        list($fieldName, $relations) = extract_last_part($field);
 
                         $query->orWhereHas($relations, function ($query) use ($fieldName, $mask) {
                             $query->where(
@@ -145,7 +150,7 @@ trait SearchTrait
                     $this->filterTo($field, false, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_in_list')) {
                     $field = Str::replace('_in_list', '', $fieldName);
-                    $this->query->whereIn($field, $value);
+                    $this->filterByList($field, $fieldName);
                 } else {
                     $this->filterBy($fieldName);
                 }
@@ -178,7 +183,7 @@ trait SearchTrait
 
         $paginator = new LengthAwarePaginator($data, $total, $perPage, 1, [
             'path' => Paginator::resolveCurrentPath(),
-            'pageName' => 'page'
+            'pageName' => 'page',
         ]);
 
         return $this->getModifiedPaginator($paginator);
@@ -277,7 +282,10 @@ trait SearchTrait
     {
         return function ($query) use ($field, $mask) {
             $databaseDriver = config('database.default');
-            $value = str_replace('{{ value }}', $this->filter['query'], $mask);
+            $value = ($databaseDriver === 'pgsql')
+                ? pg_escape_string($this->filter['query'])
+                : addslashes($this->filter['query']);
+            $value = str_replace('{{ value }}', $value, $mask);
             $operator = ($databaseDriver === 'pgsql')
                 ? 'ilike'
                 : 'like';
@@ -340,7 +348,7 @@ trait SearchTrait
             $field = (empty($field)) ? $this->primaryKey : $field;
 
             $where = [
-                $field => $where
+                $field => $where,
             ];
         }
 
@@ -354,7 +362,7 @@ trait SearchTrait
     protected function applyWhereCallback(Query $query, string $field, Closure $callback): void
     {
         if (Str::contains($field, '.')) {
-            list ($conditionField, $relations) = extract_last_part($field);
+            list($conditionField, $relations) = extract_last_part($field);
 
             $query->whereHas($relations, function ($q) use ($callback, $conditionField) {
                 $callback($q, $conditionField);
@@ -384,5 +392,14 @@ trait SearchTrait
             $this->with([]);
             $this->withCount([]);
         }
+    }
+
+    protected function getFilterName(string $field): string
+    {
+        if (Str::contains($field, '.')) {
+            [$field] = extract_last_part($field);
+        }
+
+        return $field;
     }
 }

@@ -150,7 +150,7 @@ class HttpRequestService
             case 'delete':
                 $response = $client->delete($url, $this->options);
                 break;
-            default :
+            default:
                 throw new UnknownRequestMethodException($method);
         }
 
@@ -172,7 +172,7 @@ class HttpRequestService
             logger("sending {$typeOfRequest} request:", [
                 'url' => $url,
                 'data' => $data,
-                'headers' => $headers
+                'headers' => $headers,
             ]);
             logger('');
         }
@@ -184,7 +184,7 @@ class HttpRequestService
      * https://laravel.com/docs/10.x/telescope and
      * https://packagist.org/packages/muhammadhuzaifa/telescope-guzzle-watcher instead
      */
-    protected function logResponse(?int $time = null): void
+    protected function logResponse(?float $time = null): void
     {
         $endTime = (empty($time)) ? null : microtime(true) - $time;
 

@@ -2,14 +2,15 @@
 
 namespace RonasIT\Support\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
-use RonasIT\Support\Tests\Support\Mock\TestModel;
-use RonasIT\Support\Tests\Support\Mock\TestModelWithoutJsonFields;
-use RonasIT\Support\Tests\Support\Traits\ModelTestStateMockTrait;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutJsonFields;
+use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class ModelTestStateTest extends HelpersTestCase
 {
-    use ModelTestStateMockTrait;
+    use TableTestStateMockTrait;
 
     public function setUp(): void
     {
@@ -33,9 +34,31 @@ class ModelTestStateTest extends HelpersTestCase
         $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertNotEmpty($jsonFields);
         $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
+    }
+
+    public static function getInitializationViaPrepareModelTestStateFilters(): array
+    {
+        return [
+            [
+                'testCaseGlobalExportMode' => true,
+            ],
+            [
+                'testCaseGlobalExportMode' => false,
+            ],
+        ];
+    }
+
+    #[DataProvider('getInitializationViaPrepareModelTestStateFilters')]
+    public function testInitializationViaPrepareTableTestState(bool $testCaseGlobalExportMode)
+    {
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+        $this->mockGettingDataset($datasetMock);
+
+        $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
+
+        $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
     }
 
     public function testAssertChangesEqualsFixture()
@@ -52,10 +75,10 @@ class ModelTestStateTest extends HelpersTestCase
     public function testAssertChangesWithoutJsonFields()
     {
         $initialDatasetMock = collect(
-            $this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset.json')
+            $this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset.json'),
         );
         $changedDatasetMock = collect(
-            $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json')
+            $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
         );
 
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_without_json_fields');

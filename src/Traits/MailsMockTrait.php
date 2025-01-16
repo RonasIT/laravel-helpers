@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\HttpFoundation\Response;
 
 trait MailsMockTrait
 {
@@ -14,7 +13,7 @@ trait MailsMockTrait
 
     private array $requiredExpectationParameters = [
         'emails',
-        'fixture'
+        'fixture',
     ];
 
     /**
@@ -23,11 +22,13 @@ trait MailsMockTrait
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
+     *      'from' => string|null, expected email sender address the step 1
+     *      'attachments' => array, expected attachments
      *   ]
      *
      * or be a function call:
      *
-     *   $this->mockedMail($emails, $fixture, $subject, $from),
+     *   $this->mockedMail($emails, $fixture, $subject, $from, $attachments),
      *
      * or be an array, if sent more than 1 email:
      *
@@ -36,12 +37,14 @@ trait MailsMockTrait
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step 1
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step 1
      *      'subject' => string|null, expected email subject from the step 1
+     *      'from' => string|null, expected email sender address the step 1
      *   ],
      *   ...
      *   [
      *      'emails' => string|array, email addresses to which the letter is expected to be sent on the step N
      *      'fixture' => 'expected_rendered_fixture.html', fixture name to which send email expected to be equal on the step N
      *      'subject' => string|null, expected email subject from the step N
+     *      'attachments' => array, expected attachments
      *   ]
      * ]
      *
@@ -75,6 +78,7 @@ trait MailsMockTrait
             $this->assertEmailsList($expectedMailData, $mail, $index);
             $this->assertFixture($expectedMailData, $mail, $exportMode);
             $this->assertEmailFrom($expectedMailData, $mail);
+            $this->assertAttachments($expectedMailData, $mail, $index);
 
             $index++;
 
@@ -96,22 +100,13 @@ trait MailsMockTrait
         $expectedSubject = Arr::get($currentMail, 'subject');
 
         if (!empty($expectedSubject)) {
-            if (method_exists($mail, 'hasSubject')) {
-                $subject = method_exists($mail, 'envelope') ? $mail->envelope()->subject : $mail->subject;
+            $subject = method_exists($mail, 'envelope') ? $mail->envelope()->subject : $mail->subject;
 
-                $this->assertTrue(
-                    $mail->hasSubject($expectedSubject),
-                    "Failed assert that the expected subject \"{$expectedSubject}\" equals "
-                    . "to the actual \"{$subject}\"."
-                );
-            } else {
-                $this->assertEquals(
-                    $expectedSubject,
-                    $mail->subject,
-                    "Failed assert that the expected subject \"{$expectedSubject}\" equals "
-                    . "to the actual \"{$mail->subject}\"."
-                );
-            }
+            $this->assertTrue(
+                $mail->hasSubject($expectedSubject),
+                "Failed assert that the expected subject \"{$expectedSubject}\" equals "
+                . "to the actual \"{$subject}\"."
+            );
         }
     }
 
@@ -146,10 +141,15 @@ trait MailsMockTrait
         $expectedFrom = Arr::get($currentMail, 'from');
 
         if (!empty($expectedFrom)) {
-            $this->assertTrue(
-                $mail->hasFrom($expectedFrom),
-                "Email was not from expected address [{$expectedFrom}]."
-            );
+            $expectedFrom = Arr::wrap($expectedFrom);
+
+            foreach ($expectedFrom as $expected) {
+                $expectedJson = json_encode($expected);
+                $this->assertTrue(
+                    $mail->hasFrom($expected['address'] ?? $expected, $expected['name'] ?? null),
+                    "Email was not from expected address [{$expectedJson}]."
+                );
+            }
         }
     }
 
@@ -176,9 +176,12 @@ trait MailsMockTrait
     protected function assertFixture(array $expectedMailData, Mailable $mail, bool $exportMode = false): void
     {
         $view = (method_exists($mail, 'content')) ? $mail->content()->view : $mail->view;
-        $mailContent = view($view, $mail->viewData)->render();
+        $data = (method_exists($mail, 'content')) ? $mail->content()->with : $mail->viewData;
+        $mailContent = view($view, $data)->render();
 
-        if ($exportMode) {
+        $globalExportMode = $this->globalExportMode ?? false;
+
+        if ($exportMode || $globalExportMode) {
             $this->exportContent($mailContent, $expectedMailData['fixture']);
         }
 
@@ -200,13 +203,31 @@ trait MailsMockTrait
         return (is_multidimensional($emailChain)) ? $emailChain : [$emailChain];
     }
 
-    protected function mockedMail($emails, string $fixture, string $subject = '', $from = ''): array
+    protected function mockedMail($emails, string $fixture, string $subject = '', $from = '', $attachments = []): array
     {
         return [
             'emails' => $emails,
             'fixture' => $fixture,
             'subject' => $subject,
             'from' => $from,
+            'attachments' => $attachments,
         ];
+    }
+
+    protected function assertAttachments(array $currentMail, Mailable $mail, int $index): void
+    {
+        $attachments = Arr::get($currentMail, 'attachments', []);
+        $className = get_class($mail);
+
+        if (count($attachments)) {
+            $this->assertTrue(
+                method_exists($mail, 'assertHasAttachment'),
+                "Class {$className} doesn't have method `assertHasAttachment` to check an attachment.",
+            );
+
+            foreach ($attachments as $attachment) {
+                $mail->assertHasAttachment($attachment);
+            }
+        }
     }
 }
