@@ -1,7 +1,6 @@
-version: '3'
-
 services:
   nginx:
+    image: ghcr.io/ronasit/php-nginx-dev:8.3
     build: .
     working_dir: /app
     ports:

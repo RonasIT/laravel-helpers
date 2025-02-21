@@ -20,14 +20,7 @@ abstract class TestCase extends BaseTest
     protected static string $startedTestSuite = '';
     protected static bool $isWrappedIntoTransaction = true;
 
-    protected bool $globalExportMode = false;
-
-    protected function setGlobalExportMode(): void
-    {
-        $this->globalExportMode = true;
-    }
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -111,5 +104,15 @@ abstract class TestCase extends BaseTest
             $connection->setEventDispatcher($dispatcher);
             $connection->disconnect();
         }
+    }
+
+    protected function prepareModelTestState(string $modelClassName): ModelTestState
+    {
+        return (new ModelTestState($modelClassName))->setGlobalExportMode($this->globalExportMode);
+    }
+
+    protected function prepareTableTestState(string $tableName, array $jsonFields = [], ?string $connectionName = null): TableTestState
+    {
+        return (new TableTestState($tableName, $jsonFields, $connectionName))->setGlobalExportMode($this->globalExportMode);
     }
 }

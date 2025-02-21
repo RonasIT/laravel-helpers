@@ -21,7 +21,7 @@ class HelpersTestCase extends BaseTest
     protected function getPackageProviders($app): array
     {
         return [
-            HelpersServiceProvider::class
+            HelpersServiceProvider::class,
         ];
     }
 
@@ -48,16 +48,15 @@ class HelpersTestCase extends BaseTest
     public function getLoginSession($session, $guard = 'session'): array
     {
         return array_filter(
-            $session->all(),
-            fn ($key) => strpos($key, "login_{$guard}_") === 0,
-            ARRAY_FILTER_USE_KEY
+            array: $session->all(),
+            callback: fn ($key) => strpos($key, "login_{$guard}_") === 0,
+            mode: ARRAY_FILTER_USE_KEY,
         );
     }
 
     protected function getProtectedProperty(ReflectionClass $reflectionClass, string $methodName, $objectInstance)
     {
         $property = $reflectionClass->getProperty($methodName);
-        $property->setAccessible(true);
 
         return $property->getValue($objectInstance);
     }
