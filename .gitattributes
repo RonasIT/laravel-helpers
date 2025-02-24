@@ -6,3 +6,4 @@
 composer.lock export-ignore
 docker-compose.yml export-ignore
 phpunit.xml export-ignore
+readme.md export-ignore
