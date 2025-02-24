@@ -47,6 +47,16 @@ class HttpRequestServiceTest extends HelpersTestCase
                 result: new GuzzleResponse(200, [], json_encode([]))
             ),
         ]);
+
+        app(HttpRequestService::class)->get(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: [
+                'some_header_name' => 'some_header_value',
+            ],
+        );
     }
 
     public function testSetOption()
