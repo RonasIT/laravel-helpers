@@ -37,7 +37,7 @@ class HttpRequestService
 
     public function json(): array
     {
-        $stringResponse = (string) $this->response->getBody();
+        $stringResponse = (string)$this->response->getBody();
 
         $result = json_decode($stringResponse, true);
 
@@ -128,13 +128,15 @@ class HttpRequestService
         }
     }
 
-    public function parseMultipart(string $content): StreamedPart
+    public function multipart(string $content): StreamedPart
     {
         $stream = fopen('php://temp', 'rw');
         fwrite($stream, $content);
         rewind($stream);
 
-        return app()->makeWith(StreamedPart::class, ['stream' => $stream]);
+        return app()
+            ->makeWith(StreamedPart::class, ['stream' => $stream])
+            ->getParts();
     }
 
     protected function sendRequest($method, $url, array $data = [], array $headers = []): ResponseInterface
@@ -241,45 +243,28 @@ class HttpRequestService
         } elseif (preg_match('/application\/x-www-form-urlencoded/', $contentType)) {
             $this->options['form_params'] = $data;
         } elseif (preg_match('/multipart\/form-data/', $contentType)) {
-            $this->options['multipart'] = $this->getMultipartOptionReplacement($data);
+            Arr::forget($this->options, 'headers.content-type');
+            $this->options['multipart'] = $this->convertToMultipart($data);
         } else {
             $this->options['body'] = json_encode($data);
         }
     }
 
-    protected function getMultipartOptionReplacement(array $data): array
+    protected function convertToMultipart(array $data, ?string $parentKey = null): array
     {
-        Arr::forget($this->options, 'headers.content-type');
-
         $options = [];
 
         foreach ($data as $key => $value) {
+            $preparedKey = is_int($key)
+                ? $key
+                : (is_null($parentKey) ? $key : "{$parentKey}[{$key}]");
+
             if (is_array($value)) {
-                $options = array_merge($options, $this->getArrayMultipartOptionReplacement($key, $value));
-            } else {
-                $options[] = [
-                    'name' => $key,
-                    'contents' => $value
-                ];
-            }
-        }
-
-        return $options;
-    }
-
-    protected function getArrayMultipartOptionReplacement(string $parentKey, array $items): array
-    {
-        $options = [];
-
-        foreach ($items as $key => $item) {
-            $preparedKey = "{$parentKey}[{$key}]";
-
-            if (is_array($item)) {
-                $options = array_merge($options, $this->getArrayMultipartOptionReplacement($preparedKey, $item));
+                $options = array_merge($options, $this->convertToMultipart($value, $preparedKey));
             } else {
                 $options[] = [
                     'name' => $preparedKey,
-                    'contents' => $item
+                    'contents' => $value
                 ];
             }
         }
