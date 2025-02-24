@@ -1,0 +1,9 @@
+/.github export-ignore
+/bootstrap export-ignore
+/documentation export-ignore
+/tests export-ignore
+.php-cs-fixer.dist.php export-ignore
+composer.lock export-ignore
+docker-compose.yml export-ignore
+phpunit.xml export-ignore
+readme.md export-ignore
