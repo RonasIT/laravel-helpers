@@ -128,7 +128,7 @@ class HttpRequestService
         }
     }
 
-    public function multipart(string $content): StreamedPart
+    public function multipart(string $content): array
     {
         $stream = fopen('php://temp', 'rw');
         fwrite($stream, $content);
