@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
+use Riverline\MultiPartParser\StreamedPart;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 
@@ -36,7 +37,7 @@ class HttpRequestService
 
     public function json(): array
     {
-        $stringResponse = (string) $this->response->getBody();
+        $stringResponse = (string)$this->response->getBody();
 
         $result = json_decode($stringResponse, true);
 
@@ -127,8 +128,21 @@ class HttpRequestService
         }
     }
 
+    public function multipart(string $content): array
+    {
+        $stream = fopen('php://temp', 'rw');
+        fwrite($stream, $content);
+        rewind($stream);
+
+        return app()
+            ->makeWith(StreamedPart::class, ['stream' => $stream])
+            ->getParts();
+    }
+
     protected function sendRequest($method, $url, array $data = [], array $headers = []): ResponseInterface
     {
+        $headers = array_change_key_case($headers);
+
         $this->setOptions($headers);
         $this->setData($method, $headers, $data);
 
@@ -222,15 +236,39 @@ class HttpRequestService
             return;
         }
 
-        $headers = array_change_key_case($headers);
         $contentType = Arr::get($headers, 'content-type');
 
         if (preg_match('/application\/json/', $contentType)) {
             $this->options['json'] = $data;
         } elseif (preg_match('/application\/x-www-form-urlencoded/', $contentType)) {
             $this->options['form_params'] = $data;
+        } elseif (preg_match('/multipart\/form-data/', $contentType)) {
+            Arr::forget($this->options, 'headers.content-type');
+            $this->options['multipart'] = $this->convertToMultipart($data);
         } else {
             $this->options['body'] = json_encode($data);
         }
+    }
+
+    protected function convertToMultipart(array $data, ?string $parentKey = null): array
+    {
+        $options = [];
+
+        foreach ($data as $key => $value) {
+            $preparedKey = is_int($key)
+                ? $key
+                : (is_null($parentKey) ? $key : "{$parentKey}[{$key}]");
+
+            if (is_array($value)) {
+                $options = array_merge($options, $this->convertToMultipart($value, $preparedKey));
+            } else {
+                $options[] = [
+                    'name' => $preparedKey,
+                    'contents' => $value
+                ];
+            }
+        }
+
+        return $options;
     }
 }

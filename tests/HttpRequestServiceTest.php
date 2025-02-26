@@ -168,7 +168,7 @@ class HttpRequestServiceTest extends HelpersTestCase
                 [
                     'headers' => [
                         'some_header' => 'some_header_value',
-                        'Content-type' => 'application/x-www-form-urlencoded',
+                        'content-type' => 'application/x-www-form-urlencoded',
                     ],
                     'cookies' => null,
                     'allow_redirects' => true,
@@ -190,6 +190,72 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'Content-type' => 'application/x-www-form-urlencoded',
             ],
         );
+    }
+
+    public function testSendPutMultipartContentTypeWithFiles(): void
+    {
+        $this->mockGuzzleClient('put', [
+            'https://some.url.com',
+            [
+                'headers' => [],
+                'cookies' => null,
+                'allow_redirects' => true,
+                'connect_timeout' => 0,
+                'multipart' => [
+                    [
+                        'name' => '0[first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '0[second_file][first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '0[second_file][second_file]',
+                        'contents' => 'second_file_content',
+                    ],
+                    [
+                        'name' => '1[first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '1[second_file]',
+                        'contents' => 'second_file_content',
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->httpRequestServiceClass->put('https://some.url.com', [
+            [
+                'first_file' => 'first_file_content',
+                'second_file' => [
+                    'first_file' => 'first_file_content',
+                    'second_file' => 'second_file_content'
+                ]
+            ],
+            [
+                'first_file' => 'first_file_content',
+                'second_file' => 'second_file_content'
+            ]
+        ], [
+            'Content-type' => 'multipart/form-data;'
+        ]);
+    }
+
+    public function testParseMultipartContent(): void
+    {
+        $multipartContent = $this->getFixture('multipart_content');
+
+        $multipartObject = $this->httpRequestServiceClass->multipart($multipartContent);
+
+        $parsedData = [];
+
+        foreach ($multipartObject as $part) {
+            $parsedData[] = [$part->getName(), $part->getBody()];
+        }
+
+        $this->assertEqualsFixture('parsed_multipart_content.json', $parsedData);
     }
 
     public static function sendPutAsJSONData(): array
@@ -221,7 +287,7 @@ class HttpRequestServiceTest extends HelpersTestCase
             arguments: [
                 'https://some.url.com',
                 [
-                    'headers' => $headers,
+                    'headers' => ['content-type' => 'application/json'],
                     'cookies' => null,
                     'allow_redirects' => true,
                     'connect_timeout' => 0,

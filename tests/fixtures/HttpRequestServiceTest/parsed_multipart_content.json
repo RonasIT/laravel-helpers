@@ -1,0 +1,14 @@
+[
+    [
+        "foo",
+        "bar"
+    ],
+    [
+        null,
+        "base64"
+    ],
+    [
+        "upload",
+        "File content"
+    ]
+]
