@@ -1,5 +1,6 @@
 .idea
 .phpunit.result.cache
+.phpunit.cache
 vendor/
 .php-cs-fixer.cache
 cghooks.lock

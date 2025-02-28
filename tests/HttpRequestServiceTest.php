@@ -203,15 +203,15 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'connect_timeout' => 0,
                 'multipart' => [
                     [
-                        'name' => '0[first_file]',
+                        'name' => '[0][first_file]',
                         'contents' => 'first_file_content',
                     ],
                     [
-                        'name' => '0[second_file][first_file]',
+                        'name' => '[0][second_file][first_file]',
                         'contents' => 'first_file_content',
                     ],
                     [
-                        'name' => '0[second_file][second_file]',
+                        'name' => '[0][second_file][second_file]',
                         'contents' => 'second_file_content',
                     ],
                     [
@@ -242,6 +242,8 @@ class HttpRequestServiceTest extends HelpersTestCase
             'Content-type' => 'multipart/form-data;'
         ]);
     }
+
+
 
     public function testParseMultipartContent(): void
     {

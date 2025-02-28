@@ -37,7 +37,7 @@ class HttpRequestService
 
     public function json(): array
     {
-        $stringResponse = (string)$this->response->getBody();
+        $stringResponse = (string) $this->response->getBody();
 
         $result = json_decode($stringResponse, true);
 
@@ -255,9 +255,9 @@ class HttpRequestService
         $options = [];
 
         foreach ($data as $key => $value) {
-            $preparedKey = is_int($key)
+            $preparedKey = (is_int($key)
                 ? $key
-                : (is_null($parentKey) ? $key : "{$parentKey}[{$key}]");
+                : (is_null($parentKey))) ? $key : "{$parentKey}[{$key}]";
 
             if (is_array($value)) {
                 $options = array_merge($options, $this->convertToMultipart($value, $preparedKey));
