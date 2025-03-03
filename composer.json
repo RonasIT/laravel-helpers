@@ -10,6 +10,7 @@
     }
   ],
   "require": {
+    "riverline/multipart-parser": "^2.1",
     "ext-json": "*",
     "guzzlehttp/guzzle": "^7.9.2",
     "laravel/framework": "^11.20",
