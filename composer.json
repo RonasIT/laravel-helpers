@@ -12,7 +12,7 @@
   "require": {
     "ext-json": "*",
     "guzzlehttp/guzzle": "^7.9.2",
-    "laravel/framework": "^11.20",
+    "laravel/framework": "^11",
     "maatwebsite/excel": "^3.1.55",
     "php": ">=8.3",
     "php-mock/php-mock-phpunit": "^2.10"
