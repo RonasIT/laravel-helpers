@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
+use RonasIT\Support\Testing\TableTestState;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class TableTestStateTest extends TestCase
