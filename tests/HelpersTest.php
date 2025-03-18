@@ -5,7 +5,7 @@ namespace RonasIT\Support\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Traits\MockTrait;
 
-class HelpersTest extends HelpersTestCase
+class HelpersTest extends TestCase
 {
     use MockTrait;
 

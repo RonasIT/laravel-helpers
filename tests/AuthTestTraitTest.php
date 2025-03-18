@@ -8,7 +8,7 @@ use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
 use RonasIT\Support\Traits\AuthTestTrait;
 use RonasIT\Support\Traits\FixturesTrait;
 
-class AuthTestTraitTest extends HelpersTestCase
+class AuthTestTraitTest extends TestCase
 {
     use AuthTestTrait;
     use FixturesTrait;

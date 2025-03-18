@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests;
+namespace RonasIT\Support\Testing;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;

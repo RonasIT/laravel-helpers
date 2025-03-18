@@ -10,7 +10,7 @@ use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
-class SearchTraitTest extends HelpersTestCase
+class SearchTraitTest extends TestCase
 {
     use SqlMockTrait;
 

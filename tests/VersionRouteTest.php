@@ -7,7 +7,7 @@ use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
 
-class VersionRouteTest extends HelpersTestCase
+class VersionRouteTest extends TestCase
 {
     use RouteMockTrait;
 
