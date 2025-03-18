@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests;
+namespace RonasIT\Support\Testing;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;

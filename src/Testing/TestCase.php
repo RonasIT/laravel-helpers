@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests;
+namespace RonasIT\Support\Testing;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
