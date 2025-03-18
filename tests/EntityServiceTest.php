@@ -7,7 +7,7 @@ use ReflectionProperty;
 use RonasIT\Support\Services\EntityService;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
 
-class EntityServiceTest extends HelpersTestCase
+class EntityServiceTest extends TestCase
 {
     protected static EntityService $entityServiceClass;
     protected ReflectionProperty $repositoryProperty;

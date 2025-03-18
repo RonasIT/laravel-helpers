@@ -29,8 +29,6 @@
   },
   "autoload": {
     "psr-4": {
-      "RonasIT\\Support\\Tests\\": "tests/",
-      "RonasIT\\Support\\Tests\\Support\\": "tests/support/",
       "RonasIT\\Support\\": "src/"
     },
     "files": [
@@ -40,7 +38,11 @@
   "autoload-dev": {
     "files": [
       "tests/TestCase.php"
-    ]
+    ],
+    "psr-4": {
+      "RonasIT\\Support\\Tests\\": "tests/",
+      "RonasIT\\Support\\Tests\\Support\\": "tests/support/"
+    }
   },
   "minimum-stability": "alpha",
   "extra": {

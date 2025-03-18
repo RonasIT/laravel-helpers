@@ -11,7 +11,7 @@ use RonasIT\Support\Tests\Support\Mock\Mails\TestMail;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMailManyFromWithName;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMailWithAttachments;
 
-class MailsMockTraitTest extends HelpersTestCase
+class MailsMockTraitTest extends TestCase
 {
     public function setUp(): void
     {

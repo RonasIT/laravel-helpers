@@ -7,7 +7,7 @@ use RonasIT\Support\Http\BaseRequest;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
-class BaseRequestTest extends HelpersTestCase
+class BaseRequestTest extends TestCase
 {
     use TableTestStateMockTrait;
 

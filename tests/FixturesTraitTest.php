@@ -19,7 +19,7 @@ use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class FixturesTraitTest extends HelpersTestCase
+class FixturesTraitTest extends TestCase
 {
     use MockTrait;
 

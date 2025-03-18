@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
-class ValidatorTest extends HelpersTestCase
+class ValidatorTest extends TestCase
 {
     use SqlMockTrait;
 

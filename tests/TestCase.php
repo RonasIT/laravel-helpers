@@ -7,7 +7,7 @@ use RonasIT\Support\HelpersServiceProvider;
 use RonasIT\Support\Traits\MailsMockTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
 
-class HelpersTestCase extends BaseTest
+class TestCase extends BaseTest
 {
     use MailsMockTrait;
 
