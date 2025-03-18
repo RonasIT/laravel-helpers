@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
 use ReflectionMethod;
-use RonasIT\Support\Tests\TableTestState;
 use RonasIT\Support\Tests\TestCase;
 
 trait TableTestStateMockTrait
