@@ -243,7 +243,6 @@ class HttpRequestService
         } elseif (preg_match('/application\/x-www-form-urlencoded/', $contentType)) {
             $this->options['form_params'] = $data;
         } elseif (preg_match('/multipart\/form-data/', $contentType)) {
-            Arr::forget($this->options, 'headers.content-type');
             $this->options['multipart'] = $this->convertToMultipart($data);
         } else {
             $this->options['body'] = json_encode($data);
@@ -264,7 +263,7 @@ class HttpRequestService
             } else {
                 $options[] = [
                     'name' => $preparedKey,
-                    'contents' => $value
+                    'contents' => $value,
                 ];
             }
         }

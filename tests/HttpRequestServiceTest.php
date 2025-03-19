@@ -197,7 +197,9 @@ class HttpRequestServiceTest extends HelpersTestCase
         $this->mockGuzzleClient('put', [
             'https://some.url.com',
             [
-                'headers' => [],
+                'headers' => [
+                    'content-type' => 'multipart/form-data',
+                ],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
@@ -239,11 +241,9 @@ class HttpRequestServiceTest extends HelpersTestCase
                 'second_file' => 'second_file_content'
             ]
         ], [
-            'Content-type' => 'multipart/form-data;'
+            'Content-type' => 'multipart/form-data',
         ]);
     }
-
-
 
     public function testParseMultipartContent(): void
     {
