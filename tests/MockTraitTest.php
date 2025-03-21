@@ -6,7 +6,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMockClass;
 use RonasIT\Support\Traits\MockTrait;
 
-class MockTraitTest extends HelpersTestCase
+class MockTraitTest extends TestCase
 {
     use MockTrait;
 

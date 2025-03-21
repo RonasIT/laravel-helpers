@@ -12,7 +12,7 @@ use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
 
-class HttpRequestServiceTest extends HelpersTestCase
+class HttpRequestServiceTest extends TestCase
 {
     use HttpRequestServiceMockTrait;
 

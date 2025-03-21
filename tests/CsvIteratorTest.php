@@ -7,7 +7,7 @@ use ReflectionProperty;
 use RonasIT\Support\Exceptions\IncorrectCSVFileException;
 use RonasIT\Support\Iterators\CsvIterator;
 
-class CsvIteratorTest extends HelpersTestCase
+class CsvIteratorTest extends TestCase
 {
     protected CsvIterator $csvIteratorClass;
     protected ReflectionProperty $columnsProperty;

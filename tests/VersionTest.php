@@ -8,7 +8,7 @@ use RonasIT\Support\Support\Version;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use Illuminate\Http\Request;
 
-class VersionTest extends HelpersTestCase
+class VersionTest extends TestCase
 {
     protected Request $request;
 

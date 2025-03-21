@@ -11,7 +11,7 @@ use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithDifferentT
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithoutTimestamps;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
-class EntityControlTraitTest extends HelpersTestCase
+class EntityControlTraitTest extends TestCase
 {
     use SqlMockTrait;
 

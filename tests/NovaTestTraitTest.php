@@ -12,7 +12,7 @@ use RonasIT\Support\Traits\MockTrait;
 use RonasIT\Support\Traits\NovaTestTrait;
 use Symfony\Component\HttpFoundation\Response;
 
-class NovaTestTraitTest extends HelpersTestCase
+class NovaTestTraitTest extends TestCase
 {
     use MockTrait;
     use NovaTestTrait;

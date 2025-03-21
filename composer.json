@@ -10,13 +10,13 @@
     }
   ],
   "require": {
-    "riverline/multipart-parser": "^2.1",
     "ext-json": "*",
     "guzzlehttp/guzzle": "^7.9.2",
-    "laravel/framework": "^11.20",
+    "laravel/framework": ">=11.20",
     "maatwebsite/excel": "^3.1.55",
     "php": ">=8.3",
-    "php-mock/php-mock-phpunit": "^2.10"
+    "php-mock/php-mock-phpunit": "^2.10",
+    "riverline/multipart-parser": "^2.1"
   },
   "require-dev": {
     "brainmaestro/composer-git-hooks": "^3.0",
@@ -30,8 +30,6 @@
   },
   "autoload": {
     "psr-4": {
-      "RonasIT\\Support\\Tests\\": "tests/",
-      "RonasIT\\Support\\Tests\\Support\\": "tests/support/",
       "RonasIT\\Support\\": "src/"
     },
     "files": [
@@ -41,7 +39,11 @@
   "autoload-dev": {
     "files": [
       "tests/TestCase.php"
-    ]
+    ],
+    "psr-4": {
+      "RonasIT\\Support\\Tests\\": "tests/",
+      "RonasIT\\Support\\Tests\\Support\\": "tests/support/"
+    }
   },
   "minimum-stability": "alpha",
   "extra": {
