@@ -194,26 +194,24 @@ class HttpRequestServiceTest extends HelpersTestCase
 
     public function testSendPutMultipartContentTypeWithFiles(): void
     {
-        $this->mockGuzzleClient('put', [
+        $this->mockGuzzleClient('post', [
             'https://some.url.com',
             [
-                'headers' => [
-                    'content-type' => 'multipart/form-data',
-                ],
+                'headers' => [],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
                 'multipart' => [
                     [
-                        'name' => '[0][first_file]',
+                        'name' => '0[first_file]',
                         'contents' => 'first_file_content',
                     ],
                     [
-                        'name' => '[0][second_file][first_file]',
+                        'name' => '0[second_file][first_file]',
                         'contents' => 'first_file_content',
                     ],
                     [
-                        'name' => '[0][second_file][second_file]',
+                        'name' => '0[second_file][second_file]',
                         'contents' => 'second_file_content',
                     ],
                     [
@@ -223,12 +221,12 @@ class HttpRequestServiceTest extends HelpersTestCase
                     [
                         'name' => '1[second_file]',
                         'contents' => 'second_file_content',
-                    ]
+                    ],
                 ]
             ]
         ]);
 
-        $this->httpRequestServiceClass->put('https://some.url.com', [
+        $this->httpRequestServiceClass->post('https://some.url.com', [
             [
                 'first_file' => 'first_file_content',
                 'second_file' => [
@@ -249,7 +247,27 @@ class HttpRequestServiceTest extends HelpersTestCase
     {
         $multipartContent = $this->getFixture('multipart_content');
 
-        $multipartObject = $this->httpRequestServiceClass->multipart($multipartContent);
+        $this->mockGuzzleClient(
+            method: 'get',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                ],
+            ],
+            response: new GuzzleResponse(
+                200,
+                [ 'Content-Type' => 'multipart/form-data; boundary=----------------------------83ff53821b7c'],
+                $multipartContent,
+            ),
+        );
+
+        $this->httpRequestServiceClass->get(url: 'https://some.url.com');
+
+        $multipartObject = $this->httpRequestServiceClass->multipart();
 
         $parsedData = [];
 

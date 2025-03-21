@@ -128,8 +128,12 @@ class HttpRequestService
         }
     }
 
-    public function multipart(string $content): array
+    public function multipart(): array
     {
+        $content = $this->response
+            ->getBody()
+            ->getContents();
+
         $stream = fopen('php://temp', 'rw');
         fwrite($stream, $content);
         rewind($stream);
@@ -243,6 +247,7 @@ class HttpRequestService
         } elseif (preg_match('/application\/x-www-form-urlencoded/', $contentType)) {
             $this->options['form_params'] = $data;
         } elseif (preg_match('/multipart\/form-data/', $contentType)) {
+            Arr::forget($this->options, 'headers.content-type');
             $this->options['multipart'] = $this->convertToMultipart($data);
         } else {
             $this->options['body'] = json_encode($data);
@@ -254,9 +259,9 @@ class HttpRequestService
         $options = [];
 
         foreach ($data as $key => $value) {
-            $preparedKey = (is_int($key)
+            $preparedKey = is_int($key) || is_null($parentKey)
                 ? $key
-                : (is_null($parentKey))) ? $key : "{$parentKey}[{$key}]";
+                : "{$parentKey}[{$key}]";
 
             if (is_array($value)) {
                 $options = array_merge($options, $this->convertToMultipart($value, $preparedKey));
