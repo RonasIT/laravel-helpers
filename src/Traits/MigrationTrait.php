@@ -2,12 +2,90 @@
 
 namespace RonasIT\Support\Traits;
 
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\JsonType;
+use Doctrine\DBAL\Types\StringType;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Exception;
 
 trait MigrationTrait
 {
+    public function __construct()
+    {
+        $this->registerJsonbType();
+        $this->registerEnumType();
+    }
+
+    private function changeEnum(string $table, string $field, array $values): void
+    {
+        $databaseDriver = config('database.default');
+
+        match ($databaseDriver) {
+            'pgsql' => $this->changePostgreEnums($table, $field, $values),
+            default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
+        };
+    }
+
+    private function changePostgreEnums(string $table, string $field, array $values): void
+    {
+        $check = "{$table}_{$field}_check";
+
+        DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
+
+        $values = $this->preparePostgreValues($values);
+
+        DB::statement("ALTER TABLE {$table} ADD CONSTRAINT {$check} CHECK ({$field}::text = ANY (ARRAY[{$values}]::text[]))");
+    }
+
+    private function preparePostgreValues(array $values): string
+    {
+        $values = array_map(fn ($value) => "'{$value}'::character varying", $values);
+
+        return join(', ', $values);
+    }
+
+    protected function alterColumn(string $table, string $columnName, string $command): void
+    {
+        DB::statement("ALTER TABLE {$table} ALTER COLUMN {$columnName} {$command}");
+    }
+
+    protected function changeToUUID(string $table, string $column): void
+    {
+        $this->alterColumn($table, $column, "TYPE uuid USING {$column}::uuid");
+    }
+
+    protected function renameTable(string $from, string $to): void
+    {
+        Schema::rename($from, $to);
+
+        DB::statement("ALTER SEQUENCE {$from}_id_seq RENAME TO {$to}_id_seq");
+    }
+
+    protected function registerEnumType(): void
+    {
+        if (!Type::hasType('enum')) {
+            Type::addType('enum', StringType::class);
+        }
+    }
+
+    private function registerJsonbType(): void
+    {
+        if (!Type::hasType('jsonb')) {
+            Type::addType('jsonb', JsonType::class);
+        }
+    }
+
+    protected function isIndexExists(Blueprint $table, string $indexName): bool
+    {
+        return Schema::getConnection()
+            ->getDoctrineSchemaManager()
+            ->introspectTable($table->getTable())
+            ->hasIndex($indexName);
+    }
+
     public function addForeignKey($fromEntity, $toEntity, $needAddField = false, $onDelete = 'cascade')
     {
         Schema::table(
