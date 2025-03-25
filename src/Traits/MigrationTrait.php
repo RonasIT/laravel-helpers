@@ -17,7 +17,7 @@ trait MigrationTrait
         $this->registerEnumType();
     }
 
-    protected function changeEnum(string $table, string $field, array $values): void
+    public function changeEnum(string $table, string $field, array $values): void
     {
         $databaseDriver = config('database.default');
 
@@ -52,7 +52,7 @@ trait MigrationTrait
         }
     }
 
-    public function addForeignKey($fromEntity, $toEntity, $needAddField = false, $onDelete = 'cascade')
+    public function addForeignKey($fromEntity, $toEntity, $needAddField = false, $onDelete = 'cascade'): void
     {
         Schema::table(
             $this->getTableName($fromEntity),
@@ -72,7 +72,7 @@ trait MigrationTrait
         );
     }
 
-    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false)
+    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false): void
     {
         $field = Str::snake($toEntity) . '_id';
         $table = $this->getTableName($fromEntity);
@@ -88,7 +88,7 @@ trait MigrationTrait
         }
     }
 
-    public function createBridgeTable($fromEntity, $toEntity)
+    public function createBridgeTable($fromEntity, $toEntity): void
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
@@ -100,7 +100,7 @@ trait MigrationTrait
         $this->addForeignKey($bridgeTableName, $toEntity, true);
     }
 
-    public function dropBridgeTable($fromEntity, $toEntity)
+    public function dropBridgeTable($fromEntity, $toEntity): void
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
@@ -110,7 +110,7 @@ trait MigrationTrait
         Schema::drop($bridgeTableName);
     }
 
-    protected function getBridgeTable($fromEntity, $toEntity)
+    protected function getBridgeTable($fromEntity, $toEntity): string
     {
         $entities = [Str::snake($fromEntity), Str::snake($toEntity)];
         sort($entities, SORT_STRING);
