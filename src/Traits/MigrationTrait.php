@@ -33,19 +33,19 @@ trait MigrationTrait
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
 
-        $values = $this->preparePostgreValues($values);
+        $values = $this->preparePostgresValues($values);
 
         DB::statement("ALTER TABLE {$table} ADD CONSTRAINT {$check} CHECK ({$field}::text = ANY (ARRAY[{$values}]::text[]))");
     }
 
-    private function preparePostgreValues(array $values): string
+    private function preparePostgresValues(array $values): string
     {
         $values = array_map(fn ($value) => "'{$value}'::character varying", $values);
 
         return join(', ', $values);
     }
 
-    protected function registerEnumType(): void
+    private function registerEnumType(): void
     {
         if (!Type::hasType('enum')) {
             Type::addType('enum', StringType::class);
