@@ -64,7 +64,7 @@ trait MigrationTrait
         DB::statement("ALTER SEQUENCE {$from}_id_seq RENAME TO {$to}_id_seq");
     }
 
-    protected function registerEnumType(): void
+    private function registerEnumType(): void
     {
         if (!Type::hasType('enum')) {
             Type::addType('enum', StringType::class);
