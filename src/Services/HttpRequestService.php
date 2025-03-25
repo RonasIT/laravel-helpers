@@ -256,7 +256,7 @@ class HttpRequestService
 
     protected function convertToMultipart(array $data, ?string $parentKey = null): array
     {
-        $options = [];
+        $result = [];
 
         foreach ($data as $key => $value) {
             $preparedKey = is_int($key) || is_null($parentKey)
@@ -264,15 +264,15 @@ class HttpRequestService
                 : "{$parentKey}[{$key}]";
 
             if (is_array($value)) {
-                $options = array_merge($options, $this->convertToMultipart($value, $preparedKey));
+                $result = array_merge($result, $this->convertToMultipart($value, $preparedKey));
             } else {
-                $options[] = [
+                $result[] = [
                     'name' => $preparedKey,
                     'contents' => $value,
                 ];
             }
         }
 
-        return $options;
+        return $result;
     }
 }
