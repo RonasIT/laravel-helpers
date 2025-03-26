@@ -29,9 +29,9 @@ class MigrationTraitTest extends TestCase
         $this->mockStatementDBFacade(
             'ALTER TABLE some_table '.
             'ADD CONSTRAINT some_table_enum_field_check '.
-            "CHECK (".
-            "enum_field::text = ANY (ARRAY['first_value'::character varying, 'second_value'::character varying]::text[])".
-            ')'
+            "CHECK (enum_field::text = ANY (".
+                "ARRAY['first_value'::character varying, 'second_value'::character varying]::text[]".
+            '))'
         );
 
         Config::set('database.default', 'pgsql');
@@ -63,9 +63,9 @@ class MigrationTraitTest extends TestCase
         $this->mockStatementDBFacade(
             'ALTER TABLE some_table '.
             'ADD CONSTRAINT some_table_enum_field_check '.
-            "CHECK (".
-                "enum_field::text = ANY (ARRAY['renamed_first_value'::character varying, 'second_value'::character varying, 'renamed_third_value'::character varying]::text[])".
-            ')'
+            "CHECK (enum_field::text = ANY (".
+                "ARRAY['renamed_first_value'::character varying, 'second_value'::character varying, 'renamed_third_value'::character varying]::text[]".
+            '))'
         );
 
         Config::set('database.default', 'pgsql');
