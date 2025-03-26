@@ -29,7 +29,6 @@ trait MigrationTrait
 
     private function changePostgresEnums(string $table, string $field, array $values, array $rename): void
     {
-
         $check = "{$table}_{$field}_check";
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
