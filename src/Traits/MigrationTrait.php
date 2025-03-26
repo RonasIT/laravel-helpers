@@ -17,21 +17,31 @@ trait MigrationTrait
         $this->registerEnumType();
     }
 
-    public function changeEnum(string $table, string $field, array $values): void
+    public function changeEnum(string $table, string $field, array $values, array $rename = []): void
     {
         $databaseDriver = config('database.default');
 
         match ($databaseDriver) {
-            'pgsql' => $this->changePostgresEnums($table, $field, $values),
+            'pgsql' => $this->changePostgresEnums($table, $field, $values, $rename),
             default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
         };
     }
 
-    private function changePostgresEnums(string $table, string $field, array $values): void
+    private function changePostgresEnums(string $table, string $field, array $values, array $rename): void
     {
+
         $check = "{$table}_{$field}_check";
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
+
+        if (!empty($rename)) {
+            foreach ($rename as $key => $value) {
+                DB::table($table)->where([$field => $key])->update([$field => $value]);
+
+                $keySearched = array_search($key, $values);
+                $values[$keySearched] = $value;
+            }
+        }
 
         $values = $this->preparePostgresValues($values);
 
@@ -88,7 +98,7 @@ trait MigrationTrait
         }
     }
 
-    public function createBridgeTable($fromEntity, $toEntity): void
+    public function createBridgeTable($fromEntity, $toEntity)
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
@@ -100,7 +110,7 @@ trait MigrationTrait
         $this->addForeignKey($bridgeTableName, $toEntity, true);
     }
 
-    public function dropBridgeTable($fromEntity, $toEntity): void
+    public function dropBridgeTable($fromEntity, $toEntity)
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
@@ -110,7 +120,7 @@ trait MigrationTrait
         Schema::drop($bridgeTableName);
     }
 
-    protected function getBridgeTable($fromEntity, $toEntity): string
+    protected function getBridgeTable($fromEntity, $toEntity)
     {
         $entities = [Str::snake($fromEntity), Str::snake($toEntity)];
         sort($entities, SORT_STRING);

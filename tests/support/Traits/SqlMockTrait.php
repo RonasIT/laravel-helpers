@@ -547,11 +547,29 @@ trait SqlMockTrait
         return $this->pdo;
     }
 
-    protected function mockStatementDBFacade(array $sql): void
+    protected function mockStatementDBFacade(string $sql): void
     {
         DB::shouldReceive('statement')
-            ->times(count($sql))
-            ->withArgs(fn ($query) => in_array($query, $sql))
+            ->once()
+            ->withArgs(fn ($query) => $query === $sql)
+            ->andReturn(true);
+    }
+
+    protected function mockUpdateDBFacade(string $table, array $where = [], array $update): void
+    {
+        DB::shouldReceive('table')
+            ->once()
+            ->with($table)
+            ->andReturnSelf();
+
+        if(!empty($where)) {
+            DB::shouldReceive('where')
+                ->with($where)
+                ->andReturnSelf();
+        }
+
+        DB::shouldReceive('update')
+            ->with($update)
             ->andReturn(true);
     }
 }
