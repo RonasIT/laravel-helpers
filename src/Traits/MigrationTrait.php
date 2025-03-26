@@ -61,7 +61,7 @@ trait MigrationTrait
         }
     }
 
-    public function addForeignKey($fromEntity, $toEntity, $needAddField = false, $onDelete = 'cascade'): void
+    public function addForeignKey($fromEntity, $toEntity, $needAddField = false, $onDelete = 'cascade')
     {
         Schema::table(
             $this->getTableName($fromEntity),
@@ -81,7 +81,7 @@ trait MigrationTrait
         );
     }
 
-    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false): void
+    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false)
     {
         $field = Str::snake($toEntity) . '_id';
         $table = $this->getTableName($fromEntity);
