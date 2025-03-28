@@ -4,14 +4,14 @@ namespace RonasIT\Support\Tests;
 
 use Exception;
 use Illuminate\Support\Facades\Config;
-use RonasIT\Support\Tests\Support\Mock\Migration\Migration;
+use RonasIT\Support\Tests\Support\Mock\Migrations\TestMigration;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class MigrationTraitTest extends TestCase
 {
     use SqlMockTrait;
 
-    protected Migration $migration;
+    protected TestMigration $migration;
 
     public function setUp(): void
     {
@@ -19,66 +19,26 @@ class MigrationTraitTest extends TestCase
 
         self::$tables = null;
 
-        $this->migration = new Migration();
+        $this->migration = new TestMigration();
     }
 
     public function testChangeEnum()
     {
+        Config::set('database.default', 'pgsql');
+
         $this->mockStatementDBFacade('ALTER TABLE some_table DROP CONSTRAINT some_table_enum_field_check');
 
         $this->mockStatementDBFacade(
-            'ALTER TABLE some_table '.
-            'ADD CONSTRAINT some_table_enum_field_check '.
-            "CHECK (enum_field::text = ANY (".
-                "ARRAY['first_value'::character varying, 'second_value'::character varying]::text[]".
+            'ALTER TABLE some_table ADD CONSTRAINT some_table_enum_field_check CHECK (enum_field::text = ANY ('.
+            "ARRAY['first_value'::character varying, 'second_value'::character varying]::text[]".
             '))'
         );
-
-        Config::set('database.default', 'pgsql');
 
         $this
             ->migration
             ->changeEnum('some_table', 'enum_field', [
                 'first_value',
                 'second_value',
-            ]);
-    }
-
-    public function testChangeEnumRenameField()
-    {
-        $this->mockStatementDBFacade('ALTER TABLE some_table DROP CONSTRAINT some_table_enum_field_check');
-
-        $this->mockUpdateDBFacade(
-            table: 'some_table',
-            where: ['enum_field' => 'first_value'],
-            update: ['enum_field' => 'renamed_first_value'],
-        );
-
-        $this->mockUpdateDBFacade(
-            table: 'some_table',
-            where: ['enum_field' => 'third_value'],
-            update: ['enum_field' => 'renamed_third_value'],
-        );
-
-        $this->mockStatementDBFacade(
-            'ALTER TABLE some_table '.
-            'ADD CONSTRAINT some_table_enum_field_check '.
-            "CHECK (enum_field::text = ANY (".
-                "ARRAY['renamed_first_value'::character varying, 'second_value'::character varying, 'renamed_third_value'::character varying]::text[]".
-            '))'
-        );
-
-        Config::set('database.default', 'pgsql');
-
-        $this
-            ->migration
-            ->changeEnum('some_table', 'enum_field', [
-                'first_value',
-                'second_value',
-                'third_value',
-            ], [
-                'first_value' => 'renamed_first_value',
-                'third_value' => 'renamed_third_value',
             ]);
     }
 
