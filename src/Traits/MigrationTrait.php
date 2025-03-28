@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\StringType;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
@@ -17,30 +18,21 @@ trait MigrationTrait
         $this->registerEnumType();
     }
 
-    public function changeEnum(string $table, string $field, array $values, array $rename = []): void
+    public function changeEnum(string $table, string $field, array $values): void
     {
         $databaseDriver = config('database.default');
 
         match ($databaseDriver) {
-            'pgsql' => $this->changePostgresEnums($table, $field, $values, $rename),
+            'pgsql' => $this->changePostgresEnums($table, $field, $values),
             default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
         };
     }
 
-    private function changePostgresEnums(string $table, string $field, array $values, array $rename): void
+    private function changePostgresEnums(string $table, string $field, array $values): void
     {
         $check = "{$table}_{$field}_check";
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
-
-        if (!empty($rename)) {
-            foreach ($rename as $key => $value) {
-                DB::table($table)->where([$field => $key])->update([$field => $value]);
-
-                $keySearched = array_search($key, $values);
-                $values[$keySearched] = $value;
-            }
-        }
 
         $values = $this->preparePostgresValues($values);
 
