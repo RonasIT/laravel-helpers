@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests\Support\Traits;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use Mpyw\LaravelDatabaseMock\Proxies\SingleConnectionProxy;
 
@@ -544,5 +545,31 @@ trait SqlMockTrait
         $this->pdo ??= DBMock::mockPdo();
 
         return $this->pdo;
+    }
+
+    protected function mockStatementDBFacade(string $sql): void
+    {
+        DB::shouldReceive('statement')
+            ->once()
+            ->withArgs([$sql])
+            ->andReturn(true);
+    }
+
+    protected function mockUpdateDBFacade(string $table, array $where = [], array $update): void
+    {
+        DB::shouldReceive('table')
+            ->once()
+            ->with($table)
+            ->andReturnSelf();
+
+        if (!empty($where)) {
+            DB::shouldReceive('where')
+                ->with($where)
+                ->andReturnSelf();
+        }
+
+        DB::shouldReceive('update')
+            ->with($update)
+            ->andReturn(true);
     }
 }
