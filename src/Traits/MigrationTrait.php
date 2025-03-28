@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\StringType;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
