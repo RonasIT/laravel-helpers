@@ -17,12 +17,12 @@ trait MigrationTrait
         $this->registerEnumType();
     }
 
-    public function changeEnum(string $table, string $field, array $values, array $rename = []): void
+    public function changeEnum(string $table, string $field, array $values, array $valuesToRename = []): void
     {
         $databaseDriver = config('database.default');
 
         match ($databaseDriver) {
-            'pgsql' => $this->changePostgresEnums($table, $field, $values, $rename),
+            'pgsql' => $this->changePostgresEnums($table, $field, $values, $valuesToRename),
             default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
         };
     }
