@@ -4,14 +4,14 @@ namespace RonasIT\Support\Tests;
 
 use Exception;
 use Illuminate\Support\Facades\Config;
-use RonasIT\Support\Tests\Support\Mock\Migration\Migration;
+use RonasIT\Support\Tests\Support\Mock\Migrations\TestMigration;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 
 class MigrationTraitTest extends TestCase
 {
     use SqlMockTrait;
 
-    protected Migration $migration;
+    protected TestMigration $migration;
 
     public function setUp(): void
     {
@@ -19,7 +19,9 @@ class MigrationTraitTest extends TestCase
 
         self::$tables = null;
 
-        $this->migration = new Migration();
+        $this->migration = new TestMigration();
+
+        Config::set('database.default', 'pgsql');
     }
 
     public function testChangeEnum()
@@ -33,8 +35,6 @@ class MigrationTraitTest extends TestCase
                 "ARRAY['first_value'::character varying, 'second_value'::character varying]::text[]".
             '))'
         );
-
-        Config::set('database.default', 'pgsql');
 
         $this
             ->migration
@@ -68,8 +68,6 @@ class MigrationTraitTest extends TestCase
             '))'
         );
 
-        Config::set('database.default', 'pgsql');
-
         $this
             ->migration
             ->changeEnum('some_table', 'enum_field', [
@@ -84,6 +82,8 @@ class MigrationTraitTest extends TestCase
 
     public function testChangeEnumDriverNotAvailable()
     {
+        Config::set('database.default', 'testing');
+
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Database driver "testing" not available');
 

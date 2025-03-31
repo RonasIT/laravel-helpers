@@ -551,7 +551,7 @@ trait SqlMockTrait
     {
         DB::shouldReceive('statement')
             ->once()
-            ->withArgs(fn ($query) => $query === $sql)
+            ->withArgs([$sql])
             ->andReturn(true);
     }
 
@@ -562,7 +562,7 @@ trait SqlMockTrait
             ->with($table)
             ->andReturnSelf();
 
-        if(!empty($where)) {
+        if (!empty($where)) {
             DB::shouldReceive('where')
                 ->with($where)
                 ->andReturnSelf();

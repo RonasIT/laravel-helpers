@@ -27,19 +27,14 @@ trait MigrationTrait
         };
     }
 
-    private function changePostgresEnums(string $table, string $field, array $values, array $rename): void
+    private function changePostgresEnums(string $table, string $field, array $values, array $valuesToRename = []): void
     {
         $check = "{$table}_{$field}_check";
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
 
-        if (!empty($rename)) {
-            foreach ($rename as $key => $value) {
-                DB::table($table)->where([$field => $key])->update([$field => $value]);
-
-                $keySearched = array_search($key, $values);
-                $values[$keySearched] = $value;
-            }
+        foreach ($valuesToRename as $key => $value) {
+            DB::table($table)->where([$field => $key])->update([$field => $value]);
         }
 
         $values = $this->preparePostgresValues($values);

@@ -1,10 +1,10 @@
 <?php
 
-namespace RonasIT\Support\Tests\Support\Mock\Migration;
+namespace RonasIT\Support\Tests\Support\Mock\Migrations;
 
 use RonasIT\Support\Traits\MigrationTrait;
 
-class Migration
+class TestMigration
 {
     use MigrationTrait;
 }
