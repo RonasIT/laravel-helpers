@@ -68,14 +68,19 @@ class MigrationTraitTest extends TestCase
 
         $this
             ->migration
-            ->changeEnum('some_table', 'enum_field', [
-                'first_value',
-                'second_value',
-                'third_value',
-            ], [
-                'first_value' => 'renamed_first_value',
-                'third_value' => 'renamed_third_value',
-            ]);
+            ->changeEnum(
+                table: 'some_table',
+                field: 'enum_field',
+                values: [
+                    'renamed_first_value',
+                    'second_value',
+                    'renamed_third_value',
+                ],
+                valuesToRename: [
+                    'first_value' => 'renamed_first_value',
+                    'third_value' => 'renamed_third_value',
+                ],
+            );
     }
 
     public function testChangeEnumDriverNotAvailable()
