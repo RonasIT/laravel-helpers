@@ -34,7 +34,7 @@ trait MigrationTrait
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
 
         foreach ($valuesToRename as $key => $value) {
-            DB::table($table)->where($field, $key)->update([$field => $value]);
+            DB::table($table)->where([$field => $key])->update([$field => $value]);
         }
 
         $values = $this->preparePostgresValues($values);
