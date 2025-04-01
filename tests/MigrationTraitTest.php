@@ -34,8 +34,6 @@ class MigrationTraitTest extends TestCase
             '))'
         );
 
-        Config::set('database.default', 'pgsql');
-
         $this
             ->migration
             ->changeEnum('some_table', 'enum_field', [
