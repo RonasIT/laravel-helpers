@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -270,5 +271,17 @@ class FixturesTraitTest extends HelpersTestCase
         $this->globalExportMode = false;
 
         $this->assertEqualsFixture('get_fixture/export_fixture.json', $content);
+    }
+
+    public function testAssertEqualsFixtureNotEqualErrorMessage()
+    {
+        $fixturePath = $this->getFixturePath($fixtureName = 'get_fixture/export_fixture.json');
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            "Failed asserting that the provided data equal to fixture: {$fixturePath}"
+        );
+
+        $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);
     }
 }

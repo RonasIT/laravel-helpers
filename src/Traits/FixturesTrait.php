@@ -117,7 +117,6 @@ trait FixturesTrait
         }
 
         $fixturePath = $this->prepareFixtureName($this->getFixturePath($fixture));
-
         $assertFailedMessage = "Failed asserting that the provided data equal to fixture: {$fixturePath}";
 
         $this->assertEquals(
