@@ -34,12 +34,12 @@ class NovaTestTraitTest extends TestCase
     {
         $result = $this->generateNovaUri(TestModel::class);
 
-        $this->assertEquals($result, '/nova-api/test-model-resources');
+        $this->assertEquals($result, '/nova-api/test-models');
     }
 
     public function testNovaCreateResource()
     {
-        Route::post('/nova-api/test-model-resources', function (Request $request) {
+        Route::post('/nova-api/test-models', function (Request $request) {
             $request->validate([
                 'key' => 'required|string',
             ]);
@@ -54,7 +54,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaUpdateResource()
     {
-        Route::put('/nova-api/test-model-resources/1', function (Request $request) {
+        Route::put('/nova-api/test-models/1', function (Request $request) {
             $request->validate([
                 'key' => 'required|string',
             ]);
@@ -69,7 +69,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaGetResource()
     {
-        Route::get('/nova-api/test-model-resources/1', function () {
+        Route::get('/nova-api/test-models/1', function () {
             return response('', Response::HTTP_OK);
         });
 
@@ -80,7 +80,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaSearchResource()
     {
-        Route::get('/nova-api/test-model-resources', function (Request $request) {
+        Route::get('/nova-api/test-models', function (Request $request) {
             $request->validate([
                 'key' => 'required|string',
             ]);
@@ -95,7 +95,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaGetCreationFields()
     {
-        Route::get('/nova-api/test-model-resources/creation-fields', function (Request $request) {
+        Route::get('/nova-api/test-models/creation-fields', function (Request $request) {
             return response('', Response::HTTP_OK);
         });
 
@@ -106,7 +106,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaGetActions()
     {
-        Route::get('/nova-api/test-model-resources/actions', function (Request $request) {
+        Route::get('/nova-api/test-models/actions', function (Request $request) {
             $request->validate([
                 'resources' => 'required|string',
             ]);
@@ -123,7 +123,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaDeleteResource()
     {
-        Route::delete('/nova-api/test-model-resources', function (Request $request) {
+        Route::delete('/nova-api/test-models', function (Request $request) {
             $request->validate([
                 'resources' => 'required|array',
             ]);
@@ -140,7 +140,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaGetUpdatableFields()
     {
-        Route::get('/nova-api/test-model-resources/1/update-fields', function (Request $request) {
+        Route::get('/nova-api/test-models/1/update-fields', function (Request $request) {
             return response('', Response::HTTP_OK);
         });
 
@@ -151,7 +151,7 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaRunAction()
     {
-        Route::post('/nova-api/test-model-resources/action', function (Request $request) {
+        Route::post('/nova-api/test-models/action', function (Request $request) {
             return response($request->all(), Response::HTTP_OK);
         });
 
