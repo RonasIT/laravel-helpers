@@ -98,12 +98,12 @@ trait NovaTestTrait
             : $this->actingAs($user, 'web');
     }
 
-    protected function generateNovaUri(string $modelClass, string $path = ''): string
+    protected function generateNovaUri(string $resourceClass, string $path = ''): string
     {
-        $modelName = Str::afterLast($modelClass, '\\');
+        $modelName = Str::afterLast($resourceClass, '\\');
 
-        $modelName = Str::kebab($modelName);
+        $modelName = Str::plural(Str::kebab($modelName));
 
-        return "/nova-api/{$modelName}-resources{$path}";
+        return "/nova-api/{$modelName}{$path}";
     }
 }
