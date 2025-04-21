@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\StringType;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
@@ -23,8 +24,30 @@ trait MigrationTrait
 
         match ($databaseDriver) {
             'pgsql' => $this->changePostgresEnums($table, $field, $values, $valuesToRename),
+            'mysql' => $this->changeMySQLEnums($table, $field, $values, $valuesToRename),
             default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
         };
+    }
+
+    private function changeMySQLEnums(string $table, string $field, array $values, array $valuesToRename = []): void
+    {
+        $withRenamedValues = array_merge($values, array_keys($valuesToRename));
+
+        $withRenamedValues = Arr::map($withRenamedValues, fn ($value) => "'{$value}'");
+
+        $enums = implode( ', ', $withRenamedValues);
+
+        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enums})");
+
+        foreach ($valuesToRename as $key => $value) {
+            DB::table($table)->where([$field => $key])->update([$field => $value]);
+        }
+
+        $values = Arr::map($values, fn ($value) => "'{$value}'");
+
+        $enums = implode( ', ', $values);
+
+        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enums})");
     }
 
     private function changePostgresEnums(string $table, string $field, array $values, array $valuesToRename = []): void
