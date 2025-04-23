@@ -24,32 +24,22 @@ trait MigrationTrait
 
         match ($databaseDriver) {
             'pgsql' => $this->changePostgresEnums($table, $field, $values, $valuesToRename),
-            'mysql' => $this->changeMySQLEnums($table, $field, $values, $valuesToRename),
+            'mysql' => $this->changeMySqlEnums($table, $field, $values, $valuesToRename),
             default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
         };
     }
 
-    private function changeMySQLEnums(string $table, string $field, array $values, array $valuesToRename = []): void
+    private function changeMySqlEnums(string $table, string $field, array $values, array $valuesToRename = []): void
     {
         if (!empty($valuesToRename)) {
             $withRenamedValues = array_merge($values, array_keys($valuesToRename));
 
-            $withRenamedValues = Arr::map($withRenamedValues, fn ($value) => "'{$value}'");
+            $this->setMySqlEnum($table, $field, $withRenamedValues);
 
-            $enums = implode(', ', $withRenamedValues);
-
-            DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enums})");
-
-            foreach ($valuesToRename as $key => $value) {
-                DB::table($table)->where([$field => $key])->update([$field => $value]);
-            }
+            $this->updateChangedValues($table, $field, $valuesToRename);
         }
 
-        $values = Arr::map($values, fn ($value) => "'{$value}'");
-
-        $enums = implode( ', ', $values);
-
-        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enums})");
+        $this->setMySqlEnum($table, $field, $values);
     }
 
     private function changePostgresEnums(string $table, string $field, array $values, array $valuesToRename = []): void
@@ -58,13 +48,27 @@ trait MigrationTrait
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
 
-        foreach ($valuesToRename as $key => $value) {
-            DB::table($table)->where([$field => $key])->update([$field => $value]);
-        }
+        $this->updateChangedValues($table, $field, $valuesToRename);
 
         $values = $this->preparePostgresValues($values);
 
         DB::statement("ALTER TABLE {$table} ADD CONSTRAINT {$check} CHECK ({$field}::text = ANY (ARRAY[{$values}]::text[]))");
+    }
+
+    private function updateChangedValues(string $table, string $field, array $valuesToRename): void
+    {
+        foreach ($valuesToRename as $key => $value) {
+            DB::table($table)->where([$field => $key])->update([$field => $value]);
+        }
+    }
+
+    private function setMySqlEnum(string $table, string $field, array $values): void
+    {
+        $values = Arr::map($values, fn ($value) => "'{$value}'");
+
+        $enumValues = implode( ', ', $values);
+
+        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enumValues})");
     }
 
     private function preparePostgresValues(array $values): string
