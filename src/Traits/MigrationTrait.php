@@ -31,16 +31,18 @@ trait MigrationTrait
 
     private function changeMySQLEnums(string $table, string $field, array $values, array $valuesToRename = []): void
     {
-        $withRenamedValues = array_merge($values, array_keys($valuesToRename));
+        if (!empty($valuesToRename)) {
+            $withRenamedValues = array_merge($values, array_keys($valuesToRename));
 
-        $withRenamedValues = Arr::map($withRenamedValues, fn ($value) => "'{$value}'");
+            $withRenamedValues = Arr::map($withRenamedValues, fn ($value) => "'{$value}'");
 
-        $enums = implode( ', ', $withRenamedValues);
+            $enums = implode(', ', $withRenamedValues);
 
-        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enums})");
+            DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enums})");
 
-        foreach ($valuesToRename as $key => $value) {
-            DB::table($table)->where([$field => $key])->update([$field => $value]);
+            foreach ($valuesToRename as $key => $value) {
+                DB::table($table)->where([$field => $key])->update([$field => $value]);
+            }
         }
 
         $values = Arr::map($values, fn ($value) => "'{$value}'");
