@@ -36,7 +36,7 @@ trait MigrationTrait
 
             $this->setMySqlEnum($table, $field, $withRenamedValues);
 
-            $this->updateChangedValues($table, $field, $valuesToRename);
+            $this->updateRenamedValues($table, $field, $valuesToRename);
         }
 
         $this->setMySqlEnum($table, $field, $values);
@@ -48,14 +48,14 @@ trait MigrationTrait
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
 
-        $this->updateChangedValues($table, $field, $valuesToRename);
+        $this->updateRenamedValues($table, $field, $valuesToRename);
 
         $values = $this->preparePostgresValues($values);
 
         DB::statement("ALTER TABLE {$table} ADD CONSTRAINT {$check} CHECK ({$field}::text = ANY (ARRAY[{$values}]::text[]))");
     }
 
-    private function updateChangedValues(string $table, string $field, array $valuesToRename): void
+    private function updateRenamedValues(string $table, string $field, array $valuesToRename): void
     {
         foreach ($valuesToRename as $key => $value) {
             DB::table($table)->where([$field => $key])->update([$field => $value]);
