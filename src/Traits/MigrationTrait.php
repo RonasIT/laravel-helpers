@@ -23,13 +23,13 @@ trait MigrationTrait
         $databaseDriver = config('database.default');
 
         match ($databaseDriver) {
-            'pgsql' => $this->changePostgresEnums($table, $field, $values, $valuesToRename),
-            'mysql' => $this->changeMySqlEnums($table, $field, $values, $valuesToRename),
+            'pgsql' => $this->changePostgresEnum($table, $field, $values, $valuesToRename),
+            'mysql' => $this->changeMySqlEnum($table, $field, $values, $valuesToRename),
             default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
         };
     }
 
-    private function changeMySqlEnums(string $table, string $field, array $values, array $valuesToRename = []): void
+    private function changeMySqlEnum(string $table, string $field, array $values, array $valuesToRename = []): void
     {
         if (!empty($valuesToRename)) {
             $withRenamedValues = array_merge($values, array_keys($valuesToRename));
@@ -42,7 +42,7 @@ trait MigrationTrait
         $this->setMySqlEnum($table, $field, $values);
     }
 
-    private function changePostgresEnums(string $table, string $field, array $values, array $valuesToRename = []): void
+    private function changePostgresEnum(string $table, string $field, array $values, array $valuesToRename = []): void
     {
         $check = "{$table}_{$field}_check";
 
@@ -66,9 +66,9 @@ trait MigrationTrait
     {
         $values = Arr::map($values, fn ($value) => "'{$value}'");
 
-        $enumValues = implode( ', ', $values);
+        $enum = implode( ', ', $values);
 
-        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enumValues})");
+        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enum})");
     }
 
     private function preparePostgresValues(array $values): string
