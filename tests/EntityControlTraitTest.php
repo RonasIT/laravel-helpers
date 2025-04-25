@@ -136,7 +136,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelectById(
             'select exists(select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?) as "exists"',
         );
 
         self::$testRepositoryClass
@@ -155,7 +155,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelectExists(
             'select exists(select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?) as "exists"'
         );
 
         self::$testRepositoryClass
@@ -290,7 +290,7 @@ class EntityControlTraitTest extends TestCase
     {
         $this->mockUpdateSqlQuery(
             'update "test_models" set "name" = ?, "updated_at" = ? '
-            . 'where "test_models"."deleted_at" is not null and "id" = ?',
+            . 'where "test_models"."deleted_at" is not null and "test_models"."id" = ?',
             ['test_name', Carbon::now(), 1],
             1
         );
@@ -346,7 +346,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1'
         );
 
         self::$testRepositoryClass
@@ -393,7 +393,7 @@ class EntityControlTraitTest extends TestCase
     public function testCount()
     {
         $this->mockSelectById(
-            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null and "id" = ?'
+            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?'
         );
 
         self::$testRepositoryClass
@@ -427,7 +427,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?'
         );
 
         self::$testRepositoryClass
@@ -476,7 +476,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1'
         );
 
         self::$testRepositoryClass
@@ -510,7 +510,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1'
         );
 
         self::$testRepositoryClass
@@ -544,7 +544,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1'
         );
 
         self::$testRepositoryClass
@@ -590,7 +590,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testForceDelete()
     {
-        $this->mockDelete('delete from "test_models" where "test_models"."deleted_at" is not null and "id" = ?', [1]);
+        $this->mockDelete('delete from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?', [1]);
 
         self::$testRepositoryClass
             ->withTrashed()
@@ -607,7 +607,7 @@ class EntityControlTraitTest extends TestCase
     {
         $this->mockUpdateSqlQuery(
             'update "test_models" set "deleted_at" = ?, "updated_at" = ? '
-            . 'where "id" = ?',
+            . 'where "test_models"."id" = ?',
             [Carbon::now(), Carbon::now(), 1]
         );
 
@@ -624,7 +624,7 @@ class EntityControlTraitTest extends TestCase
     {
         $this->mockUpdateSqlQuery(
             'update "test_models" set "deleted_at" = ?, "updated_at" = ? '
-            . 'where "test_models"."deleted_at" is not null and "id" = ? and "test_models"."deleted_at" is not null',
+            . 'where "test_models"."deleted_at" is not null and "test_models"."id" = ? and "test_models"."deleted_at" is not null',
             [null, Carbon::now(), 1]
         );
 

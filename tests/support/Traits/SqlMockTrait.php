@@ -32,7 +32,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?',
             $selectResult
         );
 
@@ -46,7 +46,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1',
             $selectResult
         );
 
@@ -60,7 +60,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1',
             $selectResult
         );
 
@@ -74,7 +74,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? '
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? '
             . 'order by "created_at" desc limit 1',
             $selectResult
         );
@@ -89,7 +89,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1',
             $selectResult
         );
 
@@ -103,7 +103,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1',
             $selectResult
         );
 
@@ -202,7 +202,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1',
             $selectResult
         );
 
@@ -235,13 +235,13 @@ trait SqlMockTrait
         $this->mockSelectExists(
             'select exists(select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?) as "exists"'
         );
 
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1',
             $selectResult
         );
 
@@ -274,7 +274,7 @@ trait SqlMockTrait
         $this->mockSelectExists(
             'select exists(select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ?) as "exists"',
             false
         );
 
@@ -298,7 +298,7 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "test_models"."id" = ? limit 1'
         );
 
         $this->mockInsert(
@@ -410,6 +410,51 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" where "user_id" in (?, ?) and "user_id" '
+            . 'not in (?, ?) and "name" = ? and "test_models"."date" >= ? and "test_models"."date" <= ? '
+            . 'and "test_models"."created_at" >= ? and "test_models"."created_at" <= ? and "test_models"."updated_at" > ? '
+            . 'and "test_models"."updated_at" < ? and "test_models"."deleted_at" is null',
+            [
+                1,
+                2,
+                3,
+                4,
+                'text_name',
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+            ]
+        );
+
+        $this->mockSelect(
+            'select * from "test_models" where "user_id" in (?, ?) and "user_id" not in (?, ?) '
+            . 'and "name" = ? and "test_models"."date" >= ? and "test_models"."date" <= ? '
+            . 'and "test_models"."created_at" >= ? and "test_models"."created_at" <= ? '
+            . 'and "test_models"."updated_at" > ? and "test_models"."updated_at" < ? and "test_models"."deleted_at" is null '
+            . 'order by "id" asc limit 15 offset 0',
+            $selectResult,
+            [
+                1,
+                2,
+                3,
+                4,
+                'text_name',
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+                Carbon::now(),
+            ]
+        );
+    }
+
+    protected function mockGetSearchResultWithFiltersDeprecated(array $selectResult): void
+    {
+        $this->mockSelectWithAggregate(
+            'select count(*) as aggregate from "test_models" where "user_id" in (?, ?) and "user_id" '
             . 'not in (?, ?) and "name" = ? and "date" >= ? and "date" <= ? '
             . 'and "created_at" >= ? and "created_at" <= ? and "updated_at" > ? '
             . 'and "updated_at" < ? and "test_models"."deleted_at" is null',
@@ -430,7 +475,8 @@ trait SqlMockTrait
 
         $this->mockSelect(
             'select * from "test_models" where "user_id" in (?, ?) and "user_id" not in (?, ?) '
-            . 'and "name" = ? and "date" >= ? and "date" <= ? and "created_at" >= ? and "created_at" <= ? '
+            . 'and "name" = ? and "date" >= ? and "date" <= ? '
+            . 'and "created_at" >= ? and "created_at" <= ? '
             . 'and "updated_at" > ? and "updated_at" < ? and "test_models"."deleted_at" is null '
             . 'order by "id" asc limit 15 offset 0',
             $selectResult,

@@ -289,7 +289,7 @@ class SearchTraitTest extends TestCase
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
-        $this->mockGetSearchResultWithFilters(self::$selectResult);
+        $this->mockGetSearchResultWithFiltersDeprecated(self::$selectResult);
 
         $this->testRepositoryClass
             ->searchQuery([
