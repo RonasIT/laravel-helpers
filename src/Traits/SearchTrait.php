@@ -337,10 +337,10 @@ trait SearchTrait
 
     protected function addWhere(Query &$query, string $field, $value, string $sign = '='): void
     {
-        $field = "{$query->getModel()->getTable()}.{$field}";
+        $tableName = $query->getModel()->getTable();
 
-        $this->applyWhereCallback($query, $field, function (&$query, $field) use ($sign, $value) {
-            $query->where($field, $sign, $value);
+        $this->applyWhereCallback($query, $field, function (&$query, $field) use ($sign, $value, $tableName) {
+            $query->where("{$tableName}.{$field}", $sign, $value);
         });
     }
 
