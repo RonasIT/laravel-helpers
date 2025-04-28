@@ -451,7 +451,7 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockGetSearchResultWithFiltersDeprecated(array $selectResult): void
+    protected function mockGetSearchResultWithDeprecatedFiltersFunctions(array $selectResult): void
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" where "user_id" in (?, ?) and "user_id" '
