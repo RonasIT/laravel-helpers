@@ -113,7 +113,7 @@ class MigrationTraitTest extends TestCase
             ]);
     }
 
-    public function testChangeEnumRenameFieldByMySQL()
+    public function testChangeEnumFieldByMySQLWithRenaming()
     {
         Config::set('database.default', 'mysql');
 
