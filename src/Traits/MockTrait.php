@@ -9,6 +9,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use ReflectionFunction;
 use ReflectionMethod;
+use ReflectionParameter;
 
 trait MockTrait
 {
@@ -175,10 +176,23 @@ trait MockTrait
                 $actual[$index] = $parameter->getDefaultValue();
             }
 
-            if (!isset($expected[$index]) && $parameter->isOptional()) {
+            if ($this->isSetDefaultValue($expected, $index, $parameter)) {
                 $expected[$index] = $parameter->getDefaultValue();
             }
         }
+    }
+
+    protected function isSetDefaultValue(array $expected, int $index, ReflectionParameter $parameter): bool
+    {
+        if (!$parameter->isOptional()) {
+            return false;
+        }
+
+        if (!$parameter->allowsNull()) {
+            return !isset($expected[$index]);
+        }
+
+        return !array_key_exists($index, $expected);
     }
 
     protected function compareArguments(array $actual, array $expected, string $message): void

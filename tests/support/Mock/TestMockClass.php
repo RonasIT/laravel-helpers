@@ -7,7 +7,7 @@ class TestMockClass
     public function mockFunction(
         string $firsrRequeredParam,
         string $secondRequiredParam,
-        string $firstOptionalParam = 'string',
+        ?string $firstOptionalParam = 'string',
         ?string $secondOptionalParam = null,
     ): string {
         return 'mockFunction';
