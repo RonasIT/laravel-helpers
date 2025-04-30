@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Tests\Support\Mock\NovaActions\TestNovaAction;
 use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
-use RonasIT\Support\Tests\Support\Mock\Resources\Media;
-use RonasIT\Support\Tests\Support\Mock\Resources\TestModel;
-use RonasIT\Support\Tests\Support\Mock\Resources\User;
-use RonasIT\Support\Tests\Support\Mock\Resources\UserResource;
+use RonasIT\Support\Tests\Support\Mock\NovaResources\Media;
+use RonasIT\Support\Tests\Support\Mock\NovaResources\TestModel;
+use RonasIT\Support\Tests\Support\Mock\NovaResources\User;
+use RonasIT\Support\Tests\Support\Mock\NovaResources\UserResource;
 use RonasIT\Support\Traits\MockTrait;
 use RonasIT\Support\Traits\NovaTestTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +34,7 @@ class NovaTestTraitTest extends TestCase
         ]);
     }
 
-    public static function getGetNovaResourceUriFilters(): array
+    public static function getNovaResourceUriData(): array
     {
         return [
             [
@@ -49,22 +49,19 @@ class NovaTestTraitTest extends TestCase
                 'resource' => UserResource::class,
                 'uri' => '/nova-api/user-resources',
             ],
+            [
+                'resource' => TestModel::class,
+                'uri' => '/nova-api/test-models',
+            ],
         ];
     }
 
-    #[DataProvider('getGetNovaResourceUriFilters')]
-    public function testFilterAdmin(string $resource, string $uri): void
+    #[DataProvider('getNovaResourceUriData')]
+    public function testGetNovaResourceUri(string $resource, string $uri): void
     {
         $result = $this->generateNovaUri($resource);
 
         $this->assertEquals($result, $uri);
-    }
-
-    public function testGetNovaResourceUri()
-    {
-        $result = $this->generateNovaUri(TestModel::class);
-
-        $this->assertEquals($result, '/nova-api/test-models');
     }
 
     public function testNovaCreateResource()
