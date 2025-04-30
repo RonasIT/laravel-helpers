@@ -156,4 +156,13 @@ class MockTraitTest extends TestCase
             callIndex: 0,
         );
     }
+
+    public function testMockClassMethodWithSetNullForOptionalParameter(): void
+    {
+        $mock = $this->mockClass(TestMockClass::class, [
+            $this->functionCall('mockFunction', ['firstRequired', 'secondRequired', null, 'string'], 'mockFunction'),
+        ]);
+
+        $this->assertEquals('mockFunction', $mock->mockFunction('firstRequired', 'secondRequired', null, 'string'));
+    }
 }
