@@ -2,20 +2,14 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Support\Arr;
-use Illuminate\Testing\TestResponse;
-use RonasIT\Support\Contracts\VersionEnumContract;
 use ReflectionClass;
 use RonasIT\Support\HelpersServiceProvider;
-use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Traits\MailsMockTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
 
 class TestCase extends BaseTest
 {
     use MailsMockTrait;
-
-    protected ?string $apiVersion;
 
     public function setUp(): void
     {
@@ -55,7 +49,7 @@ class TestCase extends BaseTest
     {
         return array_filter(
             array: $session->all(),
-            callback: fn ($key) => strpos($key, "login_{$guard}_") === 0,
+            callback: fn($key) => strpos($key, "login_{$guard}_") === 0,
             mode: ARRAY_FILTER_USE_KEY,
         );
     }
@@ -65,26 +59,5 @@ class TestCase extends BaseTest
         $property = $reflectionClass->getProperty($methodName);
 
         return $property->getValue($objectInstance);
-    }
-
-    public function withoutAPIVersion(): self
-    {
-        return $this->setAPIVersion(new VersionEnum(), null);
-    }
-
-    public function setAPIVersion(VersionEnumContract $apiVersion, ?string $version): self
-    {
-        if(!empty($version)){
-            $this->apiVersion = Arr::get($apiVersion::values(), $version);
-        }
-
-        return $this;
-    }
-
-    public function json($method, $uri, array $data = [], array $headers = [], $options = 0): TestResponse
-    {
-        $version = (is_null($this->apiVersion)) ? '' : "/v{$this->apiVersion}";
-
-        return parent::json($method, "{$version}{$uri}", $data, $headers);
     }
 }

@@ -4,9 +4,12 @@ namespace RonasIT\Support\Testing;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
+use RonasIT\Support\Contracts\VersionEnumContract;
+use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Traits\MailsMockTrait;
 
 abstract class TestCase extends BaseTest
@@ -19,6 +22,8 @@ abstract class TestCase extends BaseTest
 
     protected static string $startedTestSuite = '';
     protected static bool $isWrappedIntoTransaction = true;
+
+    protected ?string $apiVersion;
 
     protected function setUp(): void
     {
@@ -114,5 +119,26 @@ abstract class TestCase extends BaseTest
     protected function prepareTableTestState(string $tableName, array $jsonFields = [], ?string $connectionName = null): TableTestState
     {
         return (new TableTestState($tableName, $jsonFields, $connectionName))->setGlobalExportMode($this->globalExportMode);
+    }
+
+    public function withoutAPIVersion(): self
+    {
+        return $this->setAPIVersion(new VersionEnum(), null);
+    }
+
+    public function setAPIVersion(VersionEnumContract $apiVersion, ?string $version): self
+    {
+        if(!empty($version)){
+            $this->apiVersion = Arr::get($apiVersion::values(), $version);
+        }
+
+        return $this;
+    }
+
+    public function json($method, $uri, array $data = [], array $headers = [], $options = 0): TestResponse
+    {
+        $version = (is_null($this->apiVersion)) ? '' : "/v{$this->apiVersion}";
+
+        return parent::json($method, "{$version}{$uri}", $data, $headers);
     }
 }
