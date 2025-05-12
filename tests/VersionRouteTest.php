@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
@@ -288,5 +289,36 @@ class VersionRouteTest extends TestCase
         $status = ($isCorrectVersion) ? 200 : 404;
 
         $response->assertStatus($status);
+    }
+
+    public function testWithoutApiVersion(): void
+    {
+        $this->withoutAPIVersion();
+
+        Route::get('/test', function () {
+            return 'test';
+        });
+
+        $response = $this->json('get', '/test');
+
+        $response->assertOk();
+    }
+
+    public function testRouteWithSetApiVersion(): void
+    {
+        $version = $this->createMock(VersionEnumContract::class);
+        $version->value = VersionEnum::v1;
+
+        $this->setAPIVersion($version);
+
+        Route::version($version)->group(function () {
+            Route::get('/test', function () {
+                return 'test';
+            });
+        });
+
+        $response = $this->json('get', '/test/');
+
+        $response->assertOk();
     }
 }
