@@ -53,7 +53,7 @@ class TestCase extends BaseTest
     {
         return array_filter(
             array: $session->all(),
-            callback: fn($key) => strpos($key, "login_{$guard}_") === 0,
+            callback: fn ($key) => strpos($key, "login_{$guard}_") === 0,
             mode: ARRAY_FILTER_USE_KEY,
         );
     }
