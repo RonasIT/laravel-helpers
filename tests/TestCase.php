@@ -2,9 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Testing\TestResponse;
 use ReflectionClass;
-use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\HelpersServiceProvider;
 use RonasIT\Support\Traits\MailsMockTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
@@ -12,8 +10,6 @@ use Orchestra\Testbench\TestCase as BaseTest;
 class TestCase extends BaseTest
 {
     use MailsMockTrait;
-
-    protected ?VersionEnumContract $apiVersion;
 
     public function setUp(): void
     {
@@ -63,24 +59,5 @@ class TestCase extends BaseTest
         $property = $reflectionClass->getProperty($methodName);
 
         return $property->getValue($objectInstance);
-    }
-
-    public function withoutAPIVersion(): self
-    {
-        return $this->setAPIVersion(null);
-    }
-
-    public function setAPIVersion(?VersionEnumContract $apiVersion): self
-    {
-        $this->apiVersion = $apiVersion;
-
-        return $this;
-    }
-
-    public function json($method, $uri, array $data = [], array $headers = [], $options = 0): TestResponse
-    {
-        $version = (is_null($this->apiVersion)) ? '' : "/v{$this->apiVersion->value}";
-
-        return parent::json($method, "{$version}{$uri}", $data, $headers);
     }
 }

@@ -46,6 +46,8 @@ abstract class TestCase extends BaseTest
         Mail::fake();
 
         $this->beginDatabaseTransaction();
+
+        $this->setAPIVersion($this->apiVersion::getLatest());
     }
 
     public function tearDown(): void

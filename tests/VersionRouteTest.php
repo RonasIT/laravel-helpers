@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
+use RonasIT\Support\Testing\TestCase as PackageTestCase;
 
 class VersionRouteTest extends TestCase
 {
@@ -293,13 +294,18 @@ class VersionRouteTest extends TestCase
 
     public function testWithoutApiVersion(): void
     {
-        $this->withoutAPIVersion();
+        $mockTestCase = $this
+            ->getMockBuilder(PackageTestCase::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $mockTestCase->withoutAPIVersion();
 
         Route::get('/test', function () {
             return 'test';
         });
 
-        $response = $this->json('get', '/test');
+        $response = $mockTestCase->json('get', '/test');
 
         $response->assertOk();
     }
@@ -309,7 +315,12 @@ class VersionRouteTest extends TestCase
         $version = $this->createMock(VersionEnumContract::class);
         $version->value = VersionEnum::v1;
 
-        $this->setAPIVersion($version);
+        $mockTestCase = $this
+            ->getMockBuilder(PackageTestCase::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $mockTestCase->setAPIVersion($version);
 
         Route::version($version)->group(function () {
             Route::get('/test', function () {
@@ -317,7 +328,7 @@ class VersionRouteTest extends TestCase
             });
         });
 
-        $response = $this->json('get', '/test/');
+        $response = $mockTestCase->json('get', '/test/');
 
         $response->assertOk();
     }
