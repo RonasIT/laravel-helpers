@@ -21,6 +21,13 @@ class NovaTestTraitTest extends TestCase
     use MockTrait;
     use NovaTestTrait;
 
+    public function setUp():void
+    {
+        parent::setUp();
+
+        $this->withoutAPIVersion();
+    }
+
     public function testMockSingleCall()
     {
         $result = $this->novaSearchParams([
