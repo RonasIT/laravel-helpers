@@ -3,13 +3,10 @@
 namespace RonasIT\Support\Tests\Support\Enum;
 
 use RonasIT\Support\Contracts\VersionEnumContract;
-use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
 
 // Backward compatibility with PHP < 8
 class VersionEnum implements VersionEnumContract
 {
-    use RouteMockTrait;
-
     public const v1 = '1';
     public const v2 = '2';
     public const v3 = '3';
