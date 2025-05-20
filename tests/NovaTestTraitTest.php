@@ -12,6 +12,7 @@ use RonasIT\Support\Tests\Support\Mock\NovaResources\Media;
 use RonasIT\Support\Tests\Support\Mock\NovaResources\TestModel;
 use RonasIT\Support\Tests\Support\Mock\NovaResources\User;
 use RonasIT\Support\Tests\Support\Mock\NovaResources\UserResource;
+use RonasIT\Support\Tests\Support\Mock\TestCaseMock;
 use RonasIT\Support\Traits\MockTrait;
 use RonasIT\Support\Traits\NovaTestTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,9 @@ class NovaTestTraitTest extends TestCase
     {
         parent::setUp();
 
-        $this->withoutAPIVersion();
+        (new TestCaseMock('name'))
+            ->setUpMock($this->app)
+            ->withoutAPIVersion();
     }
 
     public function testMockSingleCall()
