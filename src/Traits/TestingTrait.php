@@ -8,15 +8,12 @@ trait TestingTrait
     use MockTrait;
     use MailsMockTrait;
 
-    protected function assertExceptionThrew(string $className, string $message, bool $isStrinct = true): void
+    protected function assertExceptionThrew(string $expectedClassName, string $expectedMessage, bool $isStrict = true): void
     {
-        $this->expectException($className);
+        $this->expectException($expectedClassName);
 
-        if ($isStrinct) {
-            $message = "/^{$message}$/";
-            $this->expectExceptionMessageMatches($message);
-        } else {
-            $this->expectExceptionMessage($message);
-        }
+        $expectedMessage = ($isStrict) ? "/^{$expectedMessage}$/" : "/$expectedMessage/";
+
+        $this->expectExceptionMessageMatches($expectedMessage);
     }
 }
