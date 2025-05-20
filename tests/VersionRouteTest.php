@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
-use RonasIT\Support\Testing\TestCase as PackageTestCase;
+use RonasIT\Support\Tests\Support\Mock\TestCaseMock;
 
 class VersionRouteTest extends TestCase
 {
@@ -294,18 +294,15 @@ class VersionRouteTest extends TestCase
 
     public function testWithoutApiVersion(): void
     {
-        $mockTestCase = $this
-            ->getMockBuilder(PackageTestCase::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $mockTestCase->withoutAPIVersion();
+        $testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app)
+            ->withoutAPIVersion();
 
         Route::get('/test', function () {
             return 'test';
         });
 
-        $response = $mockTestCase->json('get', '/test');
+        $response = $testCaseMock->json('get', '/test');
 
         $response->assertOk();
     }
@@ -315,12 +312,9 @@ class VersionRouteTest extends TestCase
         $version = $this->createMock(VersionEnumContract::class);
         $version->value = VersionEnum::v1;
 
-        $mockTestCase = $this
-            ->getMockBuilder(PackageTestCase::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $mockTestCase->setAPIVersion($version);
+        $testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app)
+            ->setAPIVersion($version);
 
         Route::version($version)->group(function () {
             Route::get('/test', function () {
@@ -328,8 +322,46 @@ class VersionRouteTest extends TestCase
             });
         });
 
-        $response = $mockTestCase->json('get', '/test/');
+        $response = $testCaseMock->json('get', '/test/');
 
         $response->assertOk();
+    }
+
+    public function testRouteWithLatestVersion(): void
+    {
+        $testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app);
+
+        Route::version(VersionEnum::getLatest())->group(function () {
+            Route::get('/test', function () {
+                return 'test';
+            });
+        });
+
+        $response = $testCaseMock->json('get', '/test/');
+
+        $response->assertOk();
+    }
+
+    public function testRouteWithIncorrectVersion(): void
+    {
+        $version = $this->createMock(VersionEnumContract::class);
+        $version->value = VersionEnum::v1;
+
+        $testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app)
+            ->setAPIVersion($version);
+
+        Route::version(VersionEnum::getLatest())->group(function () {
+            Route::get('/test', function () {
+                return 'test';
+            });
+        });
+
+        $response = $testCaseMock->json('get', '/test/');
+
+        $response->assertNotFound();
+
+        $response->assertJson(['message' => 'The route v1/test could not be found.']);
     }
 }
