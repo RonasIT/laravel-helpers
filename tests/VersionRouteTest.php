@@ -2,10 +2,12 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
+use RonasIT\Support\Tests\Support\Mock\TestCaseMock;
 
 class VersionRouteTest extends TestCase
 {
@@ -288,5 +290,62 @@ class VersionRouteTest extends TestCase
         $status = ($isCorrectVersion) ? 200 : 404;
 
         $response->assertStatus($status);
+    }
+
+    public function testWithoutApiVersion(): void
+    {
+        $testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app)
+            ->withoutAPIVersion();
+
+        Route::get('/test', function () {
+            return 'test';
+        });
+
+        $response = $testCaseMock->json('get', '/test');
+
+        $response->assertOk();
+    }
+
+    public function testRouteWithSetApiVersion(): void
+    {
+        $version = $this->createMock(VersionEnumContract::class);
+        $version->value = VersionEnum::v1;
+
+        $testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app)
+            ->setAPIVersion($version);
+
+        Route::version($version)->group(function () {
+            Route::get('/test', function () {
+                return 'test';
+            });
+        });
+
+        $response = $testCaseMock->json('get', '/test/');
+
+        $response->assertOk();
+    }
+
+    public function testRouteWithIncorrectVersion(): void
+    {
+        $version = $this->createMock(VersionEnumContract::class);
+        $version->value = VersionEnum::v1;
+
+        $testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app)
+            ->withoutAPIVersion();
+
+        Route::version($version)->group(function () {
+            Route::get('/test', function () {
+                return 'test';
+            });
+        });
+
+        $response = $testCaseMock->json('get', '/test/');
+
+        $response->assertNotFound();
+
+        $response->assertJson(['message' => 'The route test could not be found.']);
     }
 }
