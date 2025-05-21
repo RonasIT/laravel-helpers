@@ -2,8 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
-use RonasIT\Support\Exceptions\UnknownRequestMethodException;
-use RonasIT\Support\Traits\ExceptionsTestTrait;
+use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Traits\TestingTrait;
 
 class TestingTraitTest extends TestCase
@@ -12,19 +11,19 @@ class TestingTraitTest extends TestCase
 
     public function testAssertExceptionThrew(): void
     {
-        $this->assertExceptionThrew(UnknownRequestMethodException::class, "Unknown request method 'unsupported'");
+        $this->assertExceptionThrew(ModelFactoryNotFound::class, 'full error message');
 
-        throw new UnknownRequestMethodException('unsupported');
+        throw new ModelFactoryNotFound('full error message');
     }
 
     public function testAssertExceptionThrewNotStrictly(): void
     {
         $this->assertExceptionThrew(
-            expectedClassName: UnknownRequestMethodException::class,
-            expectedMessage: 'Unknown request method',
+            expectedClassName: ModelFactoryNotFound::class,
+            expectedMessage: 'error',
             isStrict: false
         );
 
-        throw new UnknownRequestMethodException('unsupported');
+        throw new ModelFactoryNotFound('full error message');
     }
 }
