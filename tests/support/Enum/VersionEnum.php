@@ -11,10 +11,6 @@ class VersionEnum implements VersionEnumContract
     public const v2 = '2';
     public const v3 = '3';
 
-    public function __construct(public string $value = self::v1)
-    {
-    }
-
     public static function values(): array
     {
         return [static::v1, static::v2, static::v3];
@@ -23,10 +19,5 @@ class VersionEnum implements VersionEnumContract
     public static function toString(string $separator = ','): string
     {
         return implode($separator, self::values());
-    }
-
-    public static function getLatest(): self
-    {
-      return new self(max(self::values()));
     }
 }

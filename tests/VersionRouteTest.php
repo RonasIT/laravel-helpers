@@ -327,22 +327,6 @@ class VersionRouteTest extends TestCase
         $response->assertOk();
     }
 
-    public function testRouteWithLatestVersion(): void
-    {
-        $testCaseMock = (new TestCaseMock('name'))
-            ->setUpMock($this->app);
-
-        Route::version(VersionEnum::getLatest())->group(function () {
-            Route::get('/test', function () {
-                return 'test';
-            });
-        });
-
-        $response = $testCaseMock->json('get', '/test/');
-
-        $response->assertOk();
-    }
-
     public function testRouteWithIncorrectVersion(): void
     {
         $version = $this->createMock(VersionEnumContract::class);
@@ -350,9 +334,9 @@ class VersionRouteTest extends TestCase
 
         $testCaseMock = (new TestCaseMock('name'))
             ->setUpMock($this->app)
-            ->setAPIVersion($version);
+            ->withoutAPIVersion();
 
-        Route::version(VersionEnum::getLatest())->group(function () {
+        Route::version($version)->group(function () {
             Route::get('/test', function () {
                 return 'test';
             });
@@ -362,6 +346,6 @@ class VersionRouteTest extends TestCase
 
         $response->assertNotFound();
 
-        $response->assertJson(['message' => 'The route v1/test could not be found.']);
+        $response->assertJson(['message' => 'The route test could not be found.']);
     }
 }

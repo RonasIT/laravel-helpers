@@ -15,8 +15,6 @@ class TestCaseMock extends TestCase
     {
         $this->app = $app;
 
-        parent::setUp();
-
         return $this;
     }
 }
