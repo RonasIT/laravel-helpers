@@ -14,7 +14,6 @@
     "laravel/framework": ">=5.2.0",
     "guzzlehttp/guzzle": "~6.0",
     "tymon/jwt-auth": "0.5.* || 1.0.*",
-    "minime/annotations": "~3.0",
     "maatwebsite/excel": "3.*",
     "tecnickcom/tcpdf": "~6.0.0"
   },
