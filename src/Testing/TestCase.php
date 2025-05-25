@@ -3,6 +3,8 @@
 namespace RonasIT\Support\Testing;
 
 use Carbon\Carbon;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -114,5 +116,19 @@ abstract class TestCase extends BaseTest
     protected function prepareTableTestState(string $tableName, array $jsonFields = [], ?string $connectionName = null): TableTestState
     {
         return (new TableTestState($tableName, $jsonFields, $connectionName))->setGlobalExportMode($this->globalExportMode);
+    }
+
+    public function actingViaSession(int $userId, string $guard = 'session'): self
+    {
+        $hash = sha1(SessionGuard::class);
+
+        return $this->withSession([
+            "login_{$guard}_{$hash}" => $userId,
+        ]);
+    }
+
+    public function actingAs(Authenticatable $user, $guard = null): self
+    {
+        return parent::actingAs(clone $user, $guard);
     }
 }

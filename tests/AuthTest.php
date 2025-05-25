@@ -5,19 +5,28 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
-use RonasIT\Support\Traits\AuthTestTrait;
 use RonasIT\Support\Traits\FixturesTrait;
+use RonasIT\Support\Tests\Support\Mock\TestCaseMock;
 
-class AuthTestTraitTest extends TestCase
+class AuthTest extends TestCase
 {
-    use AuthTestTrait;
     use FixturesTrait;
+
+    protected TestCaseMock $testCaseMock;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->testCaseMock = (new TestCaseMock('name'))
+            ->setUpMock($this->app);
+    }
 
     public function testActingViaSession()
     {
         $userId = 1;
 
-        $this->actingViaSession($userId);
+        $this->testCaseMock->actingViaSession($userId);
 
         $session = $this->app['session']->getDrivers()['array'];
         $loginSession = $this->getLoginSession($session);
@@ -31,7 +40,7 @@ class AuthTestTraitTest extends TestCase
     {
         $userId = 1;
 
-        $this->actingViaSession($userId, 'some_guard');
+        $this->testCaseMock->actingViaSession($userId, 'some_guard');
 
         $session = $this->app['session']->getDrivers()['array'];
         $loginSession = $this->getLoginSession($session, 'some_guard');
@@ -53,7 +62,7 @@ class AuthTestTraitTest extends TestCase
     {
         $mockedUser = new MockAuthUser();
 
-        $this->actingAs($mockedUser);
+        $this->testCaseMock->actingAs($mockedUser);
 
         $this->assertNotSame($mockedUser, Auth::user());
     }
