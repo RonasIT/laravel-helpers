@@ -12,8 +12,8 @@ trait TestingTrait
     {
         $this->expectException($expectedClassName);
 
-        $expectedMessage = ($isStrict) ? "/^{$expectedMessage}$/" : "/$expectedMessage/";
+        $expectedMessage = ($isStrict) ? "^{$expectedMessage}$" : $expectedMessage;
 
-        $this->expectExceptionMessageMatches($expectedMessage);
+        $this->expectExceptionMessageMatches("/{$expectedMessage}/");
     }
 }
