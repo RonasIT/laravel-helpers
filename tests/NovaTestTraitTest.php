@@ -22,14 +22,13 @@ class NovaTestTraitTest extends TestCase
     use MockTrait;
     use NovaTestTrait;
 
-    public function setUp():void
+    public function setUp(): void
     {
         parent::setUp();
 
         $this
             ->getMockBuilder(PackageTestCase::class)
-            ->onlyMethods(['call'])
-            ->setConstructorArgs(['name'])
+            ->disableOriginalConstructor()
             ->getMock()
             ->withoutAPIVersion();
     }

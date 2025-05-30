@@ -298,7 +298,7 @@ class VersionRouteTest extends TestCase
         $mock = $this
             ->getMockBuilder(PackageTestCase::class)
             ->onlyMethods(['call'])
-            ->setConstructorArgs(['name'])
+            ->disableOriginalConstructor()
             ->getMock()
             ->withoutAPIVersion();
 
@@ -327,7 +327,7 @@ class VersionRouteTest extends TestCase
         $mock = $this
             ->getMockBuilder(PackageTestCase::class)
             ->onlyMethods(['call'])
-            ->setConstructorArgs(['name'])
+            ->disableOriginalConstructor()
             ->getMock()
             ->setAPIVersion(VersionEnum::V1);
 
@@ -358,7 +358,7 @@ class VersionRouteTest extends TestCase
         $mock = $this
             ->getMockBuilder(PackageTestCase::class)
             ->onlyMethods(['call'])
-            ->setConstructorArgs(['name'])
+            ->disableOriginalConstructor()
             ->getMock()
             ->withoutAPIVersion();
 
