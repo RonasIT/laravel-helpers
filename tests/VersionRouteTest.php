@@ -2,10 +2,13 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
+use RonasIT\Support\Testing\TestCase as PackageTestCase;
 
 class VersionRouteTest extends TestCase
 {
@@ -24,7 +27,7 @@ class VersionRouteTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->bind(VersionEnumContract::class, VersionEnum::class);
+        $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);
     }
 
     public static function getTestVersionRangeData(): array
@@ -288,5 +291,98 @@ class VersionRouteTest extends TestCase
         $status = ($isCorrectVersion) ? 200 : 404;
 
         $response->assertStatus($status);
+    }
+
+    public function testWithoutApiVersion(): void
+    {
+        $mock = $this
+            ->getMockBuilder(PackageTestCase::class)
+            ->onlyMethods(['call'])
+            ->disableOriginalConstructor()
+            ->getMock()
+            ->withoutAPIVersion();
+
+        Route::get('/test', function () {
+            return 'test';
+        });
+
+        $mock->expects($this->once())
+            ->method('call')
+            ->with(
+                $this->equalTo('get'),
+                $this->callback(function ($uri) {
+                    $this->assertEquals('/test', $uri);
+                    return true;
+                }),
+            )
+            ->willReturn(TestResponse::fromBaseResponse(response('test', 200)));
+
+        $response = $mock->json('get', '/test');
+
+        $response->assertOk();
+    }
+
+    public function testRouteWithSetApiVersion(): void
+    {
+        $mock = $this
+            ->getMockBuilder(PackageTestCase::class)
+            ->onlyMethods(['call'])
+            ->disableOriginalConstructor()
+            ->getMock()
+            ->setAPIVersion(VersionEnum::V1);
+
+        Route::version(VersionEnum::V1)->group(function () {
+            Route::get('/test', function () {
+                return 'test';
+            });
+        });
+
+        $mock->expects($this->once())
+            ->method('call')
+            ->with(
+                $this->equalTo('get'),
+                $this->callback(function ($uri) {
+                    $this->assertEquals('/v1/test/', $uri);
+                    return true;
+                }),
+            )
+            ->willReturn(TestResponse::fromBaseResponse(response('test', 200)));
+
+        $response = $mock->json('get', '/test/');
+
+        $response->assertOk();
+    }
+
+    public function testRouteWithIncorrectVersion(): void
+    {
+        $mock = $this
+            ->getMockBuilder(PackageTestCase::class)
+            ->onlyMethods(['call'])
+            ->disableOriginalConstructor()
+            ->getMock()
+            ->withoutAPIVersion();
+
+        Route::version(VersionEnum::V1)->group(function () {
+            Route::get('/test', function () {
+                return 'test';
+            });
+        });
+
+        $mock->expects($this->once())
+            ->method('call')
+            ->with(
+                $this->equalTo('get'),
+                $this->callback(function ($uri) {
+                    $this->assertNotEquals('/v1/test/', $uri);
+                    return true;
+                }),
+            )
+            ->willReturn(TestResponse::fromBaseResponse(response(['message' => 'The route test could not be found.'], 404)));
+
+        $response = $mock->json('get', '/test/');
+
+        $response->assertNotFound();
+
+        $response->assertJson(['message' => 'The route test could not be found.']);
     }
 }
