@@ -14,10 +14,11 @@ class AuthTest extends TestCase
         $mock = $this
             ->getMockBuilder(PackageTestCase::class)
             ->onlyMethods(['be'])
-            ->setConstructorArgs(['name'])
+            ->disableOriginalConstructor()
             ->getMock();
 
-        $mock->expects($this->once())
+        $mock
+            ->expects($this->once())
             ->method('be')
             ->with($this->callback(function ($cloneMockedUser) use ($mockedUser) {
                 $this->assertNotSame($mockedUser, $cloneMockedUser);
