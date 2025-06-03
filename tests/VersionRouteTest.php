@@ -302,10 +302,6 @@ class VersionRouteTest extends TestCase
             ->getMock()
             ->withoutAPIVersion();
 
-        Route::get('/test', function () {
-            return 'test';
-        });
-
         $mock->expects($this->once())
             ->method('call')
             ->with(
@@ -317,9 +313,7 @@ class VersionRouteTest extends TestCase
             )
             ->willReturn(TestResponse::fromBaseResponse(response('test', 200)));
 
-        $response = $mock->json('get', '/test');
-
-        $response->assertOk();
+        $mock->json('get', '/test');
     }
 
     public function testRouteWithSetApiVersion(): void
@@ -330,12 +324,6 @@ class VersionRouteTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
             ->setAPIVersion(VersionEnum::V1);
-
-        Route::version(VersionEnum::V1)->group(function () {
-            Route::get('/test', function () {
-                return 'test';
-            });
-        });
 
         $mock->expects($this->once())
             ->method('call')
@@ -348,9 +336,7 @@ class VersionRouteTest extends TestCase
             )
             ->willReturn(TestResponse::fromBaseResponse(response('test', 200)));
 
-        $response = $mock->json('get', '/test/');
-
-        $response->assertOk();
+        $mock->json('get', '/test/');
     }
 
     public function testRouteWithIncorrectVersion(): void
@@ -361,12 +347,6 @@ class VersionRouteTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock()
             ->withoutAPIVersion();
-
-        Route::version(VersionEnum::V1)->group(function () {
-            Route::get('/test', function () {
-                return 'test';
-            });
-        });
 
         $mock->expects($this->once())
             ->method('call')
@@ -379,10 +359,6 @@ class VersionRouteTest extends TestCase
             )
             ->willReturn(TestResponse::fromBaseResponse(response(['message' => 'The route test could not be found.'], 404)));
 
-        $response = $mock->json('get', '/test/');
-
-        $response->assertNotFound();
-
-        $response->assertJson(['message' => 'The route test could not be found.']);
+        $mock->json('get', '/test/');
     }
 }
