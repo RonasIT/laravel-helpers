@@ -101,7 +101,7 @@ class MigrationTraitTest extends TestCase
         Config::set('database.default', 'mysql');
 
         $this->mockStatementDBFacade(
-            'ALTER TABLE some_table MODIFY COLUMN enum_field' .
+            'ALTER TABLE some_table MODIFY COLUMN enum_field ' .
             "ENUM('first_value', 'second_value')"
         );
 
