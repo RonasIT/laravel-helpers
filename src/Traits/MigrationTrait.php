@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\StringType;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
@@ -22,24 +23,52 @@ trait MigrationTrait
         $databaseDriver = config('database.default');
 
         match ($databaseDriver) {
-            'pgsql' => $this->changePostgresEnums($table, $field, $values, $valuesToRename),
+            'pgsql' => $this->changePostgresEnum($table, $field, $values, $valuesToRename),
+            'mysql' => $this->changeMySqlEnum($table, $field, $values, $valuesToRename),
             default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
         };
     }
 
-    private function changePostgresEnums(string $table, string $field, array $values, array $valuesToRename = []): void
+    private function changeMySqlEnum(string $table, string $field, array $values, array $valuesToRename = []): void
+    {
+        if (!empty($valuesToRename)) {
+            $withRenamedValues = array_merge($values, array_keys($valuesToRename));
+
+            $this->setMySqlEnum($table, $field, $withRenamedValues);
+
+            $this->updateRenamedValues($table, $field, $valuesToRename);
+        }
+
+        $this->setMySqlEnum($table, $field, $values);
+    }
+
+    private function changePostgresEnum(string $table, string $field, array $values, array $valuesToRename = []): void
     {
         $check = "{$table}_{$field}_check";
 
         DB::statement("ALTER TABLE {$table} DROP CONSTRAINT {$check}");
 
-        foreach ($valuesToRename as $key => $value) {
-            DB::table($table)->where([$field => $key])->update([$field => $value]);
-        }
+        $this->updateRenamedValues($table, $field, $valuesToRename);
 
         $values = $this->preparePostgresValues($values);
 
         DB::statement("ALTER TABLE {$table} ADD CONSTRAINT {$check} CHECK ({$field}::text = ANY (ARRAY[{$values}]::text[]))");
+    }
+
+    private function updateRenamedValues(string $table, string $field, array $valuesToRename): void
+    {
+        foreach ($valuesToRename as $key => $value) {
+            DB::table($table)->where([$field => $key])->update([$field => $value]);
+        }
+    }
+
+    private function setMySqlEnum(string $table, string $field, array $values): void
+    {
+        $values = Arr::map($values, fn ($value) => "'{$value}'");
+
+        $enum = implode( ', ', $values);
+
+        DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enum})");
     }
 
     private function preparePostgresValues(array $values): string
