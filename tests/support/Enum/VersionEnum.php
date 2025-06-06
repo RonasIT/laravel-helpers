@@ -3,21 +3,13 @@
 namespace RonasIT\Support\Tests\Support\Enum;
 
 use RonasIT\Support\Contracts\VersionEnumContract;
+use RonasIT\Support\Traits\EnumTrait;
 
-// Backward compatibility with PHP < 8
-class VersionEnum implements VersionEnumContract
+enum VersionEnum: string implements VersionEnumContract
 {
-    public const v1 = '1';
-    public const v2 = '2';
-    public const v3 = '3';
+    use EnumTrait;
 
-    public static function values(): array
-    {
-        return [static::v1, static::v2, static::v3];
-    }
-
-    public static function toString(string $separator = ','): string
-    {
-        return implode($separator, self::values());
-    }
+    case V1 = '1';
+    case V2 = '2';
+    case V3 = '3';
 }
