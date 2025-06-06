@@ -3,7 +3,8 @@
 namespace RonasIT\Support\Tests\Support\Traits;
 
 use Illuminate\Support\Facades\Route;
-use RonasIT\Support\Contracts\VersionEnumContract;
+use Illuminate\Testing\TestResponse;
+use RonasIT\Support\Testing\TestCase;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 
 trait RouteMockTrait
@@ -88,5 +89,44 @@ trait RouteMockTrait
                 return 'ROUTE_FACADE_VERSION';
             });
         });
+    }
+
+    protected function getMockPackageTestCaseCall(): TestCase
+    {
+        return $this
+            ->getMockBuilder(TestCase::class)
+            ->onlyMethods(['call'])
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    protected function assertRouteCalled(TestCase $mock, string $expected, string $method = 'get'): void
+    {
+        $mock
+            ->expects($this->once())
+            ->method('call')
+            ->with(
+                $this->equalTo($method),
+                $this->callback(function ($uri) use ($expected) {
+                    $this->assertEquals($expected, $uri);
+                    return true;
+                }),
+            )
+            ->willReturn(TestResponse::fromBaseResponse(response('', 200)));
+    }
+
+    protected function assertRouteNotCalled(TestCase $mock, string $expected, string $method = 'get'): void
+    {
+        $mock
+            ->expects($this->once())
+            ->method('call')
+            ->with(
+                $this->equalTo($method),
+                $this->callback(function ($uri) use ($expected) {
+                    $this->assertNotEquals($expected, $uri);
+                    return true;
+                }),
+            )
+            ->willReturn(TestResponse::fromBaseResponse('', 404));
     }
 }

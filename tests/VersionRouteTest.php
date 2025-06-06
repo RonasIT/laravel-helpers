@@ -2,13 +2,10 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
-use RonasIT\Support\Testing\TestCase as PackageTestCase;
 
 class VersionRouteTest extends TestCase
 {
@@ -296,22 +293,10 @@ class VersionRouteTest extends TestCase
     public function testWithoutApiVersion(): void
     {
         $mock = $this
-            ->getMockBuilder(PackageTestCase::class)
-            ->onlyMethods(['call'])
-            ->disableOriginalConstructor()
-            ->getMock()
+            ->getMockPackageTestCaseCall()
             ->withoutAPIVersion();
 
-        $mock->expects($this->once())
-            ->method('call')
-            ->with(
-                $this->equalTo('get'),
-                $this->callback(function ($uri) {
-                    $this->assertEquals('/test', $uri);
-                    return true;
-                }),
-            )
-            ->willReturn(TestResponse::fromBaseResponse(response('test', 200)));
+        $this->assertRouteCalled($mock, '/test');
 
         $mock->json('get', '/test');
     }
@@ -319,22 +304,10 @@ class VersionRouteTest extends TestCase
     public function testRouteWithSetApiVersion(): void
     {
         $mock = $this
-            ->getMockBuilder(PackageTestCase::class)
-            ->onlyMethods(['call'])
-            ->disableOriginalConstructor()
-            ->getMock()
+            ->getMockPackageTestCaseCall()
             ->setAPIVersion(VersionEnum::V1);
 
-        $mock->expects($this->once())
-            ->method('call')
-            ->with(
-                $this->equalTo('get'),
-                $this->callback(function ($uri) {
-                    $this->assertEquals('/v1/test/', $uri);
-                    return true;
-                }),
-            )
-            ->willReturn(TestResponse::fromBaseResponse(response('test', 200)));
+        $this->assertRouteCalled($mock, '/v1/test/');
 
         $mock->json('get', '/test/');
     }
@@ -342,22 +315,10 @@ class VersionRouteTest extends TestCase
     public function testRouteWithIncorrectVersion(): void
     {
         $mock = $this
-            ->getMockBuilder(PackageTestCase::class)
-            ->onlyMethods(['call'])
-            ->disableOriginalConstructor()
-            ->getMock()
+            ->getMockPackageTestCaseCall()
             ->withoutAPIVersion();
 
-        $mock->expects($this->once())
-            ->method('call')
-            ->with(
-                $this->equalTo('get'),
-                $this->callback(function ($uri) {
-                    $this->assertNotEquals('/v1/test/', $uri);
-                    return true;
-                }),
-            )
-            ->willReturn(TestResponse::fromBaseResponse(response(['message' => 'The route test could not be found.'], 404)));
+        $this->assertRouteNotCalled($mock, '/v1/test');
 
         $mock->json('get', '/test/');
     }

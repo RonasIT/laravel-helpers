@@ -115,14 +115,9 @@ abstract class TestCase extends BaseTest
         return (new ModelTestState($modelClassName))->setGlobalExportMode($this->globalExportMode);
     }
 
-    protected function prepareTableTestState(
-        string $tableName,
-        array $jsonFields = [],
-        ?string $connectionName = null
-    ): TableTestState {
-        return (new TableTestState($tableName, $jsonFields, $connectionName))->setGlobalExportMode(
-            $this->globalExportMode
-        );
+    protected function prepareTableTestState(string $tableName, array $jsonFields = [], ?string $connectionName = null): TableTestState
+    {
+        return (new TableTestState($tableName, $jsonFields, $connectionName))->setGlobalExportMode($this->globalExportMode);
     }
 
     public function withoutAPIVersion(): TestCase
