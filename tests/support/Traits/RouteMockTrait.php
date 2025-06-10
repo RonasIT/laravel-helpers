@@ -124,6 +124,6 @@ trait RouteMockTrait
                 $this->equalTo($method),
                 new LogicalNot($this->equalTo($uri))
             )
-            ->willReturn(TestResponse::fromBaseResponse('', 404));
+            ->willReturn(TestResponse::fromBaseResponse('', Response::HTTP_NOT_FOUND));
     }
 }
