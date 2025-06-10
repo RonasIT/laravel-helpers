@@ -111,7 +111,8 @@ trait RouteMockTrait
                 $this->equalTo($method),
                 $this->equalTo($uri)
             )
-            ->willReturn(TestResponse::fromBaseResponse(response('', 200)));
+            ->willReturn(TestResponse::fromBaseResponse('', Response::HTTP_OK));
+
     }
 
     protected function assertRouteNotCalled(TestCase $mock, string $uri, string $method = 'get'): void
