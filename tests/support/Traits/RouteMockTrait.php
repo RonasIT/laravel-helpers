@@ -7,6 +7,7 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use RonasIT\Support\Testing\TestCase;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
+use Symfony\Component\HttpFoundation\Response;
 
 trait RouteMockTrait
 {
