@@ -292,34 +292,19 @@ class VersionRouteTest extends TestCase
 
     public function testWithoutApiVersion(): void
     {
-        $mock = $this
-            ->getMockPackageTestCaseCall()
-            ->withoutAPIVersion();
+        $mock = $this->mockTestCaseExpectCallMethod('/test');
 
-        $this->assertRouteCalled($mock, '/test');
-
-        $mock->json('get', '/test');
+        $mock
+            ->withoutAPIVersion()
+            ->json('get', '/test');
     }
 
     public function testRouteWithSetApiVersion(): void
     {
-        $mock = $this
-            ->getMockPackageTestCaseCall()
-            ->setAPIVersion(VersionEnum::V1);
+        $mock = $this->mockTestCaseExpectCallMethod('/v1/test/');
 
-        $this->assertRouteCalled($mock, '/v1/test/');
-
-        $mock->json('get', '/test/');
-    }
-
-    public function testRouteWithIncorrectVersion(): void
-    {
-        $mock = $this
-            ->getMockPackageTestCaseCall()
-            ->withoutAPIVersion();
-
-        $this->assertRouteNotCalled($mock, '/v1/test');
-
-        $mock->json('get', '/test/');
+        $mock
+            ->setApiVersion(VersionEnum::V1)
+            ->json('get', '/test/');
     }
 }

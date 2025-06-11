@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests\Support\Traits;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
-use PHPUnit\Framework\Constraint\LogicalNot;
 use RonasIT\Support\Testing\TestCase;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use Symfony\Component\HttpFoundation\Response;
@@ -93,17 +92,14 @@ trait RouteMockTrait
         });
     }
 
-    protected function getMockPackageTestCaseCall(): TestCase
+    protected function mockTestCaseExpectCallMethod(string $uri, string $method = 'get'): TestCase
     {
-        return $this
+        $mock = $this
             ->getMockBuilder(TestCase::class)
             ->onlyMethods(['call'])
             ->disableOriginalConstructor()
             ->getMock();
-    }
 
-    protected function assertRouteCalled(TestCase $mock, string $uri, string $method = 'get'): void
-    {
         $mock
             ->expects($this->once())
             ->method('call')
@@ -112,17 +108,7 @@ trait RouteMockTrait
                 $this->equalTo($uri)
             )
             ->willReturn(TestResponse::fromBaseResponse('', Response::HTTP_OK));
-    }
 
-    protected function assertRouteNotCalled(TestCase $mock, string $uri, string $method = 'get'): void
-    {
-        $mock
-            ->expects($this->once())
-            ->method('call')
-            ->with(
-                $this->equalTo($method),
-                new LogicalNot($this->equalTo($uri))
-            )
-            ->willReturn(TestResponse::fromBaseResponse('', Response::HTTP_NOT_FOUND));
+        return $mock;
     }
 }
