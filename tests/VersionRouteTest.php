@@ -24,7 +24,7 @@ class VersionRouteTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->bind(VersionEnumContract::class, VersionEnum::class);
+        $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);
     }
 
     public static function getTestVersionRangeData(): array
@@ -288,5 +288,23 @@ class VersionRouteTest extends TestCase
         $status = ($isCorrectVersion) ? 200 : 404;
 
         $response->assertStatus($status);
+    }
+
+    public function testWithoutApiVersion(): void
+    {
+        $mock = $this->mockTestCaseExpectCallMethod('/test');
+
+        $mock
+            ->withoutAPIVersion()
+            ->json('get', '/test');
+    }
+
+    public function testRouteWithSetApiVersion(): void
+    {
+        $mock = $this->mockTestCaseExpectCallMethod('/v1/test/');
+
+        $mock
+            ->setApiVersion(VersionEnum::V1)
+            ->json('get', '/test/');
     }
 }
