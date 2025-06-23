@@ -134,7 +134,7 @@ abstract class TestCase extends BaseTest
 
     public function json($method, $uri, array $data = [], array $headers = [], $options = 0): TestResponse
     {
-        $version = (emtpy($this->apiVersion)) ? '' : "/v{$this->apiVersion->value}";
+        $version = (empty($this->apiVersion)) ? '' : "/v{$this->apiVersion->value}";
 
         return parent::json($method, "{$version}{$uri}", $data, $headers);
     }
