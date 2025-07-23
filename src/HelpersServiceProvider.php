@@ -14,6 +14,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
+use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
 
@@ -123,6 +124,10 @@ class HelpersServiceProvider extends ServiceProvider
         ) {
             if (!$param) {
                 $param = 'version';
+            }
+
+            if (!$this->app->bound(Version::class)) {
+                throw new BindingVersionEnumException();
             }
 
             $versionEnum = app(Version::class);
