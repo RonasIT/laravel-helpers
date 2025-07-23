@@ -10,8 +10,8 @@ class BindingVersionEnumException extends BindingResolutionException
     {
         parent::__construct(
             'The VersionEnumContract is not bound in the container.'
-            .' Please ensure it is registered using'
-            .' $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);'
+            . ' Please ensure it is registered using'
+            . ' $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);'
         );
     }
 }
