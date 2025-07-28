@@ -38,6 +38,8 @@ abstract class TestCase extends BaseTest
             static::$startedTestSuite = static::class;
         }
 
+        $this->setConfigureRedisDatabase();
+
         if (config('database.default') === 'pgsql') {
             $this->prepareSequences();
         }
@@ -142,5 +144,19 @@ abstract class TestCase extends BaseTest
     public function actingAs(Authenticatable $user, $guard = null): self
     {
         return parent::actingAs(clone $user, $guard);
+    }
+
+    protected function setConfigureRedisDatabase(): void
+    {
+        $testToken = $this->getTestToken();
+
+        if (!empty($testToken)) {
+            config(['database.redis.default.database' => $testToken]);
+        }
+    }
+
+    protected function getTestToken(): int
+    {
+        return (int) getenv('TEST_TOKEN');
     }
 }
