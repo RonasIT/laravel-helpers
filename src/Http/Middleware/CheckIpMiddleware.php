@@ -14,7 +14,7 @@ class CheckIpMiddleware
     {
         $ips = [$request->header('x-real-ip'), $request->header('x-forwarded-for')];
 
-        if (empty(array_intersect(config('defaults.protected_endpoint_available_ips'), $ips)) && App::environment('production')) {
+        if (empty(array_intersect($allowedIps, $ips)) && App::environment('production')) {
             throw new AccessDeniedHttpException();
         }
 
