@@ -308,7 +308,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testUpdate()
     {
-        $this->mockUpdate(self::$selectResult, null);
+        $this->mockUpdate(self::$selectResult, Carbon::now());
 
         self::$testRepositoryClass
             ->withTrashed()
@@ -318,7 +318,6 @@ class EntityControlTraitTest extends TestCase
             ->withCount('relation')
             ->update(1, [
                 'name' => 'test_name',
-                'updated_at' => null,
             ]);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
@@ -335,10 +334,27 @@ class EntityControlTraitTest extends TestCase
             ->withCount('relation')
             ->update(1, [
                 'name' => 'test_name',
-                'updated_at' => null,
             ]);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testUpdateWithNotFillable()
+    {
+        $this->expectException(\RonasIT\Support\Exceptions\InvalidModelException::class);
+        $this->expectExceptionMessage("Attribute 'last_name' is not fillable in TestModel");
+
+        $this->mockFirst(self::$selectResult);
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->with('relation')
+            ->withCount('relation')
+            ->update(1, [
+                'name' => 'test_name',
+                'last_name' => 'test_last_name',
+            ]);
     }
 
     public function testUpdateDoesntExist()

@@ -218,6 +218,12 @@ trait EntityControlTrait
             return null;
         }
 
+        foreach (array_keys($data) as $key) {
+            if (!$item->isFillable($key)) {
+                throw new InvalidModelException("Attribute '{$key}' is not fillable in " . class_basename($item));;
+            }
+        }
+
         if ($this->forceMode) {
             $item->forceFill(Arr::only($data, $this->fields));
         } else {
