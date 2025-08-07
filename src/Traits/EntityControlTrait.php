@@ -218,9 +218,9 @@ trait EntityControlTrait
             return null;
         }
 
-        foreach (array_keys($data) as $key) {
+        foreach ($data as $key => $value) {
             if (!$item->isFillable($key)) {
-                throw new InvalidModelException("Attribute '{$key}' is not fillable in " . class_basename($item));;
+                throw new InvalidModelException("Attribute '{$key}' is not fillable in " . class_basename($item));
             }
         }
 
