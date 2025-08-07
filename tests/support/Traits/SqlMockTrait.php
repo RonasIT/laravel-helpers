@@ -230,6 +230,24 @@ trait SqlMockTrait
         );
     }
 
+    protected function mockUpdateWithForce(array $selectResult, $notFillableValue): void
+    {
+        $this->mockSelectById(
+            'select * from "test_model_with_guards" where "test_model_with_guards"."deleted_at" is not null and "id" = ? limit 1',
+            $selectResult
+        );
+
+        $this->mockUpdateSqlQuery(
+            'update "test_model_with_guards" set "name" = ?, "secret" = ?, "updated_at" = ? where "id" = ?',
+            ['test_name', 'test_secret', $notFillableValue, 1]
+        );
+
+        $this->mockSelectById(
+            'select * from "test_model_with_guards" where "id" = ? limit 1',
+            $selectResult
+        );
+    }
+
     protected function mockUpdateOrCreateEntityExists(array $selectResult): void
     {
         $this->mockSelectExists(

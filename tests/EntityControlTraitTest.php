@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithGuard;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryNoPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithDifferentTimestampNames;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithoutTimestamps;
@@ -20,6 +21,7 @@ class EntityControlTraitTest extends TestCase
     protected static array $selectResult;
 
     protected static TestRepository $testRepositoryClass;
+    protected static TestRepositoryWithGuard $testRepositoryWithGuard;
     protected static TestRepositoryWithoutTimestamps $testRepositoryClassWithoutTimestamps;
     protected static TestRepositoryWithDifferentTimestampNames $testRepositoryWithDifferentTimestampNames;
 
@@ -34,6 +36,7 @@ class EntityControlTraitTest extends TestCase
         parent::setUp();
 
         self::$testRepositoryClass ??= new TestRepository();
+        self::$testRepositoryWithGuard ??= new TestRepositoryWithGuard();
         self::$testRepositoryClassWithoutTimestamps ??= new TestRepositoryWithoutTimestamps();
         self::$testRepositoryWithDifferentTimestampNames ??= new TestRepositoryWithDifferentTimestampNames();
 
@@ -355,6 +358,22 @@ class EntityControlTraitTest extends TestCase
                 'name' => 'test_name',
                 'last_name' => 'test_last_name',
             ]);
+    }
+
+    public function testUpdateWithForce()
+    {
+        $this->mockUpdateWithForce(self::$selectResult, Carbon::now());
+
+        self::$testRepositoryWithGuard
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->update(1, [
+                'name' => 'test_name',
+                'secret' => 'test_secret',
+            ]);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryWithGuard);
     }
 
     public function testUpdateDoesntExist()
