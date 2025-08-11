@@ -10,6 +10,13 @@ This plugin provides set of helpers functions, services and traits.
  1. Run `composer require ronasit/laravel-helpers`
  1. For Laravel <= 5.5 add `RonasIT\Support\HelpersServiceProvider::class` to config `app.providers` list
 
+## Features  
+
+### Https schema 
+The package is forcing the `HTTPS` scheme for your app. Generally, it affects the URL generation logic.  
+  
+This allows to use many web-related packages like Telescope, Nova, etc.  
+
 ## Usage
  - [Helper functions][1]
  - [Traits][2]

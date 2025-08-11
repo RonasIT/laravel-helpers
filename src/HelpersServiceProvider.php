@@ -7,6 +7,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Validator;
@@ -23,6 +24,8 @@ class HelpersServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        URL::forceHttps();
+
         $router = $this->app['router'];
 
         $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
