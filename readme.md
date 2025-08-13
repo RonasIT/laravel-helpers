@@ -13,6 +13,7 @@ This plugin provides set of helpers functions, services and traits.
 ## Features  
 
 ### Https schema 
+
 The package is forcing the `HTTPS` scheme for your app. Generally, it affects the URL generation logic.  
   
 This allows to use many web-related packages like Telescope, Nova, etc.  
