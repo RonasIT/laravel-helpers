@@ -314,19 +314,15 @@ class VersionRouteTest extends TestCase
     {
         $this->app->offsetUnset(VersionEnumContract::class);
 
-        try {
-            Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () {
-                Route::get(static::ROUTE_FACADE_RANGE, function () {
-                    return 'ROUTE_FACADE_RANGE';
-                });
-            });
-        } catch (BindingVersionEnumException $exception) {
-            $this->assertEquals(
-                expected: 'The VersionEnumContract is not bound in the container.'
+        $this->assertExceptionThrew(
+            expectedClassName: BindingVersionEnumException::class,
+            expectedMessage: 'The VersionEnumContract is not bound in the container.'
                 . ' Please ensure it is registered using'
                 . ' $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);',
-                actual: $exception->getMessage(),
-            );
-        }
+        );
+
+        Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () {
+            Route::get('test', fn () => 'result');
+        });
     }
 }
