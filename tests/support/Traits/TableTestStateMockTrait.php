@@ -11,8 +11,6 @@ use RonasIT\Support\Testing\TestCase;
 
 trait TableTestStateMockTrait
 {
-    use MockTestTrait;
-
     protected function mockGettingDataset(Collection $responseMock): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
