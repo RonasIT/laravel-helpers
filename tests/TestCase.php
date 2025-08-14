@@ -4,12 +4,12 @@ namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
 use RonasIT\Support\HelpersServiceProvider;
-use RonasIT\Support\Traits\MailsMockTrait;
+use RonasIT\Support\Traits\TestingTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
 
 class TestCase extends BaseTest
 {
-    use MailsMockTrait;
+    use TestingTrait;
 
     public function setUp(): void
     {
