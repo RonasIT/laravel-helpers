@@ -25,9 +25,7 @@ class CheckIpMiddlewareTest extends TestCase
         $request = Request::create(
             uri: '/test',
             method: 'GET',
-            server: [
-                'HTTP_X_FORWARDED_FOR' => '127.0.0.2',
-            ],
+            server: ['HTTP_X_FORWARDED_FOR' => '127.0.0.2'],
         );
 
         $response = $this->middleware->handle($request, fn () => new Response(), '127.0.0.1', '127.0.0.2');
@@ -50,7 +48,7 @@ class CheckIpMiddlewareTest extends TestCase
         $this->middleware->handle($request, fn () => new Response(), '127.0.0.1', '127.0.0.2');
     }
 
-    public function testHandleWithInvalidIp(): void
+    public function testHandleWithInvalidIpNonProdEnv(): void
     {
         $request = Request::create(
             uri: '/test',
