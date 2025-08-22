@@ -12,7 +12,7 @@ class CheckIpMiddleware
 {
     public function handle(Request $request, Closure $next, string ...$allowedIps): Response
     {
-        $ips = [$request->header('x-real-ip'), $request->header('x-forwarded-for')];
+        $ips = [$request->header('x-real-ip'), $request->header('x-forwarded-for'), ...$request->ips()];
 
         if (empty(array_intersect($allowedIps, $ips)) && App::environment('production')) {
             throw new AccessDeniedHttpException();
