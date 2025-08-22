@@ -2,12 +2,16 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
+use RonasIT\Support\Http\Middleware\CheckVersionMiddleware;
+use RonasIT\Support\Http\Middleware\ClearVersion;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
+use Symfony\Component\HttpFoundation\Response;
 
 class VersionRouteTest extends TestCase
 {
@@ -324,5 +328,41 @@ class VersionRouteTest extends TestCase
         Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () {
             Route::get('test', fn () => 'result');
         });
+    }
+
+    public function testCheckVersionMiddlewareDisabled()
+    {
+        Config::set('app.disabled_api_versions', [VersionEnum::V1->value]);
+
+        Route::version(VersionEnum::V1)
+            ->middleware(CheckVersionMiddleware::class)
+            ->group(function () {
+                Route::get('/test-middleware', fn () => response()->noContent());
+            });
+
+        $this
+            ->getJson('/v1/test-middleware')
+            ->assertStatus(Response::HTTP_UPGRADE_REQUIRED);
+    }
+
+    public function testCheckVersionMiddlewareEnabled()
+    {
+        Config::set('app.disabled_api_versions', [VersionEnum::V1->value]);
+
+        Route::prefix('v{version}')
+            ->middleware([
+                CheckVersionMiddleware::class,
+                ClearVersion::class,
+            ])
+            ->group(function () {
+                Route::versionFrom(VersionEnum::V1)
+                    ->group(function () {
+                        Route::get('/test-middleware', fn() => response()->noContent());
+                    });
+            });
+
+        $this
+            ->getJson('/v2/test-middleware')
+            ->assertStatus(Response::HTTP_NO_CONTENT);
     }
 }
