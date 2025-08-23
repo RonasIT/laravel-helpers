@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Traits\MailsMockTrait;
@@ -38,7 +39,7 @@ abstract class TestCase extends BaseTest
             static::$startedTestSuite = static::class;
         }
 
-        $this->setConfigureRedisDatabase();
+        $this->configureRedis();
 
         if (config('database.default') === 'pgsql') {
             $this->prepareSequences();
@@ -146,17 +147,12 @@ abstract class TestCase extends BaseTest
         return parent::actingAs(clone $user, $guard);
     }
 
-    protected function setConfigureRedisDatabase(): void
+    protected function configureRedis(): void
     {
-        $testToken = $this->getTestToken();
+        $testToken = ParallelTesting::token();
 
         if (!empty($testToken)) {
             config(['database.redis.default.database' => $testToken]);
         }
-    }
-
-    protected function getTestToken(): int
-    {
-        return (int) getenv('TEST_TOKEN');
     }
 }
