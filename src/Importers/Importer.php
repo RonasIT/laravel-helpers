@@ -229,9 +229,7 @@ class Importer
         $mandatoryValues = Arr::only($line, $this->mandatoryFields);
 
         if (count($mandatoryValues) != count($this->mandatoryFields)) {
-            $notExistedFields = array_filter($this->mandatoryFields, function ($field) use ($line) {
-                return !Arr::has($line, $field);
-            });
+            $notExistedFields = array_filter($this->mandatoryFields, fn ($field) => !Arr::has($line, $field));
 
             if (count($notExistedFields) == 1) {
                 $message = 'Mandatory field ' . head($notExistedFields) . ' is not provided in csv file';

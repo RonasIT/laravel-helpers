@@ -78,7 +78,7 @@ trait MailsMockTrait
             $this->assertEmailsList($expectedMailData, $mail, $index);
             $this->assertFixture($expectedMailData, $mail, $exportMode);
             $this->assertEmailFrom($expectedMailData, $mail);
-            $this->assertAttachments($expectedMailData, $mail, $index);
+            $this->assertAttachments($expectedMailData, $mail);
 
             $index++;
 
@@ -103,9 +103,8 @@ trait MailsMockTrait
             $subject = method_exists($mail, 'envelope') ? $mail->envelope()->subject : $mail->subject;
 
             $this->assertTrue(
-                $mail->hasSubject($expectedSubject),
-                "Failed assert that the expected subject \"{$expectedSubject}\" equals "
-                . "to the actual \"{$subject}\"."
+                condition: $mail->hasSubject($expectedSubject),
+                message: "Failed assert that the expected subject \"{$expectedSubject}\" equals to the actual \"{$subject}\".",
             );
         }
     }
@@ -116,10 +115,9 @@ trait MailsMockTrait
         $addressesCount = count($mail->to);
 
         $this->assertEquals(
-            $expectedAddressesCount,
-            $addressesCount,
-            "Failed assert that email on the step {$index}, was sent to {$expectedAddressesCount} addresses, "
-            . "actually email had sent to the {$addressesCount} addresses."
+            expected: $expectedAddressesCount,
+            actual: $addressesCount,
+            message: "Failed assert that email on the step {$index}, was sent to {$expectedAddressesCount} addresses, actually email had sent to the {$addressesCount} addresses.",
         );
     }
 
@@ -129,9 +127,9 @@ trait MailsMockTrait
 
         foreach ($emails as $email) {
             $this->assertContains(
-                $email,
-                $sentEmails,
-                "Block \"To\" on {$index} step doesn't contain '{$email}'. It only contains '{$emailList}'."
+                needle: $email,
+                haystack:  $sentEmails,
+                message: "Block \"To\" on {$index} step doesn't contain '{$email}'. It only contains '{$emailList}'.",
             );
         }
     }
@@ -145,9 +143,10 @@ trait MailsMockTrait
 
             foreach ($expectedFrom as $expected) {
                 $expectedJson = json_encode($expected);
+
                 $this->assertTrue(
-                    $mail->hasFrom($expected['address'] ?? $expected, $expected['name'] ?? null),
-                    "Email was not from expected address [{$expectedJson}]."
+                    condition: $mail->hasFrom($expected['address'] ?? $expected, $expected['name'] ?? null),
+                    message: "Email was not from expected address [{$expectedJson}].",
                 );
             }
         }
@@ -158,9 +157,9 @@ trait MailsMockTrait
         $countData = count($emailChain);
 
         $this->assertEquals(
-            $countData,
-            $index,
-            "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}."
+            expected: $countData,
+            actual: $index,
+            message: "Failed assert that send emails count are equals, expected send email count: {$countData}, actual {$index}.",
         );
     }
 
@@ -188,9 +187,9 @@ trait MailsMockTrait
         $fixture = $this->getFixture($expectedMailData['fixture']);
 
         $this->assertEquals(
-            $fixture,
-            $mailContent,
-            "Fixture {$expectedMailData['fixture']} does not equals rendered mail."
+            expected: $fixture,
+            actual: $mailContent,
+            message: "Fixture {$expectedMailData['fixture']} does not equals rendered mail.",
         );
     }
 
@@ -214,15 +213,15 @@ trait MailsMockTrait
         ];
     }
 
-    protected function assertAttachments(array $currentMail, Mailable $mail, int $index): void
+    protected function assertAttachments(array $currentMail, Mailable $mail): void
     {
         $attachments = Arr::get($currentMail, 'attachments', []);
         $className = get_class($mail);
 
         if (count($attachments)) {
             $this->assertTrue(
-                method_exists($mail, 'assertHasAttachment'),
-                "Class {$className} doesn't have method `assertHasAttachment` to check an attachment.",
+                condition: method_exists($mail, 'assertHasAttachment'),
+                message: "Class {$className} doesn't have method `assertHasAttachment` to check an attachment.",
             );
 
             foreach ($attachments as $attachment) {

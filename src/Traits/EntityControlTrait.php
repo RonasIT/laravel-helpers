@@ -86,11 +86,7 @@ trait EntityControlTrait
                 if (empty($relation)) {
                     $query->withCount($countRelation);
                 } else {
-                    $query->with([
-                        $relation => function ($query) use ($countRelation) {
-                            $query->withCount($countRelation);
-                        },
-                    ]);
+                    $query->with([$relation => fn ($query) => $query->withCount($countRelation)]);
                 }
             }
         }

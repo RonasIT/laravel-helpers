@@ -31,9 +31,7 @@ trait ModelTrait
         $tableName = $this->getTable();
         $fields = Schema::getColumnListing($tableName);
 
-        return array_map(function ($field) use ($tableName) {
-            return "{$tableName}.{$field}";
-        }, $fields);
+        return array_map(fn ($field) => "{$tableName}.{$field}", $fields);
     }
 
     protected function getRelationshipFromMethod($method)
@@ -42,8 +40,8 @@ trait ModelTrait
             $modelName = static::class;
 
             throw new BadMethodCallException(
-                "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. "
-                . 'See property $disableLazyLoading.'
+                message: "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. "
+                . 'See property $disableLazyLoading.',
             );
         }
 
@@ -88,7 +86,7 @@ trait ModelTrait
         $relations,
         string $desc = 'DESC',
         ?string $asField = null,
-        string $manyToManyStrategy = 'max'
+        string $manyToManyStrategy = 'max',
     ) {
         if (empty($asField)) {
             $asField = str_replace('.', '_', $relations);
@@ -121,9 +119,7 @@ trait ModelTrait
 
     protected function getRelationWithoutConstraints($query, $relation)
     {
-        return Relation::noConstraints(function () use ($query, $relation) {
-            return $query->getModel()->{$relation}();
-        });
+        return Relation::noConstraints(fn () => $query->getModel()->{$relation}());
     }
 
     protected function prepareRelations(string $relations): array

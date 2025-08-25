@@ -14,13 +14,7 @@ function array_round(array $array): array
 {
     $keys = array_keys($array);
 
-    $values = array_map(function ($value) {
-        if (is_numeric($value)) {
-            return round($value);
-        }
-
-        return $value;
-    }, $array);
+    $values = array_map(fn ($value) => (is_numeric($value)) ? round($value) : $value, $array);
 
     return array_combine($keys, $values);
 }
@@ -315,6 +309,7 @@ function array_unique_objects(array $objectsList, string|callable|array $filter 
         if (in_array($value, $uniqueKeys)) {
             return null;
         }
+
         $uniqueKeys[] = $value;
 
         return $object;
@@ -327,18 +322,14 @@ function array_unique_objects(array $objectsList, string|callable|array $filter 
 
 function array_trim(array $array): array
 {
-    return array_map(
-        function ($item) {
-            return (is_string($item)) ? trim($item) : $item;
-        },
-        $array
-    );
+    return array_map(fn ($item) => (is_string($item)) ? trim($item) : $item, $array);
 }
 
 function array_remove_by_field(array $array, string|int $fieldName, mixed $fieldValue): array
 {
     $array = array_values($array);
     $key = array_search($fieldValue, array_column($array, $fieldName));
+
     if ($key !== false) {
         unset($array[$key]);
     }
