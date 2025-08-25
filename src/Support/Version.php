@@ -4,6 +4,7 @@ namespace RonasIT\Support\Support;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use RonasIT\Support\Contracts\VersionEnumContract;
 
 class Version
@@ -12,7 +13,9 @@ class Version
     {
         $route = Route::getRoutes()->match(request());
 
-        return Arr::get($route->parameters(), $pathParamName, str_replace('/v', '', $route->getPrefix()));
+        $version = Arr::get($route->parameters(), $pathParamName, $route->getPrefix());
+
+        return Str::replace('v', '', $version);
     }
 
     public static function is(VersionEnumContract $expectedVersion): bool

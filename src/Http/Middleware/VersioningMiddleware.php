@@ -4,19 +4,20 @@ namespace RonasIT\Support\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use RonasIT\Support\Support\Version;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckVersionMiddleware
+class VersioningMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, $paramName = 'version')
     {
-        $current = Str::replace('v', '', Version::current());
+        $current = Version::current();
 
         if (in_array($current, config('app.disabled_api_versions'))) {
             abort(Response::HTTP_UPGRADE_REQUIRED);
         }
+
+        $request->route()->forgetParameter($paramName);
 
         return $next($request);
     }

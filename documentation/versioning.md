@@ -3,42 +3,58 @@
 
 # Versioning
 
+The package provides a set of tools for implementing versioning in Laravel applications. These include:
+
+- macros for the Route facade,
+- middleware for version handling,
+- helpers for working with versions,
+- configuration keys for customization.
+
 ## Route Macros
 The macros provide a convenient way to manage API versioning in Laravel routes.
 
-They allow you to specify which versions of the API a route is accessible for.
-
-By using these macros, routes can be easily grouped and protected according to version-specific logic,
-ensuring backward compatibility and smooth evolution of the API.
+The package provides macros that offer a convenient way to define the range of versions a route supports. 
+Macros can be applied both to a single endpoint and to a route group, 
+allowing more flexible version constraints across the application.
 
 ### versionRange
-The versionRange macro allows you to define a range of API versions for which a route is accessible.
+The `versionRange` macro allows to define a full closed range of API versions allowed for routes.
 ```
-Route::versionRange(VersionEnum::v1, VersionEnum::v2)
+Route::versionRange(VersionEnum::v1, VersionEnum::v2)->get(...)
+Route::versionRange(VersionEnum::v1, VersionEnum::v2)->group(...)
 ```
+
 ### versionFrom
-This macro helps define the minimum API version required to access a route.
+Allows to define the minimum API version required to access routes.
 ```
-Route::versionFrom(VersionEnum::v1)
+Route::versionFrom(VersionEnum::v1)->get(...)
+Route::versionFrom(VersionEnum::v1)->group(...)
 ```
+
 ### versionTo
-The versionTo macro allows you to define the maximum API version for which a route is accessible.
+Allows to define the maximum API version allowed for routes.
 ```
-Route::versionTo(VersionEnum::v2)
+Route::versionTo(VersionEnum::v2)->get(...)
+Route::versionTo(VersionEnum::v2)->group(...)
 ```
+
 ### version
-The version macro allows you to define a specific API version for which a route is accessible.
+Allows to define the only allowed API version for routes.
 ```
-Route::version(VersionEnum::v1)
+Route::version(VersionEnum::v1)->get(...)
+Route::version(VersionEnum::v1)->group(...)
 ```
 
-## Middlewares
+## Middleware
 
-### CheckVersionMiddleware
-This middleware verifies the requested API version.
-If the version is blocked in the configuration, the application returns HTTP_UPGRADE_STATUS.
+### VersioningMiddleware
 
-To manage blocked versions, configure the `disabled_api_versions` parameter in your application `/app/config/app.php`.
+The `VersioningMiddleware` is responsible for validating the requested API version and ensuring that requests are properly
+routed without version-specific parameters.
+
+If the requested version is listed as disabled in the configuration, the application responds with HTTP_UPGRADE_STATUS.
+Blocked versions are managed through the `disabled_api_versions` parameter in the application configuration file 
+located at `/app/config/app.php`.
 
 Example:
 ```
@@ -47,16 +63,10 @@ Example:
     VersionEnum::v3->value,
 ] 
 ```
-### ClearVersion
-The ClearVersion middleware removes the API version parameter from the route before the request reaches the controller.
+After performing the version check, the middleware removes the API version parameter from the route before the request 
+is passed to the controller. 
 
-Purpose:
-
-* Ensures that controllers receive a "clean" request without version parameters.
-* Allows centralized handling of API versions in middleware, simplifying controller logic.
-* Reduces the risk of accidental usage of version parameters inside application logic.
-
-Usage: Can be applied to routes where version parameters should be cleared after validation or handling.
+This guarantees that controllers operate on a clean request and that version handling remains centralized within middleware.
 
 ## VersionEnumContract
 To manage application versions, an enumeration class must be defined to represent the available version variants.
