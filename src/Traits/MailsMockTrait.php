@@ -176,9 +176,12 @@ trait MailsMockTrait
     protected function assertFixture(array $expectedMailData, Mailable $mail, bool $exportMode = false): void
     {
         $view = (method_exists($mail, 'content')) ? $mail->content()->view : $mail->view;
-        $mailContent = view($view, $mail->viewData)->render();
+        $data = (method_exists($mail, 'content')) ? $mail->content()->with : $mail->viewData;
+        $mailContent = view($view, $data)->render();
 
-        if ($exportMode) {
+        $globalExportMode = $this->globalExportMode ?? false;
+
+        if ($exportMode || $globalExportMode) {
             $this->exportContent($mailContent, $expectedMailData['fixture']);
         }
 

@@ -2,13 +2,14 @@
 
 namespace RonasIT\Support\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Traits\MockTrait;
 
-class HelpersTest extends HelpersTestCase
+class HelpersTest extends TestCase
 {
     use MockTrait;
 
-    public function getGetListData(): array
+    public static function getGetListData(): array
     {
         return [
             [
@@ -49,13 +50,7 @@ class HelpersTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getGetListData
-     *
-     * @param string $input
-     * @param string $key
-     * @param string $expected
-     */
+    #[DataProvider('getGetListData')]
     public function testGetList(string $input, string $key, string $expected)
     {
         $input = $this->getJsonFixture($input);
@@ -65,7 +60,7 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture($expected, $result);
     }
 
-    public function getIsMultidimensionalData(): array
+    public static function getIsMultidimensionalData(): array
     {
         return [
             [
@@ -83,12 +78,7 @@ class HelpersTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsMultidimensionalData
-     *
-     * @param string $input
-     * @param bool $expected
-     */
+    #[DataProvider('getIsMultidimensionalData')]
     public function testIsMultidimensional(string $input, bool $expected)
     {
         $input = $this->getJsonFixture($input);
@@ -98,39 +88,33 @@ class HelpersTest extends HelpersTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function getEqualsData(): array
+    public static function getEqualsData(): array
     {
         return [
             [
-                'first_array' => 'array_equals/settings.json',
-                'second_array' => 'array_equals/settings_diff.json',
+                'firstArray' => 'array_equals/settings.json',
+                'secondArray' => 'array_equals/settings_diff.json',
                 'expected' => false,
             ],
             [
-                'first_array' => 'array_equals/settings_rather_types.json',
-                'second_array' => 'array_equals/settings_rather_types_diff_order.json',
+                'firstArray' => 'array_equals/settings_rather_types.json',
+                'secondArray' => 'array_equals/settings_rather_types_diff_order.json',
                 'expected' => true,
             ],
             [
-                'first_array' => 'array_equals/settings.json',
-                'second_array' => 'array_equals/settings_diff_order.json',
+                'firstArray' => 'array_equals/settings.json',
+                'secondArray' => 'array_equals/settings_diff_order.json',
                 'expected' => true,
             ],
             [
-                'first_array' => 'areas.houses.json',
-                'second_array' => 'array_equals/non_associative.json',
+                'firstArray' => 'areas.houses.json',
+                'secondArray' => 'array_equals/non_associative.json',
                 'expected' => true,
             ],
         ];
     }
 
-    /**
-     * @dataProvider getEqualsData
-     *
-     * @param string $firstArray
-     * @param string $secondArray
-     * @param bool $expected
-     */
+    #[DataProvider('getEqualsData')]
     public function testEquals(string $firstArray, string $secondArray, bool $expected)
     {
         $firstArray = $this->getJsonFixture($firstArray);
@@ -150,7 +134,7 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture('array_round/rounded_values.json', $result);
     }
 
-    public function getArrayDuplicatesData(): array
+    public static function getArrayDuplicatesData(): array
     {
         return [
             [
@@ -168,12 +152,7 @@ class HelpersTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getArrayDuplicatesData
-     *
-     * @param string $input
-     * @param string $expected
-     */
+    #[DataProvider('getArrayDuplicatesData')]
     public function testArrayGetDuplicate(string $input, string $expected)
     {
         $input = $this->getJsonFixture($input);
@@ -183,7 +162,7 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture($expected, $result);
     }
 
-    public function getArrayUniqueObjectsData(): array
+    public static function getArrayUniqueObjectsData(): array
     {
         return [
             [
@@ -195,20 +174,13 @@ class HelpersTest extends HelpersTestCase
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_array_key.json',
             ],
             [
-                'filter' => function ($objet) {
-                    return $objet['id'];
-                },
+                'filter' => fn ($objet) => $objet['id'],
                 'expected' => 'array_unique_objects/unique_objects_filtered_by_callback_key.json',
             ],
         ];
     }
 
-    /**
-     * @dataProvider getArrayUniqueObjectsData
-     *
-     * @param string|callable|array $filter
-     * @param string $expected
-     */
+    #[DataProvider('getArrayUniqueObjectsData')]
     public function testArrayUniqueObjects(string|callable|array $filter, string $expected)
     {
         $input = $this->getJsonFixture('array_unique_objects/array_with_duplicates.json');
@@ -227,7 +199,7 @@ class HelpersTest extends HelpersTestCase
         $this->assertEqualsFixture('array_trim/result.json', $result);
     }
 
-    public function getArrayRemoveByFieldData(): array
+    public static function getArrayRemoveByFieldData(): array
     {
         return [
             [
@@ -243,13 +215,7 @@ class HelpersTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getArrayRemoveByFieldData
-     *
-     * @param string  $field
-     * @param string|int $value
-     * @param string $expected
-     */
+    #[DataProvider('getArrayRemoveByFieldData')]
     public function testArrayRemoveByField(string $field, string|int $value, string $expected)
     {
         $input = $this->getJsonFixture('array_remove_by_field/data.json');

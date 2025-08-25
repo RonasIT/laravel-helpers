@@ -1,0 +1,21 @@
+<<<EOL
+User-Agent: curl/7.21.2 (x86_64-apple-darwin)
+Host: localhost:8080
+Accept: */*
+Content-Type: multipart/form-data; boundary=----------------------------83ff53821b7c
+
+------------------------------83ff53821b7c
+Content-Disposition: form-data; name="foo"
+
+bar
+------------------------------83ff53821b7c
+Content-Transfer-Encoding: base64
+
+YmFzZTY0
+------------------------------83ff53821b7c
+Content-Disposition: form-data; name="upload"; filename="text.txt"
+Content-Type: text/plain
+
+File content
+------------------------------83ff53821b7c--
+EOL;

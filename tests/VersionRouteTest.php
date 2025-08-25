@@ -2,11 +2,14 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
+use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
 
-class VersionRouteTest extends HelpersTestCase
+class VersionRouteTest extends TestCase
 {
     use RouteMockTrait;
 
@@ -23,88 +26,86 @@ class VersionRouteTest extends HelpersTestCase
     {
         parent::setUp();
 
-        $this->app->bind(VersionEnumContract::class, VersionEnum::class);
+        $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);
     }
 
-    public function getTestVersionRangeData(): array
+    public static function getTestVersionRangeData(): array
     {
         return [
             [
                 'version' => '1',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '1.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '0.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '4',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '2',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '2.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '1.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_RANGE,
             ],
             [
                 'version' => '1',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
                 'version' => '1.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
                 'version' => '0.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
                 'version' => '4',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
                 'version' => '2',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
                 'version' => '2.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
             [
                 'version' => '1.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_RANGE,
             ],
         ];
     }
 
-    /**
-     * @dataProvider getTestVersionRangeData
-     */
+    #[DataProvider('getTestVersionRangeData')]
     public function testVersionRange(string $version, bool $isCorrectVersion, string $route): void
     {
         $this->mockRoutes();
@@ -116,65 +117,63 @@ class VersionRouteTest extends HelpersTestCase
         $response->assertStatus($status);
     }
 
-    public function getTestVersionFromData(): array
+    public static function getTestVersionFromData(): array
     {
         return [
             [
                 'version' => '1',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_FROM,
             ],
             [
                 'version' => '2.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_FROM,
             ],
             [
                 'version' => '2',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_OBJECT_FROM,
             ],
             [
                 'version' => '3',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_OBJECT_FROM,
             ],
             [
                 'version' => '3.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_FROM,
             ],
             [
                 'version' => '1',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_FROM,
             ],
             [
                 'version' => '2.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_FROM,
             ],
             [
                 'version' => '2',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_FACADE_FROM,
             ],
             [
                 'version' => '3',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_FACADE_FROM,
             ],
             [
                 'version' => '3.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_FROM,
             ],
         ];
     }
 
-    /**
-     * @dataProvider getTestVersionFromData
-     */
+    #[DataProvider('getTestVersionFromData')]
     public function testVersionFrom(string $version, bool $isCorrectVersion, string $route): void
     {
         $this->mockRoutes();
@@ -186,66 +185,64 @@ class VersionRouteTest extends HelpersTestCase
         $response->assertStatus($status);
     }
 
-    public function getTestVersionToData(): array
+    public static function getTestVersionToData(): array
     {
         return [
             [
                 'version' => '1',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_OBJECT_TO,
             ],
             [
                 'version' => '2.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_TO,
             ],
             [
                 'version' => '2',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_OBJECT_TO,
             ],
             [
                 'version' => '3',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_TO,
             ],
             [
                 'version' => '1.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_OBJECT_TO,
             ],
 
             [
                 'version' => '1',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_FACADE_TO,
             ],
             [
                 'version' => '2.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_TO,
             ],
             [
                 'version' => '2',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_FACADE_TO,
             ],
             [
                 'version' => '3',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_TO,
             ],
             [
                 'version' => '1.5',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_TO,
             ],
         ];
     }
 
-    /**
-     * @dataProvider getTestVersionToData
-     */
+    #[DataProvider('getTestVersionToData')]
     public function testVersionTo(string $version, bool $isCorrectVersion, string $route): void
     {
         $this->mockRoutes();
@@ -257,35 +254,33 @@ class VersionRouteTest extends HelpersTestCase
         $response->assertStatus($status);
     }
 
-    public function getTestVersionData(): array
+    public static function getTestVersionData(): array
     {
         return [
             [
                 'version' => '2',
-                'is_correct_version' => true,
+                'isCorrectVersion' => true,
                 'route' => static::ROUTE_FACADE_VERSION,
             ],
             [
                 'version' => '2.0',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_VERSION,
             ],
             [
                 'version' => '1',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_VERSION,
             ],
             [
                 'version' => '3',
-                'is_correct_version' => false,
+                'isCorrectVersion' => false,
                 'route' => static::ROUTE_FACADE_VERSION,
             ],
         ];
     }
 
-    /**
-     * @dataProvider getTestVersionData
-     */
+    #[DataProvider('getTestVersionData')]
     public function testVersion(string $version, bool $isCorrectVersion, string $route): void
     {
         $this->mockRoutes();
@@ -295,5 +290,39 @@ class VersionRouteTest extends HelpersTestCase
         $status = ($isCorrectVersion) ? 200 : 404;
 
         $response->assertStatus($status);
+    }
+
+    public function testWithoutApiVersion(): void
+    {
+        $mock = $this->mockTestCaseExpectCallMethod('/test');
+
+        $mock
+            ->withoutAPIVersion()
+            ->json('get', '/test');
+    }
+
+    public function testRouteWithSetApiVersion(): void
+    {
+        $mock = $this->mockTestCaseExpectCallMethod('/v1/test/');
+
+        $mock
+            ->setApiVersion(VersionEnum::V1)
+            ->json('get', '/test/');
+    }
+
+    public function testVersionEnumContractIsNotBound()
+    {
+        $this->app->offsetUnset(VersionEnumContract::class);
+
+        $this->assertExceptionThrew(
+            expectedClassName: BindingVersionEnumException::class,
+            expectedMessage: 'The VersionEnumContract is not bound in the container.'
+                . ' Please ensure it is registered using'
+                . ' $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);',
+        );
+
+        Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () {
+            Route::get('test', fn () => 'result');
+        });
     }
 }

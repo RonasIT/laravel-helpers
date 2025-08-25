@@ -3,11 +3,11 @@
 namespace RonasIT\Support\Traits;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder as Query;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
@@ -153,6 +153,30 @@ trait EntityControlTrait
         $this->postQueryHook();
 
         return $model;
+    }
+
+    public function insert(array $data): bool
+    {
+        $defaultTimestamps = [];
+
+        if ($this->model->timestamps) {
+            $now = now();
+
+            $defaultTimestamps = [
+                $this->model::CREATED_AT => $now,
+                $this->model::UPDATED_AT => $now
+            ];
+        }
+
+        $data = array_map(function ($item) use ($defaultTimestamps) {
+            $fillableFields = Arr::only($item, $this->model->getFillable());
+
+            return array_merge($defaultTimestamps, $fillableFields);
+        }, $data);
+
+        $this->postQueryHook();
+
+        return $this->model->insert($data);
     }
 
     /**

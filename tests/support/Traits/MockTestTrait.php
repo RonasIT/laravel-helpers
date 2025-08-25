@@ -6,7 +6,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 trait MockTestTrait
 {
-    protected function mockClass($className, $methods = [], $disableConstructor = false): MockObject
+    public function mockClass($className, $methods = [], $disableConstructor = false): MockObject
     {
         $builder = $this->getMockBuilder($className);
 

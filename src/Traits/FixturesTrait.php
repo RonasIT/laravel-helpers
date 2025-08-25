@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
@@ -54,6 +55,15 @@ trait FixturesTrait
 
     protected string $dumpFileName = 'dump.sql';
 
+    protected bool $globalExportMode = false;
+
+    public function setGlobalExportMode(bool $value = true): self
+    {
+        $this->globalExportMode = $value;
+
+        return $this;
+    }
+
     protected function loadTestDump(): void
     {
         $dump = $this->getFixture($this->dumpFileName, false);
@@ -95,18 +105,25 @@ trait FixturesTrait
 
     public function getJsonFixture(string $fixtureName, $assoc = true)
     {
+        $fixtureName = $this->prepareFixtureName($fixtureName);
+
         return json_decode($this->getFixture($fixtureName), $assoc);
     }
 
     public function assertEqualsFixture(string $fixture, $data, bool $exportMode = false): void
     {
-        $globalExportMode = $this->globalExportMode ?? false;
-
-        if ($globalExportMode || $exportMode) {
+        if ($this->globalExportMode || $exportMode) {
             $this->exportJson($fixture, $data);
         }
 
-        $this->assertEquals($this->getJsonFixture($fixture), $data);
+        $fixturePath = $this->prepareFixtureName($this->getFixturePath($fixture));
+        $assertFailedMessage = "Failed asserting that the provided data equal to fixture: {$fixturePath}";
+
+        $this->assertEquals(
+            expected: $this->getJsonFixture($fixture),
+            actual: $data,
+            message: $assertFailedMessage,
+        );
     }
 
     public function exportJson($fixture, $data): void
@@ -114,6 +131,8 @@ trait FixturesTrait
         if ($data instanceof TestResponse) {
             $data = $data->json();
         }
+
+        $fixture = $this->prepareFixtureName($fixture);
 
         $this->exportContent(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $fixture);
     }
@@ -139,7 +158,7 @@ trait FixturesTrait
             if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE {$table['name']} RESTART IDENTITY CASCADE; \n";
+                return "TRUNCATE \"{$table['name']}\" RESTART IDENTITY CASCADE;\n";
             }
         });
     }
@@ -152,7 +171,7 @@ trait FixturesTrait
             if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE {$table['name']}; \n";
+                return "TRUNCATE TABLE \"{$table['name']}\";\n";
             }
         });
 
@@ -213,15 +232,35 @@ trait FixturesTrait
         return self::$sequences;
     }
 
-    protected function exportContent($content, string $fixture): void
+    protected function exportContent(string $content, string $fixture): void
     {
         if (env('FAIL_EXPORT_JSON', true)) {
             throw new ForbiddenExportModeException();
         }
 
-        file_put_contents(
-            $this->getFixturePath($fixture),
-            $content
-        );
+        $path = $this->getFixturePath($fixture);
+
+        $this->makeFixtureDir($path);
+
+        file_put_contents($path, $content);
+    }
+
+    protected function makeFixtureDir(string $path): void
+    {
+        $dir = Str::beforeLast($path, '/');
+
+        if (!is_dir($dir)) {
+            mkdir(
+                directory: $dir,
+                recursive: true,
+            );
+        }
+    }
+
+    protected function prepareFixtureName(string $fixtureName): string
+    {
+        return (str_contains($fixtureName, '.'))
+            ? $fixtureName
+            : "{$fixtureName}.json";
     }
 }

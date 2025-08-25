@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
@@ -11,7 +12,7 @@ use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
 
-class HttpRequestServiceTest extends HelpersTestCase
+class HttpRequestServiceTest extends TestCase
 {
     use HttpRequestServiceMockTrait;
 
@@ -28,32 +29,34 @@ class HttpRequestServiceTest extends HelpersTestCase
         $this->httpRequestServiceClass = new HttpRequestService();
 
         $this->optionsProperty = new ReflectionProperty(HttpRequestService::class, 'options');
-        $this->optionsProperty->setAccessible(true);
 
         $this->responseProperty = new ReflectionProperty(HttpRequestService::class, 'response');
-        $this->responseProperty->setAccessible(true);
     }
 
     public function testSend()
     {
         $this->mockClass(HttpRequestService::class, [
             $this->functionCall(
-                'sendRequest',
-                [
+                name: 'sendRequest',
+                arguments: [
                     'get',
                     'https://some.url.com',
                     ['some_key' => 'some_value'],
                     ['some_header_name' => 'some_header_value'],
                 ],
-                new GuzzleResponse(200, [], json_encode([]))
+                result: new GuzzleResponse(200, [], json_encode([]))
             ),
         ]);
 
-        app(HttpRequestService::class)->get('https://some.url.com', [
-            'some_key' => 'some_value',
-        ], [
-            'some_header_name' => 'some_header_value',
-        ]);
+        app(HttpRequestService::class)->get(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: [
+                'some_header_name' => 'some_header_value',
+            ],
+        );
     }
 
     public function testSetOption()
@@ -62,108 +65,220 @@ class HttpRequestServiceTest extends HelpersTestCase
 
         $actualOptions = $this->optionsProperty->getValue($this->httpRequestServiceClass);
 
-        $this->assertEquals([
-            'allow_redirects' => false,
-        ], $actualOptions);
+        $this->assertEquals(['allow_redirects' => false], $actualOptions);
     }
 
     public function testAllowRedirects()
     {
         $this->httpRequestServiceClass->allowRedirects(false);
 
-        $this->mockGuzzleClient('put', [
-            'https://some.url.com',
-            [
-                'headers' => [
-                    'some_header' => 'some_header_value',
+        $this->mockGuzzleClient(
+            method: 'put',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => false,
+                    'connect_timeout' => 0,
+                    'body' => '{"some_key":"some_value"}',
                 ],
-                'cookies' => null,
-                'allow_redirects' => false,
-                'connect_timeout' => 0,
-                'body' => '{"some_key":"some_value"}',
             ],
-        ]);
+        );
 
-        $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value',
-        ], [
-            'some_header' => 'some_header_value',
-        ]);
+        $this->httpRequestServiceClass->put(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: [
+                'some_header' => 'some_header_value',
+            ],
+        );
     }
 
     public function testConnectTimeout()
     {
         $this->httpRequestServiceClass->setConnectTimeout(999);
 
-        $this->mockGuzzleClient('post', [
-            'https://some.url.com',
-            [
-                'headers' => [
-                    'some_header' => 'some_header_value',
+        $this->mockGuzzleClient(
+            method: 'post',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 999,
+                    'body' => '{"some_key":"some_value"}',
                 ],
-                'cookies' => null,
-                'allow_redirects' => true,
-                'connect_timeout' => 999,
-                'body' => '{"some_key":"some_value"}',
             ],
-        ]);
+        );
 
-        $this->httpRequestServiceClass->post('https://some.url.com', [
-            'some_key' => 'some_value',
-        ], [
-            'some_header' => 'some_header_value',
-        ]);
+        $this->httpRequestServiceClass->post(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: [
+                'some_header' => 'some_header_value',
+            ],
+        );
     }
 
     public function testSendPutWithoutContentType()
     {
-        $this->mockGuzzleClient('put', [
-            'https://some.url.com',
-            [
-                'headers' => [
-                    'some_header' => 'some_header_value',
+        $this->mockGuzzleClient(
+            method: 'put',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                    'body' => '{"some_key":"some_value"}',
                 ],
-                'cookies' => null,
-                'allow_redirects' => true,
-                'connect_timeout' => 0,
-                'body' => '{"some_key":"some_value"}',
             ],
-        ]);
+        );
 
-        $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value',
-        ], [
-            'some_header' => 'some_header_value',
-        ]);
+        $this->httpRequestServiceClass->put(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: [
+                'some_header' => 'some_header_value',
+            ],
+        );
     }
 
     public function testSendPutWithMultipartContentType()
     {
-        $this->mockGuzzleClient('put', [
+        $this->mockGuzzleClient(
+            method: 'put',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                        'content-type' => 'application/x-www-form-urlencoded',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                    'form_params' => [
+                        'some_key' => 'some_value',
+                    ],
+                ],
+            ],
+        );
+
+        $this->httpRequestServiceClass->put(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: [
+                'some_header' => 'some_header_value',
+                'Content-type' => 'application/x-www-form-urlencoded',
+            ],
+        );
+    }
+
+    public function testSendPutMultipartContentTypeWithFiles(): void
+    {
+        $this->mockGuzzleClient('post', [
             'https://some.url.com',
             [
-                'headers' => [
-                    'some_header' => 'some_header_value',
-                    'Content-type' => 'application/x-www-form-urlencoded',
-                ],
+                'headers' => [],
                 'cookies' => null,
                 'allow_redirects' => true,
                 'connect_timeout' => 0,
-                'form_params' => [
-                    'some_key' => 'some_value',
-                ],
-            ],
+                'multipart' => [
+                    [
+                        'name' => '0[first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '0[second_file][first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '0[second_file][second_file]',
+                        'contents' => 'second_file_content',
+                    ],
+                    [
+                        'name' => '1[first_file]',
+                        'contents' => 'first_file_content',
+                    ],
+                    [
+                        'name' => '1[second_file]',
+                        'contents' => 'second_file_content',
+                    ],
+                ]
+            ]
         ]);
 
-        $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value',
+        $this->httpRequestServiceClass->post('https://some.url.com', [
+            [
+                'first_file' => 'first_file_content',
+                'second_file' => [
+                    'first_file' => 'first_file_content',
+                    'second_file' => 'second_file_content'
+                ]
+            ],
+            [
+                'first_file' => 'first_file_content',
+                'second_file' => 'second_file_content'
+            ]
         ], [
-            'some_header' => 'some_header_value',
-            'Content-type' => 'application/x-www-form-urlencoded',
+            'Content-type' => 'multipart/form-data',
         ]);
     }
 
-    public function sendPutAsJSONData(): array
+    public function testParseMultipartContent(): void
+    {
+        $multipartContent = $this->getFixture('multipart_content');
+
+        $this->mockGuzzleClient(
+            method: 'get',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                ],
+            ],
+            response: new GuzzleResponse(
+                200,
+                [ 'Content-Type' => 'multipart/form-data; boundary=----------------------------83ff53821b7c'],
+                $multipartContent,
+            ),
+        );
+
+        $this->httpRequestServiceClass->get(url: 'https://some.url.com');
+
+        $multipartObject = $this->httpRequestServiceClass->multipart();
+
+        $parsedData = [];
+
+        foreach ($multipartObject as $part) {
+            $parsedData[] = [$part->getName(), $part->getBody()];
+        }
+
+        $this->assertEqualsFixture('parsed_multipart_content.json', $parsedData);
+    }
+
+    public static function sendPutAsJSONData(): array
     {
         return [
             [
@@ -184,44 +299,50 @@ class HttpRequestServiceTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendPutAsJSONData
-     *
-     * @param array $headers
-     */
+    #[DataProvider('sendPutAsJSONData')]
     public function testSendPutAsJSON(array $headers)
     {
-        $this->mockGuzzleClient('put', [
-            'https://some.url.com',
-            [
-                'headers' => $headers,
-                'cookies' => null,
-                'allow_redirects' => true,
-                'connect_timeout' => 0,
-                'json' => [
-                    'some_key' => 'some_value',
+        $this->mockGuzzleClient(
+            method: 'put',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => ['content-type' => 'application/json'],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                    'json' => [
+                        'some_key' => 'some_value',
+                    ],
                 ],
             ],
-        ]);
+        );
 
-        $this->httpRequestServiceClass->put('https://some.url.com', [
-            'some_key' => 'some_value',
-        ], $headers);
+        $this->httpRequestServiceClass->put(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: $headers,
+        );
     }
 
     public function testSendDelete()
     {
-        $this->mockGuzzleClient('delete', [
-            'https://some.url.com',
-            [
-                'headers' => [
-                    'some_header' => 'some_header_value',
+        $this->mockGuzzleClient(
+            method: 'delete',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
                 ],
-                'cookies' => null,
-                'allow_redirects' => true,
-                'connect_timeout' => 0,
             ],
-        ]);
+        );
 
         $this->httpRequestServiceClass->delete('https://some.url.com', [
             'some_header' => 'some_header_value',
@@ -230,24 +351,31 @@ class HttpRequestServiceTest extends HelpersTestCase
 
     public function testSendPatch()
     {
-        $this->mockGuzzleClient('patch', [
-            'https://some.url.com',
-            [
-                'headers' => [
-                    'some_header' => 'some_header_value',
+        $this->mockGuzzleClient(
+            method: 'patch',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                    'body' => '{"some_key":"some_value"}',
                 ],
-                'cookies' => null,
-                'allow_redirects' => true,
-                'connect_timeout' => 0,
-                'body' => '{"some_key":"some_value"}',
             ],
-        ]);
+        );
 
-        $this->httpRequestServiceClass->patch('https://some.url.com', [
-            'some_key' => 'some_value',
-        ], [
-            'some_header' => 'some_header_value',
-        ]);
+        $this->httpRequestServiceClass->patch(
+            url: 'https://some.url.com',
+            data: [
+                'some_key' => 'some_value',
+            ],
+            headers: [
+                'some_header' => 'some_header_value',
+            ],
+        );
     }
 
     public function testSendWithUnsupportedMethod()
@@ -262,24 +390,32 @@ class HttpRequestServiceTest extends HelpersTestCase
     {
         $responseJson = $this->getFixture('json_response.json');
 
-        $this->mockGuzzleClient('get', [
-            'https://some.url.com',
-            [
-                'headers' => [
-                    'some_header' => 'some_header_value',
+        $this->mockGuzzleClient(
+            method: 'get',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                    'query' => ['user' => 'admin'],
                 ],
-                'cookies' => null,
-                'allow_redirects' => true,
-                'connect_timeout' => 0,
-                'query' => ['user' => 'admin'],
             ],
-        ], new GuzzleResponse(200, [], $responseJson));
+            response: new GuzzleResponse(200, [], $responseJson),
+        );
 
-        $this->httpRequestServiceClass->get('https://some.url.com', [
-            'user' => 'admin',
-        ], [
-            'some_header' => 'some_header_value',
-        ]);
+        $this->httpRequestServiceClass->get(
+            url: 'https://some.url.com',
+            data: [
+                'user' => 'admin',
+            ],
+            headers: [
+                'some_header' => 'some_header_value',
+            ],
+        );
 
         $resultRaw = $this->httpRequestServiceClass->getResponse()->getBody();
         $resultJson = $this->httpRequestServiceClass->json();
@@ -292,21 +428,28 @@ class HttpRequestServiceTest extends HelpersTestCase
     {
         $this->expectException(InvalidJSONFormatException::class);
 
-        $this->mockGuzzleClient('get', [
-            'https://some.url.com',
-            [
-                'headers' => [
-                    'some_header' => 'some_header_value',
+        $this->mockGuzzleClient(
+            method: 'get',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [
+                        'some_header' => 'some_header_value',
+                    ],
+                    'cookies' => null,
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
                 ],
-                'cookies' => null,
-                'allow_redirects' => true,
-                'connect_timeout' => 0,
             ],
-        ], new GuzzleResponse(200, [], 'Some not json string'));
+            response: new GuzzleResponse(200, [], 'Some not json string')
+        );
 
-        $this->httpRequestServiceClass->get('https://some.url.com', [], [
-            'some_header' => 'some_header_value',
-        ]);
+        $this->httpRequestServiceClass->get(
+            url: 'https://some.url.com',
+            headers: [
+                'some_header' => 'some_header_value',
+            ],
+        );
 
         $this->httpRequestServiceClass->json();
     }
@@ -320,10 +463,9 @@ class HttpRequestServiceTest extends HelpersTestCase
         $mock
             ->expects($this->once())
             ->method('sendRequest')
-            ->will($this->returnCallback(function () use ($mock) {
-                $response = new GuzzleResponse(200, [], null);
-                throw new RequestException('Some exception message', new Request('type', 'url'));
-            }));
+            ->willReturnCallback(
+                fn () => throw new RequestException('Some exception message', new Request('type', 'url'))
+            );
 
         $this->app->instance(HttpRequestService::class, $mock);
 

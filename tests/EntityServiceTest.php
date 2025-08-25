@@ -2,60 +2,59 @@
 
 namespace RonasIT\Support\Tests;
 
+use BadMethodCallException;
 use ReflectionProperty;
 use RonasIT\Support\Services\EntityService;
-use RonasIT\Support\Tests\Support\Mock\TestRepository;
-use BadMethodCallException;
+use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
 
-class EntityServiceTest extends HelpersTestCase
+class EntityServiceTest extends TestCase
 {
-    protected EntityService $entityServiceClass;
+    protected static EntityService $entityServiceClass;
     protected ReflectionProperty $repositoryProperty;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->entityServiceClass = new EntityService();
+        self::$entityServiceClass ??= new EntityService();
 
         $this->repositoryProperty = new ReflectionProperty(EntityService::class, 'repository');
-        $this->repositoryProperty->setAccessible(true);
     }
 
     public function testSetRepository()
     {
-        $this->entityServiceClass->setRepository(TestRepository::class);
+        self::$entityServiceClass->setRepository(TestRepository::class);
 
-        $this->assertTrue($this->repositoryProperty->getValue($this->entityServiceClass) instanceof TestRepository);
+        $this->assertTrue($this->repositoryProperty->getValue(self::$entityServiceClass) instanceof TestRepository);
     }
 
     public function testCallRepositoryMethod()
     {
-        $this->entityServiceClass->setRepository(TestRepository::class);
+        self::$entityServiceClass->setRepository(TestRepository::class);
 
-        $result = $this->entityServiceClass->getUser();
+        $result = self::$entityServiceClass->getUser();
 
         $this->assertSame('Correct result', $result);
     }
 
     public function testCallRepositoryMethodReturnsSelf()
     {
-        $this->entityServiceClass->setRepository(TestRepository::class);
+        self::$entityServiceClass->setRepository(TestRepository::class);
 
-        $result = $this->entityServiceClass->getFilter();
+        $result = self::$entityServiceClass->getFilter();
 
         $this->assertInstanceOf(EntityService::class, $result);
     }
 
     public function testCallNotExistsRepositoryMethod()
     {
-        $className = get_class($this->entityServiceClass);
+        $className = get_class(self::$entityServiceClass);
 
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("Method getSomething does not exists in {$className}.");
 
-        $this->entityServiceClass->setRepository(TestRepository::class);
+        self::$entityServiceClass->setRepository(TestRepository::class);
 
-        $this->entityServiceClass->getSomething();
+        self::$entityServiceClass->getSomething();
     }
 }

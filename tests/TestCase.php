@@ -2,114 +2,62 @@
 
 namespace RonasIT\Support\Tests;
 
-use Carbon\Carbon;
-use Illuminate\Foundation\Testing\TestCase as BaseTest;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Testing\TestResponse;
-use RonasIT\Support\Traits\MailsMockTrait;
+use ReflectionClass;
+use RonasIT\Support\HelpersServiceProvider;
+use RonasIT\Support\Traits\TestingTrait;
+use Orchestra\Testbench\TestCase as BaseTest;
 
-abstract class TestCase extends BaseTest
+class TestCase extends BaseTest
 {
-    use MailsMockTrait;
-
-    protected $auth;
-
-    protected string $testNow = '2018-11-11 11:11:11';
-
-    protected static string $startedTestSuite = '';
-    protected static bool $isWrappedIntoTransaction = true;
-
-    protected bool $globalExportMode = false;
-
-    protected function setGlobalExportMode(): void
-    {
-        $this->globalExportMode = true;
-    }
+    use TestingTrait;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->artisan('cache:clear');
-
-        if ((static::$startedTestSuite !== static::class) || !self::$isWrappedIntoTransaction) {
-            $this->artisan('migrate');
-
-            $this->loadTestDump();
-
-            static::$startedTestSuite = static::class;
-        }
-
-        if (config('database.default') === 'pgsql') {
-            $this->prepareSequences();
-        }
-
-        Carbon::setTestNow(Carbon::parse($this->testNow));
-
-        Mail::fake();
-
-        $this->beginDatabaseTransaction();
+        putenv('FAIL_EXPORT_JSON=true');
     }
 
-    public function tearDown(): void
+    protected function getPackageProviders($app): array
     {
-        $this->beforeApplicationDestroyed(function () {
-            DB::disconnect();
-        });
-
-        parent::tearDown();
+        return [
+            HelpersServiceProvider::class,
+        ];
     }
 
-    public function callRawRequest(string $method, string $uri, $content, array $headers = []): TestResponse
+    protected function defineEnvironment($app)
     {
-        $server = $this->transformHeadersToServerVars($headers);
-
-        return $this->call($method, $uri, [], [], [], $server, $content);
+        $app->setBasePath(__DIR__ . '/..');
     }
 
-    protected function dontWrapIntoTransaction(): void
+    protected function assertSettablePropertiesReset($class): void
     {
-        $this->rollbackTransaction();
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($class);
+        $withTrashed = $this->withTrashedProperty->getValue($class);
+        $forceMode = $this->forceModeProperty->getValue($class);
+        $attachedRelations = $this->attachedRelationsProperty->getValue($class);
+        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($class);
 
-        self::$isWrappedIntoTransaction = false;
+        $this->assertFalse($onlyTrashed);
+        $this->assertFalse($withTrashed);
+        $this->assertFalse($forceMode);
+        $this->assertEquals([], $attachedRelations);
+        $this->assertEquals([], $attachedRelationsCount);
     }
 
-    protected function beginDatabaseTransaction(): void
+    public function getLoginSession($session, $guard = 'session'): array
     {
-        $database = $this->app->make('db');
-
-        foreach ($this->connectionsToTransact() as $name) {
-            $connection = $database->connection($name);
-            $dispatcher = $connection->getEventDispatcher();
-
-            $connection->unsetEventDispatcher();
-            $connection->beginTransaction();
-            $connection->setEventDispatcher($dispatcher);
-        }
-
-        $this->beforeApplicationDestroyed(function () {
-            $this->rollbackTransaction();
-        });
+        return array_filter(
+            array: $session->all(),
+            callback: fn ($key) => strpos($key, "login_{$guard}_") === 0,
+            mode: ARRAY_FILTER_USE_KEY,
+        );
     }
 
-    protected function connectionsToTransact(): array
+    protected function getProtectedProperty(ReflectionClass $reflectionClass, string $methodName, $objectInstance)
     {
-        return property_exists($this, 'connectionsToTransact') ? $this->connectionsToTransact : [null];
-    }
+        $property = $reflectionClass->getProperty($methodName);
 
-    protected function rollbackTransaction(): void
-    {
-        $database = $this->app->make('db');
-
-        foreach ($this->connectionsToTransact() as $name) {
-            $connection = $database->connection($name);
-            $dispatcher = $connection->getEventDispatcher();
-
-            $connection->unsetEventDispatcher();
-            $connection->rollback();
-            $connection->setEventDispatcher($dispatcher);
-            $connection->disconnect();
-        }
+        return $property->getValue($objectInstance);
     }
 }

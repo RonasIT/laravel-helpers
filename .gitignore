@@ -1,9 +1,7 @@
-/.phpunit.cache
-/.idea
-/.vscode
-vendor/
-storage/app
-.phpstorm.meta.php
+.idea
 .phpunit.result.cache
+.phpunit.cache
+vendor/
 .php-cs-fixer.cache
 cghooks.lock
+tests/fixtures/MailsMockTraitTest/test_mail_with_global_export.html

@@ -11,13 +11,16 @@ use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class FixturesTraitTest extends HelpersTestCase
+class FixturesTraitTest extends TestCase
 {
     use MockTrait;
 
@@ -28,7 +31,7 @@ class FixturesTraitTest extends HelpersTestCase
         self::$tables = null;
     }
 
-    public function getFixtureData(): array
+    public static function getFixtureData(): array
     {
         return [
             [
@@ -37,11 +40,7 @@ class FixturesTraitTest extends HelpersTestCase
         ];
     }
 
-    /**
-     * @dataProvider getFixtureData
-     *
-     * @param string $input
-     */
+    #[DataProvider('getFixtureData')]
     public function testGetFixture(string $input)
     {
         $response = $this->getJsonFixture($input);
@@ -75,6 +74,55 @@ class FixturesTraitTest extends HelpersTestCase
         $this->assertFileExists($this->getFixturePath('export_json/response.json'));
     }
 
+    public function testGetJsonFixtureWithoutExtension()
+    {
+        $response = $this->getJsonFixture('get_fixture/exists_fixture');
+
+        $this->assertEqualsFixture('get_fixture/exists_fixture.json', $response);
+    }
+
+    public function testExportJsonWithoutExtension()
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        $fixturePath = $this->getFixturePath('export_json/response.json');
+
+        if (file_exists($fixturePath)) {
+            unlink($fixturePath);
+        }
+
+        $result = ['value' => 1234567890];
+
+        $this->exportJson('export_json/response', new TestResponse(
+            new Response(json_encode($result))
+        ));
+
+        $this->assertFileExists($this->getFixturePath('export_json/response.json'));
+    }
+
+    public function testExportJsonDirNotExists()
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        $result = [
+            'value' => 1234567890,
+        ];
+
+        $fixtureName = 'export_json/some_directory/response.json';
+
+        $this->exportContent(json_encode($result), $fixtureName);
+
+        $this->assertEquals($this->getJsonFixture($fixtureName), $result);
+
+        $fixturePath = $this->getFixturePath($fixtureName);
+
+        $this->assertFileExists($fixturePath);
+
+        unlink($fixturePath);
+
+        rmdir(Str::beforeLast($fixturePath, '/'));
+    }
+
     public function testExportFile()
     {
         putenv('FAIL_EXPORT_JSON=false');
@@ -85,14 +133,14 @@ class FixturesTraitTest extends HelpersTestCase
         $response = new TestResponse(
             new BinaryFileResponse(
                 Storage::disk('files')->path('content_source.txt')
-            )
+            ),
         );
 
         $this->exportFile($response, 'export_file/content_result.txt');
 
         $this->assertEquals(
-            $this->getJsonFixture('export_file/result.txt'),
-            $this->getJsonFixture('export_file/content_result.txt')
+            expected: $this->getFixture('export_file/result.txt'),
+            actual: $this->getFixture('export_file/content_result.txt'),
         );
     }
 
@@ -196,7 +244,11 @@ class FixturesTraitTest extends HelpersTestCase
         $connection = $this->mockClass(PostgresConnection::class, [
             $this->functionCall('getQueryGrammar', [], new Grammar()),
             $this->functionCall('getPostProcessor', [], new Processor()),
-            $this->functionCall('select', [], $sequences),
+            $this->functionCall('select', [
+                'select "table_name", "table_schema", "column_name", "column_default" from "information_schema"."columns" where "column_default" LIKE ?',
+                ['nextval%'],
+                true,
+            ], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
@@ -216,8 +268,20 @@ class FixturesTraitTest extends HelpersTestCase
     {
         $content = $this->getJsonFixture('get_fixture/export_fixture.json');
 
-        unset($this->globalExportMode);
+        $this->globalExportMode = false;
 
         $this->assertEqualsFixture('get_fixture/export_fixture.json', $content);
+    }
+
+    public function testAssertEqualsFixtureNotEqualErrorMessage()
+    {
+        $fixturePath = $this->getFixturePath($fixtureName = 'get_fixture/export_fixture.json');
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            "Failed asserting that the provided data equal to fixture: {$fixturePath}"
+        );
+
+        $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);
     }
 }
