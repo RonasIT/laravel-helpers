@@ -72,12 +72,14 @@ Example:
     VersionEnum::v3->value,
 ] 
 ```
+
 After performing the version check, the middleware removes the API version parameter from the route before the request 
 is passed to the controller. 
 
 This guarantees that controllers operate on a clean request and that version handling remains centralized within middleware.
 
 ## VersionEnumContract
+
 To manage application versions, an enumeration class must be defined to represent the available version variants.
 This enumeration class is required to implement the VersionEnumContract interface.
 
@@ -95,6 +97,7 @@ This class is typically used to implement version-based logic in controllers or 
 ## Usage
 
 ### Step 1.
+
 Please create an enumeration class to manage your versions.
 The enumeration class must implement the VersionEnumContract interface.
 ```
@@ -117,7 +120,9 @@ enum VersionEnum: string implements VersionEnumContract
     }
 }
 ```
+
 ### Step 2.
+
 Next, bind the contract to your enumeration class in the service container.
 This enumeration class will define the list of your API versions.
 
@@ -131,6 +136,7 @@ This enumeration class will define the list of your API versions.
 ### Step 3.
 
 Implementation in routes file
+
 ```
 Route::prefix('v{version}')
     ->middleware(VersioningMiddleware::class)
