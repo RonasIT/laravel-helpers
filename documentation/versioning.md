@@ -11,6 +11,7 @@ The package provides a set of tools for implementing versioning in Laravel appli
 - configuration keys for customization.
 
 ## Route Macros
+
 The macros provide a convenient way to manage API versioning in Laravel routes.
 
 The package provides macros that offer a convenient way to define the range of versions a route supports. 
@@ -18,28 +19,36 @@ Macros can be applied both to a single endpoint and to a route group,
 allowing more flexible version constraints across the application.
 
 ### versionRange
+
 The `versionRange` macro allows to define a full closed range of API versions allowed for routes.
+
 ```
 Route::versionRange(VersionEnum::v1, VersionEnum::v2)->get(...)
 Route::versionRange(VersionEnum::v1, VersionEnum::v2)->group(...)
 ```
 
 ### versionFrom
+
 Allows to define the minimum API version required to access routes.
+
 ```
 Route::versionFrom(VersionEnum::v1)->get(...)
 Route::versionFrom(VersionEnum::v1)->group(...)
 ```
 
 ### versionTo
+
 Allows to define the maximum API version allowed for routes.
+
 ```
 Route::versionTo(VersionEnum::v2)->get(...)
 Route::versionTo(VersionEnum::v2)->group(...)
 ```
 
 ### version
+
 Allows to define the only allowed API version for routes.
+
 ```
 Route::version(VersionEnum::v1)->get(...)
 Route::version(VersionEnum::v1)->group(...)
@@ -124,10 +133,7 @@ This enumeration class will define the list of your API versions.
 Implementation in routes file
 ```
 Route::prefix('v{version}')
-    ->middleware([
-         CheckVersionMiddleware::class,
-         ClearVersion::class,
-    ])
+    ->middleware(VersioningMiddleware::class)
     ->group(function () {
         Route::versionFrom(VersionEnum::v1)->group(function () {
             Route::middleware('auth_group')->group(function () {
