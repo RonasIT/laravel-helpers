@@ -2,16 +2,12 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
-use RonasIT\Support\Http\Middleware\VersioningMiddleware;
-use RonasIT\Support\Http\Middleware\ClearVersion;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
-use Symfony\Component\HttpFoundation\Response;
 
 class VersionRouteTest extends TestCase
 {
