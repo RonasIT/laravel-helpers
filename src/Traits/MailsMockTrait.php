@@ -128,7 +128,7 @@ trait MailsMockTrait
         foreach ($emails as $email) {
             $this->assertContains(
                 needle: $email,
-                haystack:  $sentEmails,
+                haystack: $sentEmails,
                 message: "Block \"To\" on {$index} step doesn't contain '{$email}'. It only contains '{$emailList}'.",
             );
         }
