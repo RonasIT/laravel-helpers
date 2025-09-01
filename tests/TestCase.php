@@ -25,7 +25,7 @@ class TestCase extends BaseTest
         ];
     }
 
-    protected function defineEnvironment($app)
+    protected function defineEnvironment($app): void
     {
         $app->setBasePath(__DIR__ . '/..');
     }
