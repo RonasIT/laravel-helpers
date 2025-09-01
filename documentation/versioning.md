@@ -12,8 +12,6 @@ The package provides a set of tools for implementing versioning in Laravel appli
 
 ## Route Macros
 
-The macros provide a convenient way to manage API versioning in Laravel routes.
-
 The package provides macros that offer a convenient way to define the range of versions a route supports. 
 Macros can be applied both to a single endpoint and to a route group, 
 allowing more flexible version constraints across the application.
@@ -54,38 +52,53 @@ Route::version(VersionEnum::v1)->get(...)
 Route::version(VersionEnum::v1)->group(...)
 ```
 
-## Middleware
+## VersioningMiddleware
 
-### VersioningMiddleware
+The `VersioningMiddleware` is responsible for two main features:
 
-The `VersioningMiddleware` is responsible for validating the requested API version and ensuring that requests are properly
-routed without version-specific parameters.
+1. Validating that the requested API version is not in the disabled list
+2. Removing the version path param from the list of parameters passed to the controller's method
 
-If the requested version is listed as disabled in the configuration, the application responds with HTTP_UPGRADE_STATUS.
-Blocked versions are managed through the `disabled_api_versions` parameter in the application configuration file 
-located at `/app/config/app.php`.
+### Disabled API versions check
 
-Example:
+To disable the particular API version - need to add it to the `app.disabled_api_versions` config.
+
+If the requested version is listed in the config, the middleware responds with `HTTP_UPGRADE_REQUIRED`.
+
+### Removing version path param
+
+We recommend keeping a common group of routes which will work with any version. The only way to implement it is using the path param with the requested version.
+
+```php
+Route::prefix('v{version}')
+    ->middleware(VersioningMiddlewre::class)
+    ->group(function () {
+        Route::versionFrom(VersionEnum::v0_1)->group(function () {
+            Route::get('test/{param}', [TestController::class, 'test']);
 ```
-'disabled_api_versions' => [
-    VersionEnum::v1->value,
-    VersionEnum::v3->value,
-] 
+
+By default, `version` path param will be passed to each controller's method
+
+```php
+//TestController
+public function test($version, $param)
 ```
 
-After performing the version check, the middleware removes the API version parameter from the route before the request 
-is passed to the controller. 
+This middleware preventing such behavior and `version` param will be ignoring
 
-This guarantees that controllers operate on a clean request and that version handling remains centralized within middleware.
+
+```php
+//TestController
+public function test($param)
+```
 
 ## VersionEnumContract
 
-To manage application versions, an enumeration class must be defined to represent the available version variants.
-This enumeration class is required to implement the VersionEnumContract interface.
+Using to indicate your application's versions list. The contract using in a type hint of [the Route macros][3], [VersionHelper][4] and [setAPIVersion][5] test helper.
 
-## Support Version class
+## Version helper
 
-The Version class provides utility methods for working with API versions in a Laravel application.
+The `Version` class provides utility methods for working with API versions in any place of the Laravel application.
 
 It allows retrieving the current version from the request route and performing comparisons with specific version constraints.
 
@@ -94,12 +107,30 @@ and checking greater-than-or-equal and less-than-or-equal conditions.
 
 This class is typically used to implement version-based logic in controllers or middleware.
 
+## Testing helpers
+
+The `json` method of the `Testing\TestCase` class has been extended and now will add the version prefix to each test API call, if the API version is set.
+
+### setAPIVersion
+
+Helper using to set the API version as a class field. We suggest setting the actual API version in the `setUp` method of the application's `TestCase` class. In this case - all tests will work with the same actual API version.
+
+When implementing tests for a particular API version, the `setAPIversion` method may be called in the `setUp` method of the specific test class.
+
+### withoutAPIVersion
+
+For some types of tests, the API version may not be used e.g., for webhooks or health status APIs. In these cases the `withoutAPIVersion` helper call will prevent the adding of a version prefix to each API call in tests.
+
+Helper may be called either in a single test or in the `setUp` method of the test case.
+
 ## Usage
 
 ### Step 1.
 
-Please create an enumeration class to manage your versions.
-The enumeration class must implement the VersionEnumContract interface.
+Create an Enum structure to store the list of API versions.
+
+Created Enum must implement the `VersionEnumContract` interface and use `EnumTrait`.
+
 ```
 <?php
 
@@ -113,18 +144,12 @@ enum VersionEnum: string implements VersionEnumContract
     use EnumTrait;
 
     case v1 = '1';
-
-    public static function last(): self
-    {
-        return self::v1;
-    }
 }
 ```
 
 ### Step 2.
 
-Next, bind the contract to your enumeration class in the service container.
-This enumeration class will define the list of your API versions.
+Bind the `VersionEnumContract` to the created `VersionEnum` in any service provider.
 
 ```
     public function register(): void
@@ -135,7 +160,7 @@ This enumeration class will define the list of your API versions.
 
 ### Step 3.
 
-Implementation in routes file
+Wrap all routes to the group of common versions
 
 ```
 Route::prefix('v{version}')
@@ -156,8 +181,35 @@ Route::prefix('v{version}')
     });
 ```
 
+### Implement backward compatibility
+```
+Route::version(VersionEnum::v0_1)->group(function () {
+    Route::controller(TestControllerV0_1::class)->group(function () {
+        Route::get('tests/{id}', 'get')->whereNumber('id');
+    });
+});
+
+Route::prefix('v{version}')
+    ->middleware(VersioningMiddleware::class)
+    ->group(function () {
+        Route::versionFrom(VersionEnum::v0_1)->group(function () {
+            Route::controller(TestController::class)->group(function () {
+                Route::versionFrom(VersionEnum::v0_2)->group(function () {
+                     Route::get('tests/{id}', 'get')->whereNumber('id');
+                });
+                    
+                Route::get('tests', 'tests');   
+            });
+        });
+    });
+```
+
+
 [<< Helpers][1]
 [Traits >>][2]
 
 [1]:helpers.md
 [2]:traits.md
+[3]:../src/HelpersServiceProvider.php#L111
+[4]:../src/Support/Version.php
+[5]:../src/Testing/TestCase.php#L128
