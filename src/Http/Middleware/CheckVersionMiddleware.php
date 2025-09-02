@@ -13,7 +13,7 @@ class CheckVersionMiddleware
     {
         $current = Version::current();
 
-        if (in_array($current, config('app.disabled_api_versions'))) {
+        if (in_array($current, config('app.disabled_api_versions', []))) {
             abort(Response::HTTP_UPGRADE_REQUIRED);
         }
 

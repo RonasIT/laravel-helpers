@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests;;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Config;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Http\Middleware\CheckVersionMiddleware;
@@ -27,18 +28,27 @@ class CheckVersionMiddlewareTest extends TestCase
         $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);
     }
 
-    public function testHandle(): void
+    public function testHandleDisabledApiVersion(): void
     {
-        $this->expectException(HttpException::class);
-
         $this->mockRouteObjectRange();
 
         Config::set('app.disabled_api_versions', [1]);
 
-        $request = Request::create('v1/test-object-range', 'get');
+        $this->expectException(HttpException::class);
 
-        $this->app->request = $request;
+        $this->app->request = Request::create('v1/test-object-range', 'get');
 
-        $this->middleware->handle($request, function () {});
+        $this->middleware->handle($this->app->request, function () {});
+    }
+
+    public function testHandleEnabledApiVersion(): void
+    {
+        $this->mockRouteObjectRange();
+
+        $this->app->request = Request::create('v1/test-object-range', 'get');
+
+        $response = $this->middleware->handle($this->app->request, fn () => new Response());
+
+        $this->assertInstanceOf(Response::class, $response);
     }
 }
