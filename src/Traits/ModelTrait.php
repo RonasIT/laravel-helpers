@@ -119,7 +119,7 @@ trait ModelTrait
 
     protected function getRelationWithoutConstraints($query, $relation)
     {
-        return Relation::noConstraints(fn () => $query->getModel()->{$relation}());
+        return Relation::noConstraints(fn () => call_user_func([$query->getModel(), $relation]));
     }
 
     protected function prepareRelations(string $relations): array

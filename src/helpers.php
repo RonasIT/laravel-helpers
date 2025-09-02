@@ -170,7 +170,7 @@ function array_subtraction(array $array1, array $array2): array
  */
 function getGUID(): string
 {
-    mt_srand((float)microtime() * 10000);//optional for php 4.2.0 and up.
+    mt_srand();
     $charId = strtoupper(md5(uniqid(rand(), true)));
     $hyphen = chr(45);// "-"
 
