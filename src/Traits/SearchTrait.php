@@ -90,14 +90,10 @@ trait SearchTrait
                         list($fieldName, $relations) = extract_last_part($field);
 
                         $query->orWhereHas($relations, function ($query) use ($fieldName, $mask) {
-                            $query->where(
-                                $this->getQuerySearchCallback($fieldName, $mask)
-                            );
+                            $query->where($this->getQuerySearchCallback($fieldName, $mask));
                         });
                     } else {
-                        $query->orWhere(
-                            $this->getQuerySearchCallback($field, $mask)
-                        );
+                        $query->orWhere($this->getQuerySearchCallback($field, $mask));
                     }
                 }
             });
@@ -259,7 +255,7 @@ trait SearchTrait
      *
      * @return $this
      */
-    public function with($relations): self
+    public function with(array|string $relations): self
     {
         $this->attachedRelations = Arr::wrap($relations);
 
@@ -271,7 +267,7 @@ trait SearchTrait
      *
      * @return $this
      */
-    public function withCount($relations): self
+    public function withCount(array|string $relations): self
     {
         $this->attachedRelationsCount = Arr::wrap($relations);
 
@@ -337,9 +333,7 @@ trait SearchTrait
 
     protected function addWhere(Query &$query, string $field, $value, string $sign = '='): void
     {
-        $this->applyWhereCallback($query, $field, function (&$query, $field) use ($sign, $value) {
-            $query->where($field, $sign, $value);
-        });
+        $this->applyWhereCallback($query, $field, fn (&$query, $field) => $query->where($field, $sign, $value));
     }
 
     protected function constructWhere(Query $query, $where = [], ?string $field = null): Query
@@ -364,9 +358,7 @@ trait SearchTrait
         if (Str::contains($field, '.')) {
             list($conditionField, $relations) = extract_last_part($field);
 
-            $query->whereHas($relations, function ($q) use ($callback, $conditionField) {
-                $callback($q, $conditionField);
-            });
+            $query->whereHas($relations, fn ($q) => $callback($q, $conditionField));
         } else {
             $callback($query, $field);
         }
