@@ -3,7 +3,9 @@
 namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
+use ReflectionMethod;
 use RonasIT\Support\HelpersServiceProvider;
+use RonasIT\Support\Tests\Support\Mock\Testing\SomeTestCase;
 use RonasIT\Support\Traits\MailsMockTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
 
