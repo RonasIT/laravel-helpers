@@ -7,6 +7,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +15,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
+use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
 
@@ -23,6 +25,8 @@ class HelpersServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        URL::forceHttps();
+
         $router = $this->app['router'];
 
         $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
@@ -119,10 +123,14 @@ class HelpersServiceProvider extends ServiceProvider
             ?Version $start,
             ?Version $end,
             ?string $param,
-            Route $instance = null
+            Route $instance = null,
         ) {
             if (!$param) {
                 $param = 'version';
+            }
+
+            if (!$this->app->bound(Version::class)) {
+                throw new BindingVersionEnumException();
             }
 
             $versionEnum = app(Version::class);
@@ -150,15 +158,15 @@ class HelpersServiceProvider extends ServiceProvider
         };
 
         Route::macro(
-            'versionRange',
-            fn (Version $from, Version $to, $param = null) => $versionRange($from, $to, $param, $this)
+            name: 'versionRange',
+            macro: fn (Version $from, Version $to, $param = null) => $versionRange($from, $to, $param, $this),
         );
         Route::macro('versionFrom', fn (Version $from, $param = null) => $versionRange($from, null, $param, $this));
         Route::macro('versionTo', fn (Version $to, $param = null) => $versionRange(null, $to, $param, $this));
 
         RouteFacade::macro(
-            'versionRange',
-            fn (Version $from, Version $to, string $param = null) => $versionRange($from, $to, $param)
+            name: 'versionRange',
+            macro: fn (Version $from, Version $to, string $param = null) => $versionRange($from, $to, $param),
         );
         RouteFacade::macro('versionFrom', fn (Version $from, $param = null) => $versionRange($from, null, $param));
         RouteFacade::macro('versionTo', fn (Version $to, $param = null) => $versionRange(null, $to, $param));

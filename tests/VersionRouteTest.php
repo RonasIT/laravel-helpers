@@ -2,8 +2,10 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
+use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use RonasIT\Support\Tests\Support\Traits\RouteMockTrait;
 
@@ -306,5 +308,21 @@ class VersionRouteTest extends TestCase
         $mock
             ->setApiVersion(VersionEnum::V1)
             ->json('get', '/test/');
+    }
+
+    public function testVersionEnumContractIsNotBound()
+    {
+        $this->app->offsetUnset(VersionEnumContract::class);
+
+        $this->assertExceptionThrew(
+            expectedClassName: BindingVersionEnumException::class,
+            expectedMessage: 'The VersionEnumContract is not bound in the container.'
+                . ' Please ensure it is registered using'
+                . ' $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);',
+        );
+
+        Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () {
+            Route::get('test', fn () => 'result');
+        });
     }
 }

@@ -66,7 +66,7 @@ class FixturesTraitTest extends TestCase
         ];
 
         $this->exportJson('export_json/response.json', new TestResponse(
-            new Response(json_encode($result))
+            response: new Response(json_encode($result)),
         ));
 
         $this->assertEquals($this->getJsonFixture('export_json/response.json'), $result);
@@ -94,7 +94,7 @@ class FixturesTraitTest extends TestCase
         $result = ['value' => 1234567890];
 
         $this->exportJson('export_json/response', new TestResponse(
-            new Response(json_encode($result))
+            response: new Response(json_encode($result)),
         ));
 
         $this->assertFileExists($this->getFixturePath('export_json/response.json'));
@@ -131,8 +131,8 @@ class FixturesTraitTest extends TestCase
         Storage::disk('files')->put('content_source.txt', 'some content is here');
 
         $response = new TestResponse(
-            new BinaryFileResponse(
-                Storage::disk('files')->path('content_source.txt')
+            response: new BinaryFileResponse(
+                file: Storage::disk('files')->path('content_source.txt'),
             ),
         );
 
