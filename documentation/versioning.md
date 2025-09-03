@@ -129,7 +129,7 @@ Helper may be called either in a single test or in the `setUp` method of the tes
 
 Create an Enum structure to store the list of API versions.
 
-Created Enum must implement the `VersionEnumContract` interface and use `EnumTrait`.
+Created Enum must implement the [VersionEnumContract][6] interface and use [EnumTrait][7].
 
 ```
 <?php
@@ -182,6 +182,7 @@ Route::prefix('v{version}')
 ```
 
 ### Implement backward compatibility
+
 ```
 Route::version(VersionEnum::v0_1)->group(function () {
     Route::controller(TestControllerV0_1::class)->group(function () {
@@ -194,9 +195,7 @@ Route::prefix('v{version}')
     ->group(function () {
         Route::versionFrom(VersionEnum::v0_1)->group(function () {
             Route::controller(TestController::class)->group(function () {
-                Route::versionFrom(VersionEnum::v0_2)->group(function () {
-                     Route::get('tests/{id}', 'get')->whereNumber('id');
-                });
+                Route::versionFrom(VersionEnum::v0_2)->get('tests/{id}', 'get')->whereNumber('id');
                     
                 Route::get('tests', 'tests');   
             });
@@ -213,3 +212,5 @@ Route::prefix('v{version}')
 [3]:../src/HelpersServiceProvider.php#L111
 [4]:../src/Support/Version.php
 [5]:../src/Testing/TestCase.php#L128
+[6]:../src/Contracts/VersionEnumContract.php
+[7]:../src/Traits/EnumTrait.php
