@@ -6,7 +6,7 @@ use ReflectionMethod;
 use RonasIT\Support\Tests\Support\Mock\Testing\SomeTestCase;
 use RonasIT\Support\Tests\Support\Traits\TestingTestCaseMockTrait;
 
-class testTestingTestCase extends TestCase
+class TestCaseTest extends TestCase
 {
     use TestingTestCaseMockTrait;
 
