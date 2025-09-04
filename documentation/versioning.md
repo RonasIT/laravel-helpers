@@ -152,10 +152,10 @@ enum VersionEnum: string implements VersionEnumContract
 Bind the `VersionEnumContract` to the created `VersionEnum` in any service provider.
 
 ```
-    public function register(): void
-    {
-        $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);
-    }
+public function register(): void
+{
+    $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);
+}
 ```
 
 ### Step 3.
