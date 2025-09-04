@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests;;
+namespace RonasIT\Support\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
