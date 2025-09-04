@@ -25,7 +25,7 @@ trait MigrationTrait
         match ($databaseDriver) {
             'pgsql' => $this->changePostgresEnum($table, $field, $values, $valuesToRename),
             'mysql' => $this->changeMySqlEnum($table, $field, $values, $valuesToRename),
-            default => throw new Exception("Database driver \"{$databaseDriver}\" not available")
+            default => throw new Exception("Database driver \"{$databaseDriver}\" not available"),
         };
     }
 
@@ -85,11 +85,11 @@ trait MigrationTrait
         }
     }
 
-    public function addForeignKey($fromEntity, $toEntity, $needAddField = false, $onDelete = 'cascade')
+    public function addForeignKey(string $fromEntity, string $toEntity, bool $needAddField = false, $onDelete = 'cascade'): void
     {
         Schema::table(
-            $this->getTableName($fromEntity),
-            function (Blueprint $table) use ($toEntity, $needAddField, $onDelete) {
+            table: $this->getTableName($fromEntity),
+            callback: function (Blueprint $table) use ($toEntity, $needAddField, $onDelete) {
                 $fieldName = Str::snake($toEntity) . '_id';
 
                 if ($needAddField) {
@@ -105,7 +105,7 @@ trait MigrationTrait
         );
     }
 
-    public function dropForeignKey($fromEntity, $toEntity, $needDropField = false)
+    public function dropForeignKey(string $fromEntity, string $toEntity, bool $needDropField = false): void
     {
         $field = Str::snake($toEntity) . '_id';
         $table = $this->getTableName($fromEntity);
@@ -121,19 +121,17 @@ trait MigrationTrait
         }
     }
 
-    public function createBridgeTable($fromEntity, $toEntity)
+    public function createBridgeTable(string $fromEntity, string $toEntity): void
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
-        Schema::create($bridgeTableName, function (Blueprint $table) {
-            $table->increments('id');
-        });
+        Schema::create($bridgeTableName, fn (Blueprint $table) => $table->increments('id'));
 
         $this->addForeignKey($bridgeTableName, $fromEntity, true);
         $this->addForeignKey($bridgeTableName, $toEntity, true);
     }
 
-    public function dropBridgeTable($fromEntity, $toEntity)
+    public function dropBridgeTable(string $fromEntity, string $toEntity): void
     {
         $bridgeTableName = $this->getBridgeTable($fromEntity, $toEntity);
 
@@ -143,7 +141,7 @@ trait MigrationTrait
         Schema::drop($bridgeTableName);
     }
 
-    protected function getBridgeTable($fromEntity, $toEntity)
+    protected function getBridgeTable(string $fromEntity, string $toEntity): string
     {
         $entities = [Str::snake($fromEntity), Str::snake($toEntity)];
         sort($entities, SORT_STRING);
@@ -151,7 +149,7 @@ trait MigrationTrait
         return implode('_', $entities);
     }
 
-    protected function getTableName($entityName)
+    protected function getTableName(string $entityName): string
     {
         if (Schema::hasTable($entityName)) {
             return $entityName;

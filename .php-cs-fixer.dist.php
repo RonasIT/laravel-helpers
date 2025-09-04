@@ -1,7 +1,7 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude(['vendor', 'bootstrap/cache'])
+    ->exclude(['docker', 'vendor', 'bootstrap/cache'])
     ->in(__DIR__);
 
 $config = new PhpCsFixer\Config();
