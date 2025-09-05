@@ -8,10 +8,6 @@ trait TestingTestCaseMockTrait
 {
     protected function mockParallelTestingToken(string $token): void
     {
-        ParallelTesting::shouldReceive('callTearDownTestCaseCallbacks');
-
-        ParallelTesting::shouldReceive('token')
-            ->once()
-            ->andReturn($token);
+        ParallelTesting::resolveTokenUsing(fn () => $token);
     }
 }

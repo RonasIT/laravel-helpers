@@ -4,8 +4,6 @@ namespace RonasIT\Support\Tests;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
-use ReflectionClass;
-use ReflectionMethod;
 use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
@@ -24,8 +22,6 @@ class SearchTraitTest extends TestCase
     protected ReflectionProperty $attachedRelationsProperty;
     protected ReflectionProperty $attachedRelationsCountProperty;
     protected ReflectionProperty $shouldSettablePropertiesBeResetProperty;
-
-    protected ReflectionMethod $setAdditionalReservedFiltersMethod;
 
     public function setUp(): void
     {
@@ -50,9 +46,6 @@ class SearchTraitTest extends TestCase
             TestRepository::class,
             'shouldSettablePropertiesBeReset'
         );
-
-        $reflectionClass = new ReflectionClass(TestRepository::class);
-        $this->setAdditionalReservedFiltersMethod = $reflectionClass->getMethod('setAdditionalReservedFilters');
 
         self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
     }
@@ -211,9 +204,7 @@ class SearchTraitTest extends TestCase
 
         $this->mockGetSearchResultWithRelations(self::$selectResult);
 
-        $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
-            'relation_name',
-        ]);
+        $this->callEncapsulatedMethod($this->testRepositoryClass, 'setAdditionalReservedFilters', 'relation_name');
 
         $this->testRepositoryClass
             ->searchQuery([
@@ -265,9 +256,7 @@ class SearchTraitTest extends TestCase
 
     public function testSearchQueryWithListFilters()
     {
-        $this->setAdditionalReservedFiltersMethod->invokeArgs($this->testRepositoryClass, [
-            'user_id',
-        ]);
+        $this->callEncapsulatedMethod($this->testRepositoryClass, 'setAdditionalReservedFilters', 'user_id');
 
         $this->mockSelectWithAggregate(
             query: 'select count(*) as aggregate from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null',

@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use ReflectionMethod;
 use RonasIT\Support\Tests\Support\Mock\Testing\SomeTestCase;
 use RonasIT\Support\Tests\Support\Traits\TestingTestCaseMockTrait;
 
@@ -14,9 +13,7 @@ class TestCaseTest extends TestCase
     {
         $this->mockParallelTestingToken('some_token');
 
-        $reflection = new ReflectionMethod(SomeTestCase::class, 'configureRedis');
-
-        $reflection->invoke(new SomeTestCase());
+        $this->callEncapsulatedMethod(new SomeTestCase(), 'configureRedis');
 
         $this->assertEquals('some_token', config('database.redis.default.database'));
     }
