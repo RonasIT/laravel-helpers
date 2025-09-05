@@ -23,70 +23,70 @@ trait RouteMockTrait
         $this->mockRouteFacadeVersion();
     }
 
-    protected function mockRouteFacadeRange(): void
+    protected function mockRouteFacadeRange(string $route = '/test-facade-range'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () {
-            Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () {
-                Route::get(static::ROUTE_FACADE_RANGE, function () {
+        Route::group(['prefix' => 'v{version}'], function () use ($route) {
+            Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () use ($route) {
+                Route::get($route, function () {
                     return 'ROUTE_FACADE_RANGE';
                 });
             });
         });
     }
 
-    protected function mockRouteFacadeFrom(): void
+    protected function mockRouteFacadeFrom(string $route = '/test-facade-from'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () {
-            Route::versionFrom(VersionEnum::V2)->group(function () {
-                Route::get(static::ROUTE_FACADE_FROM, function () {
+        Route::group(['prefix' => 'v{version}'], function () use ($route) {
+            Route::versionFrom(VersionEnum::V2)->group(function () use ($route) {
+                Route::get($route, function () {
                     return 'ROUTE_FACADE_FROM';
                 });
             });
         });
     }
 
-    protected function mockRouteFacadeTo(): void
+    protected function mockRouteFacadeTo(string $route = '/test-facade-to'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () {
-            Route::versionTo(VersionEnum::V2)->group(function () {
-                Route::get(static::ROUTE_FACADE_TO, function () {
+        Route::group(['prefix' => 'v{version}'], function () use ($route) {
+            Route::versionTo(VersionEnum::V2)->group(function () use ($route) {
+                Route::get($route, function () {
                     return 'ROUTE_FACADE_TO';
                 });
             });
         });
     }
 
-    protected function mockRouteObjectRange(): void
+    protected function mockRouteObjectRange(string $route = '/test-object-range'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () {
-            Route::get(static::ROUTE_OBJECT_RANGE, function () {
+        Route::group(['prefix' => 'v{version}'], function () use ($route) {
+            Route::get($route, function () {
                 return 'ROUTE_OBJECT_RANGE';
             })->versionRange(VersionEnum::V1, VersionEnum::V2);
         });
     }
 
-    protected function mockRouteObjectFrom(): void
+    protected function mockRouteObjectFrom(string $route = '/test-object-from'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () {
-            Route::get(static::ROUTE_OBJECT_FROM, function () {
+        Route::group(['prefix' => 'v{version}'], function () use ($route) {
+            Route::get($route, function () {
                 return 'ROUTE_OBJECT_FROM';
             })->versionFrom(VersionEnum::V2);
         });
     }
 
-    protected function mockRouteObjectTo(): void
+    protected function mockRouteObjectTo(string $route = '/test-object-to'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () {
-            Route::get(static::ROUTE_OBJECT_TO, function () {
+        Route::group(['prefix' => 'v{version}'], function () use ($route) {
+            Route::get($route, function () {
                 return 'ROUTE_OBJECT_TO';
             })->versionTo(VersionEnum::V2);
         });
     }
 
-    protected function mockRouteFacadeVersion(): void
+    protected function mockRouteFacadeVersion(string $route = '/test-facade-version'): void
     {
-        Route::version(VersionEnum::V2)->group(function () {
-            Route::get(static::ROUTE_FACADE_VERSION, function () {
+        Route::version(VersionEnum::V2)->group(function () use ($route) {
+            Route::get($route, function () {
                 return 'ROUTE_FACADE_VERSION';
             });
         });
