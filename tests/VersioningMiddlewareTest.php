@@ -27,7 +27,7 @@ class VersioningMiddlewareTest extends TestCase
         $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);
     }
 
-    public function testHandleDisabledApiVersion(): void
+    public function testHandleDisabledAPIVersion(): void
     {
         $this->mockRouteObjectRange();
 
@@ -42,7 +42,7 @@ class VersioningMiddlewareTest extends TestCase
         $this->middleware->handle($request, function () {});
     }
 
-    public function testHandleEnabledApiVersion(): void
+    public function testHandleEnabledAPIVersion(): void
     {
         $this->mockRouteObjectRange();
 
@@ -52,16 +52,40 @@ class VersioningMiddlewareTest extends TestCase
 
         $this->app->bind('request', fn () => $request);
 
-        $route = new Route(['GET'], 'v{version}/test-object-range', function () {});
-        $route->bind($request);
-        $route->setParameter('version', 1);
-
-        $request->setRouteResolver(fn () => $route);
+        $this->mockRoute(['GET'], 'v{version}/test-object-range');
 
         $response = $this->middleware->handle($request, fn () => new Response());
 
         $this->assertInstanceOf(Response::class, $response);
+    }
+
+    public function testCheckVersionParameterRemoved(): void
+    {
+        $this->mockRouteObjectRange();
+
+        Config::set('app.disabled_api_versions', []);
+
+        $request = Request::create('v1/test-object-range', 'get');
+
+        $this->app->bind('request', fn () => $request);
+
+        $route = $this->mockRoute(['GET'], 'v{version}/test-object-range');
+
+        $this->middleware->handle($request, fn () => new Response());
 
         $this->assertNull($route->parameter('version'));
+    }
+
+    protected function mockRoute(array $methods, string $uri): Route
+    {
+        $route = new Route($methods, $uri, function () {});
+
+        $route->bind($this->app->request);
+
+        $route->setParameter('version', 1);
+
+        $this->app->request->setRouteResolver(fn () => $route);
+
+        return $route;
     }
 }
