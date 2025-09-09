@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests;
 
 use ReflectionClass;
+use ReflectionMethod;
 use RonasIT\Support\HelpersServiceProvider;
 use RonasIT\Support\Traits\TestingTrait;
 use Orchestra\Testbench\TestCase as BaseTest;
@@ -25,7 +26,7 @@ class TestCase extends BaseTest
         ];
     }
 
-    protected function defineEnvironment($app)
+    protected function defineEnvironment($app): void
     {
         $app->setBasePath(__DIR__ . '/..');
     }
@@ -59,5 +60,12 @@ class TestCase extends BaseTest
         $property = $reflectionClass->getProperty($methodName);
 
         return $property->getValue($objectInstance);
+    }
+
+    protected function callEncapsulatedMethod(object $object, string $methodName, mixed ...$args): mixed
+    {
+        $reflection = new ReflectionMethod($object, $methodName);
+
+        return $reflection->invoke($object, ...$args);
     }
 }
