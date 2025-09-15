@@ -79,8 +79,7 @@ class VersioningMiddlewareTest extends TestCase
     protected function mockRoute(array|string $methods, string $uri): Route
     {
         $route = new Route(Arr::wrap($methods), $uri, function () {});
-    {
-        $route = new Route($methods, $uri, function () {});
+ 
 
         $route->bind($this->app->request);
 
