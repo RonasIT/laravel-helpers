@@ -5,6 +5,7 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Http\Middleware\VersioningMiddleware;
