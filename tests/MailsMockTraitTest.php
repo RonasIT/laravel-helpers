@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
-use RonasIT\Support\Tests\Support\Mock\Mails\LegacyTestMail;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMail;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMailManyFromWithName;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMailWithAttachments;
@@ -44,24 +43,6 @@ class MailsMockTraitTest extends TestCase
         Mail::to('test@mail.com')->queue($mail);
 
         Mail::assertQueued(fn (TestMail $mail) => $mail->queue === 'different_queue');
-    }
-
-    public function testLegacyMail()
-    {
-        Mail::to('test@mail.com')->queue(new LegacyTestMail(
-            ['name' => 'John Smith'],
-            'Test Subject',
-            'emails.test',
-        ));
-
-        $this->assertMailEquals(LegacyTestMail::class, [
-            [
-                'emails' => 'test@mail.com',
-                'fixture' => 'test_mail.html',
-                'subject' => 'Test Subject',
-                'from' => 'noreply@mail.net',
-            ],
-        ]);
     }
 
     public function testMailFromManyWithName()
