@@ -52,7 +52,7 @@ class VersioningMiddlewareTest extends TestCase
 
         $this->app->bind('request', fn () => $request);
 
-        $this->mockRoute(['GET'], 'v{version}/test-object-range');
+        $this->mockRoute('GET', 'v{version}/test-object-range');
 
         $response = $this->middleware->handle($request, fn () => new Response());
 
