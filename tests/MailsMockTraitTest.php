@@ -8,6 +8,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMail;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMailManyFromWithName;
+use RonasIT\Support\Tests\Support\Mock\Mails\TestMailViewDataViaProperty;
 use RonasIT\Support\Tests\Support\Mock\Mails\TestMailWithAttachments;
 
 class MailsMockTraitTest extends TestCase
@@ -23,11 +24,25 @@ class MailsMockTraitTest extends TestCase
         putenv('MAIL_FROM_ADDRESS=noreply@mail.net');
     }
 
-    public function testMail()
+    public function testMailViewDataAsArray()
     {
         Mail::to('test@mail.com')->queue(new TestMail(['name' => 'John Smith']));
 
         $this->assertMailEquals(TestMail::class, [
+            [
+                'emails' => 'test@mail.com',
+                'fixture' => 'test_mail.html',
+                'subject' => 'Test Subject',
+                'from' => 'noreply@mail.net',
+            ],
+        ]);
+    }
+
+    public function testMailViewDataViaProperty()
+    {
+        Mail::to('test@mail.com')->queue(new TestMailViewDataViaProperty('John Smith'));
+
+        $this->assertMailEquals(TestMailViewDataViaProperty::class, [
             [
                 'emails' => 'test@mail.com',
                 'fixture' => 'test_mail.html',
