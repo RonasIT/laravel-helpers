@@ -16,7 +16,13 @@ This plugin provides set of helpers functions, services and traits.
 
 The package is forcing the `HTTPS` scheme for your app. Generally, it affects the URL generation logic.  
   
-This allows to use many web-related packages like Telescope, Nova, etc.  
+This allows to use many web-related packages like Telescope, Nova, etc.
+
+### Versioning
+
+Versioning is a mechanism to keep your API applications in a workable state for both new and legacy client applications. Versioning is a critical feature for applications with mobile clients, as developers cannot control the client application version and cannot guarantee that the newly released version is already available to download in all regions in stores.
+
+[Follow the versioning documentation][8] to implement versioning in your Laravel app using this package.
 
 ## Usage
  - [Helper functions][1]
@@ -36,3 +42,4 @@ This allows to use many web-related packages like Telescope, Nova, etc.
 [5]:./documentation/migration.md#1.1
 [6]:./documentation/migration.md#2.0.0
 [7]:./documentation/migration.md#2.0.8
+[8]:./documentation/versioning.md
