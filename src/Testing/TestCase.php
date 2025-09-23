@@ -152,7 +152,7 @@ abstract class TestCase extends BaseTest
         $testToken = ParallelTesting::token();
 
         if (!empty($testToken)) {
-            config(['database.redis.default.database' => $testToken]);
+            config(['database.redis.default.database' => (int) $testToken]);
         }
     }
 }

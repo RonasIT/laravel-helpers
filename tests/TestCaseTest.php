@@ -11,10 +11,10 @@ class TestCaseTest extends TestCase
 
     public function testTestCaseConfigureRedis(): void
     {
-        $this->mockParallelTestingToken('some_token');
+        $this->mockParallelTestingToken(1234);
 
         $this->callEncapsulatedMethod(new SomeTestCase(), 'configureRedis');
 
-        $this->assertEquals('some_token', config('database.redis.default.database'));
+        $this->assertEqualsCanonicalizing(1234, config('database.redis.default.database'));
     }
 }
