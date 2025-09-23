@@ -44,7 +44,7 @@ class VersioningMiddlewareTest extends TestCase
 
         $request = $this->createRequestObject('v1/test-object-range', 'get');
 
-        $this->mockBoundObjectRangeRoute('/test-object-range', 1);
+        $this->mockRouteObjectRangeWithBoundRequest('/test-object-range', $request, 1);
 
         $response = $this->middleware->handle($request, fn () => new Response());
 
@@ -57,7 +57,7 @@ class VersioningMiddlewareTest extends TestCase
 
         $request = $this->createRequestObject('v1/test-object-range', 'get');
 
-        $route = $this->mockBoundObjectRangeRoute('/test-object-range', 1);
+        $route = $this->mockRouteObjectRangeWithBoundRequest('/test-object-range', $request, 1);
 
         $this->middleware->handle($request, fn () => new Response());
 

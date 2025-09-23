@@ -2,12 +2,13 @@
 
 namespace RonasIT\Support\Tests\Support\Traits;
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Testing\TestCase;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Routing\Route as RoutingRoute;
+use Illuminate\Routing\Route;
 
 trait RouteMockTrait
 {
@@ -26,9 +27,9 @@ trait RouteMockTrait
 
     protected function mockRouteFacadeRange(string $route = '/test-facade-range'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () use ($route) {
-            Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () use ($route) {
-                Route::get($route, function () {
+        RouteFacade::group(['prefix' => 'v{version}'], function () use ($route) {
+            RouteFacade::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () use ($route) {
+                RouteFacade::get($route, function () {
                     return 'ROUTE_FACADE_RANGE';
                 });
             });
@@ -37,9 +38,9 @@ trait RouteMockTrait
 
     protected function mockRouteFacadeFrom(string $route = '/test-facade-from'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () use ($route) {
-            Route::versionFrom(VersionEnum::V2)->group(function () use ($route) {
-                Route::get($route, function () {
+        RouteFacade::group(['prefix' => 'v{version}'], function () use ($route) {
+            RouteFacade::versionFrom(VersionEnum::V2)->group(function () use ($route) {
+                RouteFacade::get($route, function () {
                     return 'ROUTE_FACADE_FROM';
                 });
             });
@@ -48,9 +49,9 @@ trait RouteMockTrait
 
     protected function mockRouteFacadeTo(string $route = '/test-facade-to'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () use ($route) {
-            Route::versionTo(VersionEnum::V2)->group(function () use ($route) {
-                Route::get($route, function () {
+        RouteFacade::group(['prefix' => 'v{version}'], function () use ($route) {
+            RouteFacade::versionTo(VersionEnum::V2)->group(function () use ($route) {
+                RouteFacade::get($route, function () {
                     return 'ROUTE_FACADE_TO';
                 });
             });
@@ -59,8 +60,8 @@ trait RouteMockTrait
 
     protected function mockRouteObjectRange(string $route = '/test-object-range'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () use ($route) {
-            Route::get($route, function () {
+        RouteFacade::group(['prefix' => 'v{version}'], function () use ($route) {
+            RouteFacade::get($route, function () {
                 return 'ROUTE_OBJECT_RANGE';
             })->versionRange(VersionEnum::V1, VersionEnum::V2);
         });
@@ -68,8 +69,8 @@ trait RouteMockTrait
 
     protected function mockRouteObjectFrom(string $route = '/test-object-from'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () use ($route) {
-            Route::get($route, function () {
+        RouteFacade::group(['prefix' => 'v{version}'], function () use ($route) {
+            RouteFacade::get($route, function () {
                 return 'ROUTE_OBJECT_FROM';
             })->versionFrom(VersionEnum::V2);
         });
@@ -77,8 +78,8 @@ trait RouteMockTrait
 
     protected function mockRouteObjectTo(string $route = '/test-object-to'): void
     {
-        Route::group(['prefix' => 'v{version}'], function () use ($route) {
-            Route::get($route, function () {
+        RouteFacade::group(['prefix' => 'v{version}'], function () use ($route) {
+            RouteFacade::get($route, function () {
                 return 'ROUTE_OBJECT_TO';
             })->versionTo(VersionEnum::V2);
         });
@@ -86,8 +87,8 @@ trait RouteMockTrait
 
     protected function mockRouteFacadeVersion(string $route = '/test-facade-version'): void
     {
-        Route::version(VersionEnum::V2)->group(function () use ($route) {
-            Route::get($route, function () {
+        RouteFacade::version(VersionEnum::V2)->group(function () use ($route) {
+            RouteFacade::get($route, function () {
                 return 'ROUTE_FACADE_VERSION';
             });
         });
@@ -113,15 +114,15 @@ trait RouteMockTrait
         return $mock;
     }
 
-    protected function mockBoundObjectRangeRoute(string $route, int $version): RoutingRoute
+    protected function mockRouteObjectRangeWithBoundRequest(string $route, Request $request, int $version): Route
     {
         $this->mockRouteObjectRange($route);
 
         $route = $this->app->routes->get('GET')["v{version}{$route}"];
 
-        $route->bind($this->app->request)->setParameter('version', $version);
+        $route->bind($request)->setParameter('version', $version);
 
-        $this->app->request->setRouteResolver(fn () => $route);
+        $request->setRouteResolver(fn () => $route);
 
         return $route;
     }
