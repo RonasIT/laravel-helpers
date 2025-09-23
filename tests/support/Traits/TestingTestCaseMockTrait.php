@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\ParallelTesting;
 
 trait TestingTestCaseMockTrait
 {
-    protected function mockParallelTestingToken(int $token): void
+    protected function mockParallelTestingToken(mixed $token): void
     {
         ParallelTesting::resolveTokenUsing(fn () => $token);
     }

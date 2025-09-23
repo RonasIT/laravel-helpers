@@ -16,6 +16,7 @@ abstract class TestCase extends BaseTest
 {
     use MailsMockTrait;
 
+    protected const int REDIS_COUNT_DATABASES = 16;
     protected $auth;
 
     protected string $testNow = '2018-11-11 11:11:11';
@@ -149,10 +150,12 @@ abstract class TestCase extends BaseTest
 
     protected function configureRedis(): void
     {
-        $testToken = ParallelTesting::token();
+        $token = ParallelTesting::token();
 
-        if (!empty($testToken)) {
-            config(['database.redis.default.database' => (int) $testToken]);
+        if (!empty($token)) {
+            $token = intval($token) % self::REDIS_COUNT_DATABASES;
+
+            config(['database.redis.default.database' => $token ?: self::REDIS_COUNT_DATABASES]);
         }
     }
 }
