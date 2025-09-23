@@ -14,28 +14,24 @@ class TestCaseTest extends TestCase
     {
         return [
             [
-                'token' => 2,
-                'expected' => 2,
+                'token' => 0,
+                'expected' => 0,
+            ],
+            [
+                'token' => 15,
+                'expected' => 15,
             ],
             [
                 'token' => 16,
-                'expected' => 16,
+                'expected' => 0,
             ],
             [
                 'token' => 17,
                 'expected' => 1,
             ],
             [
-                'token' => 48,
-                'expected' => 16,
-            ],
-            [
-                'token' => 51,
-                'expected' => 3,
-            ],
-            [
                 'token' => 'string',
-                'expected' => 16,
+                'expected' => 0,
             ],
         ];
     }

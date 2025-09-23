@@ -152,10 +152,8 @@ abstract class TestCase extends BaseTest
     {
         $token = ParallelTesting::token();
 
-        if (!empty($token)) {
-            $token = intval($token) % self::REDIS_COUNT_DATABASES;
-
-            config(['database.redis.default.database' => $token ?: self::REDIS_COUNT_DATABASES]);
+        if ($token) {
+            config(['database.redis.default.database' => intval($token) % self::REDIS_COUNT_DATABASES]);
         }
     }
 }
