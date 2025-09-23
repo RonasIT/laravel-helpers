@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Http\Request;
 use ReflectionClass;
 use RonasIT\Support\HelpersServiceProvider;
 use RonasIT\Support\Traits\TestingTrait;
@@ -59,5 +60,14 @@ class TestCase extends BaseTest
         $property = $reflectionClass->getProperty($methodName);
 
         return $property->getValue($objectInstance);
+    }
+
+    protected function createRequestObject(string $uri, string $method): Request
+    {
+        $request = Request::create($uri, $method);
+
+        $this->app->bind('request', fn () => $request);
+
+        return $request;
     }
 }
