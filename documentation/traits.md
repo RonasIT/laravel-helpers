@@ -1,5 +1,5 @@
 [<< Helpers][1]
-[Services >>][2]
+[Versioning >>][2]
 
 # Traits
 
@@ -80,7 +80,7 @@ Methods list:
 * `createBridgeTable($fromEntity, $toEntity)` - creates bridge table for many-to-many relation
 
 [<< Helpers][1]
-[Services >>][2]
+[Versioning >>][2]
 
 [1]:helpers.md
-[2]:services.md
+[2]:versioning.md
