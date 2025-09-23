@@ -7,6 +7,7 @@ use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Testing\TestCase;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Routing\Route as RoutingRoute;
 
 trait RouteMockTrait
 {
@@ -110,5 +111,18 @@ trait RouteMockTrait
             ->willReturn(TestResponse::fromBaseResponse('', Response::HTTP_OK));
 
         return $mock;
+    }
+
+    protected function mockBoundObjectRangeRoute(string $route, int $version): RoutingRoute
+    {
+        $this->mockRouteObjectRange($route);
+
+        $route = $this->app->routes->get('GET')["v{version}{$route}"];
+
+        $route->bind($this->app->request)->setParameter('version', $version);
+
+        $this->app->request->setRouteResolver(fn () => $route);
+
+        return $route;
     }
 }
