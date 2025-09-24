@@ -247,4 +247,34 @@ trait MockTrait
             ? $matcher->getInvocationCount()
             : $matcher->numberOfInvocations();
     }
+
+    /**
+     * Mock native function chain. Call chain can be passed as multiple arrays
+     * or already prepared arrays of calls.
+     *
+     * @param string $namespace 
+     * @param array ...$calls
+     */
+    public function mockNativeFunctionChain(string $namespace, array ...$calls): void
+    {
+        $this->mockNativeFunction(
+            namespace: $namespace,
+            callChain: $this->prepareCallChain($calls),
+        );
+    }
+
+    protected function prepareCallChain(array $calls): array
+    {
+        $data = [];
+
+        foreach ($calls as $call) {
+            if (Arr::isList($call)) {
+                array_push($data, ...$call);
+            } else {
+               array_push($data, $call);
+            }
+        }
+
+        return $data;
+    }
 }
