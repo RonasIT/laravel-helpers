@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Http\Request;
 use ReflectionClass;
 use ReflectionMethod;
 use RonasIT\Support\HelpersServiceProvider;
@@ -60,6 +61,15 @@ class TestCase extends BaseTest
         $property = $reflectionClass->getProperty($methodName);
 
         return $property->getValue($objectInstance);
+    }
+
+    protected function createRequestObject(string $uri, string $method): Request
+    {
+        $request = Request::create($uri, $method);
+
+        $this->app->bind('request', fn () => $request);
+
+        return $request;
     }
 
     protected function callEncapsulatedMethod(object $object, string $methodName, mixed ...$args): mixed
