@@ -257,14 +257,6 @@ trait MockTrait
      */
     public function mockNativeFunctionChain(string $namespace, array ...$calls): void
     {
-        $this->mockNativeFunction(
-            namespace: $namespace,
-            callChain: $this->prepareCallChain($calls),
-        );
-    }
-
-    protected function prepareCallChain(array $calls): array
-    {
         $data = [];
 
         foreach ($calls as $call) {
@@ -275,6 +267,9 @@ trait MockTrait
             }
         }
 
-        return $data;
+        $this->mockNativeFunction(
+            namespace: $namespace,
+            callChain: $data,
+        );
     }
 }
