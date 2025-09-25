@@ -43,6 +43,6 @@ class TestCaseTest extends TestCase
 
         $this->callEncapsulatedMethod(new SomeTestCase(), 'configureRedis');
 
-        $this->assertEqualsCanonicalizing($expected, config('database.redis.default.database'));
+        $this->assertEquals($expected, config('database.redis.default.database'));
     }
 }
