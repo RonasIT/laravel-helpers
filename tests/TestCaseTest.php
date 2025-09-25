@@ -4,11 +4,11 @@ namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Tests\Support\Mock\Testing\SomeTestCase;
-use RonasIT\Support\Tests\Support\Traits\TestingTestCaseMockTrait;
+use RonasIT\Support\Tests\Support\Traits\MockTestTrait;
 
 class TestCaseTest extends TestCase
 {
-    use TestingTestCaseMockTrait;
+    use MockTestTrait;
 
     public static function getConfigureRedisData(): array
     {
