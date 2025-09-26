@@ -92,11 +92,13 @@ trait MockTrait
      * ]
      *
      * @param string $namespace
-     * @param array $callChain
+     * @param array ...$callChain
      */
-    public function mockNativeFunction(string $namespace, array $callChain)
+    public function mockNativeFunction(string $namespace, array ...$callChain): void
     {
-        $methodsCalls = collect($callChain)->groupBy('function');
+        $normalizedCallChain = $this->prepareCallChain($callChain);
+
+        $methodsCalls = collect($normalizedCallChain)->groupBy('function');
 
         $methodsCalls->each(function ($calls, $function) use ($namespace) {
             $matcher = $this->exactly($calls->count());
@@ -248,14 +250,7 @@ trait MockTrait
             : $matcher->numberOfInvocations();
     }
 
-    /**
-     * Mock native function chain. Call chain can be passed as multiple arrays
-     * or already prepared arrays of calls.
-     *
-     * @param string $namespace 
-     * @param array ...$calls
-     */
-    public function mockNativeFunctionChain(string $namespace, array ...$calls): void
+    protected function prepareCallChain(array $calls): array
     {
         $data = [];
 
@@ -267,9 +262,6 @@ trait MockTrait
             }
         }
 
-        $this->mockNativeFunction(
-            namespace: $namespace,
-            callChain: $data,
-        );
+        return $data;
     }
 }
