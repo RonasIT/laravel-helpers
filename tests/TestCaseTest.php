@@ -8,8 +8,6 @@ use RonasIT\Support\Tests\Support\Traits\MockTestTrait;
 
 class TestCaseTest extends TestCase
 {
-    use MockTestTrait;
-
     public static function getConfigureRedisData(): array
     {
         return [
