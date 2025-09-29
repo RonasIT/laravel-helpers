@@ -107,6 +107,37 @@ class MockTraitTest extends TestCase
         $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2));
     }
 
+    public function testMockNativeFunctionChain()
+    {
+        $firstCalls = [
+            ['function' => 'rand', 'arguments' => [0, 9], 'result' => 1],
+            ['function' => 'rand', 'arguments' => [0, 9], 'result' => 2],
+        ];
+
+        $secondCalls = [
+            ['function' => 'rand', 'arguments' => [0, 9], 'result' => 3],
+            ['function' => 'rand', 'arguments' => [0, 9], 'result' => 4],
+        ];
+
+        $thirdCalls = ['function' => 'rand', 'arguments' => [0, 9], 'result' => 5];
+
+        $fourthCalls = ['function' => 'rand', 'arguments' => [0, 9], 'result' => 6];
+
+        $this->mockNativeFunction('RonasIT\Support\Tests', ...[$firstCalls, $secondCalls, $thirdCalls, $fourthCalls]);
+
+        $generate = function (int $length): string {
+            $code = '';
+
+            for ($i = 0; $i < $length; $i++) {
+                $code .= rand(0, 9);
+            }
+
+            return $code;
+        };
+
+        $this->assertEquals('123456', $generate(6));
+    }
+
     public function testMockFunctionInClass()
     {
         $mock = $this->mockClass(TestMockClass::class, [

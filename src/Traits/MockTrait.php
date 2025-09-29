@@ -92,12 +92,14 @@ trait MockTrait
      *     $this->functionCall('function_name', ['firstArgumentValue', 2, true], '123')
      * ]
      *
-     * @param string $namespace
-     * @param array $callChain
+     * @param string $namespace WITHOUT class name, e.g. App\Services for mock method which uses in the App\Services\UserService class
+     * @param array ...$callChain
      */
-    public function mockNativeFunction(string $namespace, array $callChain)
+    public function mockNativeFunction(string $namespace, array ...$callChain): void
     {
-        $methodsCalls = collect($callChain)->groupBy('function');
+        $normalizedCallChain = $this->prepareCallChain($callChain);
+
+        $methodsCalls = collect($normalizedCallChain)->groupBy('function');
 
         $methodsCalls->each(function ($calls, $function) use ($namespace) {
             $matcher = $this->exactly($calls->count());
@@ -247,6 +249,21 @@ trait MockTrait
         return method_exists($matcher, 'getInvocationCount')
             ? $matcher->getInvocationCount()
             : $matcher->numberOfInvocations();
+    }
+
+    protected function prepareCallChain(array $calls): array
+    {
+        $data = [];
+
+        foreach ($calls as $call) {
+            if (Arr::isList($call)) {
+                array_push($data, ...$call);
+            } else {
+               array_push($data, $call);
+            }
+        }
+
+        return $data;
     }
 
     protected function mockParallelTestingToken(mixed $token): void
