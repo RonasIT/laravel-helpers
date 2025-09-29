@@ -91,7 +91,7 @@ trait MockTrait
      *     $this->functionCall('function_name', ['firstArgumentValue', 2, true], '123')
      * ]
      *
-     * @param string $namespace
+     * @param string $namespace WITHOUT class name, e.g. App\Services for mock method which uses in the App\Services\UserService class
      * @param array ...$callChain
      */
     public function mockNativeFunction(string $namespace, array ...$callChain): void
