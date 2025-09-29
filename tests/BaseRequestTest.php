@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use ReflectionClass;
 use RonasIT\Support\Http\BaseRequest;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
@@ -13,11 +12,7 @@ class BaseRequestTest extends TestCase
 
     public function testGetOrderableFields()
     {
-        $baseRequest = new BaseRequest();
-        $reflectionClass = new ReflectionClass($baseRequest);
-
-        $method = $reflectionClass->getMethod('getOrderableFields');
-        $result = $method->invoke($baseRequest, TestModel::class);
+        $result = $this->callEncapsulatedMethod(new BaseRequest(), 'getOrderableFields', TestModel::class);
 
         $expectedResult = 'id,name,json_field,castable_field,*,created_at,updated_at';
 
@@ -26,11 +21,12 @@ class BaseRequestTest extends TestCase
 
     public function testGetOrderableFieldsWithAdditionalFields()
     {
-        $baseRequest = new BaseRequest();
-        $reflectionClass = new ReflectionClass($baseRequest);
+        $args = [
+            TestModel::class,
+            ['additional_field_1', 'additional_field_2'],
+        ];
 
-        $method = $reflectionClass->getMethod('getOrderableFields');
-        $result = $method->invoke($baseRequest, TestModel::class, ['additional_field_1', 'additional_field_2']);
+        $result = $this->callEncapsulatedMethod(new BaseRequest(), 'getOrderableFields', ...$args);
 
         $expectedResult = 'id,name,json_field,castable_field,*,created_at,updated_at,additional_field_1,additional_field_2';
 
