@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests\Support\Traits;
 
-use Illuminate\Support\Facades\ParallelTesting;
 use PHPUnit\Framework\MockObject\MockObject;
 
 trait MockTestTrait
@@ -20,10 +19,5 @@ trait MockTestTrait
         }
 
         return $builder->getMock();
-    }
-
-    protected function mockParallelTestingToken(mixed $token): void
-    {
-        ParallelTesting::resolveTokenUsing(fn () => $token);
     }
 }

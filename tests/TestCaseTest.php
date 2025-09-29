@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Tests\Support\Mock\Testing\SomeTestCase;
-use RonasIT\Support\Tests\Support\Traits\MockTestTrait;
 
 class TestCaseTest extends TestCase
 {
