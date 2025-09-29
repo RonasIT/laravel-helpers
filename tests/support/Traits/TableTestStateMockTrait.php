@@ -59,8 +59,7 @@ trait TableTestStateMockTrait
 
         $testCaseMock->setGlobalExportMode($testCaseGlobalExportMode);
 
-        $reflectionMethod = new ReflectionMethod($testCaseMock, $methodName);
-        $instance = $reflectionMethod->invoke($testCaseMock, $entity);
+        $instance = $this->callEncapsulatedMethod($testCaseMock, $methodName, $entity);
 
         $reflectionClass = new ReflectionClass($instance);
         $globalExportMode = $reflectionClass->getProperty('globalExportMode');

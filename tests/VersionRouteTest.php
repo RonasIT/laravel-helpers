@@ -316,9 +316,10 @@ class VersionRouteTest extends TestCase
 
         $this->assertExceptionThrew(
             expectedClassName: BindingVersionEnumException::class,
-            expectedMessage: 'The VersionEnumContract is not bound in the container.'
-                . ' Please ensure it is registered using'
-                . ' $this->app->bind(VersionEnumContract::class, fn () => VersionEnum::class);',
+            expectedMessage: "The VersionEnumContract is not bound in the container.\n"
+            . 'Please ensure it is registered correctly '
+            . "https://github.com/RonasIT/laravel-helpers/blob/master/documentation/versioning.md#step-2\n"
+            . 'More info here https://github.com/RonasIT/laravel-helpers/blob/master/documentation/versioning.md',
         );
 
         Route::versionRange(VersionEnum::V1, VersionEnum::V2)->group(function () {
