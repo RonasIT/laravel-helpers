@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Closure;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\ParallelTesting;
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
@@ -246,5 +247,10 @@ trait MockTrait
         return method_exists($matcher, 'getInvocationCount')
             ? $matcher->getInvocationCount()
             : $matcher->numberOfInvocations();
+    }
+
+    protected function mockParallelTestingToken(mixed $token): void
+    {
+        ParallelTesting::resolveTokenUsing(fn () => $token);
     }
 }
