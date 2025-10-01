@@ -45,7 +45,7 @@ Route::versionTo(VersionEnum::v2)->group(...)
 
 ### version
 
-Allows adding a prefix to routes.
+Adds a version-based prefix to route URLs.
 
 ```
 Route::version(VersionEnum::v1)->get(...)
