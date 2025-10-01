@@ -45,7 +45,7 @@ Route::versionTo(VersionEnum::v2)->group(...)
 
 ### version
 
-Allows to define the only allowed API version for routes.
+Adds a version-based prefix to route URLs.
 
 ```
 Route::version(VersionEnum::v1)->get(...)
