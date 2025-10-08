@@ -211,7 +211,7 @@ trait MockTrait
 
     protected function mockNoCalls(
         string $className,
-        Closure $mockCallback = null,
+        ?Closure $mockCallback = null,
         $disableConstructor = false
     ): MockObject {
         $mock = $this->getMockBuilder($className);
