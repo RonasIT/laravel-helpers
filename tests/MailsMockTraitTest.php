@@ -138,7 +138,7 @@ class MailsMockTraitTest extends TestCase
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage(
-            'Failed assert that the expected subject "Incorrect Subject" equals to the actual "Test Subject".'
+            'Failed assert that the expected subject "Incorrect Subject" equals to the actual "Test Subject".',
         );
 
         Mail::to('test@mail.com')->queue(new TestMail(['name' => 'John Smith']));
@@ -156,7 +156,7 @@ class MailsMockTraitTest extends TestCase
         Mail::to('test@mail.com')->queue(new TestMail(['name' => 'John Smith']));
 
         Mail::assertQueued(function (TestMail $mail) {
-            return ($mail->queue === 'mails');
+            return $mail->queue === 'mails';
         });
 
         $this->assertMailEquals(TestMail::class, [

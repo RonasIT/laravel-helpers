@@ -279,7 +279,7 @@ class FixturesTraitTest extends TestCase
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage(
-            "Failed asserting that the provided data equal to fixture: {$fixturePath}"
+            "Failed asserting that the provided data equal to fixture: {$fixturePath}",
         );
 
         $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);

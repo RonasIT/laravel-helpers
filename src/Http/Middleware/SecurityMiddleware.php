@@ -45,7 +45,7 @@ class SecurityMiddleware
         return ($request->header(self::MAINTENANCE_MODE_HEADER) === 'deactivate') && ($request->header('App-Key') === config('app.key'));
     }
 
-    //To hide the reason from attackers
+    // To hide the reason from attackers
     protected function getFailResponse()
     {
         $code = array_rand($this->codeVariations());

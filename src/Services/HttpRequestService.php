@@ -3,10 +3,10 @@
 namespace RonasIT\Support\Services;
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Arr;
 use GuzzleHttp\Cookie\CookieJar;
-use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Arr;
+use Psr\Http\Message\ResponseInterface;
 use Riverline\MultiPartParser\StreamedPart;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
@@ -177,6 +177,7 @@ class HttpRequestService
 
     /**
      * @codeCoverageIgnore
+     *
      * @deprecated please use
      * https://laravel.com/docs/10.x/telescope and
      * https://packagist.org/packages/muhammadhuzaifa/telescope-guzzle-watcher instead
@@ -198,6 +199,7 @@ class HttpRequestService
 
     /**
      * @codeCoverageIgnore
+     *
      * @deprecated please use
      * https://laravel.com/docs/10.x/telescope and
      * https://packagist.org/packages/muhammadhuzaifa/telescope-guzzle-watcher instead

@@ -17,7 +17,7 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
@@ -33,11 +33,11 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -47,11 +47,11 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -61,11 +61,11 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -76,11 +76,11 @@ trait SqlMockTrait
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? '
             . 'order by "created_at" desc limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -90,11 +90,11 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -104,11 +104,11 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -123,7 +123,7 @@ trait SqlMockTrait
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -133,11 +133,11 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 10 offset 0',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -145,16 +145,16 @@ trait SqlMockTrait
     {
         $this->mockInsert(
             'insert into "test_models" ("name", "updated_at", "created_at") values (?, ?, ?)',
-            ['test_name', $notFillableValue, Carbon::now()]
+            ['test_name', $notFillableValue, Carbon::now()],
         );
 
         $this->mockSelectById(
             'select * from "test_models" where "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -203,30 +203,30 @@ trait SqlMockTrait
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
             'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockUpdateSqlQuery(
             'update "test_models" set "name" = ?, "updated_at" = ? where "id" = ?',
-            ['test_name', $notFillableValue, 1]
+            ['test_name', $notFillableValue, 1],
         );
 
         $this->mockSelectById(
             'select * from "test_models" where "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -235,37 +235,37 @@ trait SqlMockTrait
         $this->mockSelectExists(
             'select exists(select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
         );
 
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
             'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockUpdateSqlQuery(
             'update "test_models" set "name" = ?, "updated_at" = ? where "id" = ?',
-            ['test_name', Carbon::now(), 1]
+            ['test_name', Carbon::now(), 1],
         );
 
         $this->mockSelectById(
             'select * from "test_models" where "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -275,21 +275,21 @@ trait SqlMockTrait
             'select exists(select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
-            false
+            false,
         );
 
         $this->mockInsert(
             'insert into "test_models" ("name", "id", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['test_name', 1, Carbon::now(), Carbon::now()]
+            ['test_name', 1, Carbon::now(), Carbon::now()],
         );
 
         $this->mockSelectById(
             'select * from "test_models" where "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -298,50 +298,50 @@ trait SqlMockTrait
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1'
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
         );
 
         $this->mockInsert(
             'insert into "test_models" ("name", "id", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['test_name', 1, Carbon::now(), Carbon::now()]
+            ['test_name', 1, Carbon::now(), Carbon::now()],
         );
 
         $this->mockSelectById(
             'select * from "test_models" where "id" = ? limit 1',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
     protected function mockGetSearchResult(array $selectResult): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null'
+            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null',
         );
 
         $this->mockSelect(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 15 offset 0',
-            $selectResult
+            $selectResult,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)'
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
     protected function mockGetSearchResultWithTrashed(): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from "test_models"'
+            'select count(*) as aggregate from "test_models"',
         );
 
         $this->mockSelect(
-            'select * from "test_models" order by "id" asc limit 15 offset 0'
+            'select * from "test_models" order by "id" asc limit 15 offset 0',
         );
     }
 
@@ -350,14 +350,14 @@ trait SqlMockTrait
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
             . "where ((\"query_field\" like '%search_\'string%') or (\"another_query_field\" like '%search_\'string%')) "
-            . 'and "test_models"."deleted_at" is null'
+            . 'and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
             "select * from \"test_models\" where ((\"query_field\" like '%search_\'string%') "
             . "or (\"another_query_field\" like '%search_\'string%')) and \"test_models\".\"deleted_at\" is null "
             . 'order by "id" asc limit 15 offset 0',
-            $selectResult
+            $selectResult,
         );
     }
 
@@ -367,7 +367,7 @@ trait SqlMockTrait
             'select count(*) as aggregate from "test_models" '
             . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
             . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
-            . 'and "test_models"."deleted_at" is null'
+            . 'and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
@@ -375,7 +375,7 @@ trait SqlMockTrait
             . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
             . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
-            $selectResult
+            $selectResult,
         );
     }
 
@@ -388,7 +388,7 @@ trait SqlMockTrait
             . 'and ("another_query_field" like \'%search_string%\'))) and exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" and "name" = ?) '
             . 'and "test_models"."deleted_at" is null',
-            ['some_value']
+            ['some_value'],
         );
 
         $this->mockSelect(
@@ -425,7 +425,7 @@ trait SqlMockTrait
                 Carbon::now(),
                 Carbon::now(),
                 Carbon::now(),
-            ]
+            ],
         );
 
         $this->mockSelect(
@@ -446,7 +446,7 @@ trait SqlMockTrait
                 Carbon::now(),
                 Carbon::now(),
                 Carbon::now(),
-            ]
+            ],
         );
     }
 
@@ -455,19 +455,19 @@ trait SqlMockTrait
         $this->mockSelectExists(
             'select exists(select * from "users" where "id" <> ? and "email" in (?)) as "exists"',
             false,
-            [1, 'mail@mail.com']
+            [1, 'mail@mail.com'],
         );
     }
 
     protected function mockExistsUsersExceptAuthorizedByArray(
         bool $isExist,
         string $table = 'users',
-        string $keyField = 'id'
+        string $keyField = 'id',
     ): void {
         $this->mockSelectExists(
             "select exists(select * from \"{$table}\" where \"{$keyField}\" <> ? and \"email\" in (?, ?)) as \"exists\"",
             $isExist,
-            [1, 'mail@mail.com', 'mail@mail.net']
+            [1, 'mail@mail.com', 'mail@mail.net'],
         );
     }
 
@@ -479,7 +479,7 @@ trait SqlMockTrait
         $this->mockSelect(
             query: "select count(distinct \"{$keyField}\") as aggregate from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
             result: [['aggregate' => count($result)]],
-            bindings: [1, 2, 3]
+            bindings: [1, 2, 3],
         );
     }
 
@@ -535,7 +535,7 @@ trait SqlMockTrait
 
     protected function mockTruncate(string $table): void
     {
-        $this->mockDelete("delete from sqlite_sequence where name = ?", [$table]);
+        $this->mockDelete('delete from sqlite_sequence where name = ?', [$table]);
 
         $this->mockDelete("delete from \"{$table}\"");
     }
@@ -555,7 +555,7 @@ trait SqlMockTrait
             ->andReturn(true);
     }
 
-    protected function mockUpdateDBFacade(string $table, array $where = [], array $update): void
+    protected function mockUpdateDBFacade(string $table, array $where, array $update): void
     {
         DB::shouldReceive('table')
             ->once()

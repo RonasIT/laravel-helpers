@@ -2,8 +2,8 @@
 
 namespace RonasIT\Support\Iterators;
 
-use Iterator;
 use Generator;
+use Iterator;
 use RonasIT\Support\Exceptions\IncorrectCSVFileException;
 
 class CsvIterator implements Iterator

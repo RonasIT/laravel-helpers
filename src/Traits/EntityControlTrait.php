@@ -97,9 +97,7 @@ trait EntityControlTrait
     /**
      * Check entity existing in database.
      *
-     * @param mixed $where
-     *
-     * @return boolean
+     * @param  mixed  $where
      */
     public function exists($where): bool
     {
@@ -112,11 +110,6 @@ trait EntityControlTrait
 
     /**
      * Checking that record with this key value exists
-     *
-     * @param string $field
-     * @param $value
-     *
-     * @return boolean
      */
     public function existsBy(string $field, $value): bool
     {
@@ -160,7 +153,7 @@ trait EntityControlTrait
 
             $defaultTimestamps = [
                 $this->model::CREATED_AT => $now,
-                $this->model::UPDATED_AT => $now
+                $this->model::UPDATED_AT => $now,
             ];
         }
 
@@ -178,10 +171,7 @@ trait EntityControlTrait
     /**
      * Update rows by condition or primary key
      *
-     * @param mixed $where
-     * @param array $data
-     *
-     * @return int
+     * @param  mixed  $where
      */
     public function updateMany($where, array $data): int
     {
@@ -199,10 +189,7 @@ trait EntityControlTrait
     /**
      * Update only one row by condition or primary key value
      *
-     * @param array|integer $where
-     * @param array $data
-     *
-     * @return Model
+     * @param  array|int  $where
      */
     public function update($where, array $data): ?Model
     {
@@ -301,10 +288,7 @@ trait EntityControlTrait
     }
 
     /**
-     * @param array|string|int $where array of conditions or primary key value
-     * @param array $data
-     *
-     * @return Model
+     * @param  array|string|int  $where  array of conditions or primary key value
      */
     public function firstOrCreate($where, array $data = []): Model
     {
@@ -326,9 +310,9 @@ trait EntityControlTrait
     /**
      * Delete rows by condition or primary key
      *
-     * @param array|integer|string $where
+     * @param  array|int|string  $where
      *
-     * @return integer count of deleted rows
+     * @return int count of deleted rows
      */
     public function delete($where): int
     {
@@ -381,10 +365,9 @@ trait EntityControlTrait
     /**
      * Delete rows by list of values a particular field or primary key
      *
-     * @param array $values
-     * @param ?string $field condition field, primary key is default value
+     * @param  ?string  $field  condition field, primary key is default value
      *
-     * @return integer count of deleted rows
+     * @return int count of deleted rows
      */
     public function deleteByList(array $values, ?string $field = null): int
     {

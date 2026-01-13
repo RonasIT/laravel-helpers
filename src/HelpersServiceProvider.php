@@ -7,9 +7,9 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Route as RouteFacade;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
@@ -40,7 +40,7 @@ class HelpersServiceProvider extends ServiceProvider
 
         if ($this->app->runningUnitTests()) {
             $this->whenNotUsingInMemoryDatabase(function ($database) {
-                [$testDatabase, $created] = $this->ensureTestDatabaseExists($database);
+                list($testDatabase, $created) = $this->ensureTestDatabaseExists($database);
 
                 $this->switchToDatabase($testDatabase);
 
@@ -113,17 +113,18 @@ class HelpersServiceProvider extends ServiceProvider
         /**
          * Specify that the route version must be in the range of given values inclusive.
          *
-         * @param Version|null $start
-         * @param Version|null $end
-         * @param string|null $param (default is 'version')
-         * @param Route|null $instance
+         * @param  Version|null  $start
+         * @param  Version|null  $end
+         * @param  string|null  $param  (default is 'version')
+         * @param  Route|null  $instance
+         *
          * @return Router|Route
          */
         $versionRange = function (
             ?Version $start,
             ?Version $end,
             ?string $param,
-            Route $instance = null,
+            ?Route $instance = null,
         ) {
             if (!$param) {
                 $param = 'version';
@@ -166,7 +167,7 @@ class HelpersServiceProvider extends ServiceProvider
 
         RouteFacade::macro(
             name: 'versionRange',
-            macro: fn (Version $from, Version $to, string $param = null) => $versionRange($from, $to, $param),
+            macro: fn (Version $from, Version $to, ?string $param = null) => $versionRange($from, $to, $param),
         );
         RouteFacade::macro('versionFrom', fn (Version $from, $param = null) => $versionRange($from, null, $param));
         RouteFacade::macro('versionTo', fn (Version $to, $param = null) => $versionRange(null, $to, $param));

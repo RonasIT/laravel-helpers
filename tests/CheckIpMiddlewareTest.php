@@ -1,6 +1,6 @@
 <?php
 
-namespace RonasIT\Support\Tests;;
+namespace RonasIT\Support\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -65,7 +65,7 @@ class CheckIpMiddlewareTest extends TestCase
             ],
         );
 
-        $response =$this->middleware->handle($request, fn () => new Response(), '127.0.0.1', '127.0.0.2');
+        $response = $this->middleware->handle($request, fn () => new Response(), '127.0.0.1', '127.0.0.2');
 
         $this->assertInstanceOf(Response::class, $response);
     }

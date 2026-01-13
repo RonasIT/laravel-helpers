@@ -19,15 +19,14 @@ class BaseRequest extends FormRequest
     }
 
     /**
-     * @param array|string $keys
-     * @param mixed $default
+     * @param  array|string  $keys
+     * @param  mixed  $default
      *
      * Sorts and filters request parameters. Returns parameters specified only in the function rules().
      * It needs to avoid troubles in cases where array-parameter declared in rules below its content.
      *
      * @return array;
      */
-
     public function onlyValidated($keys = null, $default = null): array
     {
         $rules = array_keys($this->rules());
@@ -90,7 +89,7 @@ class BaseRequest extends FormRequest
 
     protected function isNotNestedRule($validatedKeys): bool
     {
-        return is_integer($validatedKeys);
+        return is_int($validatedKeys);
     }
 
     private function sortByStrlen(array &$array): void

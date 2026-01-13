@@ -2,11 +2,11 @@
 
 namespace RonasIT\Support\Traits;
 
+use BadMethodCallException;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use BadMethodCallException;
-use Illuminate\Support\Arr;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait ModelTrait
 {
@@ -51,8 +51,6 @@ trait ModelTrait
     /**
      * This method was added, because native Laravel's method addSelect
      * overwrites existed select clause
-     * @param $query
-     * @param array $fields
      *
      * @return mixed
      */
@@ -73,11 +71,6 @@ trait ModelTrait
      * Add orderBy By related field,
      * $manyToManyStrategy is affect oneToMany and ManyToMany Relations make orderBy('id', ASC/DESC)
      *
-     * @param $query
-     * @param $relations
-     * @param string $desc
-     * @param string|null $asField
-     * @param string $manyToManyStrategy
      *
      * @return mixed $query
      */
@@ -154,7 +147,7 @@ trait ModelTrait
             $subQuery = $relation->getRelationExistenceQuery(
                 $relation->getQuery(),
                 $query,
-                $requiredColumns
+                $requiredColumns,
             );
 
             $queryCollection[] = $subQuery;
