@@ -6,4 +6,3 @@ storage/
 .php-cs-fixer.cache
 cghooks.lock
 tests/fixtures/MailsMockTraitTest/test_mail_with_global_export.html
-pint.json export-ignore
