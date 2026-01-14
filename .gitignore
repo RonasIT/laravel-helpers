@@ -2,6 +2,7 @@
 .phpunit.result.cache
 .phpunit.cache
 vendor/
+storage/
 .php-cs-fixer.cache
 cghooks.lock
 tests/fixtures/MailsMockTraitTest/test_mail_with_global_export.html
