@@ -2,8 +2,8 @@
 
 namespace RonasIT\Support\Tests;
 
-use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
 use RonasIT\Support\Testing\TestCase as PackageTestCase;
+use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
 
 class AuthTest extends TestCase
 {

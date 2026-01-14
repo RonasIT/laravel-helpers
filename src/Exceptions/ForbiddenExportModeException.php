@@ -11,7 +11,7 @@ class ForbiddenExportModeException extends EntityCreateException
 
         parent::__construct(
             "Looks like you try to export fixture.\nIf you see this message while "
-            . "running tests in the local environment - please set {$envKey}=false to {$envFile}."
+            . "running tests in the local environment - please set {$envKey}=false to {$envFile}.",
         );
     }
 }

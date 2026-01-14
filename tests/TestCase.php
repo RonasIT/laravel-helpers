@@ -3,11 +3,11 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Http\Request;
+use Orchestra\Testbench\TestCase as BaseTest;
 use ReflectionClass;
 use ReflectionMethod;
 use RonasIT\Support\HelpersServiceProvider;
 use RonasIT\Support\Traits\TestingTrait;
-use Orchestra\Testbench\TestCase as BaseTest;
 
 class TestCase extends BaseTest
 {

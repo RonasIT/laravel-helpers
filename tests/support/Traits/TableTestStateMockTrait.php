@@ -6,7 +6,6 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
-use ReflectionMethod;
 use RonasIT\Support\Testing\TestCase;
 
 trait TableTestStateMockTrait

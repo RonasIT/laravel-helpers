@@ -29,11 +29,6 @@ trait MockTrait
      *     ],
      *     $this->functionCall('yourMethod', ['firstArgumentValue', 2, true], 'result_fixture.json')
      * ]
-     *
-     * @param string $class
-     * @param array $callChain
-     * @param bool $disableConstructor
-     * @return MockObject
      */
     public function mockClass(string $class, array $callChain, bool $disableConstructor = false): MockObject
     {
@@ -68,7 +63,7 @@ trait MockTrait
                         $expectedArguments,
                         $class,
                         $method,
-                        $callIndex
+                        $callIndex,
                     );
 
                     return $expectedCall['result'];
@@ -92,8 +87,7 @@ trait MockTrait
      *     $this->functionCall('function_name', ['firstArgumentValue', 2, true], '123')
      * ]
      *
-     * @param string $namespace WITHOUT class name, e.g. App\Services for mock method which uses in the App\Services\UserService class
-     * @param array ...$callChain
+     * @param  string  $namespace  WITHOUT class name, e.g. App\Services for mock method which uses in the App\Services\UserService class
      */
     public function mockNativeFunction(string $namespace, array ...$callChain): void
     {
@@ -120,7 +114,7 @@ trait MockTrait
                         $namespace,
                         $function,
                         $callIndex,
-                        false
+                        false,
                     );
 
                     return $expectedCall['result'];
@@ -162,12 +156,12 @@ trait MockTrait
         if ($expectedCount !== $actualCount) {
             $this->assertFalse(
                 $expectedCount < $requiredParametersCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments."
+                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments.",
             );
 
             $this->assertFalse(
                 $expectedCount > $actualCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments."
+                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments.",
             );
         }
     }
@@ -204,7 +198,7 @@ trait MockTrait
             $this->assertEquals(
                 $expected[$index],
                 $argument,
-                "Failed asserting that arguments are equal to expected.\n{$message}\nArgument index: {$index}"
+                "Failed asserting that arguments are equal to expected.\n{$message}\nArgument index: {$index}",
             );
         }
     }
@@ -212,7 +206,7 @@ trait MockTrait
     protected function mockNoCalls(
         string $className,
         ?Closure $mockCallback = null,
-        $disableConstructor = false
+        $disableConstructor = false,
     ): MockObject {
         $mock = $this->getMockBuilder($className);
 
@@ -259,7 +253,7 @@ trait MockTrait
             if (Arr::isList($call)) {
                 array_push($data, ...$call);
             } else {
-               array_push($data, $call);
+                array_push($data, $call);
             }
         }
 

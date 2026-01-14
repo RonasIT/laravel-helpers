@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use RonasIT\Support\Contracts\ExporterContract;
 
-abstract class Exporter implements FromQuery, WithHeadings, WithMapping, ExporterContract
+abstract class Exporter implements ExporterContract, FromQuery, WithHeadings, WithMapping
 {
     use Exportable;
 
@@ -46,7 +46,7 @@ abstract class Exporter implements FromQuery, WithHeadings, WithMapping, Exporte
     }
 
     /**
-     * @param $type string default: csv, should be one of presented here https://docs.laravel-excel.com/3.0/exports/export-formats.html
+     * @param  $type  string default: csv, should be one of presented here https://docs.laravel-excel.com/3.0/exports/export-formats.html
      *
      * @return $this
      */

@@ -3,12 +3,12 @@
 namespace RonasIT\Support\Traits;
 
 use Closure;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -22,7 +22,7 @@ trait SearchTrait
     protected $attachedRelations = [];
     protected $attachedRelationsCount = [];
 
-    protected $reservedFilters  = [
+    protected $reservedFilters = [
         'with',
         'with_count',
         'with_trashed',
@@ -50,10 +50,8 @@ trait SearchTrait
     }
 
     /**
-     * @param $field string filtered field, you can pass field name with dots to filter by field of relation
-     * @param $filterName string|null key from filters which contains filter value
-     *
-     * @return self
+     * @param  $field  string filtered field, you can pass field name with dots to filter by field of relation
+     * @param  $filterName  string|null key from filters which contains filter value
      */
     public function filterBy(string $field, ?string $filterName = null): self
     {
@@ -119,7 +117,7 @@ trait SearchTrait
 
         $this->filter = $filter;
 
-        foreach($filter as $fieldName => $value) {
+        foreach ($filter as $fieldName => $value) {
             $isNotReservedFilter = (!in_array($fieldName, $this->reservedFilters));
 
             if ($isNotReservedFilter) {
@@ -251,7 +249,7 @@ trait SearchTrait
     }
 
     /**
-     * @param $relations array|string
+     * @param  $relations  array|string
      *
      * @return $this
      */
@@ -263,7 +261,7 @@ trait SearchTrait
     }
 
     /**
-     * @param $relations array|string
+     * @param  $relations  array|string
      *
      * @return $this
      */
@@ -389,7 +387,7 @@ trait SearchTrait
     protected function getFilterName(string $field): string
     {
         if (Str::contains($field, '.')) {
-            [$field] = extract_last_part($field);
+            list($field) = extract_last_part($field);
         }
 
         return $field;

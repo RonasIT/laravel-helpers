@@ -9,7 +9,7 @@ use RonasIT\Support\Mail\BaseMail;
 class TestMail extends BaseMail
 {
     public function __construct(
-        public $viewData
+        public $viewData,
     ) {
         parent::__construct();
     }

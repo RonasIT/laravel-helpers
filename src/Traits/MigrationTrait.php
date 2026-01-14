@@ -2,14 +2,14 @@
 
 namespace RonasIT\Support\Traits;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
+use Exception;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Exception;
+use Illuminate\Support\Str;
 
 trait MigrationTrait
 {
@@ -66,7 +66,7 @@ trait MigrationTrait
     {
         $values = Arr::map($values, fn ($value) => "'{$value}'");
 
-        $enum = implode( ', ', $values);
+        $enum = implode(', ', $values);
 
         DB::statement("ALTER TABLE {$table} MODIFY COLUMN {$field} ENUM({$enum})");
     }
@@ -75,7 +75,7 @@ trait MigrationTrait
     {
         $values = array_map(fn ($value) => "'{$value}'::character varying", $values);
 
-        return join(', ', $values);
+        return implode(', ', $values);
     }
 
     private function registerEnumType(): void
@@ -101,7 +101,7 @@ trait MigrationTrait
                     ->references('id')
                     ->on($this->getTableName($toEntity))
                     ->onDelete($onDelete);
-            }
+            },
         );
     }
 

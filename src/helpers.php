@@ -1,14 +1,11 @@
 <?php
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
  * Round all values in list of floats.
- *
- * @param array $array
- * @return array
  */
 function array_round(array $array): array
 {
@@ -21,11 +18,6 @@ function array_round(array $array): array
 
 /**
  * Get list of element which placed in $path in $array
- *
- * @param array|string|null $array
- * @param array|string $path
- *
- * @return mixed
  */
 function array_get_list(array|string|null $array, array|string $path): mixed
 {
@@ -64,10 +56,6 @@ function array_get_list(array|string|null $array, array|string $path): mixed
 
 /**
  * Verifies whether input is array or arrays or not
- *
- * @param array $array
- *
- * @return boolean
  */
 function is_multidimensional(array $array): bool
 {
@@ -77,8 +65,6 @@ function is_multidimensional(array $array): bool
 /**
  * Create directory recursively. The native mkdir() function recursively create directory incorrectly.
  * This is solution.
- *
- * @param string $path
  */
 function mkdir_recursively(string $path): void
 {
@@ -112,11 +98,6 @@ function mkdir_recursively(string $path): void
 
 /**
  * Check equivalency of two arrays
- *
- * @param array $array1
- * @param array $array2
- *
- * @return boolean
  */
 function array_equals(array $array1, array $array2): bool
 {
@@ -132,11 +113,6 @@ function array_equals(array $array1, array $array2): bool
 
 /**
  * Check equivalency of two associative arrays
- *
- * @param array $array1
- * @param array $array2
- *
- * @return boolean
  */
 function array_equals_assoc(array $array1, array $array2): bool
 {
@@ -148,11 +124,6 @@ function array_equals_assoc(array $array1, array $array2): bool
 
 /**
  * Return subtraction of two arrays
- *
- * @param array $array1
- * @param array $array2
- *
- * @return array
  */
 function array_subtraction(array $array1, array $array2): array
 {
@@ -164,7 +135,6 @@ function array_subtraction(array $array1, array $array2): array
 /**
  * Generate GUID
  *
- * @return string
  *
  * @codeCoverageIgnore
  */
@@ -172,7 +142,7 @@ function getGUID(): string
 {
     mt_srand();
     $charId = strtoupper(md5(uniqid(rand(), true)));
-    $hyphen = chr(45);// "-"
+    $hyphen = chr(45); // "-"
 
     return chr(123)// "{"
         . substr($charId, 0, 8) . $hyphen
@@ -180,7 +150,7 @@ function getGUID(): string
         . substr($charId, 12, 4) . $hyphen
         . substr($charId, 16, 4) . $hyphen
         . substr($charId, 20, 12)
-        . chr(125);// "}"
+        . chr(125); // "}"
 }
 
 function array_concat(array $array, callable $callback): string
@@ -196,7 +166,7 @@ function array_concat(array $array, callable $callback): string
 
 function rmdir_recursively(string $dir): void
 {
-    if ($objs = glob($dir . "/*")) {
+    if ($objs = glob($dir . '/*')) {
         foreach ($objs as $obj) {
             is_dir($obj) ? rmdir_recursively($obj) : unlink($obj);
         }
@@ -216,7 +186,7 @@ function fPutQuotedCsv($handle, array $row, string $fd = ',', string $quot = '"'
 
     $str = implode($fd, $cells);
 
-    fputs($handle, $str . "\n");
+    fwrite($handle, $str . "\n");
 
     return strlen($str);
 }
@@ -239,8 +209,7 @@ function clear_folder(string $path): void
 /**
  * Builds an associative array by gotten keys and values
  *
- * @param array $array
- * @param callable $callback - should return associate array with "key" and "value" keys
+ * @param  callable  $callback  - should return associate array with "key" and "value" keys
  *
  * @example $callback
  *  function ($value, $key) {
@@ -249,8 +218,6 @@ function clear_folder(string $path): void
  *        'value' => $value,
  *      ];
  *  }
- *
- * @return array
  *
  * @deprecated Use array_walk, forEach or mapWithKeys instead
  */
@@ -271,10 +238,6 @@ function array_associate(array $array, callable $callback): array
 
 /**
  * Get duplicate values of array
- *
- * @param array $array
- *
- * @return array
  */
 function array_get_duplicates(array $array): array
 {
@@ -283,11 +246,6 @@ function array_get_duplicates(array $array): array
 
 /**
  * Get only unique objects from array by key (array of keys) or by closure
- *
- * @param array $objectsList
- * @param string|callable|array $filter
- *
- * @return array
  */
 function array_unique_objects(array $objectsList, string|callable|array $filter = 'id'): array
 {
@@ -344,6 +302,7 @@ function array_remove_elements(array $array, array $elements): array
 
 /**
  * @deprecated use str_pad and mb_str_pad instead
+ *
  * @codeCoverageIgnore
  */
 function prepend_symbols($string, $expectedLength, $symbol)
@@ -362,8 +321,6 @@ function array_default(array &$array, string|int $key, mixed $default): void
 
 /**
  * inverse transformation from array_dot
- * @param $array
- * @return array
  */
 function array_undot(array $array): array
 {

@@ -35,7 +35,8 @@ class VersioningMiddlewareTest extends TestCase
 
         $request = $this->createRequestObject('v1/test-object-range', 'get');
 
-        $this->middleware->handle($request, function () {});
+        $this->middleware->handle($request, function () {
+        });
     }
 
     public function testHandleEnabledAPIVersion(): void

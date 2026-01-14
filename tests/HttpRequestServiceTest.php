@@ -4,9 +4,9 @@ namespace RonasIT\Support\Tests;
 
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
-use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
@@ -44,7 +44,7 @@ class HttpRequestServiceTest extends TestCase
                     ['some_key' => 'some_value'],
                     ['some_header_name' => 'some_header_value'],
                 ],
-                result: new GuzzleResponse(200, [], json_encode([]))
+                result: new GuzzleResponse(200, [], json_encode([])),
             ),
         ]);
 
@@ -222,8 +222,8 @@ class HttpRequestServiceTest extends TestCase
                         'name' => '1[second_file]',
                         'contents' => 'second_file_content',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $this->httpRequestServiceClass->post('https://some.url.com', [
@@ -231,13 +231,13 @@ class HttpRequestServiceTest extends TestCase
                 'first_file' => 'first_file_content',
                 'second_file' => [
                     'first_file' => 'first_file_content',
-                    'second_file' => 'second_file_content'
-                ]
+                    'second_file' => 'second_file_content',
+                ],
             ],
             [
                 'first_file' => 'first_file_content',
-                'second_file' => 'second_file_content'
-            ]
+                'second_file' => 'second_file_content',
+            ],
         ], [
             'Content-type' => 'multipart/form-data',
         ]);
@@ -260,7 +260,7 @@ class HttpRequestServiceTest extends TestCase
             ],
             response: new GuzzleResponse(
                 200,
-                [ 'Content-Type' => 'multipart/form-data; boundary=----------------------------83ff53821b7c'],
+                ['Content-Type' => 'multipart/form-data; boundary=----------------------------83ff53821b7c'],
                 $multipartContent,
             ),
         );
@@ -441,7 +441,7 @@ class HttpRequestServiceTest extends TestCase
                     'connect_timeout' => 0,
                 ],
             ],
-            response: new GuzzleResponse(200, [], 'Some not json string')
+            response: new GuzzleResponse(200, [], 'Some not json string'),
         );
 
         $this->httpRequestServiceClass->get(
@@ -464,7 +464,7 @@ class HttpRequestServiceTest extends TestCase
             ->expects($this->once())
             ->method('sendRequest')
             ->willReturnCallback(
-                fn () => throw new RequestException('Some exception message', new Request('type', 'url'))
+                fn () => throw new RequestException('Some exception message', new Request('type', 'url')),
             );
 
         $this->app->instance(HttpRequestService::class, $mock);

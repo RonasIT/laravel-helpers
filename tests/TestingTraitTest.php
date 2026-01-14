@@ -21,7 +21,7 @@ class TestingTraitTest extends TestCase
         $this->assertExceptionThrew(
             expectedClassName: ModelFactoryNotFound::class,
             expectedMessage: 'error',
-            isStrict: false
+            isStrict: false,
         );
 
         throw new ModelFactoryNotFound('full error message');
