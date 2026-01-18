@@ -88,7 +88,7 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
     }
 
-    public function testAssertChangesBinarySting()
+    public function testAssertChangesBinaryString()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
@@ -103,6 +103,23 @@ class ModelTestStateTest extends TestCase
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('assert_changes_binary_string.json');
+    }
+
+    public function testAssertChangesBinaryNullable()
+    {
+        $initialDatasetMock = collect([[
+            'id' => 1,
+            'binary_field' => md5('some_string', true),
+        ]]);
+        $changedDatasetMock = collect([[
+            'id' => 1,
+            'binary_field' => null,
+        ]]);
+
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
+
+        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState->assertChangesEqualsFixture('assert_changes_binary_string_to_null.json');
     }
 
     public function testAssertNoChanges()

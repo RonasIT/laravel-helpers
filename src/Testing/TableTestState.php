@@ -101,9 +101,10 @@ class TableTestState extends Assert
         }, $changes);
     }
 
-    protected function isBinary(string $data): bool
+    protected function isBinary(?string $data): bool
     {
-        return !mb_check_encoding($data, 'UTF-8');
+        return is_null($data)
+            && !mb_check_encoding($data, 'UTF-8');
     }
 
     protected function getFixturePath(string $fixtureName): string
