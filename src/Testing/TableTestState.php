@@ -103,7 +103,7 @@ class TableTestState extends Assert
 
     protected function isBinary(?string $data): bool
     {
-        return is_null($data)
+        return !is_null($data)
             && !mb_check_encoding($data, 'UTF-8');
     }
 
