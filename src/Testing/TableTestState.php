@@ -89,12 +89,21 @@ class TableTestState extends Assert
         return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
                 if (Arr::has($item, $jsonField)) {
-                    $item[$jsonField] = json_decode($item[$jsonField], true);
+                    $value = $item[$jsonField];
+
+                    $item[$jsonField] = $this->isBinary($value)
+                        ? bin2hex($value)
+                        : json_decode($value, true);
                 }
             }
 
             return $item;
         }, $changes);
+    }
+
+    protected function isBinary(string $data): bool
+    {
+        return !mb_check_encoding($data, 'UTF-8');
     }
 
     protected function getFixturePath(string $fixtureName): string

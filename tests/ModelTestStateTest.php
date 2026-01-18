@@ -35,7 +35,7 @@ class ModelTestStateTest extends TestCase
         $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
+        $this->assertEquals(['json_field', 'castable_field', 'binary_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
     }
 
@@ -86,6 +86,23 @@ class ModelTestStateTest extends TestCase
 
         $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
+    }
+
+    public function testAssertChangesBinarySting()
+    {
+        $initialDatasetMock = collect([[
+            'id' => 1,
+            'binary_field' => null,
+        ]]);
+        $changedDatasetMock = collect([[
+            'id' => 1,
+            'binary_field' => md5('some_string', true),
+        ]]);
+
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
+
+        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState->assertChangesEqualsFixture('assert_changes_binary_string.json');
     }
 
     public function testAssertNoChanges()
