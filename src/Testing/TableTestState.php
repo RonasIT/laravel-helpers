@@ -64,6 +64,10 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
+                    $changes = Arr::map($changes, fn ($field) => (!mb_check_encoding($field, 'UTF-8'))
+                        ? bin2hex($field)
+                        : $field);
+
                     $updatedRecords[] = array_merge(['id' => $originItem['id']], $changes);
                 }
 
@@ -88,23 +92,13 @@ class TableTestState extends Assert
 
         return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
-                if (Arr::has($item, $jsonField)) {
-                    $value = $item[$jsonField];
-
-                    $item[$jsonField] = $this->isBinary($value)
-                        ? bin2hex($value)
-                        : json_decode($value, true);
+                if (Arr::has($item, $jsonField) && json_validate($item[$jsonField])) {
+                    $item[$jsonField] = json_decode($item[$jsonField], true);
                 }
             }
 
             return $item;
         }, $changes);
-    }
-
-    protected function isBinary(?string $data): bool
-    {
-        return !is_null($data)
-            && !mb_check_encoding($data, 'UTF-8');
     }
 
     protected function getFixturePath(string $fixtureName): string
