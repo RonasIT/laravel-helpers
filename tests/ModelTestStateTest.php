@@ -106,7 +106,7 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes');
     }
 
-    public function testAssertChangesBinaryNullable()
+    public function testAssertChangesBinaryToNull()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
