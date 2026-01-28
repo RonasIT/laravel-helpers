@@ -64,10 +64,6 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
-                    $changes = Arr::map($changes, fn ($field) => (!mb_check_encoding($field, 'UTF-8'))
-                        ? bin2hex($field)
-                        : $field);
-
                     $updatedRecords[] = array_merge(['id' => $originItem['id']], $changes);
                 }
 
