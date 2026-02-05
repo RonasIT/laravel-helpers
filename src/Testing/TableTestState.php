@@ -96,7 +96,8 @@ class TableTestState extends Assert
             return false;
         }
 
-        return !ctype_print($sample) && !preg_match('//u', $sample);
+        return preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', $sample)
+            || !ctype_print($sample);
     }
 
     protected function prepareChanges(array $changes): array
