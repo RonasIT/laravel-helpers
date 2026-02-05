@@ -82,7 +82,21 @@ class TableTestState extends Assert
 
     protected function isBinary(mixed $value): bool
     {
-        return !mb_check_encoding($value, 'UTF-8');
+        if (!is_string($value) || $value === '') {
+            return false;
+        }
+
+        if (str_contains($value, "\0")) {
+            return true;
+        }
+
+        $sample = substr($value, 0, 8192);
+
+        if (strlen($sample) === 0) {
+            return false;
+        }
+
+        return !ctype_print($sample) && !preg_match('//u', $sample);
     }
 
     protected function prepareChanges(array $changes): array
