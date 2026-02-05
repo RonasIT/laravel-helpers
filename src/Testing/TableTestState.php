@@ -92,7 +92,7 @@ class TableTestState extends Assert
 
         $sample = substr($value, 0, 8192);
 
-        if (strlen($sample) === 0) {
+        if (strlen($sample) === 0 || mb_check_encoding($sample, 'UTF-8')) {
             return false;
         }
 
