@@ -2,8 +2,8 @@
 
 namespace RonasIT\Support\Iterators;
 
-use Iterator;
 use Generator;
+use Iterator;
 
 class DBIterator implements Iterator
 {

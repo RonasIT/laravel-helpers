@@ -3,9 +3,9 @@
 namespace RonasIT\Support\Importers;
 
 use Illuminate\Support\Arr;
-use RonasIT\Support\Iterators\CsvIterator;
 use RonasIT\Support\Exceptions\IncorrectImportFileException;
 use RonasIT\Support\Exceptions\IncorrectImportLineException;
+use RonasIT\Support\Iterators\CsvIterator;
 
 class Importer
 {

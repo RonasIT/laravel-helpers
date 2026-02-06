@@ -175,7 +175,7 @@ trait FixturesTrait
             }
         });
 
-        return  "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
+        return "{$query} SET FOREIGN_KEY_CHECKS = 1;\n";
     }
 
     public function prepareSequences(array $except = []): void
@@ -205,7 +205,7 @@ trait FixturesTrait
     {
         $this->exportContent(
             file_get_contents($response->getFile()->getPathName()),
-            $fixture
+            $fixture,
         );
     }
 

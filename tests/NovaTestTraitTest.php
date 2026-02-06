@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
-use RonasIT\Support\Tests\Support\Mock\NovaActions\TestNovaAction;
 use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
+use RonasIT\Support\Tests\Support\Mock\NovaActions\TestNovaAction;
 use RonasIT\Support\Tests\Support\Mock\NovaResources\Media;
 use RonasIT\Support\Tests\Support\Mock\NovaResources\TestModel;
 use RonasIT\Support\Tests\Support\Mock\NovaResources\User;
@@ -115,7 +115,7 @@ class NovaTestTraitTest extends TestCase
             return response($request->all(), Response::HTTP_OK);
         });
 
-        $result = $this->novaSearchResourceAPICall(TestModel::class,  ['key' => 'value']);
+        $result = $this->novaSearchResourceAPICall(TestModel::class, ['key' => 'value']);
 
         $result->assertOk();
     }

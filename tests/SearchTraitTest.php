@@ -39,12 +39,12 @@ class SearchTraitTest extends TestCase
 
         $this->attachedRelationsCountProperty = new ReflectionProperty(
             TestRepository::class,
-            'attachedRelationsCount'
+            'attachedRelationsCount',
         );
 
         $this->shouldSettablePropertiesBeResetProperty = new ReflectionProperty(
             TestRepository::class,
-            'shouldSettablePropertiesBeReset'
+            'shouldSettablePropertiesBeReset',
         );
 
         self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
@@ -242,11 +242,11 @@ class SearchTraitTest extends TestCase
     public function testSearchQueryWithNullFilters()
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from "test_models" where "user_id" is null and "test_models"."deleted_at" is null'
+            'select count(*) as aggregate from "test_models" where "user_id" is null and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
-            'select * from "test_models" where "user_id" is null and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0'
+            'select * from "test_models" where "user_id" is null and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
         );
 
         $this->testRepositoryClass
@@ -260,12 +260,12 @@ class SearchTraitTest extends TestCase
 
         $this->mockSelectWithAggregate(
             query: 'select count(*) as aggregate from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null',
-            bindings: [1, 2, 3]
+            bindings: [1, 2, 3],
         );
 
         $this->mockSelect(
             query: 'select * from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
-            bindings: [1, 2, 3]
+            bindings: [1, 2, 3],
         );
 
         $this->testRepositoryClass

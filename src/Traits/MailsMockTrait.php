@@ -54,9 +54,8 @@ trait MailsMockTrait
      *
      * Export mode will export html to fixture before assert
      *
-     * @param string $mailableClass
-     * @param array|string $emailChain
-     * @param mixed $exportMode
+     * @param  array|string  $emailChain
+     * @param  mixed  $exportMode
      */
     protected function assertMailEquals(string $mailableClass, $emailChain, bool $exportMode = false): void
     {

@@ -31,7 +31,7 @@ class MigrationTraitTest extends TestCase
         $this->mockStatementDBFacade(
             'ALTER TABLE some_table ADD CONSTRAINT some_table_enum_field_check CHECK (enum_field::text = ANY (' .
             "ARRAY['first_value'::character varying, 'second_value'::character varying]::text[]" .
-            '))'
+            '))',
         );
 
         $this
@@ -63,7 +63,7 @@ class MigrationTraitTest extends TestCase
         $this->mockStatementDBFacade(
             'ALTER TABLE some_table ADD CONSTRAINT some_table_enum_field_check CHECK (enum_field::text = ANY (' .
             "ARRAY['renamed_first_value'::character varying, 'second_value'::character varying, 'renamed_third_value'::character varying]::text[]" .
-            '))'
+            '))',
         );
 
         $this
@@ -102,7 +102,7 @@ class MigrationTraitTest extends TestCase
 
         $this->mockStatementDBFacade(
             'ALTER TABLE some_table MODIFY COLUMN enum_field ' .
-            "ENUM('first_value', 'second_value')"
+            "ENUM('first_value', 'second_value')",
         );
 
         $this
@@ -119,7 +119,7 @@ class MigrationTraitTest extends TestCase
 
         $this->mockStatementDBFacade(
             'ALTER TABLE some_table MODIFY COLUMN enum_field ' .
-            "ENUM('renamed_first_value', 'second_value', 'renamed_third_value', 'first_value', 'third_value')"
+            "ENUM('renamed_first_value', 'second_value', 'renamed_third_value', 'first_value', 'third_value')",
         );
 
         $this->mockUpdateDBFacade(
@@ -136,7 +136,7 @@ class MigrationTraitTest extends TestCase
 
         $this->mockStatementDBFacade(
             'ALTER TABLE some_table MODIFY COLUMN enum_field ' .
-            "ENUM('renamed_first_value', 'second_value', 'renamed_third_value')"
+            "ENUM('renamed_first_value', 'second_value', 'renamed_third_value')",
         );
 
         $this

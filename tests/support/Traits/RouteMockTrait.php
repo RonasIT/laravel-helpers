@@ -3,12 +3,12 @@
 namespace RonasIT\Support\Tests\Support\Traits;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Testing\TestCase;
 use RonasIT\Support\Tests\Support\Enum\VersionEnum;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Routing\Route;
 
 trait RouteMockTrait
 {
@@ -107,7 +107,7 @@ trait RouteMockTrait
             ->method('call')
             ->with(
                 $this->equalTo($method),
-                $this->equalTo($uri)
+                $this->equalTo($uri),
             )
             ->willReturn(TestResponse::fromBaseResponse('', Response::HTTP_OK));
 
