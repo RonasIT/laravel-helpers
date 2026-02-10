@@ -51,8 +51,8 @@ class BaseRequestTest extends TestCase
                         [
                             'value' => '111',
                             'description' => 'meta id',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
             ],
             [
