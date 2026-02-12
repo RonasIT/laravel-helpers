@@ -195,6 +195,19 @@ trait FixturesTrait
         app('db.connection')->unprepared($query);
     }
 
+    public function resetMySQLAutoIncrement($tables, $except = [])
+    {
+        $query = array_concat($tables, function ($table) use ($except) {
+            if (in_array($table, $except)) {
+                return '';
+            } else {
+                return "ALTER TABLE {$table} AUTO_INCREMENT = 1;\n";
+            }
+        });
+
+        app('db.connection')->unprepared($query);
+    }
+
     public function exportFile($response, $fixture)
     {
         $this->exportContent(
@@ -218,7 +231,7 @@ trait FixturesTrait
     {
         if (env('FAIL_EXPORT_JSON', true)) {
             $this->fail(preg_replace('/[ ]+/mu', ' ',
-                'Looks like you forget to remove exportJson. If it is your local environment add 
+                'Looks like you forget to remove exportJson. If it is your local environment add
                 FAIL_EXPORT_JSON=false to .env.testing.
                 If it is dev.testing environment then remove it.'
             ));
