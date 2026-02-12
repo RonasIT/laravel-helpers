@@ -46,6 +46,8 @@ abstract class TestCase extends BaseTest
 
         if (config('database.default') === 'pgsql') {
             $this->prepareSequences($this->getTables());
+        } elseif (config('database.default') === 'mysql') {
+            $this->resetMySQLAutoIncrement($this->getTables());
         }
 
         $this->auth = app(JWTAuth::class);
