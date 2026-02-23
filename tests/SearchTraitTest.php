@@ -27,6 +27,8 @@ class SearchTraitTest extends TestCase
     {
         parent::setUp();
 
+        Carbon::setTestNow(Carbon::create(2026));
+
         $this->testRepositoryClass = new TestRepository();
 
         $this->onlyTrashedProperty = new ReflectionProperty(TestRepository::class, 'onlyTrashed');
