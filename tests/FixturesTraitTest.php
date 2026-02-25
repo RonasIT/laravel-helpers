@@ -284,4 +284,28 @@ class FixturesTraitTest extends TestCase
 
         $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);
     }
+
+    public function testPrepareMySQLAutoIncrement()
+    {
+        $mock = $this->mockClass(MySqlBuilder::class, [
+            $this->functionCall('getTables', [], $this->getJsonFixture('set_auto_increment/get_tables.json')),
+        ], true);
+
+        $connection = $this->mockClass(MysqlConnection::class, [
+            $this->functionCall('getSchemaBuilder', [], $mock),
+            $this->functionCall('unprepared', [$this->getFixture('set_auto_increment/set_auto_increment.sql')]),
+        ], true);
+
+        $db = $this->mockClass(DatabaseManager::class, [
+            $this->functionCall('connection', [null], $connection),
+            $this->functionCall('connection', [null], $connection),
+        ], true);
+
+        $this->app->instance('db', $db);
+        $this->dumpFileName = 'clear_database/dump.sql';
+
+        Config::set('database.default', 'mysql');
+
+        $this->resetMySQLAutoIncrement($this->getTables(), ['roles', 'groups']);
+    }
 }
