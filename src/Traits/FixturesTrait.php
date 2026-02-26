@@ -171,7 +171,7 @@ trait FixturesTrait
             if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE \"{$table['name']}\";\n";
+                return "TRUNCATE TABLE `{$table['name']}`;\n";
             }
         });
 
@@ -207,7 +207,7 @@ trait FixturesTrait
             if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "ALTER TABLE {$table['name']} AUTO_INCREMENT = 1;\n";
+                return "ALTER TABLE `{$table['name']}` AUTO_INCREMENT = 1;\n";
             }
         });
 
