@@ -288,11 +288,16 @@ class FixturesTraitTest extends TestCase
     public function testPrepareMySQLAutoIncrement()
     {
         $mock = $this->mockClass(MySqlBuilder::class, [
-            $this->functionCall('getTables', [], $this->getJsonFixture('set_auto_increment/get_tables.json')),
+            $this->functionCall(
+                name: 'getTables',
+                result: $this->getJsonFixture('set_auto_increment/get_tables.json')),
         ], true);
 
         $connection = $this->mockClass(MysqlConnection::class, [
-            $this->functionCall('getSchemaBuilder', [], $mock),
+            $this->functionCall(
+                name: 'getSchemaBuilder',
+                result: $mock,
+            ),
             $this->functionCall('unprepared', [$this->getFixture('set_auto_increment/set_auto_increment.sql')]),
         ], true);
 

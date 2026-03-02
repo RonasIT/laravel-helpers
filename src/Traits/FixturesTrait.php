@@ -203,13 +203,10 @@ trait FixturesTrait
 
     public function resetMySQLAutoIncrement(array $tables, $except = []): void
     {
-        $query = array_concat($tables, function ($table) use ($except) {
-            if (in_array($table['name'], $except)) {
-                return '';
-            } else {
-                return "ALTER TABLE `{$table['name']}` AUTO_INCREMENT = 1;\n";
-            }
-        });
+        $query = array_concat($tables, fn ($table) => (in_array($table['name'], $except))
+            ? ''
+            : "ALTER TABLE `{$table['name']}` AUTO_INCREMENT = 1;\n",
+        );
 
         app('db.connection')->unprepared($query);
     }

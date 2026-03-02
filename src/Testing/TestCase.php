@@ -157,10 +157,10 @@ abstract class TestCase extends BaseTest
 
     protected function prepareDB(): void
     {
-        if (config('database.default') === 'pgsql') {
-            $this->prepareSequences();
-        } elseif (config('database.default') === 'mysql') {
-            $this->resetMySQLAutoIncrement($this->getTables());
-        }
+        match (config('database.default')) {
+            'pgsql' => $this->prepareSequences(),
+            'mysql' => $this->resetMySQLAutoIncrement($this->getTables()),
+            default => null,
+        };
     }
 }
