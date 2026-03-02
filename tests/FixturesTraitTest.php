@@ -307,7 +307,6 @@ class FixturesTraitTest extends TestCase
         ], true);
 
         $this->app->instance('db', $db);
-        $this->dumpFileName = 'clear_database/dump.sql';
 
         Config::set('database.default', 'mysql');
 

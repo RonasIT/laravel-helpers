@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Config;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Tests\Support\Mock\Testing\SomeTestCase;
 
@@ -41,5 +43,39 @@ class TestCaseTest extends TestCase
         $this->callEncapsulatedMethod(new SomeTestCase(), 'configureRedis');
 
         $this->assertEquals($expected, config('database.redis.default.database'));
+    }
+
+    public function testTestCasePrepareMysqlDB(): void
+    {
+        $tables = [
+            [
+                'name' => 'users',
+            ],
+            [
+                'name' => 'groups',
+            ],
+        ];
+
+        Config::set('database.default', 'mysql');
+
+        $mock = Mockery::mock(SomeTestCase::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock->shouldReceive('getTables')->once()->andReturn($tables);
+        $mock->shouldReceive('resetMySQLAutoIncrement')->once()->with($tables);
+
+        $this->callEncapsulatedMethod($mock, 'prepareDB');
+
+        $mock->shouldNotReceive('prepareSequences');
+    }
+
+    public function testTestCasePreparePgsqlDB(): void
+    {
+        Config::set('database.default', 'pgsql');
+
+        $mock = Mockery::mock(SomeTestCase::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock->shouldReceive('prepareSequences')->once();
+
+        $this->callEncapsulatedMethod($mock, 'prepareDB');
+
+        $mock->shouldNotReceive('resetMySQLAutoIncrement');
     }
 }
