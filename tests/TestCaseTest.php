@@ -58,24 +58,22 @@ class TestCaseTest extends TestCase
 
         Config::set('database.default', 'mysql');
 
-        $mock = Mockery::mock(SomeTestCase::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Mockery::mock(SomeTestCase::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $mock->shouldReceive('getTables')->once()->andReturn($tables);
         $mock->shouldReceive('resetMySQLAutoIncrement')->once()->with($tables);
+        $mock->shouldNotReceive('prepareSequences');
 
         $this->callEncapsulatedMethod($mock, 'prepareDB');
-
-        $mock->shouldNotReceive('prepareSequences');
     }
 
     public function testTestCasePreparePgsqlDB(): void
     {
         Config::set('database.default', 'pgsql');
 
-        $mock = Mockery::mock(SomeTestCase::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        $mock = Mockery::mock(SomeTestCase::class)->makePartial()->shouldAllowMockingProtectedMethods();
         $mock->shouldReceive('prepareSequences')->once();
+        $mock->shouldNotReceive('resetMySQLAutoIncrement');
 
         $this->callEncapsulatedMethod($mock, 'prepareDB');
-
-        $mock->shouldNotReceive('resetMySQLAutoIncrement');
     }
 }

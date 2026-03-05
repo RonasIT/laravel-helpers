@@ -201,8 +201,10 @@ trait FixturesTrait
         app('db.connection')->unprepared($query);
     }
 
-    public function resetMySQLAutoIncrement(array $tables, $except = []): void
+    public function resetMySQLAutoIncrement(array $tables, array $except = []): void
     {
+        $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
+
         $query = array_concat($tables, fn ($table) => (in_array($table['name'], $except))
             ? ''
             : "ALTER TABLE `{$table['name']}` AUTO_INCREMENT = 1;\n",
