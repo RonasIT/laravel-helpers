@@ -210,7 +210,9 @@ trait FixturesTrait
             : "ALTER TABLE `{$table['name']}` AUTO_INCREMENT = 1;\n",
         );
 
-        app('db.connection')->unprepared($query);
+        if (!empty($query)) {
+            app('db.connection')->unprepared($query);
+        }
     }
 
     public function exportFile(TestResponse $response, string $fixture): void
