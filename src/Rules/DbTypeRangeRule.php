@@ -9,27 +9,27 @@ use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
 class DbTypeRangeRule implements ValidationRule
 {
-    protected DatabaseTypeRangesContract $rangesResolver;
+    protected array $ranges;
 
     public function __construct(
         protected string $type,
     ) {
-        $this->rangesResolver = app(DatabaseTypeRangesContract::class);
+        $resolver = app(DatabaseTypeRangesContract::class);
+
+        $this->ranges = $resolver::ranges();
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $ranges = $this->rangesResolver->getRanges();
-
-        if (!array_key_exists($this->type, $ranges)) {
-            $available = implode(', ', array_keys($ranges));
+        if (!array_key_exists($this->type, $this->ranges)) {
+            $available = implode(', ', array_keys($this->ranges));
 
             throw new InvalidValidationRuleUsageException(
                 message: "db_type_range: Unknown type '{$this->type}' for the {$attribute} field. Available types: {$available}.",
             );
         }
 
-        list($min, $max) = $ranges[$this->type];
+        list($min, $max) = $this->ranges[$this->type];
 
         if (is_string($value)) {
             $metric = mb_strlen($value);
