@@ -332,11 +332,26 @@ class ValidatorTest extends TestCase
     public function testDbTypeRangeObjectSyntaxPasses(): void
     {
         $validator = Validator::make(
-            ['value' => 100],
+            ['value' => 0],
             ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
         );
 
         $this->assertTrue($validator->passes());
+    }
+
+    public function testDbTypeRangeObjectSyntaxFails(): void
+    {
+        $validator = Validator::make(
+            ['value' => self::INTEGER_MAX + 1],
+            ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
+        );
+
+        $this->assertTrue($validator->fails());
+
+        $this->assertEquals(
+            expected: sprintf('The value must be between %d and %d.', self::INTEGER_MIN, self::INTEGER_MAX),
+            actual: $validator->errors()->first('value'),
+        );
     }
 
     public function testDbTypeRangeUnknownTypeThrows(): void
@@ -348,7 +363,7 @@ class ValidatorTest extends TestCase
         );
 
         $validator = Validator::make(
-            ['value' => 42],
+            ['value' => 0],
             ['value' => 'db_type_range:unknown_type'],
         );
 
@@ -363,7 +378,7 @@ class ValidatorTest extends TestCase
         );
 
         $validator = Validator::make(
-            ['value' => 42],
+            ['value' => 0],
             ['value' => 'db_type_range'],
         );
 
