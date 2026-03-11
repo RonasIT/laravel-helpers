@@ -33,10 +33,10 @@ class DbTypeRangeRule implements ValidationRule
 
         if (is_string($value)) {
             $metric = mb_strlen($value);
-            $errorMessage = "The :attribute length must be between {$min} and {$max} characters.";
+            $errorMessage = "The {$attribute} length must be between {$min} and {$max} characters.";
         } else {
             $metric = $value;
-            $errorMessage = "The :attribute must be between {$min} and {$max}.";
+            $errorMessage = "The {$attribute} must be between {$min} and {$max}.";
         }
 
         if (($metric < $min) || ($metric > $max)) {

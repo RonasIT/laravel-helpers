@@ -131,7 +131,7 @@ class HelpersServiceProvider extends ServiceProvider
                 attribute: $attribute,
                 value: $value,
                 fail: function (string $message) use ($validator, &$failed) {
-                    $validator->addReplacer('db_type_range', fn ($msg, $attr) => str_replace(':attribute', $attr, $message));
+                    $validator->addReplacer('db_type_range', fn () => $message);
                     $failed = true;
                 },
             );
