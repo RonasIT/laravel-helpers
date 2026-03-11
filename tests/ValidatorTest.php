@@ -270,52 +270,61 @@ class ValidatorTest extends TestCase
                 'value' => self::INTEGER_MIN - 1,
                 'type' => 'integer',
                 'range' => [self::INTEGER_MIN, self::INTEGER_MAX],
+                'message' => 'The value must be between %d and %d.',
             ],
             'integer above max' => [
                 'value' => self::INTEGER_MAX + 1,
                 'type' => 'integer',
                 'range' => [self::INTEGER_MIN, self::INTEGER_MAX],
+                'message' => 'The value must be between %d and %d.',
             ],
             'smallint below min' => [
                 'value' => self::SMALLINT_MIN - 1,
                 'type' => 'smallint',
                 'range' => [self::SMALLINT_MIN, self::SMALLINT_MAX],
+                'message' => 'The value must be between %d and %d.',
             ],
             'smallint above max' => [
                 'value' => self::SMALLINT_MAX + 1,
                 'type' => 'smallint',
                 'range' => [self::SMALLINT_MIN, self::SMALLINT_MAX],
+                'message' => 'The value must be between %d and %d.',
             ],
             'serial below min' => [
                 'value' => self::SERIAL_MIN - 1,
                 'type' => 'serial',
                 'range' => [self::SERIAL_MIN, self::SERIAL_MAX],
+                'message' => 'The value must be between %d and %d.',
             ],
             'serial above max' => [
                 'value' => self::SERIAL_MAX + 1,
                 'type' => 'serial',
                 'range' => [self::SERIAL_MIN, self::SERIAL_MAX],
+                'message' => 'The value must be between %d and %d.',
             ],
             'varchar above max' => [
                 'value' => str_repeat('a', self::VARCHAR_MAX + 1),
                 'type' => 'varchar',
                 'range' => [0, self::VARCHAR_MAX],
+                'message' => 'The value length must be between %d and %d characters.',
             ],
         ];
     }
 
     #[DataProvider('provideDbTypeRangeFails')]
-    public function testDbTypeRangeFails(mixed $value, string $type, array $range): void
+    public function testDbTypeRangeFails(mixed $value, string $type, array $range, string $message): void
     {
         $validator = Validator::make(
             ['value' => $value],
-            ['value' => "db_type_range:$type"],
+            ['value' => "db_type_range:{$type}"],
         );
 
         $this->assertTrue($validator->fails());
 
+        $expectedMessage = sprintf($message, $range[0], $range[1]);
+
         $this->assertEquals(
-            expected: sprintf('The value value must be within the %s range [%d, %d].', $type, $range[0], $range[1]),
+            expected: $expectedMessage,
             actual: $validator->errors()->first('value'),
         );
     }
