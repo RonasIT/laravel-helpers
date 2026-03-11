@@ -15,10 +15,13 @@ use Illuminate\Support\Pluralizer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
+use RonasIT\Support\Contracts\DatabaseTypeRangesContract;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
+use RonasIT\Support\Enums\PostgresDatabaseTypeEnum;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
+use RonasIT\Support\Rules\DbTypeRangeRule;
 use RonasIT\Support\Support\UncountableWords;
 
 class HelpersServiceProvider extends ServiceProvider
@@ -58,6 +61,8 @@ class HelpersServiceProvider extends ServiceProvider
     public function register(): void
     {
         app(ExcelServiceProvider::class, ['app' => app()])->register();
+
+        $this->app->singleton(DatabaseTypeRangesContract::class, fn () => PostgresDatabaseTypeEnum::class);
     }
 
     protected function extendValidator(): void
@@ -109,6 +114,29 @@ class HelpersServiceProvider extends ServiceProvider
             $validator->addReplacer('list_exists', fn ($message, $attribute) => "Some of the passed {$attribute} are not exists.");
 
             return $existingValueCount === count($value);
+        });
+
+        Validator::extend('db_type_range', function ($attribute, $value, $parameters, $validator) {
+            $typeName = Arr::get($parameters, 0);
+
+            if (empty($typeName)) {
+                throw new InvalidValidationRuleUsageException(
+                    "db_type_range: The type parameter is required when checking the {$attribute} field."
+                );
+            }
+
+            $failed = false;
+
+            (new DbTypeRangeRule($typeName))->validate(
+                attribute: $attribute,
+                value: $value,
+                fail: function (string $message) use ($validator, &$failed) {
+                    $validator->addReplacer('db_type_range', fn ($msg, $attr) => str_replace(':attribute', $attr, $message));
+                    $failed = true;
+                },
+            );
+
+            return !$failed;
         });
     }
 
