@@ -16,6 +16,16 @@ class ValidatorTest extends TestCase
     use SqlMockTrait;
     use TestingTrait;
 
+    private const int SMALLINT_MIN = -32768;
+    private const int SMALLINT_MAX = 32767;
+    private const int INTEGER_MIN = -2147483648;
+    private const int INTEGER_MAX = 2147483647;
+    private const int BIGINT_MIN = PHP_INT_MIN;
+    private const int BIGINT_MAX = PHP_INT_MAX;
+    private const int SERIAL_MIN = 1;
+    private const int SERIAL_MAX = 2147483647;
+    private const int VARCHAR_MAX = 255;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -196,35 +206,35 @@ class ValidatorTest extends TestCase
     {
         return [
             'integer min' => [
-                'value' => -2147483648,
+                'value' => self::INTEGER_MIN,
                 'type' => 'integer',
             ],
             'integer max' => [
-                'value' => 2147483647,
+                'value' => self::INTEGER_MAX,
                 'type' => 'integer',
             ],
             'smallint min' => [
-                'value' => -32768,
+                'value' => self::SMALLINT_MIN,
                 'type' => 'smallint',
             ],
             'smallint max' => [
-                'value' => 32767,
+                'value' => self::SMALLINT_MAX,
                 'type' => 'smallint',
             ],
             'bigint min' => [
-                'value' => -9223372036854775808,
+                'value' => self::BIGINT_MIN,
                 'type' => 'bigint',
             ],
             'bigint max' => [
-                'value' => 9223372036854775807,
+                'value' => self::BIGINT_MAX,
                 'type' => 'bigint',
             ],
             'serial min' => [
-                'value' => 1,
+                'value' => self::SERIAL_MIN,
                 'type' => 'serial',
             ],
             'serial max' => [
-                'value' => 2147483647,
+                'value' => self::SERIAL_MAX,
                 'type' => 'serial',
             ],
             'varchar min' => [
@@ -232,7 +242,7 @@ class ValidatorTest extends TestCase
                 'type' => 'varchar',
             ],
             'varchar max' => [
-                'value' => str_repeat('a', 255),
+                'value' => str_repeat('a', self::VARCHAR_MAX),
                 'type' => 'varchar',
             ],
             'text min' => [
@@ -257,54 +267,57 @@ class ValidatorTest extends TestCase
     {
         return [
             'integer below min' => [
-                'value' => -2147483649,
+                'value' => self::INTEGER_MIN - 1,
                 'type' => 'integer',
-                'message' => 'The value value must be within the integer range [-2147483648, 2147483647].',
+                'range' => [self::INTEGER_MIN, self::INTEGER_MAX],
             ],
             'integer above max' => [
-                'value' => 2147483648,
+                'value' => self::INTEGER_MAX + 1,
                 'type' => 'integer',
-                'message' => 'The value value must be within the integer range [-2147483648, 2147483647].',
+                'range' => [self::INTEGER_MIN, self::INTEGER_MAX],
             ],
             'smallint below min' => [
-                'value' => -32769,
+                'value' => self::SMALLINT_MIN - 1,
                 'type' => 'smallint',
-                'message' => 'The value value must be within the smallint range [-32768, 32767].',
+                'range' => [self::SMALLINT_MIN, self::SMALLINT_MAX],
             ],
             'smallint above max' => [
-                'value' => 32768,
+                'value' => self::SMALLINT_MAX + 1,
                 'type' => 'smallint',
-                'message' => 'The value value must be within the smallint range [-32768, 32767].',
+                'range' => [self::SMALLINT_MIN, self::SMALLINT_MAX],
             ],
             'serial below min' => [
-                'value' => 0,
+                'value' => self::SERIAL_MIN - 1,
                 'type' => 'serial',
-                'message' => 'The value value must be within the serial range [1, 2147483647].',
+                'range' => [self::SERIAL_MIN, self::SERIAL_MAX],
             ],
             'serial above max' => [
-                'value' => 2147483648,
+                'value' => self::SERIAL_MAX + 1,
                 'type' => 'serial',
-                'message' => 'The value value must be within the serial range [1, 2147483647].',
+                'range' => [self::SERIAL_MIN, self::SERIAL_MAX],
             ],
             'varchar above max' => [
-                'value' => str_repeat('a', 256),
+                'value' => str_repeat('a', self::VARCHAR_MAX + 1),
                 'type' => 'varchar',
-                'message' => 'The value value must be within the varchar range [0, 255].',
+                'range' => [0, self::VARCHAR_MAX],
             ],
         ];
     }
 
     #[DataProvider('provideDbTypeRangeFails')]
-    public function testDbTypeRangeFails(mixed $value, string $type, ?string $message): void
+    public function testDbTypeRangeFails(mixed $value, string $type, array $range): void
     {
         $validator = Validator::make(
             ['value' => $value],
-            ['value' => "db_type_range:{$type}"],
+            ['value' => "db_type_range:$type"],
         );
 
         $this->assertTrue($validator->fails());
 
-        $this->assertEquals($message, $validator->errors()->first('value'));
+        $this->assertEquals(
+            expected: sprintf('The value value must be within the %s range [%d, %d].', $type, $range[0], $range[1]),
+            actual: $validator->errors()->first('value'),
+        );
     }
 
     public function testDbTypeRangeObjectSyntaxPasses(): void
