@@ -197,47 +197,47 @@ class ValidatorTest extends TestCase
         return [
             'integer min' => [
                 'value' => -2147483648,
-                'type'  => 'integer',
+                'type' => 'integer',
             ],
             'integer max' => [
                 'value' => 2147483647,
-                'type'  => 'integer',
+                'type' => 'integer',
             ],
             'smallint min' => [
                 'value' => -32768,
-                'type'  => 'smallint',
+                'type' => 'smallint',
             ],
             'smallint max' => [
                 'value' => 32767,
-                'type'  => 'smallint',
+                'type' => 'smallint',
             ],
             'bigint min' => [
                 'value' => -9223372036854775808,
-                'type'  => 'bigint',
+                'type' => 'bigint',
             ],
             'bigint max' => [
                 'value' => 9223372036854775807,
-                'type'  => 'bigint',
+                'type' => 'bigint',
             ],
             'serial min' => [
                 'value' => 1,
-                'type'  => 'serial',
+                'type' => 'serial',
             ],
             'serial max' => [
                 'value' => 2147483647,
-                'type'  => 'serial',
+                'type' => 'serial',
             ],
             'varchar min' => [
                 'value' => '',
-                'type'  => 'varchar',
+                'type' => 'varchar',
             ],
             'varchar max' => [
                 'value' => str_repeat('a', 255),
-                'type'  => 'varchar',
+                'type' => 'varchar',
             ],
             'text min' => [
                 'value' => '',
-                'type'  => 'text',
+                'type' => 'text',
             ],
         ];
     }
@@ -257,38 +257,38 @@ class ValidatorTest extends TestCase
     {
         return [
             'integer below min' => [
-                'value'   => -2147483649,
-                'type'    => 'integer',
+                'value' => -2147483649,
+                'type' => 'integer',
                 'message' => 'The value value must be within the integer range [-2147483648, 2147483647].',
             ],
             'integer above max' => [
-                'value'   => 2147483648,
-                'type'    => 'integer',
+                'value' => 2147483648,
+                'type' => 'integer',
                 'message' => 'The value value must be within the integer range [-2147483648, 2147483647].',
             ],
             'smallint below min' => [
-                'value'   => -32769,
-                'type'    => 'smallint',
+                'value' => -32769,
+                'type' => 'smallint',
                 'message' => 'The value value must be within the smallint range [-32768, 32767].',
             ],
             'smallint above max' => [
-                'value'   => 32768,
-                'type'    => 'smallint',
+                'value' => 32768,
+                'type' => 'smallint',
                 'message' => 'The value value must be within the smallint range [-32768, 32767].',
             ],
             'serial below min' => [
-                'value'   => 0,
-                'type'    => 'serial',
+                'value' => 0,
+                'type' => 'serial',
                 'message' => 'The value value must be within the serial range [1, 2147483647].',
             ],
             'serial above max' => [
-                'value'   => 2147483648,
-                'type'    => 'serial',
+                'value' => 2147483648,
+                'type' => 'serial',
                 'message' => 'The value value must be within the serial range [1, 2147483647].',
             ],
             'varchar above max' => [
-                'value'   => str_repeat('a', 256),
-                'type'    => 'varchar',
+                'value' => str_repeat('a', 256),
+                'type' => 'varchar',
                 'message' => 'The value value must be within the varchar range [0, 255].',
             ],
         ];

@@ -25,11 +25,11 @@ class DbTypeRangeRule implements ValidationRule
             $available = implode(', ', array_keys($ranges));
 
             throw new InvalidValidationRuleUsageException(
-                "db_type_range: Unknown type '{$this->type}' for the {$attribute} field. Available types: {$available}."
+                message: "db_type_range: Unknown type '{$this->type}' for the {$attribute} field. Available types: {$available}.",
             );
         }
 
-        [$min, $max] = $ranges[$this->type];
+        list($min, $max) = $ranges[$this->type];
 
         $checked = is_string($value) ? mb_strlen($value) : $value;
 

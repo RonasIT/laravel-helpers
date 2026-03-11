@@ -121,7 +121,7 @@ class HelpersServiceProvider extends ServiceProvider
 
             if (empty($typeName)) {
                 throw new InvalidValidationRuleUsageException(
-                    "db_type_range: The type parameter is required when checking the {$attribute} field."
+                    message: "db_type_range: The type parameter is required when checking the {$attribute} field.",
                 );
             }
 
