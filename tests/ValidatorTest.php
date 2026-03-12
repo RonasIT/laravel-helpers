@@ -263,56 +263,44 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public static function provideDbTypeRangeFails(): array
+    public static function provideNumericDbTypeRangeFails(): array
     {
         return [
             'integer below min' => [
                 'value' => self::INTEGER_MIN - 1,
                 'type' => 'integer',
                 'range' => [self::INTEGER_MIN, self::INTEGER_MAX],
-                'message' => 'The value must be between %d and %d.',
             ],
             'integer above max' => [
                 'value' => self::INTEGER_MAX + 1,
                 'type' => 'integer',
                 'range' => [self::INTEGER_MIN, self::INTEGER_MAX],
-                'message' => 'The value must be between %d and %d.',
             ],
             'smallint below min' => [
                 'value' => self::SMALLINT_MIN - 1,
                 'type' => 'smallint',
                 'range' => [self::SMALLINT_MIN, self::SMALLINT_MAX],
-                'message' => 'The value must be between %d and %d.',
             ],
             'smallint above max' => [
                 'value' => self::SMALLINT_MAX + 1,
                 'type' => 'smallint',
                 'range' => [self::SMALLINT_MIN, self::SMALLINT_MAX],
-                'message' => 'The value must be between %d and %d.',
             ],
             'serial below min' => [
                 'value' => self::SERIAL_MIN - 1,
                 'type' => 'serial',
                 'range' => [self::SERIAL_MIN, self::SERIAL_MAX],
-                'message' => 'The value must be between %d and %d.',
             ],
             'serial above max' => [
                 'value' => self::SERIAL_MAX + 1,
                 'type' => 'serial',
                 'range' => [self::SERIAL_MIN, self::SERIAL_MAX],
-                'message' => 'The value must be between %d and %d.',
-            ],
-            'varchar above max' => [
-                'value' => str_repeat('a', self::VARCHAR_MAX + 1),
-                'type' => 'varchar',
-                'range' => [0, self::VARCHAR_MAX],
-                'message' => 'The value length must be between %d and %d characters.',
             ],
         ];
     }
 
-    #[DataProvider('provideDbTypeRangeFails')]
-    public function testDbTypeRangeFails(mixed $value, string $type, array $range, string $message): void
+    #[DataProvider('provideNumericDbTypeRangeFails')]
+    public function testNumericDbTypeRangeFails(mixed $value, string $type, array $range): void
     {
         $validator = Validator::make(
             ['value' => $value],
@@ -321,10 +309,26 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($validator->fails());
 
-        $expectedMessage = sprintf($message, $range[0], $range[1]);
+        $this->assertEquals(
+            expected: "The value must be between {$range[0]} and {$range[1]}.",
+            actual: $validator->errors()->first('value'),
+        );
+    }
+
+    public function testVarcharDbTypeRangeFails(): void
+    {
+        $value = str_repeat('a', self::VARCHAR_MAX + 1);
+        $max = self::VARCHAR_MAX;
+
+        $validator = Validator::make(
+            ['value' => $value],
+            ['value' => 'db_type_range:varchar'],
+        );
+
+        $this->assertTrue($validator->fails());
 
         $this->assertEquals(
-            expected: $expectedMessage,
+            expected: "The value length must be less than {$max} characters.",
             actual: $validator->errors()->first('value'),
         );
     }
