@@ -86,4 +86,19 @@ class TableTestStateTest extends TestCase
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertNotChanged();
     }
+
+    public function testInitializationWithPrimaryKeySet()
+    {
+        $initialDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/initial_dataset.json'));
+        $changedDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/changed_dataset.json'));
+
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models', 'name');
+
+        $modelTestState = new TableTestState(
+            tableName: 'test_models',
+            jsonFields: ['json_field', 'castable_field'],
+            primaryKey: 'name',
+        );
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set.json');
+    }
 }
