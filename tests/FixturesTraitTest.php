@@ -171,7 +171,7 @@ class FixturesTraitTest extends TestCase
 
     public function testLoadTestDumpForMysql()
     {
-        $connection = $this->mockClass(MysqlConnection::class, [
+        $connection = $this->mockClass(MySqlConnection::class, [
             $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_mysql_db_query.sql')]),
             $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
