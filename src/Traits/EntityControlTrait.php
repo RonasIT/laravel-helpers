@@ -144,6 +144,9 @@ trait EntityControlTrait
         return $model;
     }
 
+    /**
+     * @param  array<array>  $data
+     */
     public function insert(array $data): bool
     {
         $result = $this->model->insert($this->prepareInsertData($data));
@@ -153,6 +156,13 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * Insert rows ignoring duplicate key errors.
+     *
+     * @param  array<array>  $data
+     *
+     * @return int count of inserted rows
+     */
     public function insertOrIgnore(array $data): int
     {
         $result = $this->model->insertOrIgnore($this->prepareInsertData($data));
@@ -476,7 +486,7 @@ trait EntityControlTrait
             ];
         }
 
-        return array_map(function ($item) use ($defaultTimestamps) {
+        return array_map(function (array $item) use ($defaultTimestamps) {
             $fillableFields = Arr::only($item, $this->model->getFillable());
 
             return array_merge($defaultTimestamps, $fillableFields);
