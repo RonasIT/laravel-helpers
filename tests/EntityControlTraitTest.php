@@ -286,6 +286,88 @@ class EntityControlTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertOrIgnore(): void
+    {
+        $this->mockInsertOrIgnoreData();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            ['name' => 'test_name_1'],
+            ['name' => 'test_name_2'],
+            ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreWithSettableProperties(): void
+    {
+        $this->mockInsertOrIgnoreData();
+
+        $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->insertOrIgnore([
+                ['name' => 'test_name_1'],
+                ['name' => 'test_name_2'],
+                ['name' => 'test_name_3'],
+            ]);
+
+        $this->assertSame(3, $result);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testInsertOrIgnoreWithoutTimestamps(): void
+    {
+        $this->mockInsertOrIgnoreDataWithoutTimestamps();
+
+        $result = self::$testRepositoryClassWithoutTimestamps->insertOrIgnore([
+            [
+                'name' => 'test_name_1',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_2',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_3',
+                'created_at' => '1999-01-01',
+                'updated_at' => '1999-01-01',
+            ],
+        ]);
+
+        $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreWithDifferentTimestampNames(): void
+    {
+        $this->mockInsertOrIgnoreDataWithDifferentTimestampNames();
+
+        $result = self::$testRepositoryWithDifferentTimestampNames->insertOrIgnore([
+            [
+                'name' => 'test_name_1',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_2',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
+            [
+                'name' => 'test_name_3',
+                'creation_date' => '1999-01-01',
+                'updated_date' => '1999-01-01',
+            ],
+        ]);
+
+        $this->assertSame(3, $result);
+    }
+
     public function testUpdateMany()
     {
         $this->mockUpdateSqlQuery(
