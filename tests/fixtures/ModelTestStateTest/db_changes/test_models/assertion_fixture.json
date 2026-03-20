@@ -15,22 +15,31 @@
                 }
             },
             "castable_field": {
-                "field1": "value 1",
-                "field2": [
-                    2,
-                    3
-                ],
-                "field3": {
-                    "one": 1,
-                    "two": 2
+                "appearance": {
+                    "theme": "dark"
+                },
+                "locale": {
+                    "language": "de"
+                },
+                "notifications": {
+                    "email": true,
+                    "sms": true
                 }
             }
         },
         {
             "id": 2,
             "castable_field": {
-                "one": "first value updated",
-                "two": "second value"
+                "appearance": {
+                    "theme": "dark"
+                },
+                "locale": {
+                    "language": "fr"
+                },
+                "notifications": {
+                    "email": false,
+                    "sms": true
+                }
             }
         }
     ],
@@ -38,8 +47,19 @@
         {
             "id": 4,
             "name": "name4",
-            "castable_field": [],
             "json_field": [],
+            "castable_field": {
+                "appearance": {
+                    "theme": "light"
+                },
+                "locale": {
+                    "language": "pl"
+                },
+                "notifications": {
+                    "email": false,
+                    "sms": false
+                }
+            },
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }
@@ -48,8 +68,19 @@
         {
             "id": 5,
             "name": "name5",
-            "castable_field": [],
             "json_field": [],
+            "castable_field": {
+                "appearance": {
+                    "theme": "dark"
+                },
+                "locale": {
+                    "language": "es"
+                },
+                "notifications": {
+                    "email": true,
+                    "sms": false
+                }
+            },
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }
