@@ -23,8 +23,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FixturesTraitTest extends TestCase
 {
-    use MockTrait;
     use FixturesTestTrait;
+    use MockTrait;
 
     public function setUp(): void
     {
@@ -178,7 +178,7 @@ class FixturesTraitTest extends TestCase
         return [
             'mysql' => [
                 'driver' => 'mysql',
-                'connectionClass' => MysqlConnection::class,
+                'connectionClass' => MySqlConnection::class,
                 'clearSqlFixture' => 'clear_database/clear_mysql_db_query.sql',
             ],
             'pgsql' => [
@@ -278,7 +278,7 @@ class FixturesTraitTest extends TestCase
                 result: $this->getJsonFixture('set_auto_increment/get_tables.json')),
         ], true);
 
-        $connection = $this->mockClass(MysqlConnection::class, [
+        $connection = $this->mockClass(MySqlConnection::class, [
             $this->functionCall(
                 name: 'getSchemaBuilder',
                 result: $mock,
