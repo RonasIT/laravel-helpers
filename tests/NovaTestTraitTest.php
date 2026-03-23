@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Tests\Support\Mock\Models\MockAuthUser;
@@ -191,11 +192,18 @@ class NovaTestTraitTest extends TestCase
 
     public function testNovaActingAs()
     {
+        Config::set('nova.guard', 'nova_test_guard');
+        Config::set('auth.guards.nova_test_guard', [
+            'driver' => 'session',
+            'provider' => 'users',
+        ]);
+
         $mockedUser = new MockAuthUser();
 
         $this->novaActingAs($mockedUser);
 
         $this->assertEquals($mockedUser, Auth::user());
+        $this->assertEquals('nova_test_guard', Auth::getDefaultDriver());
     }
 
     public function testNovaActingAsUserNotSet()
