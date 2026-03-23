@@ -40,7 +40,7 @@ class BaseRequestTest extends TestCase
         return [
             [
                 'keys' => [],
-                'validatedResult' => [
+                'result' => [
                     'name' => 'Update User',
                     'email' => 'updateuser@example.com',
                     'address' => [
@@ -57,25 +57,25 @@ class BaseRequestTest extends TestCase
             ],
             [
                 'keys' => ['name', 'email'],
-                'validatedResult' => [
+                'result' => [
                     'name' => 'Update User',
                     'email' => 'updateuser@example.com',
                 ],
             ],
             [
                 'keys' => ['nonexistentKey'],
-                'validatedResult' => [],
+                'result' => [],
             ],
         ];
     }
 
     #[DataProvider('getOnlyValidatedRequestData')]
-    public function testOnlyValidated(array $keys, array $validatedResult)
+    public function testOnlyValidated(array $keys, array $result)
     {
         $data = $this->getJsonFixture('update_test_request');
 
         $request = UpdateTestRequest::create('v1/test', 'put', $data);
 
-        $this->assertEquals($request->onlyValidated($keys), $validatedResult);
+        $this->assertEquals($request->onlyValidated($keys), $result);
     }
 }
