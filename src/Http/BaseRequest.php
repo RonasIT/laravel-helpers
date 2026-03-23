@@ -34,9 +34,9 @@ class BaseRequest extends FormRequest
 
         $validatedFields = $this->filterOnlyValidated(parent::all(), array_undot(array_flip($rules)));
 
-        return (empty($keys)
+        return (empty($keys))
             ? $validatedFields
-            : Arr::only($validatedFields, $keys));
+            : Arr::only($validatedFields, $keys);
     }
 
     protected function getOrderableFields(string $modelName, array $additionalFields = []): string
