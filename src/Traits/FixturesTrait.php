@@ -51,7 +51,6 @@ trait FixturesTrait
     ];
 
     protected array $truncateExceptTables = ['migrations', 'password_resets'];
-    protected array $prepareSequencesExceptTables = ['migrations', 'password_resets'];
 
     protected string $dumpFileName = 'dump.sql';
 
@@ -180,7 +179,7 @@ trait FixturesTrait
 
     public function prepareSequences(array $except = []): void
     {
-        $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
+        $except = array_merge($this->postgisTables, $this->truncateExceptTables, $except);
 
         $query = array_concat($this->getSequences(), function ($item) use ($except) {
             if (
@@ -203,7 +202,7 @@ trait FixturesTrait
 
     public function resetMySQLAutoIncrement(array $tables, array $except = []): void
     {
-        $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
+        $except = array_merge($this->truncateExceptTables, $except);
 
         $query = array_concat($tables, fn ($table) => (in_array($table['name'], $except))
             ? ''

@@ -17,12 +17,14 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
+use RonasIT\Support\Tests\Support\Traits\FixturesTestTrait;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FixturesTraitTest extends TestCase
 {
     use MockTrait;
+    use FixturesTestTrait;
 
     public function setUp(): void
     {
@@ -91,7 +93,9 @@ class FixturesTraitTest extends TestCase
             unlink($fixturePath);
         }
 
-        $result = ['value' => 1234567890];
+        $result = [
+            'value' => 1234567890,
+        ];
 
         $this->exportJson('export_json/response', new TestResponse(
             response: new Response(json_encode($result)),
@@ -169,44 +173,34 @@ class FixturesTraitTest extends TestCase
         $this->loadTestDump();
     }
 
-    public function testLoadTestDumpForMysql()
+    public static function loadTestDumpData(): array
     {
-        $connection = $this->mockClass(MysqlConnection::class, [
-            $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_mysql_db_query.sql')]),
-            $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
-        ], true);
-
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
-        $this->dumpFileName = 'clear_database/dump.sql';
-
-        Config::set('database.default', 'mysql');
-
-        self::$tables = $this->getJsonFixture('clear_database/tables.json');
-
-        $this->loadTestDump();
+        return [
+            'mysql' => [
+                'driver' => 'mysql',
+                'connectionClass' => MysqlConnection::class,
+                'clearSqlFixture' => 'clear_database/clear_mysql_db_query.sql',
+            ],
+            'pgsql' => [
+                'driver' => 'pgsql',
+                'connectionClass' => PostgresConnection::class,
+                'clearSqlFixture' => 'clear_database/clear_pgsql_db_query.sql',
+            ],
+        ];
     }
 
-    public function testLoadTestDumpForPgsql()
+    #[DataProvider('loadTestDumpData')]
+    public function testLoadTestDump(string $driver, string $connectionClass, string $clearSqlFixture)
     {
-        $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_pgsql_db_query.sql')]),
+        $connection = $this->mockClass($connectionClass, [
+            $this->functionCall('unprepared', [$this->getFixture($clearSqlFixture)]),
             $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
 
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
+        $this->bindMockedDbInstance($connection);
         $this->dumpFileName = 'clear_database/dump.sql';
 
-        Config::set('database.default', 'pgsql');
+        Config::set('database.default', $driver);
 
         self::$tables = $this->getJsonFixture('clear_database/tables.json');
 
@@ -223,11 +217,7 @@ class FixturesTraitTest extends TestCase
             $this->functionCall('getSchemaBuilder', [], $mock),
         ], true);
 
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
+        $this->bindMockedDbInstance($connection, 1);
 
         Config::set('database.default', 'mysql');
 
@@ -252,12 +242,7 @@ class FixturesTraitTest extends TestCase
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
+        $this->bindMockedDbInstance($connection);
 
         Config::set('database.default', 'pgsql');
 
@@ -301,12 +286,7 @@ class FixturesTraitTest extends TestCase
             $this->functionCall('unprepared', [$this->getFixture('set_auto_increment/set_auto_increment.sql')]),
         ], true);
 
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
+        $this->bindMockedDbInstance($connection);
 
         Config::set('database.default', 'mysql');
 
