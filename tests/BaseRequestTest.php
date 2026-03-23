@@ -2,8 +2,10 @@
 
 namespace RonasIT\Support\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Http\BaseRequest;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
+use RonasIT\Support\Tests\Support\Request\UpdateTestRequest;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class BaseRequestTest extends TestCase
@@ -31,5 +33,49 @@ class BaseRequestTest extends TestCase
         $expectedResult = 'id,name,json_field,castable_field,binary_field,*,created_at,updated_at,additional_field_1,additional_field_2';
 
         $this->assertEquals($expectedResult, $result);
+    }
+
+    public static function getOnlyValidatedRequestData(): array
+    {
+        return [
+            [
+                'keys' => [],
+                'result' => [
+                    'name' => 'Update User',
+                    'email' => 'updateuser@example.com',
+                    'address' => [
+                        'CA',
+                        '123 Avenue',
+                    ],
+                    'meta' => [
+                        [
+                            'value' => '111',
+                            'description' => 'meta id',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'keys' => ['name', 'email'],
+                'result' => [
+                    'name' => 'Update User',
+                    'email' => 'updateuser@example.com',
+                ],
+            ],
+            [
+                'keys' => ['nonexistentKey'],
+                'result' => [],
+            ],
+        ];
+    }
+
+    #[DataProvider('getOnlyValidatedRequestData')]
+    public function testOnlyValidated(array $keys, array $result)
+    {
+        $data = $this->getJsonFixture('update_test_request');
+
+        $request = UpdateTestRequest::create('v1/test', 'put', $data);
+
+        $this->assertEquals($request->onlyValidated($keys), $result);
     }
 }
