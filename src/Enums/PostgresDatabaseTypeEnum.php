@@ -29,6 +29,26 @@ enum PostgresDatabaseTypeEnum: string implements DatabaseTypeRangesContract
         };
     }
 
+    public static function integerTypes(): array
+    {
+        return [
+            self::SmallInt->value,
+            self::Integer->value,
+            self::BigInt->value,
+            self::SmallSerial->value,
+            self::Serial->value,
+            self::BigSerial->value,
+        ];
+    }
+
+    public static function stringTypes(): array
+    {
+        return [
+            self::Varchar->value,
+            self::Text->value,
+        ];
+    }
+
     public static function ranges(): array
     {
         $ranges = [];
