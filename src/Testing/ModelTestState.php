@@ -22,7 +22,7 @@ class ModelTestState extends TableTestState
         parent::__construct(
             tableName: $model->getTable(),
             jsonFields: $this->getNativeJsonFields($casts),
-            connectionName: $model->getConnectionName($model),
+            connectionName: $model->getConnectionName(),
         );
 
         $this->customCastFields = $this->getCustomCastFields($casts);
