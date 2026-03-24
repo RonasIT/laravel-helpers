@@ -86,13 +86,13 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
     }
 
-    public function testAssertChangesWithoutJsonFields()
+    public function testAssertChangesWithoutCasts(): void
     {
         $initialDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_without_json_fields/initial_dataset.json'),
+            value: $this->getJsonFixture('changes_equals_fixture_without_casts/initial_dataset.json'),
         );
         $changedDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
+            value: $this->getJsonFixture('changes_equals_fixture_without_casts/changed_dataset.json'),
         );
 
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_without_json_fields');
