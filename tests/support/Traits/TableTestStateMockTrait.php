@@ -13,13 +13,16 @@ trait TableTestStateMockTrait
 {
     use MockTestTrait;
 
-    protected function mockGettingDataset(Collection $responseMock, string $uniqueKey = 'id'): void
-    {
+    protected function mockGettingDataset(
+        Collection $responseMock,
+        string $tableName = 'test_models',
+        string $uniqueKey = 'id',
+    ): void {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 
         DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
         DB::shouldReceive('connection')->once()->andReturnSelf();
-        DB::shouldReceive('table')->with('test_models')->once()->andReturn($builderMock);
+        DB::shouldReceive('table')->with($tableName)->once()->andReturn($builderMock);
 
         $builderMock
             ->method('orderBy')

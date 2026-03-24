@@ -1,0 +1,59 @@
+{
+    "updated": [
+        {
+            "id": 1,
+            "castable_field": {
+                "appearance": {
+                    "theme": "dark"
+                },
+                "locale": {
+                    "language": "de"
+                },
+                "notifications": {
+                    "email": true,
+                    "sms": true
+                }
+            }
+        }
+    ],
+    "created": [
+        {
+            "id": 4,
+            "name": "name4",
+            "castable_field": {
+                "appearance": {
+                    "theme": "system"
+                },
+                "locale": {
+                    "language": "pl"
+                },
+                "notifications": {
+                    "email": false,
+                    "sms": false
+                }
+            },
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ],
+    "deleted": [
+        {
+            "id": 3,
+            "name": "name3",
+            "castable_field": {
+                "appearance": {
+                    "theme": "dark"
+                },
+                "locale": {
+                    "language": "es"
+                },
+                "notifications": {
+                    "email": true,
+                    "sms": false
+                }
+            },
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ]
+}
