@@ -11,23 +11,18 @@ class PluralizationTest extends TestCase
 {
     public static function getUncountableWordsData(): array
     {
-        return [
-            ['billing'],
-            ['funding'],
-            ['ordering'],
-        ];
+        return array_map(
+            callback: static fn (string $word): array => [$word],
+            array: UncountableWords::LIST,
+        );
     }
 
     #[DataProvider('getUncountableWordsData')]
     public function testUncountableWordStaysUnchanged(string $word): void
     {
         $this->assertEquals($word, Str::plural($word));
-    }
-
-    #[DataProvider('getUncountableWordsData')]
-    public function testUncountableWordIsCaseInsensitive(string $word): void
-    {
         $this->assertEquals(Str::upper($word), Str::plural(Str::upper($word)));
+        $this->assertEquals(Str::ucfirst($word), Str::plural(Str::ucfirst($word)));
     }
 
     public static function getRegularWordsData(): array
