@@ -52,7 +52,7 @@ class HelpersServiceProvider extends ServiceProvider
             });
         }
 
-        Pluralizer::$uncountable = array_merge(Pluralizer::$uncountable, UncountableWords::LIST);
+        Pluralizer::$uncountable = array_unique(array_merge(Pluralizer::$uncountable, UncountableWords::LIST));
     }
 
     public function register(): void
