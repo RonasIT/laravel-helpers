@@ -5,9 +5,11 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
+use RonasIT\Support\Contracts\DatabaseTypeRangesContract;
 use RonasIT\Support\Enums\PostgresDatabaseTypeEnum;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Rules\DbTypeRangeRule;
+use RonasIT\Support\Tests\Support\Mock\Enums\DatabaseTypeRangesWithUncategorizedTypesEnum;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use RonasIT\Support\Traits\TestingTrait;
 
@@ -249,6 +251,49 @@ class ValidatorTest extends TestCase
                 'value' => '',
                 'type' => 'text',
             ],
+            'integer max as string' => [
+                'value' => (string) self::INTEGER_MAX,
+                'type' => 'integer',
+            ],
+            'integer min as string' => [
+                'value' => (string) self::INTEGER_MIN,
+                'type' => 'integer',
+            ],
+            'smallint max as string' => [
+                'value' => (string) self::SMALLINT_MAX,
+                'type' => 'smallint',
+            ],
+        ];
+    }
+
+    public static function provideDbTypeRangeWrongTypeFails(): array
+    {
+        return [
+            'non-numeric string to integer' => [
+                'value' => 'abc',
+                'type' => 'integer',
+                'error' => 'The value must be an integer.',
+            ],
+            'float to integer' => [
+                'value' => 42.5,
+                'type' => 'integer',
+                'error' => 'The value must be an integer.',
+            ],
+            'float string to integer' => [
+                'value' => '42.5',
+                'type' => 'integer',
+                'error' => 'The value must be an integer.',
+            ],
+            'integer to varchar' => [
+                'value' => 42,
+                'type' => 'varchar',
+                'error' => 'The value must be a string.',
+            ],
+            'array to varchar' => [
+                'value' => ['foo'],
+                'type' => 'varchar',
+                'error' => 'The value must be a string.',
+            ],
         ];
     }
 
@@ -313,6 +358,18 @@ class ValidatorTest extends TestCase
             expected: "The value must be between {$range[0]} and {$range[1]}.",
             actual: $validator->errors()->first('value'),
         );
+    }
+
+    #[DataProvider('provideDbTypeRangeWrongTypeFails')]
+    public function testDbTypeRangeWrongTypeFails(mixed $value, string $type, string $error): void
+    {
+        $validator = Validator::make(
+            ['value' => $value],
+            ['value' => "db_type_range:{$type}"],
+        );
+
+        $this->assertTrue($validator->fails());
+        $this->assertEquals($error, $validator->errors()->first('value'));
     }
 
     public function testVarcharDbTypeRangeFails(): void
@@ -387,5 +444,17 @@ class ValidatorTest extends TestCase
         );
 
         $validator->passes();
+    }
+
+    public function testDbTypeRangeUncategorizedTypePasses(): void
+    {
+        app()->bind(DatabaseTypeRangesContract::class, fn () => DatabaseTypeRangesWithUncategorizedTypesEnum::class);
+
+        $validator = Validator::make(
+            data: ['value' => 3.14],
+            rules: ['value' => [new DbTypeRangeRule('decimal')]],
+        );
+
+        $this->assertTrue($validator->passes());
     }
 }
