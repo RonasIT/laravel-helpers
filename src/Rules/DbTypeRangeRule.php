@@ -22,6 +22,10 @@ class DbTypeRangeRule implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if (is_null($value)) {
+            return;
+        }
+
         $ranges = $this->resolver::ranges();
 
         if (!array_key_exists($this->type, $ranges)) {
