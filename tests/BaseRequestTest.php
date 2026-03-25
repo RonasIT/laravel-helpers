@@ -16,7 +16,7 @@ class BaseRequestTest extends TestCase
     {
         $result = $this->callEncapsulatedMethod(new BaseRequest(), 'getOrderableFields', TestModel::class);
 
-        $expectedResult = 'id,name,array_field,json_field,object_field,collection_field,castable_field,*,created_at,updated_at';
+        $expectedResult = 'id,name,*,created_at,updated_at';
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -30,7 +30,7 @@ class BaseRequestTest extends TestCase
 
         $result = $this->callEncapsulatedMethod(new BaseRequest(), 'getOrderableFields', ...$args);
 
-        $expectedResult = 'id,name,array_field,json_field,object_field,collection_field,castable_field,*,created_at,updated_at,additional_field_1,additional_field_2';
+        $expectedResult = 'id,name,*,created_at,updated_at,additional_field_1,additional_field_2';
 
         $this->assertEquals($expectedResult, $result);
     }
