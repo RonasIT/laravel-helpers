@@ -9,6 +9,7 @@ use RonasIT\Support\Contracts\DatabaseTypeRangesContract;
 use RonasIT\Support\Enums\PostgresDatabaseTypeEnum;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Rules\DbTypeRangeRule;
+use RonasIT\Support\Tests\Support\Mock\Enums\CustomDatabaseTypeRangesEnum;
 use RonasIT\Support\Tests\Support\Mock\Enums\DatabaseTypeRangesWithUncategorizedTypesEnum;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use RonasIT\Support\Traits\TestingTrait;
@@ -301,8 +302,8 @@ class ValidatorTest extends TestCase
     public function testDbTypeRangePasses(mixed $value, string $type): void
     {
         $validator = Validator::make(
-            ['value' => $value],
-            ['value' => "db_type_range:{$type}"],
+            data: ['value' => $value],
+            rules: ['value' => "db_type_range:{$type}"],
         );
 
         $this->assertTrue($validator->passes());
@@ -348,8 +349,8 @@ class ValidatorTest extends TestCase
     public function testNumericDbTypeRangeFails(mixed $value, string $type, array $range): void
     {
         $validator = Validator::make(
-            ['value' => $value],
-            ['value' => "db_type_range:{$type}"],
+            data: ['value' => $value],
+            rules: ['value' => "db_type_range:{$type}"],
         );
 
         $this->assertTrue($validator->fails());
@@ -364,8 +365,8 @@ class ValidatorTest extends TestCase
     public function testDbTypeRangeWrongTypeFails(mixed $value, string $type, string $error): void
     {
         $validator = Validator::make(
-            ['value' => $value],
-            ['value' => "db_type_range:{$type}"],
+            data: ['value' => $value],
+            rules: ['value' => "db_type_range:{$type}"],
         );
 
         $this->assertTrue($validator->fails());
@@ -378,8 +379,8 @@ class ValidatorTest extends TestCase
         $max = self::VARCHAR_MAX;
 
         $validator = Validator::make(
-            ['value' => $value],
-            ['value' => 'db_type_range:varchar'],
+            data: ['value' => $value],
+            rules: ['value' => 'db_type_range:varchar'],
         );
 
         $this->assertTrue($validator->fails());
@@ -393,8 +394,8 @@ class ValidatorTest extends TestCase
     public function testDbTypeRangeObjectSyntaxPasses(): void
     {
         $validator = Validator::make(
-            ['value' => 0],
-            ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
+            data: ['value' => 0],
+            rules: ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
         );
 
         $this->assertTrue($validator->passes());
@@ -403,8 +404,8 @@ class ValidatorTest extends TestCase
     public function testDbTypeRangeObjectSyntaxFails(): void
     {
         $validator = Validator::make(
-            ['value' => self::INTEGER_MAX + 1],
-            ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
+            data: ['value' => self::INTEGER_MAX + 1],
+            rules: ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
         );
 
         $this->assertTrue($validator->fails());
@@ -424,8 +425,8 @@ class ValidatorTest extends TestCase
         );
 
         $validator = Validator::make(
-            ['value' => 0],
-            ['value' => 'db_type_range:unknown_type'],
+            data: ['value' => 0],
+            rules: ['value' => 'db_type_range:unknown_type'],
         );
 
         $validator->passes();
@@ -439,8 +440,8 @@ class ValidatorTest extends TestCase
         );
 
         $validator = Validator::make(
-            ['value' => 0],
-            ['value' => 'db_type_range'],
+            data: ['value' => 0],
+            rules: ['value' => 'db_type_range'],
         );
 
         $validator->passes();
@@ -456,5 +457,30 @@ class ValidatorTest extends TestCase
         );
 
         $this->assertTrue($validator->passes());
+    }
+
+    public function testDbTypeRangeUsesCustomResolverRangesPasses(): void
+    {
+        app()->bind(DatabaseTypeRangesContract::class, fn () => CustomDatabaseTypeRangesEnum::class);
+
+        $passing = Validator::make(
+            data: ['value' => 50],
+            rules: ['value' => [new DbTypeRangeRule('integer')]],
+        );
+
+        $this->assertTrue($passing->passes());
+    }
+
+    public function testDbTypeRangeUsesCustomResolverRangesFails(): void
+    {
+        app()->bind(DatabaseTypeRangesContract::class, fn () => CustomDatabaseTypeRangesEnum::class);
+
+        $failing = Validator::make(
+            data: ['value' => 101],
+            rules: ['value' => [new DbTypeRangeRule('integer')]],
+        );
+
+        $this->assertTrue($failing->fails());
+        $this->assertEquals('The value must be between 0 and 100.', $failing->errors()->first('value'));
     }
 }
