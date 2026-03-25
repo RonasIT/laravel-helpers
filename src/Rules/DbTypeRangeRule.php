@@ -51,7 +51,7 @@ class DbTypeRangeRule implements ValidationRule
             }
 
             $metric = mb_strlen($value);
-            $errorMessage = "The {$attribute} length must be less than {$max} characters.";
+            $errorMessage = "The {$attribute} length must not exceed {$max} characters.";
         } else {
             return;
         }

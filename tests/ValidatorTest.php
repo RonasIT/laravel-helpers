@@ -386,7 +386,7 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->fails());
 
         $this->assertEquals(
-            expected: "The value length must be less than {$max} characters.",
+            expected: "The value length must not exceed {$max} characters.",
             actual: $validator->errors()->first('value'),
         );
     }
