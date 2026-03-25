@@ -1,0 +1,26 @@
+{
+    "updated": [
+        {
+            "id": 1,
+            "amount": " 1500"
+        }
+    ],
+    "created": [
+        {
+            "id": 4,
+            "currency": "JPY",
+            "amount": "JPY 5000",
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ],
+    "deleted": [
+        {
+            "id": 3,
+            "currency": "GBP",
+            "amount": "GBP 3000",
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ]
+}

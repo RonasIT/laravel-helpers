@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "currency": "USD",
+    "amount": 1500,
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 2,
+    "currency": "EUR",
+    "amount": 2000,
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 4,
+    "currency": "JPY",
+    "amount": 5000,
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  }
+]
