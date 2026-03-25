@@ -3,10 +3,11 @@
 namespace RonasIT\Support\Tests\Support\Mock\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Model;
 
 class JSONCustomCast implements CastsAttributes
 {
-    public function get($model, $key, $value, $attributes): array
+    public function get(Model $model, string $key, mixed $value, array $attributes): array
     {
         $data = json_decode($value, true) ?? [];
 
@@ -24,7 +25,7 @@ class JSONCustomCast implements CastsAttributes
         ];
     }
 
-    public function set($model, $key, $value, $attributes): string
+    public function set(Model $model, string $key, mixed $value, array $attributes): string
     {
         return json_encode([
             'theme' => $value['appearance']['theme'] ?? null,
