@@ -16,12 +16,12 @@ class ModelTestState extends TableTestState
     protected array $customCastFields;
 
     /**
-     * @param class-string<Model> $modelClassName
+     * @param  class-string<Model>  $modelClassName
      */
     public function __construct(
         protected string $modelClassName,
     ) {
-        $model = new $this->modelClassName;
+        $model = new $this->modelClassName();
 
         $casts = $model->getCasts();
 
@@ -58,7 +58,8 @@ class ModelTestState extends TableTestState
 
     protected function applyCustomCasts(array $item): array
     {
-        $model = (new $this->modelClassName())->forceFill($item);
+        $model = new $this->modelClassName();
+        $model->setRawAttributes($item);
 
         foreach ($this->customCastFields as $field => $castClass) {
             if (Arr::has($item, $field)) {
