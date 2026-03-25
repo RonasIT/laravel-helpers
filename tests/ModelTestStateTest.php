@@ -8,6 +8,7 @@ use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithAllNativeJsonCasts;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCasts;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithModelAwareCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithOnlyCustomCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutJsonFields;
@@ -33,7 +34,7 @@ class ModelTestStateTest extends TestCase
 
         $this->mockGettingDataset($datasetMock);
 
-        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState = new ModelTestState(TestModelWithCasts::class);
         $reflectionClass = new ReflectionClass($modelTestState);
 
         $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
@@ -83,7 +84,7 @@ class ModelTestStateTest extends TestCase
 
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
 
-        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState = new ModelTestState(TestModelWithCasts::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
     }
 
