@@ -27,6 +27,10 @@ class ValidatorTest extends TestCase
     private const int BIGINT_MAX = PHP_INT_MAX;
     private const int SERIAL_MIN = 1;
     private const int SERIAL_MAX = 2147483647;
+    private const int SMALLSERIAL_MIN = 1;
+    private const int SMALLSERIAL_MAX = 32767;
+    private const int BIGSERIAL_MIN = 1;
+    private const int BIGSERIAL_MAX = PHP_INT_MAX;
     private const int VARCHAR_MAX = 255;
 
     public function setUp(): void
@@ -240,6 +244,22 @@ class ValidatorTest extends TestCase
                 'value' => self::SERIAL_MAX,
                 'type' => 'serial',
             ],
+            'smallserial min' => [
+                'value' => self::SMALLSERIAL_MIN,
+                'type' => 'smallserial',
+            ],
+            'smallserial max' => [
+                'value' => self::SMALLSERIAL_MAX,
+                'type' => 'smallserial',
+            ],
+            'bigserial min' => [
+                'value' => self::BIGSERIAL_MIN,
+                'type' => 'bigserial',
+            ],
+            'bigserial max' => [
+                'value' => self::BIGSERIAL_MAX,
+                'type' => 'bigserial',
+            ],
             'varchar min' => [
                 'value' => '',
                 'type' => 'varchar',
@@ -341,6 +361,21 @@ class ValidatorTest extends TestCase
                 'value' => self::SERIAL_MAX + 1,
                 'type' => 'serial',
                 'range' => [self::SERIAL_MIN, self::SERIAL_MAX],
+            ],
+            'smallserial below min' => [
+                'value' => self::SMALLSERIAL_MIN - 1,
+                'type' => 'smallserial',
+                'range' => [self::SMALLSERIAL_MIN, self::SMALLSERIAL_MAX],
+            ],
+            'smallserial above max' => [
+                'value' => self::SMALLSERIAL_MAX + 1,
+                'type' => 'smallserial',
+                'range' => [self::SMALLSERIAL_MIN, self::SMALLSERIAL_MAX],
+            ],
+            'bigserial below min' => [
+                'value' => self::BIGSERIAL_MIN - 1,
+                'type' => 'bigserial',
+                'range' => [self::BIGSERIAL_MIN, self::BIGSERIAL_MAX],
             ],
         ];
     }
