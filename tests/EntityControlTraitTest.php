@@ -288,7 +288,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testInsertOrIgnore(): void
     {
-        $this->mockInsertOrIgnoreData();
+        $this->mockInsertOrIgnore();
 
         $result = self::$testRepositoryClass->insertOrIgnore([
             ['name' => 'test_name_1'],
@@ -301,7 +301,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testInsertOrIgnoreWithSettableProperties(): void
     {
-        $this->mockInsertOrIgnoreData();
+        $this->mockInsertOrIgnore();
 
         $result = self::$testRepositoryClass
             ->withTrashed()
@@ -320,7 +320,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testInsertOrIgnoreWithoutTimestamps(): void
     {
-        $this->mockInsertOrIgnoreDataWithoutTimestamps();
+        $this->mockInsertOrIgnoreWithoutTimestamps();
 
         $result = self::$testRepositoryClassWithoutTimestamps->insertOrIgnore([
             [
@@ -345,23 +345,20 @@ class EntityControlTraitTest extends TestCase
 
     public function testInsertOrIgnoreWithDifferentTimestampNames(): void
     {
-        $this->mockInsertOrIgnoreDataWithDifferentTimestampNames();
+        $this->mockInsertOrIgnoreWithDifferentTimestampNames();
 
         $result = self::$testRepositoryWithDifferentTimestampNames->insertOrIgnore([
             [
                 'name' => 'test_name_1',
                 'creation_date' => '1999-01-01',
-                'updated_date' => '1999-01-01',
             ],
             [
                 'name' => 'test_name_2',
                 'creation_date' => '1999-01-01',
-                'updated_date' => '1999-01-01',
             ],
             [
                 'name' => 'test_name_3',
                 'creation_date' => '1999-01-01',
-                'updated_date' => '1999-01-01',
             ],
         ]);
 
