@@ -284,6 +284,14 @@ class ValidatorTest extends TestCase
                 'value' => (string) self::SMALLINT_MAX,
                 'type' => 'smallint',
             ],
+            'null to integer' => [
+                'value' => null,
+                'type' => 'integer',
+            ],
+            'null to varchar' => [
+                'value' => null,
+                'type' => 'varchar',
+            ],
         ];
     }
 
