@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Testing;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 class ModelTestState extends TableTestState
@@ -14,9 +15,14 @@ class ModelTestState extends TableTestState
      */
     protected array $customCastFields;
 
-    public function __construct(string $modelClassName)
-    {
-        $model = new $modelClassName();
+    /**
+     * @param class-string<Model> $modelClassName
+     */
+    public function __construct(
+        protected string $modelClassName,
+    ) {
+        $model = new $this->modelClassName;
+
         $casts = $model->getCasts();
 
         parent::__construct(
@@ -50,6 +56,19 @@ class ModelTestState extends TableTestState
         return class_exists($castType) && is_subclass_of($castType, CastsAttributes::class);
     }
 
+    protected function applyCustomCasts(array $item): array
+    {
+        $model = (new $this->modelClassName())->forceFill($item);
+
+        foreach ($this->customCastFields as $field => $castClass) {
+            if (Arr::has($item, $field)) {
+                $item[$field] = (new $castClass())->get($model, $field, $item[$field], $item);
+            }
+        }
+
+        return $item;
+    }
+
     protected function prepareChanges(array $changes): array
     {
         $changes = parent::prepareChanges($changes);
@@ -58,14 +77,6 @@ class ModelTestState extends TableTestState
             return $changes;
         }
 
-        return array_map(function ($item) {
-            foreach ($this->customCastFields as $field => $castClass) {
-                if (Arr::has($item, $field)) {
-                    $item[$field] = (new $castClass())->get(null, $field, $item[$field], $item);
-                }
-            }
-
-            return $item;
-        }, $changes);
+        return array_map(fn (array $changesItem) => $this->applyCustomCasts($changesItem), $changes);
     }
 }
