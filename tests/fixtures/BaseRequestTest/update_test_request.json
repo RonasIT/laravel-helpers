@@ -1,0 +1,17 @@
+{
+    "old_password": "123",
+    "password": "123456",
+    "password_confirmation": "123456",
+    "name": "Update User",
+    "email": "updateuser@example.com",
+    "address": [
+        "CA",
+        "123 Avenue"
+    ],
+    "meta": [
+        {
+            "value": "111",
+            "description": "meta id"
+        }
+    ]
+}
