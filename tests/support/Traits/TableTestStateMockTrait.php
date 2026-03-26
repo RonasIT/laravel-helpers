@@ -5,6 +5,7 @@ namespace RonasIT\Support\Tests\Support\Traits;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use ReflectionClass;
 use RonasIT\Support\Testing\TestCase;
 
@@ -51,12 +52,9 @@ trait TableTestStateMockTrait
 
     protected function mockTestStateCreationSetGlobalExportMode(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool
     {
-        $testCaseMock = $this
-            ->getMockBuilder(TestCase::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $testCaseMock->setGlobalExportMode($testCaseGlobalExportMode);
+        $testCaseMock = Mockery::mock(TestCase::class)
+            ->makePartial()
+            ->setGlobalExportMode($testCaseGlobalExportMode);
 
         $instance = $this->callEncapsulatedMethod($testCaseMock, $methodName, $entity);
 
