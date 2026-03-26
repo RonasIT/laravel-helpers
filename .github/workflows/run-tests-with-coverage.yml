@@ -34,8 +34,8 @@ jobs:
         if: ${{ matrix.php-version == '8.4' }}
         uses: actions/upload-artifact@v4
         with:
-          name: clover.xml
-          path: build/logs
+          name: clover-${{ matrix.php-version }}-laravel-${{ matrix.laravel-version }}.xml
+          path: build/logs/clover.xml
 
   upload-to-coveralls:
     needs: tests-with-coverage
