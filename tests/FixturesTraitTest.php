@@ -29,7 +29,6 @@ class FixturesTraitTest extends TestCase
         parent::setUp();
 
         self::$tables = null;
-        self::$sequences = [];
     }
 
     public static function getFixtureData(): array
