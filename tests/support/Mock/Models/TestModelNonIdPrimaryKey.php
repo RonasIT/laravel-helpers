@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
 use RonasIT\Support\Traits\ModelTrait;
 
-class TestModelPrimaryKey extends Model
+class TestModelNonIdPrimaryKey extends Model
 {
     use ModelTrait;
     use SoftDeletes;

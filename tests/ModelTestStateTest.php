@@ -6,7 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelPrimaryKey;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIDPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutJsonFields;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
@@ -99,14 +99,14 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertNotChanged();
     }
 
-    public function testAssertChangesPrimaryKey()
+    public function testAssertChangesWithCustomPrimaryKey()
     {
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/initial_dataset.json'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/changed_dataset.json'));
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_primary_keys', 'name');
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_non_id_primary_keys', 'name');
 
-        $modelTestState = new ModelTestState(TestModelPrimaryKey::class);
+        $modelTestState = new ModelTestState(TestModelNonIdPrimaryKey::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key.json');
     }
 }

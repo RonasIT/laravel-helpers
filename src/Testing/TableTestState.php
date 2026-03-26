@@ -17,19 +17,19 @@ class TableTestState extends Assert
     protected array $jsonFields;
     protected ?string $connectionName;
     protected Collection $state;
-    protected string $primaryKey;
+    protected string $uniqueKey;
 
     public function __construct(
         string $tableName,
         array $jsonFields = [],
         ?string $connectionName = null,
-        string $primaryKey = 'id',
+        string $uniqueKey = 'id',
     ) {
         $this->tableName = $tableName;
         $this->jsonFields = $jsonFields;
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
-        $this->state = $this->getDataSet($tableName, $primaryKey);
-        $this->primaryKey = $primaryKey;
+        $this->state = $this->getDataSet($tableName, $uniqueKey);
+        $this->uniqueKey = $uniqueKey;
     }
 
     public function assertNotChanged(): void
@@ -52,13 +52,13 @@ class TableTestState extends Assert
 
     protected function getChanges(): array
     {
-        $updatedData = $this->getDataSet($this->tableName, $this->primaryKey);
+        $updatedData = $this->getDataSet($this->tableName, $this->uniqueKey);
 
         $updatedRecords = [];
         $deletedRecords = [];
 
         $this->state->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords) {
-            $updatedItemIndex = $updatedData->search(fn ($updatedItem) => $updatedItem[$this->primaryKey] === $originItem[$this->primaryKey]);
+            $updatedItemIndex = $updatedData->search(fn ($updatedItem) => $updatedItem[$this->uniqueKey] === $originItem[$this->uniqueKey]);
 
             if ($updatedItemIndex === false) {
                 $deletedRecords[] = $originItem;
@@ -67,7 +67,7 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
-                    $updatedRecords[] = array_merge([$this->primaryKey => $originItem[$this->primaryKey]], $changes);
+                    $updatedRecords[] = array_merge([$this->uniqueKey => $originItem[$this->uniqueKey]], $changes);
                 }
 
                 $updatedData->forget($updatedItemIndex);
@@ -109,7 +109,7 @@ class TableTestState extends Assert
         return base_path("tests/fixtures/{$testClass}/db_changes/{$this->tableName}/{$fixtureName}");
     }
 
-    protected function getDataSet(string $table, string $orderField): Collection
+    protected function getDataSet(string $table, string $orderField = 'id'): Collection
     {
         return DB::connection($this->connectionName)
             ->table($table)

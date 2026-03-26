@@ -15,7 +15,7 @@ class ModelTestState extends TableTestState
             tableName: $model->getTable(),
             jsonFields: $this->getModelJSONFields($model),
             connectionName: $model->getConnectionName($model),
-            primaryKey: $model->getKeyName(),
+            uniqueKey: $model->getKeyName(),
         );
     }
 

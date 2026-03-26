@@ -12,7 +12,7 @@ trait TableTestStateMockTrait
 {
     use MockTestTrait;
 
-    protected function mockGettingDataset(Collection $responseMock, string $primaryKey = 'id'): void
+    protected function mockGettingDataset(Collection $responseMock, string $uniqueKey = 'id'): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 
@@ -22,7 +22,7 @@ trait TableTestStateMockTrait
 
         $builderMock
             ->method('orderBy')
-            ->with($primaryKey)
+            ->with($uniqueKey)
             ->willReturnSelf();
 
         $builderMock
@@ -30,7 +30,7 @@ trait TableTestStateMockTrait
             ->willReturn($responseMock);
     }
 
-    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName, string $primaryKey = 'id'): void
+    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName, string $uniqueKey = 'id'): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 
@@ -40,7 +40,7 @@ trait TableTestStateMockTrait
 
         $builderMock
             ->method('orderBy')
-            ->with($primaryKey)
+            ->with($uniqueKey)
             ->willReturnSelf();
 
         $builderMock
