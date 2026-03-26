@@ -12,7 +12,10 @@ jobs:
     strategy:
       matrix:
         php-version: [ "8.3", "8.4" ]
-        laravel-version: [ "11", "12", "13" ]
+        laravel:
+          - { name: "laravel11", version: "11.*" }
+          - { name: "laravel12", version: "12.*" }
+          - { name: "laravel13", version: "13.*" }
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -23,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Laravel version
-        run: composer require "laravel/framework:${{ matrix.laravel-version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer require "laravel/framework:${{ matrix.laravel.version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Install other dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
@@ -34,7 +37,7 @@ jobs:
         if: ${{ matrix.php-version == '8.4' }}
         uses: actions/upload-artifact@v4
         with:
-          name: clover-${{ matrix.php-version }}-laravel-$${{ matrix.laravel-version }}.xml
+          name: clover-${{ matrix.php-version }}-laravel-$${{ matrix.laravel.name }}.xml
           path: build/logs/clover.xml
 
   upload-to-coveralls:
