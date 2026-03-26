@@ -7,14 +7,17 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\TestCase as BaseTest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Testing\TestResponse;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Traits\MailsMockTrait;
+use RonasIT\Support\Traits\NotificationsMockTrait;
 
 abstract class TestCase extends BaseTest
 {
     use MailsMockTrait;
+    use NotificationsMockTrait;
 
     protected const int REDIS_COUNT_DATABASES = 16;
     protected $auth;
@@ -49,6 +52,7 @@ abstract class TestCase extends BaseTest
         Carbon::setTestNow(Carbon::parse($this->testNow));
 
         Mail::fake();
+        Notification::fake();
 
         $this->beginDatabaseTransaction();
     }
