@@ -12,6 +12,11 @@ jobs:
     strategy:
       matrix:
         php-version: [ "8.3", "8.4" ]
+        laravel-version: [ "11.*", "12.*", "13.*" ]
+        phpunit-version: [ "11.*", "12.*", "13.*" ]
+        exclude:
+          - php-version: "8.3"
+            phpunit-version: "13.*"
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -21,7 +26,11 @@ jobs:
           tools: composer
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install Dependencies
+      - name: Install Laravel version
+        run: composer require --dev "laravel/framework:${{ matrix.laravel-version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install PHPUnit version
+        run: composer require --dev "phpunit/phpunit:${{ matrix.phpunit-version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install other dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
         run: vendor/bin/pint --test
