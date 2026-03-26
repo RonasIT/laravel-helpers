@@ -6,7 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIDPrimaryKey;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIdPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutJsonFields;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
