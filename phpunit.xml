@@ -4,7 +4,6 @@
          bootstrap="bootstrap/autoload.php"
          colors="true"
          cacheDirectory=".phpunit.cache"
-         failOnPhpunitNotice="true"
 >
   <testsuites>
     <testsuite name="Application Test Suite">
