@@ -27,9 +27,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Laravel version
-        run: composer require --dev "laravel/framework:${{ matrix.laravel-version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer require "laravel/framework:${{ matrix.laravel-version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Install PHPUnit version
-        run: composer require --dev "phpunit/phpunit:${{ matrix.phpunit-version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer require --dev "phpunit/phpunit:${{ matrix.phpunit-version }}" -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Install other dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
