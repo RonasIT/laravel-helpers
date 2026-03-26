@@ -13,9 +13,9 @@ jobs:
       matrix:
         php-version: [ "8.3", "8.4" ]
         laravel:
-          - { name: "laravel11", version: "11.*" }
-          - { name: "laravel12", version: "12.*" }
-          - { name: "laravel13", version: "13.*" }
+          - { name: "11", version: "11.*" }
+          - { name: "12", version: "12.*" }
+          - { name: "13", version: "13.*" }
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -34,10 +34,10 @@ jobs:
       - name: Execute unit tests via PHPUnit with coverage
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       - name: Export coverage report
-        if: ${{ matrix.php-version == '8.4' }}
+        if: ${{ matrix.php-version == '8.4' && matrix.laravel.name == '13' }}
         uses: actions/upload-artifact@v4
         with:
-          name: clover-${{ matrix.php-version }}-laravel-$${{ matrix.laravel.name }}.xml
+          name: clover.xml
           path: build/logs/clover.xml
 
   upload-to-coveralls:
