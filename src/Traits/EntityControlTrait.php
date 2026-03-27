@@ -362,6 +362,23 @@ trait EntityControlTrait
         $this->postQueryHook();
     }
 
+    public function lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): int
+    {
+        $count = 0;
+
+        $this
+            ->getQuery($where)
+            ->lazyById($chunkSize)
+            ->tapEach(function () use (&$count) {
+                $count++;
+            })
+            ->each($callback);
+
+        $this->postQueryHook();
+
+        return $count;
+    }
+
     /**
      * Delete rows by list of values a particular field or primary key
      *
