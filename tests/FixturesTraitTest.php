@@ -31,6 +31,7 @@ class FixturesTraitTest extends TestCase
         parent::setUp();
 
         self::$tables = null;
+        self::$sequences = [];
     }
 
     public static function getFixtureData(): array
@@ -243,6 +244,44 @@ class FixturesTraitTest extends TestCase
         ], true);
 
         $this->bindMockedDbInstance($connection);
+
+        Config::set('database.default', 'pgsql');
+
+        $this->prepareSequences(['roles']);
+    }
+
+    public function testPrepareSequencesAllTablesExcluded(): void
+    {
+        $sequences = collect($this->getJsonFixture('prepare_sequences_all_tables_excluded/information_schema.json'))
+            ->map(fn (array $item) => (object) $item);
+
+        $connection = $this->mockClass(
+            class: PostgresConnection::class,
+            callChain: [
+                $this->functionCall('getQueryGrammar', [], new Grammar()),
+                $this->functionCall('getPostProcessor', [], new Processor()),
+                $this->functionCall(
+                    name: 'select',
+                    arguments: [
+                        'select "table_name", "table_schema", "column_name", "column_default" from "information_schema"."columns" where "column_default" LIKE ?',
+                        ['nextval%'],
+                        true,
+                    ],
+                    result: $sequences,
+                ),
+            ],
+            disableConstructor: true,
+        );
+
+        $db = $this->mockClass(
+            class: DatabaseManager::class,
+            callChain: [
+                $this->functionCall('connection', [null], $connection),
+            ],
+            disableConstructor: true,
+        );
+
+        $this->app->instance('db', $db);
 
         Config::set('database.default', 'pgsql');
 

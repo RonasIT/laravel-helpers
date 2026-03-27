@@ -197,7 +197,9 @@ trait FixturesTrait
             }
         });
 
-        app('db.connection')->unprepared($query);
+        if (!empty($query)) {
+            app('db.connection')->unprepared($query);
+        }
     }
 
     public function resetMySQLAutoIncrement(array $tables, array $except = []): void

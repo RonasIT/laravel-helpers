@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Pluralizer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
@@ -18,6 +19,7 @@ use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
+use RonasIT\Support\Support\UncountableWords;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -49,6 +51,8 @@ class HelpersServiceProvider extends ServiceProvider
                 }
             });
         }
+
+        Pluralizer::$uncountable = array_unique(array_merge(Pluralizer::$uncountable, UncountableWords::LIST));
     }
 
     public function register(): void
