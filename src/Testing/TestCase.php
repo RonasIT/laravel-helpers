@@ -42,9 +42,7 @@ abstract class TestCase extends BaseTest
 
         $this->configureRedis();
 
-        if (config('database.default') === 'pgsql') {
-            $this->prepareSequences();
-        }
+        $this->prepareDB();
 
         Carbon::setTestNow(Carbon::parse($this->testNow));
 
@@ -155,5 +153,14 @@ abstract class TestCase extends BaseTest
         if ($token) {
             config(['database.redis.default.database' => intval($token) % self::REDIS_COUNT_DATABASES]);
         }
+    }
+
+    protected function prepareDB(): void
+    {
+        match (config('database.default')) {
+            'pgsql' => $this->prepareSequences(),
+            'mysql' => $this->resetMySQLAutoIncrement($this->getTables()),
+            default => null,
+        };
     }
 }
