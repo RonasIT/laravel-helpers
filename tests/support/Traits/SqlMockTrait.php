@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests\Support\Traits;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
@@ -207,7 +208,7 @@ trait SqlMockTrait
             [$this->mockedNow, 'test_name_3', $this->mockedNow],
         ];
 
-        $this->getPdo()->shouldRunAffectingStatementForRows($query, array_merge(...$values), count($values));
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
     }
 
     protected function mockInsertOrIgnoreWithoutTimestamps(): void
@@ -220,7 +221,7 @@ trait SqlMockTrait
             ['1999-01-01', 'test_name_3'],
         ];
 
-        $this->getPdo()->shouldRunAffectingStatementForRows($query, array_merge(...$values), count($values));
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
     }
 
     protected function mockInsertOrIgnoreWithDifferentTimestampNames(): void
@@ -233,7 +234,7 @@ trait SqlMockTrait
             ['1999-01-01', 'test_name_3', $this->mockedNow],
         ];
 
-        $this->getPdo()->shouldRunAffectingStatementForRows($query, array_merge(...$values), count($values));
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
     }
 
     protected function mockUpdate(array $selectResult, $notFillableValue): void
