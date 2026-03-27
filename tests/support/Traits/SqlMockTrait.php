@@ -141,6 +141,20 @@ trait SqlMockTrait
         );
     }
 
+    protected function mockEachLazyById(array $selectResult): void
+    {
+        $this->mockSelect(
+            'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 500',
+            $selectResult,
+        );
+
+        $this->mockSelect(
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
+        );
+    }
+
     protected function mockCreate(array $selectResult, $notFillableValue): void
     {
         $this->mockInsert(

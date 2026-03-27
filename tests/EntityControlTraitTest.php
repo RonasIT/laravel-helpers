@@ -675,6 +675,46 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
+    public function testLazyEach()
+    {
+        $this->mockEachLazyById(self::$selectResult);
+
+        $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->lazyEach(function () {
+            });
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testLazyEachEmptyResult()
+    {
+        $this->mockSelect(
+            'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 500',
+        );
+
+        $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->lazyEach(function () {
+            });
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+
+        $this->assertEquals(0, $result);
+    }
+
     public function testForceDeleteByList()
     {
         $this->mockDelete(
