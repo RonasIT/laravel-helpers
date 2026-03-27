@@ -2,18 +2,6 @@
     "updated": [
         {
             "id": 1,
-            "name": "name1 updated",
-            "json_field": {
-                "field1": "value",
-                "field2": [
-                    2,
-                    3
-                ],
-                "field3": {
-                    "one": 1,
-                    "two": 2
-                }
-            },
             "castable_field": {
                 "appearance": {
                     "theme": "dark"
@@ -26,31 +14,15 @@
                     "sms": true
                 }
             }
-        },
-        {
-            "id": 2,
-            "castable_field": {
-                "appearance": {
-                    "theme": "dark"
-                },
-                "locale": {
-                    "language": "fr"
-                },
-                "notifications": {
-                    "email": false,
-                    "sms": true
-                }
-            }
         }
     ],
     "created": [
         {
             "id": 4,
             "name": "name4",
-            "json_field": [],
             "castable_field": {
                 "appearance": {
-                    "theme": "light"
+                    "theme": "system"
                 },
                 "locale": {
                     "language": "pl"
@@ -66,9 +38,8 @@
     ],
     "deleted": [
         {
-            "id": 5,
-            "name": "name5",
-            "json_field": [],
+            "id": 3,
+            "name": "name3",
             "castable_field": {
                 "appearance": {
                     "theme": "dark"
