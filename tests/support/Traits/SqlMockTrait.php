@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests\Support\Traits;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
@@ -195,6 +196,45 @@ trait SqlMockTrait
         ];
 
         $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertOrIgnore(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            [$this->mockedNow, 'test_name_1', $this->mockedNow],
+            [$this->mockedNow, 'test_name_2', $this->mockedNow],
+            [$this->mockedNow, 'test_name_3', $this->mockedNow],
+        ];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreWithoutTimestamps(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "name") values (?, ?), (?, ?), (?, ?)';
+
+        $values = [
+            ['1999-01-01', 'test_name_1'],
+            ['1999-01-01', 'test_name_2'],
+            ['1999-01-01', 'test_name_3'],
+        ];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreWithDifferentTimestampNames(): void
+    {
+        $query = 'insert or ignore into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            ['1999-01-01', 'test_name_1', $this->mockedNow],
+            ['1999-01-01', 'test_name_2', $this->mockedNow],
+            ['1999-01-01', 'test_name_3', $this->mockedNow],
+        ];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
     }
 
     protected function mockUpdate(array $selectResult, $notFillableValue): void
