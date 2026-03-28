@@ -5,13 +5,13 @@
 
 The package provides base classes for implementing the service-repository pattern. This pattern separates business logic (services) from data access (repositories), making the codebase more maintainable, testable, and easier to scale.
 
-Resulting a clean layered architecture:
+This results in a clean layered architecture:
 
 ```
 Controller → Service → Repository → Model
 ```
 
-- **Service** handles business logic, orchestrates application workflows and delegates data operations to the repository.
+- **Service** handles business logic, orchestrates application workflows, and delegates data operations to the repository.
 - **Repository** encapsulates all database queries and CRUD operations.
 
 ## Setting Up
@@ -50,47 +50,7 @@ class UserService extends EntityService
 }
 ```
 
-`EntityService` uses `__call()` to delegate all method calls to the repository. If a repository method returns `$this` (for chaining), the service returns itself instead, so you can chain through the service seamlessly.
-
-### 3. Use in Controller
-
-```php
-class UserController extends Controller
-{
-    public function __construct(
-        protected UserService $service,
-    ) {
-    }
-
-    public function index(GetUsersRequest $request)
-    {
-        return $this->service
-            ->searchQuery($request->onlyValidated())
-            ->filterByQuery(['name', 'email'])
-            ->getSearchResults();
-    }
-
-    public function show(int $id)
-    {
-        return $this->service->find($id);
-    }
-
-    public function store(CreateUserRequest $request)
-    {
-        return $this->service->create($request->onlyValidated());
-    }
-
-    public function update(int $id, UpdateUserRequest $request)
-    {
-        return $this->service->update($id, $request->onlyValidated());
-    }
-
-    public function destroy(int $id)
-    {
-        $this->service->delete($id);
-    }
-}
-```
+`EntityService` uses `__call()` to delegate method calls to the repository. If a repository method returns `$this` (for chaining), the service returns itself instead, allowing seamless method chaining through the service layer.
 
 ## CRUD Operations
 
@@ -100,39 +60,39 @@ All methods below are available on both the repository and the service (via dele
 
 | Method | Description |
 |--------|-------------|
-| `create(array $data): Model` | Create a single record and return the model |
-| `insert(array $data): bool` | Bulk insert multiple records (array of arrays) |
-| `firstOrCreate($where, array $data = []): Model` | Find by condition or create if not found |
-| `updateOrCreate($where, array $data): Model` | Update existing or create new record |
+| `create(array $data): Model` | Create a new entity and return the model |
+| `insert(array $data): bool` | Mass insert entities with automatic timestamps |
+| `firstOrCreate(array\|int\|string $where, array $data = []): Model` | Get the first entity matching the condition or create a new one |
+| `updateOrCreate(array\|int\|string $where, array $data): Model` | Update an existing entity or create a new one |
 
 ### Read
 
 | Method | Description |
 |--------|-------------|
-| `find($id): ?Model` | Find by primary key |
-| `findBy(string $field, $value): ?Model` | Find by a specific field |
-| `first($where = []): ?Model` | Get first matching record |
-| `last(array $where = [], string $column = 'created_at'): ?Model` | Get latest record |
-| `get(array $where = []): Collection` | Get all matching records |
-| `all(): Collection` | Get all records |
-| `exists($where): bool` | Check if a matching record exists |
-| `existsBy(string $field, $value): bool` | Check existence by field |
-| `count($where = []): int` | Count matching records |
-| `chunk(int $limit, Closure $callback, array $where = []): void` | Process records in chunks |
+| `find(int\|string $id): ?Model` | Find an entity by primary key |
+| `findBy(string $field, mixed $value): ?Model` | Find an entity by a specific field value |
+| `first(array\|int\|string $where = []): ?Model` | Get the first entity matching the condition |
+| `last(array\|int\|string $where = [], string $column = 'created_at'): ?Model` | Get the last entity by the given column |
+| `get(array\|int\|string $where = []): Collection` | Get entities by condition |
+| `all(): Collection` | Get all entities without conditions |
+| `exists(array\|int\|string $where): bool` | Check entity existence by condition or primary key |
+| `existsBy(string $field, mixed $value): bool` | Check entity existence by a specific field value |
+| `count(array\|int\|string $where = []): int` | Count entities by condition or primary key |
+| `chunk(int $limit, Closure $callback, array $where = []): void` | Process entities in chunks ordered by primary key |
 
 ### Update
 
 | Method | Description |
 |--------|-------------|
-| `update($where, array $data): ?Model` | Update a single record and return the model |
-| `updateMany($where, array $data): int` | Update multiple records, return count |
+| `update(array\|int\|string $where, array $data): ?Model` | Update a single entity by condition or primary key |
+| `updateMany(array\|int\|string $where, array $data): int` | Update multiple entities by condition or primary key |
 
 ### Delete
 
 | Method | Description |
 |--------|-------------|
-| `delete($where): int` | Delete matching records, return count |
-| `truncate(): self` | Delete all records from the table |
+| `delete(array\|int\|string $where): int` | Delete entities by condition or primary key |
+| `truncate(): self` | Remove all rows from the table |
 
 ### Batch Operations
 
@@ -140,13 +100,13 @@ These methods operate on lists of values for a given field (defaults to primary 
 
 | Method | Description |
 |--------|-------------|
-| `getByList(array $values, ?string $field = null): Collection` | Get records by list of field values |
-| `deleteByList(array $values, ?string $field = null): int` | Delete by list |
-| `restoreByList(array $values, ?string $field = null): int` | Restore soft-deleted by list |
-| `countByList(array $values, ?string $field = null): int` | Count by list |
-| `updateByList(array $values, array $data, $field = null): int` | Update by list |
+| `getByList(array $values, ?string $field = null): Collection` | Get entities by list of field values |
+| `deleteByList(array $values, ?string $field = null): int` | Delete entities by list of field values |
+| `restoreByList(array $values, ?string $field = null): int` | Restore soft-deleted entities by list of field values |
+| `countByList(array $values, ?string $field = null): int` | Count entities by list of field values |
+| `updateByList(array $values, array $data, ?string $field = null): int` | Update entities by list of field values |
 
-The `$where` parameter in most methods accepts either a primary key value or an associative array of conditions:
+The `$where` parameter in most methods accepts a primary key value (`int` or `string`) or an associative array of conditions:
 
 ```php
 $repository->find(1);
@@ -160,13 +120,13 @@ $repository->update(['email' => 'user@example.com'], ['name' => 'New Name']);
 For models using Laravel's `SoftDeletes` trait:
 
 ```php
-// Include soft-deleted records in results
+// Include soft-deleted entities in results
 $repository->withTrashed()->get();
 
-// Get only soft-deleted records
+// Get only soft-deleted entities
 $repository->onlyTrashed()->get();
 
-// Restore a soft-deleted record
+// Restore a soft-deleted entity
 $repository->restore($where);
 
 // Permanently delete (bypass soft delete)
@@ -175,7 +135,7 @@ $repository->force()->delete($where);
 
 ## Force Mode
 
-By default, `create()` and `update()` only fill attributes listed in the model's `$fillable`. Use `force()` to fill all model fields (including guarded):
+By default, `create()` and `update()` only fill attributes listed in the model's `$fillable` array. Use `force()` to bypass fillable restrictions and fill all model fields (including guarded):
 
 ```php
 $repository->force()->create($data);
@@ -213,9 +173,9 @@ public function search(array $filters)
 ### searchQuery(array $filters)
 
 Initializes the search pipeline. Automatically applies:
-- `with` / `with_count` — eager loading from filters
-- `with_trashed` / `only_trashed` — soft delete scoping
-- **Auto-filters by suffix** — filters not in the reserved list are automatically applied based on their suffix:
+- `with` / `with_count` - eager loading from filters
+- `with_trashed` / `only_trashed` - soft delete scoping
+- **Auto-filters by suffix** - filters not in the reserved list are automatically applied based on their suffix:
 
 | Suffix | Behavior | Example filter |
 |--------|----------|----------------|
