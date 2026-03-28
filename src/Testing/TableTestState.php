@@ -64,6 +64,8 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
+                    $changes = Arr::map($changes, fn ($field) => ($this->isBinary($field)) ? bin2hex($field) : $field);
+
                     $updatedRecords[] = array_merge(['id' => $originItem['id']], $changes);
                 }
 
@@ -78,6 +80,26 @@ class TableTestState extends Assert
         ];
     }
 
+    protected function isBinary(mixed $value): bool
+    {
+        if (!is_string($value) || $value === '') {
+            return false;
+        }
+
+        if (str_contains($value, "\0")) {
+            return true;
+        }
+
+        $sample = substr($value, 0, 8192);
+
+        if (strlen($sample) === 0 || mb_check_encoding($sample, 'UTF-8')) {
+            return false;
+        }
+
+        return preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', $sample)
+            || !ctype_print($sample);
+    }
+
     protected function prepareChanges(array $changes): array
     {
         $jsonFields = Arr::wrap($this->jsonFields);
@@ -88,7 +110,11 @@ class TableTestState extends Assert
 
         return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
-                if (Arr::has($item, $jsonField)) {
+                $isJsonField = Arr::has($item, $jsonField)
+                    && is_string($item[$jsonField])
+                    && json_validate($item[$jsonField]);
+
+                if ($isJsonField) {
                     $item[$jsonField] = json_decode($item[$jsonField], true);
                 }
             }
