@@ -1,0 +1,23 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestOrderNotification": [
+        {
+            "notification": {
+                "orderId": 1,
+                "trackingNumber": "12345",
+                "status": "shipped"
+            },
+            "channels": [
+                "mail",
+                "database"
+            ],
+            "notifiable": {
+                "id": 1
+            },
+            "locale": null,
+            "via_method": "shipped",
+            "via_property": "shipped",
+            "via_chain": "shipped",
+            "via_unresolvable": null
+        }
+    ]
+}

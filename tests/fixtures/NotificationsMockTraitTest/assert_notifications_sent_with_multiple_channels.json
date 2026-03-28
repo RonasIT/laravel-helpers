@@ -1,0 +1,23 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestNotification": [
+        {
+            "notification": {
+                "name": "John Smith",
+                "email": "john@example.com",
+                "userId": 1,
+                "channels": [
+                    "mail",
+                    "database"
+                ]
+            },
+            "channels": [
+                "mail",
+                "database"
+            ],
+            "notifiable": {
+                "id": 1
+            },
+            "locale": null
+        }
+    ]
+}
