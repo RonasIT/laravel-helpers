@@ -38,7 +38,7 @@ class TestCaseTest extends TestCase
     {
         $this->mockParallelTestingToken($token);
 
-        $this->callEncapsulatedMethod(new SomeTestCase(), 'configureRedis');
+        $this->callEncapsulatedMethod(new SomeTestCase('test'), 'configureRedis');
 
         $this->assertEquals($expected, config('database.redis.default.database'));
     }

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" bootstrap="bootstrap/autoload.php" colors="true" processIsolation="false" stopOnFailure="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache" backupStaticProperties="false">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.0/phpunit.xsd"
+         bootstrap="bootstrap/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+>
   <testsuites>
     <testsuite name="Application Test Suite">
-      <directory suffix="Test.php">./tests</directory>
+      <directory>./tests</directory>
     </testsuite>
   </testsuites>
   <php>
@@ -13,7 +18,7 @@
   </php>
   <source>
     <include>
-      <directory suffix=".php">./src</directory>
+      <directory>./src</directory>
     </include>
     <exclude>
       <file>./app/Http/routes.php</file>
