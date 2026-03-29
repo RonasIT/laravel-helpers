@@ -545,7 +545,7 @@ class EntityControlTraitTest extends TestCase
             ->force()
             ->with('relation')
             ->withCount('relation')
-            ->last(['id' => 1]);
+            ->last(1);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
