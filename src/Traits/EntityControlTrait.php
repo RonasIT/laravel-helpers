@@ -160,28 +160,32 @@ trait EntityControlTrait
     /**
      * Mass insert rows with automatic timestamps
      */
+    /**
+     * @param  array<array>  $data
+     */
     public function insert(array $data): bool
     {
-        $defaultTimestamps = [];
-
-        if ($this->model->timestamps) {
-            $now = now();
-
-            $defaultTimestamps = [
-                $this->model::CREATED_AT => $now,
-                $this->model::UPDATED_AT => $now,
-            ];
-        }
-
-        $data = array_map(function ($item) use ($defaultTimestamps) {
-            $fillableFields = Arr::only($item, $this->model->getFillable());
-
-            return array_merge($defaultTimestamps, $fillableFields);
-        }, $data);
+        $result = $this->model->insert($this->prepareInsertData($data));
 
         $this->postQueryHook();
 
-        return $this->model->insert($data);
+        return $result;
+    }
+
+    /**
+     * Insert rows ignoring duplicate key errors.
+     *
+     * @param  array<array>  $data
+     *
+     * @return int count of inserted rows
+     */
+    public function insertOrIgnore(array $data): int
+    {
+        $result = $this->model->insertOrIgnore($this->prepareInsertData($data));
+
+        $this->postQueryHook();
+
+        return $result;
     }
 
     /**
@@ -520,5 +524,25 @@ trait EntityControlTrait
     protected function resetSettableProperties(bool $value = true): void
     {
         $this->shouldSettablePropertiesBeReset = $value;
+    }
+
+    protected function prepareInsertData(array $data): array
+    {
+        $defaultTimestamps = [];
+
+        if ($this->model->timestamps) {
+            $now = now();
+
+            $defaultTimestamps = [
+                $this->model::CREATED_AT => $now,
+                $this->model::UPDATED_AT => $now,
+            ];
+        }
+
+        return array_map(function (array $item) use ($defaultTimestamps) {
+            $fillableFields = Arr::only($item, $this->model->getFillable());
+
+            return array_merge($defaultTimestamps, $fillableFields);
+        }, $data);
     }
 }
