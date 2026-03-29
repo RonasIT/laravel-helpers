@@ -160,9 +160,6 @@ trait EntityControlTrait
     /**
      * Mass insert rows with automatic timestamps
      */
-    /**
-     * @param  array<array>  $data
-     */
     public function insert(array $data): bool
     {
         $result = $this->model->insert($this->prepareInsertData($data));
@@ -174,8 +171,6 @@ trait EntityControlTrait
 
     /**
      * Insert rows ignoring duplicate key errors.
-     *
-     * @param  array<array>  $data
      *
      * @return int count of inserted rows
      */
