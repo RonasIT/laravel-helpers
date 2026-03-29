@@ -52,16 +52,49 @@ final class UserService extends EntityService
 
 `EntityService` uses `__call()` to delegate method calls to the repository. If a repository method returns `$this` (for chaining), the service returns itself instead, allowing seamless method chaining through the service layer.
 
+## Configuration
+
+### `setModel(string $modelClass): self`
+
+Sets the Eloquent model class for the repository. Called in the constructor. Resolves the primary key and available fields from the model.
+
+```php
+$this->setModel(User::class);
+```
+
+### `force(bool $value = true): self`
+
+By default, `create()` and `update()` only fill attributes listed in the model's `$fillable` array. Use `force()` to bypass fillable restrictions and write all model fields (including guarded ones):
+
+```php
+$repository->force()->create($data);
+$repository->force()->update($where, $data);
+$repository->force()->updateMany($where, $data);
+$repository->force()->updateByList($ids, $data);
+```
+
+`force()` is chainable and resets automatically after the next query.
+
 ## CRUD Operations
 
 All methods below are available on both the repository and the service (via delegation).
+
+The `$where` parameter accepts a primary key value (`int` or `string`) or an associative array of conditions:
+
+```php
+$repository->find(1);
+$repository->first(['email' => 'user@example.com']);
+$repository->update(1, ['name' => 'New Name']);
+$repository->update(['email' => 'user@example.com'], ['name' => 'New Name']);
+```
 
 ### Create
 
 | Method | Description |
 |--------|-------------|
-| `create(array $data): Model` | Create a new entity and return the model |
+| `create(array $data): Model` | Create a new entity and return it with loaded relations |
 | `insert(array $data): bool` | Mass insert entities with automatic timestamps |
+| `insertOrIgnore(array $data): int` | Mass insert rows, silently skipping duplicate key errors. Returns count of inserted rows |
 | `firstOrCreate(array\|int\|string $where, array $data = []): Model` | Get the first entity matching the condition or create a new one |
 | `updateOrCreate(array\|int\|string $where, array $data): Model` | Update an existing entity or create a new one |
 
@@ -72,52 +105,53 @@ All methods below are available on both the repository and the service (via dele
 | `find(int\|string $id): ?Model` | Find an entity by primary key |
 | `findBy(string $field, mixed $value): ?Model` | Find an entity by a specific field value |
 | `first(array\|int\|string $where = []): ?Model` | Get the first entity matching the condition |
-| `last(array\|int\|string $where = [], string $column = 'created_at'): ?Model` | Get the last entity matching the condition |
-| `get(array\|int\|string $where = []): Collection` | Get entities by condition |
+| `last(array\|int\|string $where = [], string $column = 'created_at'): ?Model` | Get the last entity matching the condition, ordered by `$column` |
+| `get(array\|int\|string $where = []): Collection` | Get all entities matching the condition |
+| `getByList(array $values, ?string $field = null): Collection` | Get entities whose `$field` value is in `$values` (defaults to primary key) |
 | `all(): Collection` | Get all entities without conditions |
 | `exists(array\|int\|string $where): bool` | Check entity existence by condition or primary key |
 | `existsBy(string $field, mixed $value): bool` | Check entity existence by a specific field value |
 | `count(array\|int\|string $where = []): int` | Count entities by condition or primary key |
+| `countByList(array $values, ?string $field = null): int` | Count entities whose `$field` value is in `$values` (defaults to primary key) |
 | `chunk(int $limit, Closure $callback, array $where = []): void` | Process entities in chunks ordered by primary key |
 
 ### Update
 
 | Method | Description |
 |--------|-------------|
-| `update(array\|int\|string $where, array $data): ?Model` | Update a single entity by condition or primary key |
-| `updateMany(array\|int\|string $where, array $data): int` | Update multiple entities by condition or primary key |
+| `update(array\|int\|string $where, array $data): ?Model` | Update a single entity and return it; returns `null` if not found |
+| `updateMany(array\|int\|string $where, array $data): int` | Update all entities matching the condition. Returns count of updated rows |
+| `updateByList(array $values, array $data, ?string $field = null): int` | Update entities whose `$field` value is in `$values` (defaults to primary key). Returns count of updated rows |
 
 ### Delete
 
 | Method | Description |
 |--------|-------------|
-| `delete(array\|int\|string $where): int` | Delete entities by condition or primary key |
+| `delete(array\|int\|string $where): int` | Delete entities by condition or primary key. Returns count of deleted rows |
+| `deleteByList(array $values, ?string $field = null): int` | Delete entities whose `$field` value is in `$values` (defaults to primary key). Returns count of deleted rows |
 | `truncate(): self` | Remove all rows from the table |
-
-### Batch Operations
-
-These methods operate on lists of values for a given field (defaults to primary key):
-
-| Method | Description |
-|--------|-------------|
-| `getByList(array $values, ?string $field = null): Collection` | Get entities by list of field values |
-| `deleteByList(array $values, ?string $field = null): int` | Delete entities by list of field values |
-| `restoreByList(array $values, ?string $field = null): int` | Restore soft-deleted entities by list of field values |
-| `countByList(array $values, ?string $field = null): int` | Count entities by list of field values |
-| `updateByList(array $values, array $data, ?string $field = null): int` | Update entities by list of field values |
-
-The `$where` parameter in most methods accepts a primary key value (`int` or `string`) or an associative array of conditions:
-
-```php
-$repository->find(1);
-$repository->first(['email' => 'user@example.com']);
-$repository->update(1, ['name' => 'New Name']);
-$repository->update(['email' => 'user@example.com'], ['name' => 'New Name']);
-```
 
 ## Soft Delete Support
 
-For models using Laravel's `SoftDeletes` trait:
+For models using Laravel's `SoftDeletes` trait, the following methods are available:
+
+### Scoping
+
+| Method | Description |
+|--------|-------------|
+| `withTrashed(bool $enable = true): self` | Include soft-deleted entities in query results |
+| `onlyTrashed(bool $enable = true): self` | Return only soft-deleted entities |
+
+Both methods are chainable and apply to the next query only.
+
+### Restore
+
+| Method | Description |
+|--------|-------------|
+| `restore(array\|int\|string $where): int` | Restore soft-deleted entities by condition or primary key. Returns count of restored rows |
+| `restoreByList(array $values, ?string $field = null): int` | Restore soft-deleted entities whose `$field` value is in `$values` (defaults to primary key). Returns count of restored rows |
+
+### Examples
 
 ```php
 // Include soft-deleted entities in results
@@ -126,20 +160,15 @@ $repository->withTrashed()->get();
 // Get only soft-deleted entities
 $repository->onlyTrashed()->get();
 
-// Restore a soft-deleted entity
-$repository->restore($where);
+// Restore by condition
+$repository->restore(['status' => 'banned']);
+
+// Restore by list of IDs
+$repository->restoreByList([1, 2, 3]);
 
 // Permanently delete (bypass soft delete)
 $repository->force()->delete($where);
-```
-
-## Force Mode
-
-By default, `create()` and `update()` only fill attributes listed in the model's `$fillable` array. Use `force()` to bypass fillable restrictions and fill all model fields (including guarded):
-
-```php
-$repository->force()->create($data);
-$repository->force()->update($where, $data);
+$repository->force()->deleteByList([1, 2, 3]);
 ```
 
 ## Eager Loading
