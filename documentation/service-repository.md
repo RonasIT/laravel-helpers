@@ -23,7 +23,7 @@ Extend `BaseRepository` and set the model in the constructor:
 ```php
 use RonasIT\Support\Repositories\BaseRepository;
 
-class UserRepository extends BaseRepository
+final class UserRepository extends BaseRepository
 {
     public function __construct()
     {
@@ -41,7 +41,7 @@ Extend `EntityService` and associate it with a repository:
 ```php
 use RonasIT\Support\Services\EntityService;
 
-class UserService extends EntityService
+final class UserService extends EntityService
 {
     public function __construct()
     {
@@ -72,7 +72,7 @@ All methods below are available on both the repository and the service (via dele
 | `find(int\|string $id): ?Model` | Find an entity by primary key |
 | `findBy(string $field, mixed $value): ?Model` | Find an entity by a specific field value |
 | `first(array\|int\|string $where = []): ?Model` | Get the first entity matching the condition |
-| `last(array\|int\|string $where = [], string $column = 'created_at'): ?Model` | Get the last entity by the given column |
+| `last(array\|int\|string $where = [], string $column = 'created_at'): ?Model` | Get the last entity matching the condition |
 | `get(array\|int\|string $where = []): Collection` | Get entities by condition |
 | `all(): Collection` | Get all entities without conditions |
 | `exists(array\|int\|string $where): bool` | Check entity existence by condition or primary key |
