@@ -180,8 +180,6 @@ Sets relations whose count should be loaded on the next query. Supports nested d
 $this->withCount(['posts', 'posts.comments'])->find($id);
 ```
 
-Both `with()` and `withCount()` can also be passed as filter keys in `searchQuery()`:
-
 ## Search and Filtering
 
 `SearchTrait` (included via `EntityControlTrait`) provides a search pipeline with automatic filter resolution, manual filter methods, ordering, and pagination.
@@ -214,7 +212,9 @@ Initializes the query with eager loading and soft-delete scoping from `$filters`
 | `_to` | `<=` | `created_at_to` |
 | *(none)* | `=` | `status` |
 
-Reserved filter keys (`with`, `with_count`, `with_trashed`, `only_trashed`, `query`, `order_by`, `all`, `per_page`, `page`, `desc`) are processed separately and never applied as field conditions.
+### Reserved Filter Names
+
+These filter keys are handled internally and should not be used as field filters: `with`, `with_count`, `with_trashed`, `only_trashed`, `query`, `order_by`, `all`, `per_page`, `page`, `desc`.
 
 To add custom reserved filter names, call `setAdditionalReservedFilters()` in the repository constructor:
 
@@ -230,17 +230,17 @@ Use these after `searchQuery()` for fine-grained control:
 
 | Method | Description |
 |--------|-------------|
-| `filterBy(string $field, ?string $filterName = null): self` | Exact match (`=`). `$filterName` defaults to the last segment of `$field`. Supports dot notation for relations via `whereHas` |
-| `filterByList(string $field, ?string $filterName = null): self` | `whereIn` condition. Same dot-notation and filter name resolution as `filterBy` |
-| `filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self` | Full-text search using `LIKE`/`ILIKE` across multiple fields when `$filters['query']` is set. Fields joined with `OR`. `$mask` controls the pattern — `{{ value }}` is replaced with the search term. Supports dot notation |
-| `filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self` | `>` (strict) or `>=` (non-strict) condition. Reads from `$filters[$filterName]`. `$filterName` defaults to `'from'` |
-| `filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self` | `<` (strict) or `<=` (non-strict) condition. Reads from `$filters[$filterName]`. `$filterName` defaults to `'to'` |
-| `filterValue(string $field, string $sign, mixed $value): self` | Applies any comparison operator with an explicit `$value` (not from `$filters`). Skips if `$value` is empty |
-| `orderBy(?string $default = null, bool $defaultDesc = false): self` | Sorts by `$filters['order_by']` / `$filters['desc']`. Falls back to `$default` (or primary key). Supports dot notation via `orderByRelated`. Appends secondary sort by default field as tiebreaker |
+| `filterBy(string $field, ?string $filterName = null): self` | Exact match filter. Supports dot notation for relations (e.g., `role.name`) |
+| `filterByList(string $field, ?string $filterName = null): self` | `whereIn` filter |
+| `filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self` | `LIKE` search across multiple fields. Supports relation fields via dot notation |
+| `filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self` | Greater than filter |
+| `filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self` | Less than filter |
+| `filterValue(string $field, string $sign, mixed $value): self` | Applies a comparison condition with a given value directly. Skips if empty |
+| `orderBy(?string $default = null, bool $defaultDesc = false): self` | Apply ordering. Supports relation fields via dot notation |
 
-### `getSearchResults(): LengthAwarePaginator`
+### Pagination
 
-Finalizes the search by calling `orderBy()`, then returns paginated results. Pagination is controlled via filters:
+`getSearchResults()` returns a `LengthAwarePaginator`. Pagination is controlled via filters:
 
 | Filter | Description | Default |
 |--------|-------------|---------|
@@ -252,38 +252,14 @@ Finalizes the search by calling `orderBy()`, then returns paginated results. Pag
 
 When `all: true`, all results are fetched and wrapped in a single-page `LengthAwarePaginator` via `wrapPaginatedData()`.
 
-### `paginate(): LengthAwarePaginator`
+### Advanced Methods
 
-Executes the current query with `per_page` and `page` from `$filters`. Called internally by `getSearchResults()`, but can be used directly for custom pagination flows.
-
-### `wrapPaginatedData(Collection $data): LengthAwarePaginator`
-
-Wraps an already-fetched `Collection` into a `LengthAwarePaginator` (single page, total = collection size). Used internally when `all: true`. Override in a subclass to customise the paginator structure.
-
-### `getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator`
-
-Hook called on every paginator before it is returned by `getSearchResults()` or `wrapPaginatedData()`. The default implementation is a no-op. Override in a repository to transform results — for example, to append computed fields:
-
-```php
-public function getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator
-{
-    $paginator->getCollection()->transform(function (User $user) {
-        $user->full_name = "{$user->first_name} {$user->last_name}";
-        return $user;
-    });
-
-    return parent::getModifiedPaginator($paginator);
-}
-```
-
-### `getSearchQuery(): Query`
-
-Returns the current Eloquent query builder instance. Useful for applying raw query modifications or debugging after `searchQuery()` has been called.
-
-```php
-$query = $this->searchQuery($filters)->filterBy('status')->getSearchQuery();
-$query->toSql(); // inspect generated SQL
-```
+| Method | Description |
+|--------|-------------|
+| `paginate(): LengthAwarePaginator` | Executes the query with `per_page` and `page` from `$filters`. Called internally by `getSearchResults()`, but available for custom pagination flows |
+| `wrapPaginatedData(Collection $data): LengthAwarePaginator` | Wraps a `Collection` into a single-page `LengthAwarePaginator`. Used internally when `all: true`. Override to customise the paginator structure |
+| `getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator` | Hook called on every paginator before it is returned. No-op by default. Override to transform results (e.g. append computed fields) |
+| `getSearchQuery(): Query` | Returns the current Eloquent query builder. Useful for raw query modifications or debugging after `searchQuery()` |
 
 ### Usage with filters:
 
