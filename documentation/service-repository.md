@@ -52,6 +52,8 @@ final class UserService extends EntityService
 
 `EntityService` uses `__call()` to delegate method calls to the repository. If a repository method returns `$this` (for chaining), the service returns itself instead, allowing seamless method chaining through the service layer.
 
+---
+
 ## CRUD Operations
 
 All methods below are available on both the repository and the service (via delegation).
@@ -119,7 +121,10 @@ $this->force()->updateMany($where, $data);
 $this->force()->updateByList($ids, $data);
 ```
 
-`force()` is chainable and resets automatically after the next query.
+> [!NOTE]
+> `force()` is chainable and resets automatically after the next query.
+
+---
 
 ## Soft Delete Support
 
@@ -132,7 +137,8 @@ For models using Laravel's `SoftDeletes` trait, the following methods are availa
 | `withTrashed(bool $enable = true): self` | Include soft-deleted entities in query results |
 | `onlyTrashed(bool $enable = true): self` | Return only soft-deleted entities |
 
-Both methods are chainable and apply to the next query only.
+> [!NOTE]
+> Both methods are chainable and apply to the next query only.
 
 ### Restore
 
@@ -161,12 +167,16 @@ $this->force()->delete($where);
 $this->force()->deleteByList([1, 2, 3]);
 ```
 
+---
+
 ## Eager Loading
 
 | Method | Description |
 |--------|-------------|
-| `with(array\|string $relations): self` | Sets relations to eager load on the next query. Resets automatically after the query |
+| `with(array\|string $relations): self` | Sets relations to eager load on the next query. Resets after the query |
 | `withCount(array\|string $relations): self` | Loads relation counts. Supports dot notation. Resets after the query |
+
+---
 
 ## Search and Filtering
 
@@ -210,7 +220,8 @@ To add custom reserved filter names, call `setAdditionalReservedFilters()` in th
 $this->setAdditionalReservedFilters('coach_id', 'contact_id');
 ```
 
-These keys will be skipped by the auto-filter logic and can be handled manually in a custom `search()` method.
+> [!NOTE]
+> These keys will be skipped by the auto-filter logic and can be handled manually in a custom `search()` method.
 
 ### Manual Filter Methods
 
