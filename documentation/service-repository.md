@@ -163,22 +163,10 @@ $this->force()->deleteByList([1, 2, 3]);
 
 ## Eager Loading
 
-### `with(array|string $relations): self`
-
-Sets relations to eager load on the next query. Accepts a relation name or an array of relation names. Resets automatically after the query.
-
-```php
-$this->with(['posts', 'posts.comments'])->find($id);
-```
-
-### `withCount(array|string $relations): self`
-
-Sets relations whose count should be loaded on the next query. Supports nested dot notation — the count is loaded on the intermediate relation. Resets automatically after the query.
-
-```php
-// Load post counts on users and comment counts on each post (appended as posts.comments_count)
-$this->withCount(['posts', 'posts.comments'])->find($id);
-```
+| Method | Description |
+|--------|-------------|
+| `with(array\|string $relations): self` | Sets relations to eager load on the next query. Resets automatically after the query |
+| `withCount(array\|string $relations): self` | Loads relation counts. Supports dot notation. Resets after the query |
 
 ## Search and Filtering
 
@@ -200,17 +188,17 @@ public function search(array $filters): LengthAwarePaginator
 
 Initializes the query with eager loading and soft-delete scoping from `$filters`, then auto-applies all non-reserved filters by suffix:
 
-| Suffix | Operator | Example filter key |
-|--------|----------|--------------------|
-| `_in_list` | `whereIn` | `status_in_list` |
-| `_not_in_list` | `whereNotIn` | `status_not_in_list` |
-| `_gte` | `>=` | `age_gte` |
-| `_gt` | `>` | `price_gt` |
-| `_lte` | `<=` | `age_lte` |
-| `_lt` | `<` | `price_lt` |
-| `_from` | `>=` | `created_at_from` |
-| `_to` | `<=` | `created_at_to` |
-| *(none)* | `=` | `status` |
+| Suffix | Operator | Example filter key | Example filter value |
+|--------|----------|--------------------|----------------------|
+| `_in_list` | `whereIn` | `status_in_list` | `['active', 'pending']` |
+| `_not_in_list` | `whereNotIn` | `status_not_in_list` | `[1, 2]` |
+| `_gte` | `>=` | `age_gte` | `18` |
+| `_gt` | `>` | `price_gt` | `100` |
+| `_lte` | `<=` | `age_lte` | `65` |
+| `_lt` | `<` | `price_lt` | `1000` |
+| `_from` | `>=` | `created_at_from` | `'2024-01-01'` |
+| `_to` | `<=` | `created_at_to` | `'2024-12-31'` |
+| *(none)* | `=` | `status` | `'active'` |
 
 ### Reserved Filter Names
 
@@ -233,10 +221,10 @@ Use these after `searchQuery()` for fine-grained control:
 | `filterBy(string $field, ?string $filterName = null): self` | Exact match filter. Supports dot notation for relations (e.g., `role.name`) |
 | `filterByList(string $field, ?string $filterName = null): self` | `whereIn` filter |
 | `filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self` | `LIKE` search across multiple fields. Supports relation fields via dot notation |
-| `filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self` | Greater than filter |
-| `filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self` | Less than filter |
+| `filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self` | `>` / `>=` filter. Reads from `$filters[$filterName]`, defaults to `'from'` |
+| `filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self` | `<` / `<=` filter. Reads from `$filters[$filterName]`, defaults to `'to'` |
 | `filterValue(string $field, string $sign, mixed $value): self` | Applies a comparison condition with a given value directly. Skips if empty |
-| `orderBy(?string $default = null, bool $defaultDesc = false): self` | Apply ordering. Supports relation fields via dot notation |
+| `orderBy(?string $default = null, bool $defaultDesc = false): self` | Applies ordering by `$filters['order_by']`. Supports dot notation for relation fields |
 
 ### Pagination
 
@@ -250,8 +238,6 @@ Use these after `searchQuery()` for fine-grained control:
 | `order_by` | Field to sort by | Primary key |
 | `desc` | Sort descending | `false` |
 
-When `all: true`, all results are fetched and wrapped in a single-page `LengthAwarePaginator` via `wrapPaginatedData()`.
-
 ### Advanced Methods
 
 | Method | Description |
@@ -260,23 +246,6 @@ When `all: true`, all results are fetched and wrapped in a single-page `LengthAw
 | `wrapPaginatedData(Collection $data): LengthAwarePaginator` | Wraps a `Collection` into a single-page `LengthAwarePaginator`. Used internally when `all: true`. Override to customise the paginator structure |
 | `getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator` | Hook called on every paginator before it is returned. No-op by default. Override to transform results (e.g. append computed fields) |
 | `getSearchQuery(): Query` | Returns the current Eloquent query builder. Useful for raw query modifications or debugging after `searchQuery()` |
-
-### Usage with filters:
-
-```php
-$service->search([
-    'role_name' => 'admin',
-    'query' => 'john',
-    'age_from' => 18,
-    'age_to' => 65,
-    'created_at_from' => '2024-01-01',
-    'order_by' => 'created_at',
-    'desc' => true,
-    'per_page' => 20,
-    'with' => ['posts', 'role'],
-    'with_count' => ['posts'],
-]);
-```
 
 [<< Traits][1]
 [Services >>][2]
