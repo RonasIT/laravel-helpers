@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
- * @property Model model
+ * @property Model $model
  */
 trait EntityControlTrait
 {
@@ -71,39 +71,6 @@ trait EntityControlTrait
         $this->checkPrimaryKey();
 
         return $this;
-    }
-
-    protected function getQuery(array|int|string $where = []): Query
-    {
-        $query = $this->model->query();
-
-        if ($this->onlyTrashed) {
-            $query->onlyTrashed();
-
-            $this->withTrashed = false;
-        }
-
-        if ($this->withTrashed && $this->hasSoftDeleteTrait()) {
-            $query->withTrashed();
-        }
-
-        if (!empty($this->attachedRelations)) {
-            $query->with($this->attachedRelations);
-        }
-
-        if (!empty($this->attachedRelationsCount)) {
-            foreach ($this->attachedRelationsCount as $requestedRelations) {
-                list($countRelation, $relation) = extract_last_part($requestedRelations);
-
-                if (empty($relation)) {
-                    $query->withCount($countRelation);
-                } else {
-                    $query->with([$relation => fn ($query) => $query->withCount($countRelation)]);
-                }
-            }
-        }
-
-        return $this->constructWhere($query, $where);
     }
 
     /**
@@ -170,9 +137,7 @@ trait EntityControlTrait
     }
 
     /**
-     * Insert rows ignoring duplicate key errors.
-     *
-     * @return int count of inserted rows
+     * Insert rows ignoring duplicate key errors. Return count of inserted rows
      */
     public function insertOrIgnore(array $data): int
     {
@@ -340,9 +305,7 @@ trait EntityControlTrait
     }
 
     /**
-     * Delete entities by condition or primary key
-     *
-     * @return int count of deleted rows
+     * Delete entities by condition or primary key. Return count of deleted rows
      */
     public function delete(array|int|string $where): int
     {
@@ -405,9 +368,7 @@ trait EntityControlTrait
     }
 
     /**
-     * Delete entities by list of field values
-     *
-     * @return int count of deleted rows
+     * Delete entities by list of field values. Return count of deleted rows
      */
     public function deleteByList(array $values, ?string $field = null): int
     {
@@ -491,6 +452,39 @@ trait EntityControlTrait
         $this->postQueryHook();
 
         return $query->update(Arr::only($data, $fields));
+    }
+
+    protected function getQuery(array|int|string $where = []): Query
+    {
+        $query = $this->model->query();
+
+        if ($this->onlyTrashed) {
+            $query->onlyTrashed();
+
+            $this->withTrashed = false;
+        }
+
+        if ($this->withTrashed && $this->hasSoftDeleteTrait()) {
+            $query->withTrashed();
+        }
+
+        if (!empty($this->attachedRelations)) {
+            $query->with($this->attachedRelations);
+        }
+
+        if (!empty($this->attachedRelationsCount)) {
+            foreach ($this->attachedRelationsCount as $requestedRelations) {
+                list($countRelation, $relation) = extract_last_part($requestedRelations);
+
+                if (empty($relation)) {
+                    $query->withCount($countRelation);
+                } else {
+                    $query->with([$relation => fn ($query) => $query->withCount($countRelation)]);
+                }
+            }
+        }
+
+        return $this->constructWhere($query, $where);
     }
 
     protected function getEntityName(): string

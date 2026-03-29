@@ -157,7 +157,7 @@ $repository->withCount(['posts.comments'])->get();
 
 ## Search and Filtering
 
-The `SearchTrait` (included via `EntityControlTrait`) provides a powerful search/filter pipeline.
+The `SearchTrait` (included via `EntityControlTrait`) provides a built-in search and filtering pipeline with pagination, ordering, and automatic filter resolution by suffix convention.
 
 ### Basic Usage
 
@@ -170,12 +170,12 @@ public function search(array $filters)
 }
 ```
 
-### searchQuery(array $filters)
+### `searchQuery(array $filters)`
 
-Initializes the search pipeline. Automatically applies:
-- `with` / `with_count` - eager loading from filters
-- `with_trashed` / `only_trashed` - soft delete scoping
-- **Auto-filters by suffix** - filters not in the reserved list are automatically applied based on their suffix:
+Initializes the search query, applies eager loading and soft-delete scoping from filters, then auto-applies remaining filters based on their suffix:
+- `with` / `with_count` — eager loading
+- `with_trashed` / `only_trashed` — soft-delete scoping
+- All other filters are resolved automatically by their suffix:
 
 | Suffix | Behavior | Example filter |
 |--------|----------|----------------|
@@ -191,20 +191,20 @@ Initializes the search pipeline. Automatically applies:
 
 ### Manual Filter Methods
 
-Use these after `searchQuery()` for additional control:
+Use these after `searchQuery()` for fine-grained control over filtering:
 
 | Method | Description |
 |--------|-------------|
-| `filterBy(string $field, ?string $filterName = null)` | Exact match filter. Supports dot notation for relations (e.g., `role.name`) |
-| `filterByList(string $field, ?string $filterName = null)` | `whereIn` filter |
-| `filterByQuery(array $fields, string $mask = ...)` | `LIKE` search across multiple fields. Supports relation fields via dot notation |
-| `filterGreater(string $field, bool $isStrict = true, ...)` | Greater than filter |
-| `filterLess(string $field, bool $isStrict = true, ...)` | Less than filter |
-| `orderBy(?string $default = null, bool $defaultDesc = false)` | Apply ordering. Supports relation fields via dot notation |
+| `filterBy(string $field, ?string $filterName = null)` | Filter by exact match. Supports dot notation for relations (e.g., `role.name`) |
+| `filterByList(string $field, ?string $filterName = null)` | Filter by a list of values (whereIn). Supports dot notation for relations |
+| `filterByQuery(array $fields, string $mask = ...)` | Search by text query (LIKE) across multiple fields. Supports dot notation for relations |
+| `filterGreater(string $field, bool $isStrict = true, ...)` | Filter where field is greater than (or equal to) the filter value |
+| `filterLess(string $field, bool $isStrict = true, ...)` | Filter where field is less than (or equal to) the filter value |
+| `orderBy(?string $default = null, bool $defaultDesc = false)` | Sort results by the `order_by` filter. Supports dot notation for relations |
 
 ### Pagination
 
-`getSearchResults()` returns a `LengthAwarePaginator`. Pagination is controlled via filters:
+`getSearchResults()` finalizes the search, applies ordering, and returns a `LengthAwarePaginator`. Pagination is controlled via filters:
 
 | Filter | Description | Default |
 |--------|-------------|---------|
