@@ -182,13 +182,6 @@ $this->withCount(['posts', 'posts.comments'])->find($id);
 
 Both `with()` and `withCount()` can also be passed as filter keys in `searchQuery()`:
 
-```php
-$this->searchQuery([
-    'with' => ['role'],
-    'with_count' => ['posts'],
-])->getSearchResults();
-```
-
 ## Search and Filtering
 
 `SearchTrait` (included via `EntityControlTrait`) provides a search pipeline with automatic filter resolution, manual filter methods, ordering, and pagination.
@@ -226,14 +219,7 @@ Reserved filter keys (`with`, `with_count`, `with_trashed`, `only_trashed`, `que
 To add custom reserved filter names, call `setAdditionalReservedFilters()` in the repository constructor:
 
 ```php
-final class UserRepository extends BaseRepository
-{
-    public function __construct()
-    {
-        $this->setModel(User::class);
-        $this->setAdditionalReservedFilters('has_coach_id', 'has_contact_id');
-    }
-}
+$this->setAdditionalReservedFilters('coach_id', 'contact_id');
 ```
 
 These keys will be skipped by the auto-filter logic and can be handled manually in a custom `search()` method.
@@ -242,78 +228,15 @@ These keys will be skipped by the auto-filter logic and can be handled manually 
 
 Use these after `searchQuery()` for fine-grained control:
 
-#### `filterBy(string $field, ?string $filterName = null): self`
-
-Applies an exact match (`=`) condition. If `$filterName` is omitted, it is derived from `$field` (the last segment after the last dot).
-
-Supports dot notation for filtering through relations via `whereHas`:
-
-```php
-$this->searchQuery($filters)
-    ->filterBy('status')               // WHERE status = $filters['status']
-    ->filterBy('role.name', 'role');   // whereHas('role', WHERE name = $filters['role'])
-```
-
-#### `filterByList(string $field, ?string $filterName = null): self`
-
-Applies a `whereIn` condition. Same dot-notation and filter name resolution as `filterBy`.
-
-```php
-$this->searchQuery($filters)
-    ->filterByList('status');          // WHERE status IN ($filters['status'])
-```
-
-#### `filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self`
-
-Applies full-text search using `LIKE` (MySQL) or `ILIKE` (PostgreSQL) across multiple fields when `$filters['query']` is set. Fields are joined with `OR`. Supports dot notation for relation fields.
-
-The `$mask` parameter controls the LIKE pattern. The placeholder `{{ value }}` is replaced with the search term:
-
-```php
-// Default: %term%
-$this->searchQuery($filters)->filterByQuery(['name', 'email']);
-
-// Prefix search: term%
-$this->searchQuery($filters)->filterByQuery(['name'], "'{{ value }}%'");
-```
-
-#### `filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self`
-
-Applies a `>` (strict) or `>=` (non-strict) condition. The filter value is read from `$filters[$filterName]`. If `$filterName` is omitted, defaults to `'from'`.
-
-```php
-$this->searchQuery($filters)
-    ->filterGreater('age', true, 'min_age');   // WHERE age > $filters['min_age']
-    ->filterGreater('price', false, 'price_from'); // WHERE price >= $filters['price_from']
-```
-
-#### `filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self`
-
-Applies a `<` (strict) or `<=` (non-strict) condition. If `$filterName` is omitted, defaults to `'to'`.
-
-```php
-$this->searchQuery($filters)
-    ->filterLess('age', true, 'max_age');    // WHERE age < $filters['max_age']
-    ->filterLess('price', false, 'price_to'); // WHERE price <= $filters['price_to']
-```
-
-#### `filterValue(string $field, string $sign, mixed $value): self`
-
-Low-level method for applying any comparison operator directly with an explicit value (not from `$filters`). Skips the condition if `$value` is empty.
-
-```php
-$this->searchQuery($filters)
-    ->filterValue('score', '>=', 50);
-```
-
-#### `orderBy(?string $default = null, bool $defaultDesc = false): self`
-
-Applies ordering using `$filters['order_by']` and `$filters['desc']`. Falls back to `$default` (or the primary key if omitted). Supports dot notation for ordering by related fields via `orderByRelated`. If a non-default field is used, a secondary sort by the default field is appended automatically.
-
-```php
-$this->searchQuery($filters)->orderBy('created_at', true);
-// Sorts by $filters['order_by'] DESC, then by created_at DESC as tiebreaker
-```
+| Method | Description |
+|--------|-------------|
+| `filterBy(string $field, ?string $filterName = null): self` | Exact match (`=`). `$filterName` defaults to the last segment of `$field`. Supports dot notation for relations via `whereHas` |
+| `filterByList(string $field, ?string $filterName = null): self` | `whereIn` condition. Same dot-notation and filter name resolution as `filterBy` |
+| `filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self` | Full-text search using `LIKE`/`ILIKE` across multiple fields when `$filters['query']` is set. Fields joined with `OR`. `$mask` controls the pattern — `{{ value }}` is replaced with the search term. Supports dot notation |
+| `filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self` | `>` (strict) or `>=` (non-strict) condition. Reads from `$filters[$filterName]`. `$filterName` defaults to `'from'` |
+| `filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self` | `<` (strict) or `<=` (non-strict) condition. Reads from `$filters[$filterName]`. `$filterName` defaults to `'to'` |
+| `filterValue(string $field, string $sign, mixed $value): self` | Applies any comparison operator with an explicit `$value` (not from `$filters`). Skips if `$value` is empty |
+| `orderBy(?string $default = null, bool $defaultDesc = false): self` | Sorts by `$filters['order_by']` / `$filters['desc']`. Falls back to `$default` (or primary key). Supports dot notation via `orderByRelated`. Appends secondary sort by default field as tiebreaker |
 
 ### `getSearchResults(): LengthAwarePaginator`
 
