@@ -258,6 +258,34 @@ Use these after `searchQuery()` for fine-grained control:
 | `getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator` | Hook called on every paginator before it is returned. No-op by default. Override to transform results (e.g. append computed fields) |
 | `getSearchQuery(): Query` | Returns the current Eloquent query builder. Useful for raw query modifications or debugging after `searchQuery()` |
 
+
+### Example
+
+```php
+// service layer
+public function search(array $filters): LengthAwarePaginator
+{
+    return $this
+        ->searchQuery($filters)
+        ->filterBy('role.name', 'role_name')
+        ->filterByQuery(['name'])
+        ->getSearchResults();
+}
+
+// controller or another service
+$service->search([
+    'role_name' => 'admin',
+    'query' => 'john',
+    'age_from' => 18,
+    'age_to' => 65,
+    'order_by' => 'created_at',
+    'desc' => true,
+    'per_page' => 20,
+    'with' => ['posts', 'role'],
+    'with_count' => ['posts'],
+]);
+```
+
 [<< Traits][1]
 [Services >>][2]
 
