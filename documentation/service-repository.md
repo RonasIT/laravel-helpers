@@ -52,29 +52,6 @@ final class UserService extends EntityService
 
 `EntityService` uses `__call()` to delegate method calls to the repository. If a repository method returns `$this` (for chaining), the service returns itself instead, allowing seamless method chaining through the service layer.
 
-## Configuration
-
-### `setModel(string $modelClass): self`
-
-Sets the Eloquent model class for the repository. Called in the constructor. Resolves the primary key and available fields from the model.
-
-```php
-$this->setModel(User::class);
-```
-
-### `force(bool $value = true): self`
-
-By default, `create()` and `update()` only fill attributes listed in the model's `$fillable` array. Use `force()` to bypass fillable restrictions and write all model fields (including guarded ones):
-
-```php
-$repository->force()->create($data);
-$repository->force()->update($where, $data);
-$repository->force()->updateMany($where, $data);
-$repository->force()->updateByList($ids, $data);
-```
-
-`force()` is chainable and resets automatically after the next query.
-
 ## CRUD Operations
 
 All methods below are available on both the repository and the service (via delegation).
@@ -82,10 +59,10 @@ All methods below are available on both the repository and the service (via dele
 The `$where` parameter accepts a primary key value (`int` or `string`) or an associative array of conditions:
 
 ```php
-$repository->find(1);
-$repository->first(['email' => 'user@example.com']);
-$repository->update(1, ['name' => 'New Name']);
-$repository->update(['email' => 'user@example.com'], ['name' => 'New Name']);
+$this->find(1);
+$this->first(['email' => 'user@example.com']);
+$this->update(1, ['name' => 'New Name']);
+$this->update(['email' => 'user@example.com'], ['name' => 'New Name']);
 ```
 
 ### Create
@@ -119,7 +96,7 @@ $repository->update(['email' => 'user@example.com'], ['name' => 'New Name']);
 
 | Method | Description |
 |--------|-------------|
-| `update(array\|int\|string $where, array $data): ?Model` | Update a single entity and return it; returns `null` if not found |
+| `update(array\|int\|string $where, array $data): ?Model` | Update a single entity and return it |
 | `updateMany(array\|int\|string $where, array $data): int` | Update all entities matching the condition. Returns count of updated rows |
 | `updateByList(array $values, array $data, ?string $field = null): int` | Update entities whose `$field` value is in `$values` (defaults to primary key). Returns count of updated rows |
 
@@ -130,6 +107,19 @@ $repository->update(['email' => 'user@example.com'], ['name' => 'New Name']);
 | `delete(array\|int\|string $where): int` | Delete entities by condition or primary key. Returns count of deleted rows |
 | `deleteByList(array $values, ?string $field = null): int` | Delete entities whose `$field` value is in `$values` (defaults to primary key). Returns count of deleted rows |
 | `truncate(): self` | Remove all rows from the table |
+
+### `force(bool $value = true): self`
+
+By default, `create()` and `update()` only fill attributes listed in the model's `$fillable` array. Use `force()` to bypass fillable restrictions and write all model fields (including guarded ones):
+
+```php
+$this->force()->create($data);
+$this->force()->update($where, $data);
+$this->force()->updateMany($where, $data);
+$this->force()->updateByList($ids, $data);
+```
+
+`force()` is chainable and resets automatically after the next query.
 
 ## Soft Delete Support
 
@@ -155,33 +145,33 @@ Both methods are chainable and apply to the next query only.
 
 ```php
 // Include soft-deleted entities in results
-$repository->withTrashed()->get();
+$this->withTrashed()->get();
 
 // Get only soft-deleted entities
-$repository->onlyTrashed()->get();
+$this->onlyTrashed()->get();
 
 // Restore by condition
-$repository->restore(['status' => 'banned']);
+$this->restore(['status' => 'banned']);
 
 // Restore by list of IDs
-$repository->restoreByList([1, 2, 3]);
+$this->restoreByList([1, 2, 3]);
 
 // Permanently delete (bypass soft delete)
-$repository->force()->delete($where);
-$repository->force()->deleteByList([1, 2, 3]);
+$this->force()->delete($where);
+$this->force()->deleteByList([1, 2, 3]);
 ```
 
 ## Eager Loading
 
 ```php
 // Load relations
-$repository->with(['posts', 'posts.comments'])->get();
+$this->with(['posts', 'posts.comments'])->get();
 
 // Load relation counts
-$repository->withCount(['posts'])->get();
+$this->withCount(['posts'])->get();
 
 // Nested relation counts (e.g., count comments on each post)
-$repository->withCount(['posts.comments'])->get();
+$this->withCount(['posts.comments'])->get();
 ```
 
 ## Search and Filtering
