@@ -69,11 +69,11 @@ class SearchTraitTest extends TestCase
         $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
         $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
 
-        $this->assertTrue($onlyTrashed);
+        $this->assertFalse($onlyTrashed);
         $this->assertFalse($withTrashed);
-        $this->assertTrue($forceMode);
-        $this->assertEquals(['relation'], $attachedRelations);
-        $this->assertEquals(['relation'], $attachedRelationsCount);
+        $this->assertFalse($forceMode);
+        $this->assertEquals([], $attachedRelations);
+        $this->assertEquals([], $attachedRelationsCount);
 
         $this->assertEqualsFixture('search_query_sql.json', $sql);
     }
