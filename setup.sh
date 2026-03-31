@@ -5,7 +5,9 @@ set -e
 RED_COLOR='\033[1;31m'
 DEFAULT_COLOR='\033[0m'
 
-mkdir -p docker
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+mkdir -p "$SCRIPT_DIR/docker"
 
 # --------------------------------------------------
 # Download a file if it does not exist.
@@ -17,7 +19,7 @@ mkdir -p docker
 #   $4 - Overwrite if file exists ("true" or "false", optional)
 # --------------------------------------------------
 download_file() {
-    local output=$1
+    local output="$SCRIPT_DIR/$1"
     local url=$2
     local make_executable=${3:-false}
     local overwrite=${4:-false}
@@ -59,8 +61,8 @@ prompt_yes_no() {
 # Create initial Git commit for the repository.
 # --------------------------------------------------
 init_git_repo() {
-    git add . &>/dev/null
-    git commit -m "chore: initial commit" &>/dev/null
+    git -C "$SCRIPT_DIR" add . &>/dev/null
+    git -C "$SCRIPT_DIR" commit -m "chore: initial commit" &>/dev/null
 }
 
 # --------------------------------------------------
@@ -96,7 +98,7 @@ prompt_and_add_git_remote() {
                 continue
             fi
 
-            git remote add origin "$repo_url"
+            git -C "$SCRIPT_DIR" remote add origin "$repo_url"
             echo "Added new remote 'origin' $repo_url"
             break
         done
@@ -112,20 +114,20 @@ download_file "init-project.sh" "https://raw.githubusercontent.com/RonasIT/larav
 download_file "docker-compose.yml" "https://raw.githubusercontent.com/RonasIT/laravel-project-create/refs/heads/main/docker-compose.yml" false
 download_file "Dockerfile" "https://raw.githubusercontent.com/RonasIT/laravel-project-create/refs/heads/main/Dockerfile" false
 
-mkdir -p docker && touch docker/entrypoint.sh && chmod +x docker/entrypoint.sh
+touch "$SCRIPT_DIR/docker/entrypoint.sh" && chmod +x "$SCRIPT_DIR/docker/entrypoint.sh"
 
 # Git initialization and configuration
 if command -v git &>/dev/null; then
     # Check if we are inside a Git repository
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
+    if git -C "$SCRIPT_DIR" rev-parse --is-inside-work-tree &>/dev/null; then
         # Remove existing origin remote if present
-        git remote get-url origin &>/dev/null && git remote remove origin
+        git -C "$SCRIPT_DIR" remote get-url origin &>/dev/null && git -C "$SCRIPT_DIR" remote remove origin
 
         # Rewrite initial commit if the repository already has commits
-        if git rev-parse --verify HEAD &>/dev/null; then
-            new_commit=$(git commit-tree 'HEAD^{tree}' -m "chore: initial commit")
-            git reset --soft "$new_commit"
-            git commit --amend -m "chore: initial commit" &>/dev/null
+        if git -C "$SCRIPT_DIR" rev-parse --verify HEAD &>/dev/null; then
+            new_commit=$(git -C "$SCRIPT_DIR" commit-tree 'HEAD^{tree}' -m "chore: initial commit")
+            git -C "$SCRIPT_DIR" reset --soft "$new_commit"
+            git -C "$SCRIPT_DIR" commit --amend -m "chore: initial commit" &>/dev/null
         else
             init_git_repo
         fi
@@ -134,7 +136,7 @@ if command -v git &>/dev/null; then
     else
         # Offer to initialize a new Git repository
         if prompt_yes_no "Do you want to initialize a Git repository?"; then
-            git init &>/dev/null
+            git -C "$SCRIPT_DIR" init &>/dev/null
             init_git_repo
             prompt_and_add_git_remote
         fi
@@ -143,8 +145,9 @@ fi
 
 # Docker startup and project initialization
 if command -v docker &>/dev/null && docker info &>/dev/null; then
+    cd "$SCRIPT_DIR"
     docker compose up -d
-    docker compose exec -it nginx bash /app/init-project.sh
+    MSYS_NO_PATHCONV=1 docker compose exec -it nginx bash //app/init-project.sh
 else
     printf "%b\n" "${RED_COLOR}Error: Docker is not installed, not running, or permission denied.${DEFAULT_COLOR}" >&2
     exit 1
@@ -152,10 +155,10 @@ fi
 
 download_file "docker/entrypoint.sh" "https://raw.githubusercontent.com/RonasIT/laravel-project-create/refs/heads/main/entrypoint.sh" true true
 
-rm -f "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/entrypoint.sh"
+rm -f "$SCRIPT_DIR/entrypoint.sh"
 
 echo
 echo "Setup complete!"
 
 # Remove this script after successful execution
-rm -- "$(realpath "${BASH_SOURCE[0]}")"
+rm -- "$SCRIPT_DIR/setup.sh"
