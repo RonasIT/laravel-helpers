@@ -142,7 +142,7 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockEachLazyById(array $selectResult): void
+    protected function mockLazyEach(array $selectResult): void
     {
         $this->mockSelect(
             'select "test_models".*, (select count(*) from "relation_models" '
