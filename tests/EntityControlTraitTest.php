@@ -756,7 +756,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testLazyEach()
     {
-        $this->mockEachLazyById(self::$selectResult);
+        $this->mockLazyEach(self::$selectResult);
 
         self::$testRepositoryClass
             ->withTrashed()
