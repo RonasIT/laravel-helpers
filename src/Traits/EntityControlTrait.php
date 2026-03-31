@@ -362,21 +362,14 @@ trait EntityControlTrait
         $this->postQueryHook();
     }
 
-    public function lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): int
+    public function lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): void
     {
-        $count = 0;
-
         $this
             ->getQuery($where)
             ->lazyById($chunkSize)
-            ->tapEach(function () use (&$count) {
-                $count++;
-            })
             ->each($callback);
 
         $this->postQueryHook();
-
-        return $count;
     }
 
     /**
