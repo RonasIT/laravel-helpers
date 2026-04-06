@@ -95,7 +95,7 @@ trait NovaTestTrait
     {
         return (empty($user))
             ? $this
-            : $this->actingAs($user, 'web');
+            : $this->actingAs($user, config('nova.guard'));
     }
 
     protected function generateNovaUri(string $resourceClass, string $path = ''): string
