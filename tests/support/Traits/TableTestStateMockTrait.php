@@ -54,7 +54,7 @@ trait TableTestStateMockTrait
             ->willReturnOnConsecutiveCalls($initialState, $responseMock);
     }
 
-    protected function mockGettingBinaryColumns(Collection|string $resultFixture, string $tableName, int $times = 1): void
+    protected function mockGettingBinaryColumns(Collection|string $resultFixture, string $tableName): void
     {
         if (is_string($resultFixture)) {
             $resultFixture = collect($this->getJsonFixture($resultFixture));
@@ -64,7 +64,7 @@ trait TableTestStateMockTrait
 
         DB::shouldReceive('table')
             ->with('information_schema.columns')
-            ->times($times)
+            ->once()
             ->andReturn($builderMock);
 
         $builderMock
@@ -94,7 +94,7 @@ trait TableTestStateMockTrait
             ->willReturnSelf();
 
         $builderMock
-            ->expects($this->exactly($times))
+            ->expects($this->exactly(1))
             ->method('get')
             ->willReturn($resultFixture);
     }

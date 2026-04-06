@@ -56,9 +56,9 @@ class TableTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
 
-        $this->mockDBConnection(4);
+        $this->mockDBConnection(3);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(), 'test_models', 2);
+        $this->mockGettingBinaryColumns(collect(), 'test_models');
 
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
@@ -75,7 +75,7 @@ class TableTestStateTest extends TestCase
 
         $this->mockDBConnection(3);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(), 'test_models', 1);
+        $this->mockGettingBinaryColumns(collect(), 'test_models');
 
         $modelTestState = new TableTestState('test_models');
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
@@ -85,8 +85,9 @@ class TableTestStateTest extends TestCase
     {
         $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
 
-        $this->mockDBConnection(2);
+        $this->mockDBConnection(3);
         $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
+        $this->mockGettingBinaryColumns(collect(), 'test_models');
 
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertNotChanged();

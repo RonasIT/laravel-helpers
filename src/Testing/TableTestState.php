@@ -53,8 +53,9 @@ class TableTestState extends Assert
 
         $updatedRecords = [];
         $deletedRecords = [];
+        $binaryColumns = $this->getBinaryColumns();
 
-        $this->state->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords) {
+        $this->state->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords, $binaryColumns) {
             $updatedItemIndex = $updatedData->search(fn ($updatedItem) => $updatedItem['id'] === $originItem['id']);
 
             if ($updatedItemIndex === false) {
@@ -64,7 +65,6 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
-                    $binaryColumns = $this->getBinaryColumns();
                     $changes = Arr::map($changes, fn ($field, $name) => (in_array($name, $binaryColumns)) ? bin2hex($field) : $field);
 
                     $updatedRecords[] = array_merge(['id' => $originItem['id']], $changes);
