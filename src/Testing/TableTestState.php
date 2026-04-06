@@ -102,26 +102,6 @@ class TableTestState extends Assert
             ->toArray();
     }
 
-    protected function isBinary(mixed $value): bool
-    {
-        if (!is_string($value) || $value === '') {
-            return false;
-        }
-
-        if (str_contains($value, "\0")) {
-            return true;
-        }
-
-        $sample = substr($value, 0, 8192);
-
-        if (strlen($sample) === 0 || mb_check_encoding($sample, 'UTF-8')) {
-            return false;
-        }
-
-        return preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', $sample)
-            || !ctype_print($sample);
-    }
-
     protected function prepareChanges(array $changes): array
     {
         $jsonFields = Arr::wrap($this->jsonFields);
