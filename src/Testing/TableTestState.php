@@ -83,7 +83,7 @@ class TableTestState extends Assert
 
     protected function getBinaryColumns(): array
     {
-        $result =  DB::connection($this->connectionName)
+        return DB::connection($this->connectionName)
             ->table('information_schema.columns')
             ->select('column_name')
             ->where('table_name', $this->tableName)
@@ -96,8 +96,7 @@ class TableTestState extends Assert
                 'binary',
                 'varbinary',
             ])
-            ->get();
-        return $result
+            ->get()
             ->pluck('column_name')
             ->toArray();
     }
