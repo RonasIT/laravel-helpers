@@ -64,7 +64,8 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
-                    $changes = Arr::map($changes, fn ($field) => ($this->isBinary($field)) ? bin2hex($field) : $field);
+                    $binaryColumns = $this->getBinaryColumns();
+                    $changes = Arr::map($changes, fn ($field, $name) => (in_array($name, $binaryColumns)) ? bin2hex($field) : $field);
 
                     $updatedRecords[] = array_merge(['id' => $originItem['id']], $changes);
                 }
@@ -78,6 +79,27 @@ class TableTestState extends Assert
             'created' => $this->prepareChanges($updatedData->values()->toArray()),
             'deleted' => $this->prepareChanges($deletedRecords),
         ];
+    }
+
+    protected function getBinaryColumns(): array
+    {
+        $result =  DB::connection($this->connectionName)
+            ->table('information_schema.columns')
+            ->select('column_name')
+            ->where('table_name', $this->tableName)
+            ->whereIn('data_type', [
+                'bytea',
+                'blob',
+                'tinyblob',
+                'mediumblob',
+                'longblob',
+                'binary',
+                'varbinary',
+            ])
+            ->get();
+        return $result
+            ->pluck('column_name')
+            ->toArray();
     }
 
     protected function isBinary(mixed $value): bool

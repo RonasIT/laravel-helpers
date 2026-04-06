@@ -5,6 +5,7 @@ namespace RonasIT\Support\Tests\Support\Traits;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use ReflectionClass;
 use RonasIT\Support\Testing\TestCase;
 
@@ -30,12 +31,16 @@ trait TableTestStateMockTrait
             ->willReturn($responseMock);
     }
 
+    protected function mockDBConnection(int $times): void
+    {
+        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
+        DB::shouldReceive('connection')->times($times)->andReturnSelf();
+    }
+
     protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 
-        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-        DB::shouldReceive('connection')->twice()->andReturnSelf();
         DB::shouldReceive('table')->with($tableName)->twice()->andReturn($builderMock);
 
         $builderMock
@@ -47,6 +52,51 @@ trait TableTestStateMockTrait
             ->expects($this->exactly(2))
             ->method('get')
             ->willReturnOnConsecutiveCalls($initialState, $responseMock);
+    }
+
+    protected function mockGettingBinaryColumns(Collection|string $resultFixture, string $tableName, int $times = 1): void
+    {
+        if (is_string($resultFixture)) {
+            $resultFixture = collect($this->getJsonFixture($resultFixture));
+        }
+
+        $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'get'], true);
+
+        DB::shouldReceive('table')
+            ->with('information_schema.columns')
+            ->times($times)
+            ->andReturn($builderMock);
+
+        $builderMock
+            ->method('select')
+            ->with('column_name')
+            ->willReturnSelf();
+
+        $builderMock
+            ->method('where')
+            ->with('table_name', $tableName)
+            ->willReturnSelf();
+
+        $builderMock
+            ->method('whereIn')
+            ->with(
+                'data_type',
+                [
+                    'bytea',
+                    'blob',
+                    'tinyblob',
+                    'mediumblob',
+                    'longblob',
+                    'binary',
+                    'varbinary',
+                ],
+            )
+            ->willReturnSelf();
+
+        $builderMock
+            ->expects($this->exactly($times))
+            ->method('get')
+            ->willReturn($resultFixture);
     }
 
     protected function mockTestStateCreationSetGlobalExportMode(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool
