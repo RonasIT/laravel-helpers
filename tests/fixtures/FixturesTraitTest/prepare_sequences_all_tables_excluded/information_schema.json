@@ -1,0 +1,8 @@
+[
+  {
+    "table_name": "roles",
+    "table_schema": "public",
+    "column_name": "id",
+    "column_default": "nextval('roles_id_seq'::regclass)"
+  }
+]

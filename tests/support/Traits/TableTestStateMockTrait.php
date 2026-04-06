@@ -101,12 +101,9 @@ trait TableTestStateMockTrait
 
     protected function mockTestStateCreationSetGlobalExportMode(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool
     {
-        $testCaseMock = $this
-            ->getMockBuilder(TestCase::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $testCaseMock->setGlobalExportMode($testCaseGlobalExportMode);
+        $testCaseMock = Mockery::mock(TestCase::class)
+            ->makePartial()
+            ->setGlobalExportMode($testCaseGlobalExportMode);
 
         $instance = $this->callEncapsulatedMethod($testCaseMock, $methodName, $entity);
 
