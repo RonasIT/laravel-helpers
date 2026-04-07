@@ -17,6 +17,7 @@ class TableTestState extends Assert
     protected array $jsonFields;
     protected ?string $connectionName;
     protected Collection $state;
+    private array $binaryColumns;
 
     public function __construct(
         string $tableName,
@@ -53,9 +54,8 @@ class TableTestState extends Assert
 
         $updatedRecords = [];
         $deletedRecords = [];
-        $binaryColumns = $this->getBinaryColumns();
 
-        $this->state->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords, $binaryColumns) {
+        $this->state->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords) {
             $updatedItemIndex = $updatedData->search(fn ($updatedItem) => $updatedItem['id'] === $originItem['id']);
 
             if ($updatedItemIndex === false) {
@@ -65,8 +65,6 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
-                    $changes = Arr::map($changes, fn ($field, $name) => (in_array($name, $binaryColumns)) ? bin2hex($field) : $field);
-
                     $updatedRecords[] = array_merge(['id' => $originItem['id']], $changes);
                 }
 
@@ -83,22 +81,31 @@ class TableTestState extends Assert
 
     protected function getBinaryColumns(): array
     {
-        return DB::connection($this->connectionName)
-            ->table('information_schema.columns')
-            ->select('column_name')
-            ->where('table_name', $this->tableName)
-            ->whereIn('data_type', [
-                'bytea',
-                'blob',
-                'tinyblob',
-                'mediumblob',
-                'longblob',
-                'binary',
-                'varbinary',
-            ])
-            ->get()
-            ->pluck('column_name')
-            ->toArray();
+        if (!isset($this->binaryColumns)) {
+            $tableSchema = config("database.connections.{$this->connectionName}.schema") ?? DB::getDatabaseName();
+
+            $this->binaryColumns = DB::connection($this->connectionName)
+                ->table('information_schema.columns')
+                ->select('column_name')
+                ->where([
+                    'table_name' => $this->tableName,
+                    'table_schema' => $tableSchema,
+                ])
+                ->whereIn('data_type', [
+                    'bytea',
+                    'blob',
+                    'tinyblob',
+                    'mediumblob',
+                    'longblob',
+                    'binary',
+                    'varbinary',
+                ])
+                ->get()
+                ->pluck('column_name')
+                ->toArray();
+        }
+
+        return $this->binaryColumns;
     }
 
     protected function prepareChanges(array $changes): array
@@ -111,6 +118,14 @@ class TableTestState extends Assert
 
         return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
+                $isBinaryField = (in_array($jsonField, $this->getBinaryColumns())
+                        && Arr::exists($item, $jsonField))
+                        && !is_null($item[$jsonField]);
+
+                if ($isBinaryField) {
+                    $item[$jsonField] = bin2hex($item[$jsonField]);
+                }
+
                 $isJsonField = Arr::has($item, $jsonField)
                     && is_string($item[$jsonField])
                     && json_validate($item[$jsonField]);

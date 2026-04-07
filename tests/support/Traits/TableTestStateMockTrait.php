@@ -62,6 +62,10 @@ trait TableTestStateMockTrait
 
         $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'get'], true);
 
+        DB::shouldReceive('getDatabaseName')
+            ->once()
+            ->andReturn('public');
+
         DB::shouldReceive('table')
             ->with('information_schema.columns')
             ->once()
@@ -74,7 +78,10 @@ trait TableTestStateMockTrait
 
         $builderMock
             ->method('where')
-            ->with('table_name', $tableName)
+            ->with([
+                'table_name' => $tableName,
+                'table_schema' => 'public',
+            ])
             ->willReturnSelf();
 
         $builderMock

@@ -69,7 +69,7 @@ class ModelTestStateTest extends TestCase
 
         $this->mockDBConnection(3);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(['column_name' => 'binary_field']), 'test_models');
+        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
@@ -84,9 +84,8 @@ class ModelTestStateTest extends TestCase
             value: $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
         );
 
-        $this->mockDBConnection(3);
+        $this->mockDBConnection(2);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_without_json_fields');
-        $this->mockGettingBinaryColumns(collect(), 'test_model_without_json_fields');
 
         $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
@@ -106,7 +105,7 @@ class ModelTestStateTest extends TestCase
 
         $this->mockDBConnection(3);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models', 1);
+        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes');
@@ -136,9 +135,8 @@ class ModelTestStateTest extends TestCase
     {
         $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
 
-        $this->mockDBConnection(3);
+        $this->mockDBConnection(2);
         $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(['column_name' => 'binary_field']), 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertNotChanged();
