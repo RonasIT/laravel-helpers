@@ -172,7 +172,7 @@ class FixturesTraitTest extends TestCase
 
     public function testLoadTestDumpForMysql()
     {
-        $connection = $this->mockClass(MysqlConnection::class, [
+        $connection = $this->mockClass(MySqlConnection::class, [
             $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_mysql_db_query.sql')]),
             $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
@@ -243,7 +243,7 @@ class FixturesTraitTest extends TestCase
             ->map(fn ($item) => (object) $item);
 
         $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('getQueryGrammar', [], new Grammar()),
+            $this->functionCall('getQueryGrammar', [], new Grammar($this->createMock(PostgresConnection::class))),
             $this->functionCall('getPostProcessor', [], new Processor()),
             $this->functionCall('select', [
                 'select "table_name", "table_schema", "column_name", "column_default" from "information_schema"."columns" where "column_default" LIKE ?',
@@ -273,7 +273,7 @@ class FixturesTraitTest extends TestCase
         $connection = $this->mockClass(
             class: PostgresConnection::class,
             callChain: [
-                $this->functionCall('getQueryGrammar', [], new Grammar()),
+                $this->functionCall('getQueryGrammar', [], new Grammar($this->createMock(PostgresConnection::class))),
                 $this->functionCall('getPostProcessor', [], new Processor()),
                 $this->functionCall(
                     name: 'select',
