@@ -123,9 +123,8 @@ class ModelTestStateTest extends TestCase
             'binary_field' => null,
         ]]);
 
-        $this->mockDBConnection(3);
+        $this->mockDBConnection(2);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('binary_string_to_null_changes');

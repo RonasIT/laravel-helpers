@@ -116,12 +116,10 @@ class TableTestState extends Assert
             return $changes;
         }
 
-        $binaryColumns = $this->getBinaryColumns();
-
-        return array_map(function ($item) use ($jsonFields, $binaryColumns) {
+        return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
                 if (Arr::has($item, $jsonField)) {
-                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $binaryColumns))) {
+                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $this->getBinaryColumns()))) {
                         $item[$jsonField] = bin2hex($item[$jsonField]);
                     }
 
