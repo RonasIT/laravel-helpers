@@ -120,20 +120,14 @@ class TableTestState extends Assert
 
         return array_map(function ($item) use ($jsonFields, $binaryColumns) {
             foreach ($jsonFields as $jsonField) {
-                $isBinaryField = !is_null($item[$jsonField])
-                    && Arr::exists($item, $jsonField)
-                    && (in_array($jsonField, $binaryColumns));
+                if (Arr::has($item, $jsonField)) {
+                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $binaryColumns))) {
+                        $item[$jsonField] = bin2hex($item[$jsonField]);
+                    }
 
-                if ($isBinaryField) {
-                    $item[$jsonField] = bin2hex($item[$jsonField]);
-                }
-
-                $isJsonField = Arr::has($item, $jsonField)
-                    && is_string($item[$jsonField])
-                    && json_validate($item[$jsonField]);
-
-                if ($isJsonField) {
-                    $item[$jsonField] = json_decode($item[$jsonField], true);
+                    if (is_string($item[$jsonField]) && json_validate($item[$jsonField])) {
+                        $item[$jsonField] = json_decode($item[$jsonField], true);
+                    }
                 }
             }
 
