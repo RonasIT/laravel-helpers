@@ -94,7 +94,9 @@ trait ModelTrait
 
     public function wasExchanged(string $fieldName): bool
     {
-        return $this->wasChanged($fieldName) && !is_null($this->origin($fieldName));
+        return $this->wasChanged($fieldName)
+            && !is_null($this->origin($fieldName))
+            && !is_null($this->getAttribute($fieldName));
     }
 
     public function wasFilled(string $fieldName): bool
