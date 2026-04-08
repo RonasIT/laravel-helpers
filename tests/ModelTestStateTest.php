@@ -107,6 +107,6 @@ class ModelTestStateTest extends TestCase
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_non_id_primary_keys', 'name');
 
         $modelTestState = new ModelTestState(TestModelNonIdPrimaryKey::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key.json');
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key');
     }
 }
