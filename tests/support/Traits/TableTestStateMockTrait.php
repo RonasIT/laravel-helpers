@@ -37,7 +37,7 @@ trait TableTestStateMockTrait
         DB::shouldReceive('connection')->times($times)->andReturnSelf();
     }
 
-    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName): void
+    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName, string $uniqueKey = 'id'): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 

@@ -147,7 +147,9 @@ class ModelTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/initial_dataset'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/changed_dataset'));
 
+        $this->mockDBConnection(3);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_non_id_primary_keys', 'name');
+        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_model_non_id_primary_keys');
 
         $modelTestState = new ModelTestState(TestModelNonIdPrimaryKey::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key');

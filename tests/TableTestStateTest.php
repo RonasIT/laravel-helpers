@@ -96,7 +96,9 @@ class TableTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/initial_dataset'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/changed_dataset'));
 
+        $this->mockDBConnection(3);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models', 'name');
+        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models');
 
         $modelTestState = new TableTestState(
             tableName: 'test_models',
