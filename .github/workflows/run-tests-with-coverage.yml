@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: [ "8.3", "8.4" ]
+        php-version: [ "8.3", "8.4", "8.5" ]
         laravel-version: [ "11.*", "12.*", "13.*" ]
         phpunit-version: [ "10.*", "11.*", "12.*", "13.*" ]
         exclude:
@@ -32,7 +32,7 @@ jobs:
             phpunit-version: "10.*"
 
           # This combination is handled by the tests-with-coverage job
-          - php-version: "8.4"
+          - php-version: "8.5"
             laravel-version: "13.*"
             phpunit-version: "13.*"
     steps:
@@ -59,7 +59,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.5"
           coverage: xdebug
           tools: composer
       - name: Checkout
