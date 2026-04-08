@@ -12,7 +12,6 @@ use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionParameter;
-use RuntimeException;
 
 trait MockTrait
 {
@@ -138,7 +137,7 @@ trait MockTrait
 
         $reflectionArgs = $reflection->getParameters();
 
-        $this->assertArgumentsCount($actual, $expected, $reflection, $function, $isClass);
+        $this->assertArgumentsCount($actual, $expected, $reflection, $function);
 
         $this->fillOptionalArguments($reflectionArgs, $actual, $expected, $isClass);
 
@@ -154,7 +153,6 @@ trait MockTrait
         array $expected,
         ReflectionMethod|ReflectionFunction $reflection,
         string $function,
-        bool $isClass,
     ): void {
         $expectedCount = count($expected);
         $actualCount = count($actual);
@@ -162,28 +160,17 @@ trait MockTrait
 
         if ($expectedCount !== $actualCount) {
             if ($expectedCount < $requiredParametersCount) {
-                $this->throwArgumentsCountException(
+                throw new ExpectationFailedException(
                     "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments.",
-                    $isClass,
                 );
             }
 
             if ($expectedCount > $actualCount) {
-                $this->throwArgumentsCountException(
+                throw new ExpectationFailedException(
                     "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments.",
-                    $isClass,
                 );
             }
         }
-    }
-
-    protected function throwArgumentsCountException(string $message, bool $isClass): void
-    {
-        if ($isClass) {
-            throw new ExpectationFailedException($message);
-        }
-
-        throw new RuntimeException($message);
     }
 
     protected function fillOptionalArguments(array $parameters, array &$actual, array &$expected, bool $isClass): void

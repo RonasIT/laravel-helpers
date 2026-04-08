@@ -3,9 +3,9 @@
 namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\ExpectationFailedException;
+use ReflectionFunction;
 use RonasIT\Support\Tests\Support\Mock\TestMockClass;
 use RonasIT\Support\Traits\MockTrait;
-use RuntimeException;
 
 class MockTraitTest extends TestCase
 {
@@ -65,34 +65,28 @@ class MockTraitTest extends TestCase
 
     public function testMockNativeFunctionWhenLessRequiredParameters()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.');
 
-        $this->mockNativeFunction('RonasIT\Support\Tests', [
-            $this->functionCall(
-                name: 'array_slice',
-                arguments: [[1, 2, 3, 4, 5]],
-                result: [3, 4],
-            ),
-        ]);
-
-        array_slice([1, 2, 3, 4, 5], 2, 2);
+        $this->assertArgumentsCount(
+            actual: [[1, 2, 3, 4, 5], 2, 2],
+            expected: [[1, 2, 3, 4, 5]],
+            reflection: new ReflectionFunction('array_slice'),
+            function: 'array_slice',
+        );
     }
 
     public function testMockNativeFunctionWhenMoreExpectedParameters()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.');
 
-        $this->mockNativeFunction('RonasIT\Support\Tests', [
-            $this->functionCall(
-                name: 'array_slice',
-                arguments: [[1, 2, 3, 4, 5], 2, 2, 'preserve_keys', 'extra_parameter'],
-                result: [3, 4],
-            ),
-        ]);
-
-        array_slice([1, 2, 3, 4, 5], 2, 2, 'preserve_keys');
+        $this->assertArgumentsCount(
+            actual: [[1, 2, 3, 4, 5], 2, 2, 'preserve_keys'],
+            expected: [[1, 2, 3, 4, 5], 2, 2, 'preserve_keys', 'extra_parameter'],
+            reflection: new ReflectionFunction('array_slice'),
+            function: 'array_slice',
+        );
     }
 
     public function testMockNativeFunctionCheckMockedResult()
