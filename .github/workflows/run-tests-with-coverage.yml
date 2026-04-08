@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  tests-with-coverage:
+  tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,12 +30,17 @@ jobs:
           # testbench 11.x (Laravel 13) requires PHPUnit >= 11.5.50, PHPUnit 10 is not supported
           - laravel-version: "13.*"
             phpunit-version: "10.*"
+
+          # This combination is handled by the tests-with-coverage job
+          - php-version: "8.4"
+            laravel-version: "13.*"
+            phpunit-version: "13.*"
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          coverage: xdebug
+          coverage: none
           tools: composer
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,24 +50,38 @@ jobs:
         run: composer require --dev "phpunit/phpunit:${{ matrix.phpunit-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Install dependencies
         run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Execute unit tests via PHPUnit
+        run: vendor/bin/phpunit
+
+  tests-with-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: xdebug
+          tools: composer
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Laravel version
+        run: composer require "laravel/framework:13.*" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install PHPUnit version
+        run: composer require --dev "phpunit/phpunit:13.*" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install dependencies
+        run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
-        if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*' }}
         run: vendor/bin/pint --test
       - name: Execute unit tests via PHPUnit with coverage
-        if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*' }}
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
-      - name: Execute unit tests via PHPUnit
-        if: ${{ !(matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*') }}
-        run: vendor/bin/phpunit
       - name: Export coverage report
-        if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*' }}
         uses: actions/upload-artifact@v4
         with:
           name: clover.xml
           path: build/logs
 
   upload-to-coveralls:
-    needs: tests-with-coverage
+    needs: [ tests, tests-with-coverage ]
     runs-on: ubuntu-latest
     steps:
       - name: Set up PHP
