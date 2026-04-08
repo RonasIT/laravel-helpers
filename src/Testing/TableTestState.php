@@ -82,6 +82,31 @@ class TableTestState extends Assert
         ];
     }
 
+    protected function prepareChanges(array $changes): array
+    {
+        $jsonFields = Arr::wrap($this->jsonFields);
+
+        if (empty($jsonFields)) {
+            return $changes;
+        }
+
+        return array_map(function ($item) use ($jsonFields) {
+            foreach ($jsonFields as $jsonField) {
+                if (Arr::has($item, $jsonField)) {
+                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $this->getBinaryColumns()))) {
+                        $item[$jsonField] = bin2hex($item[$jsonField]);
+                    }
+
+                    if (is_string($item[$jsonField]) && json_validate($item[$jsonField])) {
+                        $item[$jsonField] = json_decode($item[$jsonField], true);
+                    }
+                }
+            }
+
+            return $item;
+        }, $changes);
+    }
+
     protected function getBinaryColumns(): array
     {
         if (!isset($this->binaryColumns)) {
@@ -109,31 +134,6 @@ class TableTestState extends Assert
         }
 
         return $this->binaryColumns;
-    }
-
-    protected function prepareChanges(array $changes): array
-    {
-        $jsonFields = Arr::wrap($this->jsonFields);
-
-        if (empty($jsonFields)) {
-            return $changes;
-        }
-
-        return array_map(function ($item) use ($jsonFields) {
-            foreach ($jsonFields as $jsonField) {
-                if (Arr::has($item, $jsonField)) {
-                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $this->getBinaryColumns()))) {
-                        $item[$jsonField] = bin2hex($item[$jsonField]);
-                    }
-
-                    if (is_string($item[$jsonField]) && json_validate($item[$jsonField])) {
-                        $item[$jsonField] = json_decode($item[$jsonField], true);
-                    }
-                }
-            }
-
-            return $item;
-        }, $changes);
     }
 
     protected function getFixturePath(string $fixtureName): string
