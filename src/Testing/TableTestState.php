@@ -20,6 +20,16 @@ class TableTestState extends Assert
     private array $binaryColumns;
     protected string $uniqueKey;
 
+    protected const array BINARY_COLUMNS = [
+        'bytea',
+        'blob',
+        'tinyblob',
+        'mediumblob',
+        'longblob',
+        'binary',
+        'varbinary',
+    ];
+
     public function __construct(
         string $tableName,
         array $jsonFields = [],
@@ -121,15 +131,7 @@ class TableTestState extends Assert
                     'table_name' => $this->tableName,
                     'table_schema' => $tableSchema,
                 ])
-                ->whereIn('data_type', [
-                    'bytea',
-                    'blob',
-                    'tinyblob',
-                    'mediumblob',
-                    'longblob',
-                    'binary',
-                    'varbinary',
-                ])
+                ->whereIn('data_type', self::BINARY_COLUMNS)
                 ->get()
                 ->pluck('column_name')
                 ->toArray();
