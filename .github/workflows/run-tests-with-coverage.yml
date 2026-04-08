@@ -46,9 +46,14 @@ jobs:
       - name: Install dependencies
         run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
+        if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*' }}
         run: vendor/bin/pint --test
       - name: Execute unit tests via PHPUnit with coverage
+        if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*' }}
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+      - name: Execute unit tests via PHPUnit
+        if: ${{ !(matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*') }}
+        run: vendor/bin/phpunit
       - name: Export coverage report
         if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*' }}
         uses: actions/upload-artifact@v4
