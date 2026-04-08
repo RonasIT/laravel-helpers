@@ -110,7 +110,9 @@ class TableTestState extends Assert
     protected function getBinaryColumns(): array
     {
         if (!isset($this->binaryColumns)) {
-            $tableSchema = config("database.connections.{$this->connectionName}.schema") ?? DB::getDatabaseName();
+            $tableSchema = config("database.connections.{$this->connectionName}.schema")
+                ?? DB::getDatabaseName()
+                ?? 'public';
 
             $this->binaryColumns = DB::connection($this->connectionName)
                 ->table('information_schema.columns')
