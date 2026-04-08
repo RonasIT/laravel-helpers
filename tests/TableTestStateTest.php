@@ -100,6 +100,6 @@ class TableTestStateTest extends TestCase
             uniqueKey: 'name',
         );
 
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set.json');
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set');
     }
 }
