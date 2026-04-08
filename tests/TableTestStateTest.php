@@ -89,8 +89,8 @@ class TableTestStateTest extends TestCase
 
     public function testAssertChangesWithCustomPrimaryKey()
     {
-        $initialDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/initial_dataset.json'));
-        $changedDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/changed_dataset.json'));
+        $initialDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/initial_dataset'));
+        $changedDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/changed_dataset'));
 
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models', 'name');
 
