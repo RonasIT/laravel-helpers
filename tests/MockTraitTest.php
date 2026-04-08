@@ -5,6 +5,7 @@ namespace RonasIT\Support\Tests;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMockClass;
 use RonasIT\Support\Traits\MockTrait;
+use RuntimeException;
 
 class MockTraitTest extends TestCase
 {
@@ -64,7 +65,7 @@ class MockTraitTest extends TestCase
 
     public function testMockNativeFunctionWhenLessRequiredParameters()
     {
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.');
 
         $this->mockNativeFunction('RonasIT\Support\Tests', [
@@ -80,7 +81,7 @@ class MockTraitTest extends TestCase
 
     public function testMockNativeFunctionWhenMoreExpectedParameters()
     {
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.');
 
         $this->mockNativeFunction('RonasIT\Support\Tests', [

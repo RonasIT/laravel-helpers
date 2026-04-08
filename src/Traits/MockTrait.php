@@ -6,11 +6,13 @@ use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\ParallelTesting;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionParameter;
+use RuntimeException;
 
 trait MockTrait
 {
@@ -136,7 +138,7 @@ trait MockTrait
 
         $reflectionArgs = $reflection->getParameters();
 
-        $this->assertArgumentsCount($actual, $expected, $reflectionArgs, $function);
+        $this->assertArgumentsCount($actual, $expected, $reflection, $function, $isClass);
 
         $this->fillOptionalArguments($reflectionArgs, $actual, $expected, $isClass);
 
@@ -147,23 +149,41 @@ trait MockTrait
         $this->compareArguments($actual, $expected, $message);
     }
 
-    protected function assertArgumentsCount(array $actual, array $expected, array $reflectionArgs, string $function): void
-    {
+    protected function assertArgumentsCount(
+        array $actual,
+        array $expected,
+        ReflectionMethod|ReflectionFunction $reflection,
+        string $function,
+        bool $isClass,
+    ): void {
         $expectedCount = count($expected);
         $actualCount = count($actual);
-        $requiredParametersCount = count(array_filter($reflectionArgs, fn ($param) => !$param->isOptional()));
+        $requiredParametersCount = $reflection->getNumberOfRequiredParameters();
 
         if ($expectedCount !== $actualCount) {
-            $this->assertFalse(
-                $expectedCount < $requiredParametersCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments.",
-            );
+            if ($expectedCount < $requiredParametersCount) {
+                $this->throwArgumentsCountException(
+                    "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments.",
+                    $isClass,
+                );
+            }
 
-            $this->assertFalse(
-                $expectedCount > $actualCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments.",
-            );
+            if ($expectedCount > $actualCount) {
+                $this->throwArgumentsCountException(
+                    "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments.",
+                    $isClass,
+                );
+            }
         }
+    }
+
+    protected function throwArgumentsCountException(string $message, bool $isClass): void
+    {
+        if ($isClass) {
+            throw new ExpectationFailedException($message);
+        }
+
+        throw new RuntimeException($message);
     }
 
     protected function fillOptionalArguments(array $parameters, array &$actual, array &$expected, bool $isClass): void

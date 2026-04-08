@@ -13,6 +13,12 @@ jobs:
       matrix:
         php-version: [ "8.3", "8.4" ]
         laravel-version: [ "11.*", "12.*", "13.*" ]
+        phpunit-version: [ "10.*", "11.*", "12.*", "13.*" ]
+        exclude:
+          - php-version: "8.3"
+            phpunit-version: "13.*"
+          - laravel-version: "11.*"
+            phpunit-version: "13.*"
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -23,15 +29,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Laravel version
-        run: composer require "laravel/framework:${{ matrix.laravel-version }}" -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-      - name: Install other dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer require "laravel/framework:${{ matrix.laravel-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install PHPUnit version
+        run: composer require --dev "phpunit/phpunit:${{ matrix.phpunit-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Install dependencies
+        run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
         run: vendor/bin/pint --test
       - name: Execute unit tests via PHPUnit with coverage
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       - name: Export coverage report
-        if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' }}
+        if: ${{ matrix.php-version == '8.4' && matrix.laravel-version == '13.*' && matrix.phpunit-version == '13.*' }}
         uses: actions/upload-artifact@v4
         with:
           name: clover.xml
