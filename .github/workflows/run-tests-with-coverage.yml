@@ -15,10 +15,21 @@ jobs:
         laravel-version: [ "11.*", "12.*", "13.*" ]
         phpunit-version: [ "10.*", "11.*", "12.*", "13.*" ]
         exclude:
+          # PHPUnit 13 requires PHP >= 8.4.1
           - php-version: "8.3"
             phpunit-version: "13.*"
+
+          # testbench 9.x (Laravel 11) does not support PHPUnit 13
           - laravel-version: "11.*"
             phpunit-version: "13.*"
+
+          # testbench 10.x (Laravel 12) requires PHPUnit >= 11.5.3, PHPUnit 10 is not supported
+          - laravel-version: "12.*"
+            phpunit-version: "10.*"
+
+          # testbench 11.x (Laravel 13) requires PHPUnit >= 11.5.50, PHPUnit 10 is not supported
+          - laravel-version: "13.*"
+            phpunit-version: "10.*"
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
