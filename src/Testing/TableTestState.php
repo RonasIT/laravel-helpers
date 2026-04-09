@@ -17,16 +17,19 @@ class TableTestState extends Assert
     protected array $jsonFields;
     protected ?string $connectionName;
     protected Collection $state;
+    protected string $uniqueKey;
 
     public function __construct(
         string $tableName,
         array $jsonFields = [],
         ?string $connectionName = null,
+        string $uniqueKey = 'id',
     ) {
         $this->tableName = $tableName;
         $this->jsonFields = $jsonFields;
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
-        $this->state = $this->getDataSet($tableName);
+        $this->state = $this->getDataSet($tableName, $uniqueKey);
+        $this->uniqueKey = $uniqueKey;
     }
 
     public function assertNotChanged(): void
@@ -49,13 +52,13 @@ class TableTestState extends Assert
 
     protected function getChanges(): array
     {
-        $updatedData = $this->getDataSet($this->tableName);
+        $updatedData = $this->getDataSet($this->tableName, $this->uniqueKey);
 
         $updatedRecords = [];
         $deletedRecords = [];
 
         $this->state->each(function ($originItem) use (&$updatedData, &$updatedRecords, &$deletedRecords) {
-            $updatedItemIndex = $updatedData->search(fn ($updatedItem) => $updatedItem['id'] === $originItem['id']);
+            $updatedItemIndex = $updatedData->search(fn ($updatedItem) => $updatedItem[$this->uniqueKey] === $originItem[$this->uniqueKey]);
 
             if ($updatedItemIndex === false) {
                 $deletedRecords[] = $originItem;
@@ -64,7 +67,7 @@ class TableTestState extends Assert
                 $changes = array_diff_assoc($updatedItem, $originItem);
 
                 if (!empty($changes)) {
-                    $updatedRecords[] = array_merge(['id' => $originItem['id']], $changes);
+                    $updatedRecords[] = array_merge([$this->uniqueKey => $originItem[$this->uniqueKey]], $changes);
                 }
 
                 $updatedData->forget($updatedItemIndex);
