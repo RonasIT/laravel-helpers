@@ -39,6 +39,25 @@ class BaseRequest extends FormRequest
             : Arr::only($validatedFields, $keys);
     }
 
+    public function validateResolved(): void
+    {
+        $this->init();
+
+        $this->before();
+
+        parent::validateResolved();
+    }
+
+    protected function init(): void
+    {
+        // Override in child classes if needed
+    }
+
+    protected function before(): array
+    {
+        return [];
+    }
+
     protected function getOrderableFields(string $modelName, array $additionalFields = []): string
     {
         if (!class_exists($modelName)) {
