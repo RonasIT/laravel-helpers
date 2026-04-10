@@ -13,28 +13,9 @@ jobs:
       matrix:
         php-version: [ "8.3", "8.4", "8.5" ]
         laravel-version: [ "11.*", "12.*", "13.*" ]
-        phpunit-version: [ "10.*", "11.*", "12.*", "13.*" ]
         exclude:
-          # PHPUnit 13 requires PHP >= 8.4.1
-          - php-version: "8.3"
-            phpunit-version: "13.*"
-
-          # testbench 9.x (Laravel 11) does not support PHPUnit 13
-          - laravel-version: "11.*"
-            phpunit-version: "13.*"
-
-          # testbench 10.x (Laravel 12) requires PHPUnit >= 11.5.3, PHPUnit 10 is not supported
-          - laravel-version: "12.*"
-            phpunit-version: "10.*"
-
-          # testbench 11.x (Laravel 13) requires PHPUnit >= 11.5.50, PHPUnit 10 is not supported
-          - laravel-version: "13.*"
-            phpunit-version: "10.*"
-
-          # This combination is handled by the tests-with-coverage job
           - php-version: "8.5"
             laravel-version: "13.*"
-            phpunit-version: "13.*"
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -46,8 +27,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Laravel version
         run: composer require "laravel/framework:${{ matrix.laravel-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-      - name: Install PHPUnit version
-        run: composer require --dev "phpunit/phpunit:${{ matrix.phpunit-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Install dependencies
         run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Execute unit tests via PHPUnit
@@ -66,8 +45,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Laravel version
         run: composer require "laravel/framework:13.*" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-      - name: Install PHPUnit version
-        run: composer require --dev "phpunit/phpunit:13.*" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Install dependencies
         run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
