@@ -6,12 +6,9 @@ use Illuminate\Support\Facades\Notification;
 use RonasIT\Support\Tests\Support\Mock\Models\TestNotifiable;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestNotification;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestOrderNotification;
-use RonasIT\Support\Traits\NotificationsMockTrait;
 
 class NotificationsMockTraitTest extends TestCase
 {
-    use NotificationsMockTrait;
-
     public function setUp(): void
     {
         parent::setUp();

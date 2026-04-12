@@ -7,6 +7,30 @@ use ReflectionClass;
 
 trait NotificationsMockTrait
 {
+    use FixturesTrait;
+
+    /**
+     * $options should look like the following construction:
+     *   [
+     *      'field_name' => ['step1', 'step2', ...],
+     *   ]
+     *
+     * where each step is either a method call or a property access resolved sequentially
+     * on the notification object. Returns null if any step cannot be resolved.
+     *
+     * Steps format:
+     *   'method()' — calls the method on the notification or the result of the previous step
+     *   'property' — accesses the property on the notification or the result of the previous step
+     *
+     * Example:
+     *   [
+     *      'message'        => ['toExpoPush()', 'toArray()'],  // $notification->toExpoPush()->toArray()
+     *      'broadcast_on'   => ['broadcastOn()'],              // $notification->broadcastOn()
+     *      'broadcast_data' => ['toBroadcast()', 'data'],      // $notification->toBroadcast()->data
+     *   ]
+     *
+     * @param  array<string, string[]>  $options
+     */
     protected function assertNotificationsSent(
         string $fixture,
         array $options = [],
