@@ -7,8 +7,8 @@ on:
     branches: [ "master" ]
 
 env:
-  PHP_LATEST: "8.5"
-  LARAVEL_LATEST: "13.*"
+  PHP_LATEST: &php-latest "8.5"
+  LARAVEL_LATEST: &laravel-latest "13.*"
 
 jobs:
   tests:
@@ -18,8 +18,8 @@ jobs:
         php-version: [ "8.3", "8.4", "8.5" ]
         laravel-version: [ "11.*", "12.*", "13.*" ]
         exclude:
-          - php-version: ${{ env.PHP_LATEST }}
-            laravel-version: ${{ env.LARAVEL_LATEST }}
+          - php-version: *php-latest
+            laravel-version: *laravel-latest
     steps:
       - name: Setup
         uses: ./.github/actions/php-laravel-setup
@@ -36,8 +36,8 @@ jobs:
       - name: Setup
         uses: ./.github/actions/php-laravel-setup
         with:
-          php-version: ${{ env.PHP_LATEST }}
-          laravel-version: ${{ env.LARAVEL_LATEST }}
+          php-version: *php-latest
+          laravel-version: *laravel-latest
           coverage: xdebug
       - name: Format code style via Pint
         run: vendor/bin/pint --test
