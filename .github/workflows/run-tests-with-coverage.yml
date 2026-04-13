@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/php-laravel-setup
         with:
           php-version: ${{ matrix.php-version }}
-          laravel-version: ${{ matrix.LARAVEL_LATEST-version }}
+          laravel-version: ${{ matrix.laravel-version }}
           coverage: none
       - name: Execute unit tests via PHPUnit
         run: vendor/bin/phpunit
@@ -37,7 +37,7 @@ jobs:
         uses: ./.github/actions/php-laravel-setup
         with:
           php-version: ${{ env.PHP_LATEST }}
-          laravel-version: ${{ env.PHP_LATEST }}
+          laravel-version: ${{ env.LARAVEL_LATEST }}
           coverage: xdebug
       - name: Format code style via Pint
         run: vendor/bin/pint --test
