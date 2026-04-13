@@ -6,8 +6,9 @@ on:
   pull_request:
     branches: [ "master" ]
 
-x-php-latest: &php-latest "8.5"
-x-laravel-latest: &laravel-latest "13.*"
+env:
+  PHP_LATEST: "8.5"
+  LARAVEL_LATEST: "13.*"
 
 jobs:
   tests:
@@ -17,14 +18,14 @@ jobs:
         php-version: [ "8.3", "8.4", "8.5" ]
         laravel-version: [ "11.*", "12.*", "13.*" ]
         exclude:
-          - php-version: *php-latest
-            laravel-version: *laravel-latest
+          - php-version: ${{ env.PHP_LATEST }}
+            laravel-version: ${{ env.LARAVEL_LATEST }}
     steps:
       - name: Setup
         uses: ./.github/actions/php-laravel-setup
         with:
           php-version: ${{ matrix.php-version }}
-          laravel-version: ${{ matrix.laravel-version }}
+          laravel-version: ${{ matrix.LARAVEL_LATEST-version }}
           coverage: none
       - name: Execute unit tests via PHPUnit
         run: vendor/bin/phpunit
@@ -35,8 +36,8 @@ jobs:
       - name: Setup
         uses: ./.github/actions/php-laravel-setup
         with:
-          php-version: *php-latest
-          laravel-version: *laravel-latest
+          php-version: ${{ env.PHP_LATEST }}
+          laravel-version: ${{ env.PHP_LATEST }}
           coverage: xdebug
       - name: Format code style via Pint
         run: vendor/bin/pint --test
