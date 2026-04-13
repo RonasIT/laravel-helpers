@@ -1,5 +1,5 @@
 name: PHP Laravel setup
-description: Shared setup for PHP matrix jobs (PHP, checkout, Laravel constraint, dependencies)
+description: Shared setup for PHP matrix jobs (PHP, Laravel constraint, dependencies)
 inputs:
   php-version:
     description: PHP version for setup-php
@@ -20,8 +20,6 @@ runs:
         php-version: ${{ inputs.php-version }}
         coverage: ${{ inputs.coverage }}
         tools: composer
-    - name: Checkout
-      uses: actions/checkout@v4
     - name: Install Laravel version
       shell: bash
       run: composer require "laravel/framework:${{ inputs.laravel-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
