@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "master" ]
 
+x-php-latest: &php-latest "8.5"
+x-laravel-latest: &laravel-latest "13.*"
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -14,39 +17,27 @@ jobs:
         php-version: [ "8.3", "8.4", "8.5" ]
         laravel-version: [ "11.*", "12.*", "13.*" ]
         exclude:
-          - php-version: "8.5"
-            laravel-version: "13.*"
+          - php-version: *php-latest
+            laravel-version: *laravel-latest
     steps:
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - name: Setup
+        uses: ./.github/actions/php-laravel-setup
         with:
           php-version: ${{ matrix.php-version }}
+          laravel-version: ${{ matrix.laravel-version }}
           coverage: none
-          tools: composer
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Laravel version
-        run: composer require "laravel/framework:${{ matrix.laravel-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-      - name: Install dependencies
-        run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Execute unit tests via PHPUnit
         run: vendor/bin/phpunit
 
   tests-with-coverage:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - name: Setup
+        uses: ./.github/actions/php-laravel-setup
         with:
-          php-version: "8.5"
+          php-version: *php-latest
+          laravel-version: *laravel-latest
           coverage: xdebug
-          tools: composer
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Laravel version
-        run: composer require "laravel/framework:13.*" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-      - name: Install dependencies
-        run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Format code style via Pint
         run: vendor/bin/pint --test
       - name: Execute unit tests via PHPUnit with coverage
