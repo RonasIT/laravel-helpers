@@ -121,11 +121,12 @@ class TableTestState extends Assert
     {
         if (!isset($this->binaryColumns)) {
             $connection = DB::connection($this->connectionName);
+            $driverName = $connection->getDriverName();
 
-            if ($connection->getDriverName() === 'pgsql') {
+            if ($driverName === 'pgsql') {
                 $tableSchema = config("database.connections.{$this->connectionName}.schema")
                     ?? config("database.connections.{$this->connectionName}.search_path", 'public');
-            } elseif ($connection->getDriverName() === 'mysql') {
+            } elseif ($driverName === 'mysql') {
                 $tableSchema = $connection->getDatabaseName();
             } else {
                 return [];
