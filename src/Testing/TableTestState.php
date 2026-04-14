@@ -124,10 +124,11 @@ class TableTestState extends Assert
 
             if ($connection->getDriverName() === 'pgsql') {
                 $tableSchema = config("database.connections.{$this->connectionName}.schema")
-                    ?? config("database.connections.{$this->connectionName}.search_path")
-                    ?? 'public';
-            } else {
+                    ?? config("database.connections.{$this->connectionName}.search_path", 'public');
+            } elseif ($connection->getDriverName() === 'mysql') {
                 $tableSchema = $connection->getDatabaseName();
+            } else {
+                return [];
             }
 
             $this->binaryColumns = $connection
