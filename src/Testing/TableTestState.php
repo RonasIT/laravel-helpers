@@ -120,9 +120,14 @@ class TableTestState extends Assert
     protected function getBinaryColumns(): array
     {
         if (!isset($this->binaryColumns)) {
-            $tableSchema = config("database.connections.{$this->connectionName}.schema")
-                ?? DB::getDatabaseName()
-                ?? 'public';
+            $connection = DB::connection($this->connectionName);
+            if ($connection->getDriverName() === 'pgsql') {
+                $tableSchema = config("database.connections.{$this->connectionName}.schema")
+                    ?? config("database.connections.{$this->connectionName}.search_path")
+                    ?? 'public';
+            } else {
+                $tableSchema = $connection->getDatabaseName() ?? 'public';
+            }
 
             $this->binaryColumns = DB::connection($this->connectionName)
                 ->table('information_schema.columns')
