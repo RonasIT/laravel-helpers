@@ -121,15 +121,16 @@ class TableTestState extends Assert
     {
         if (!isset($this->binaryColumns)) {
             $connection = DB::connection($this->connectionName);
+
             if ($connection->getDriverName() === 'pgsql') {
                 $tableSchema = config("database.connections.{$this->connectionName}.schema")
                     ?? config("database.connections.{$this->connectionName}.search_path")
                     ?? 'public';
             } else {
-                $tableSchema = $connection->getDatabaseName() ?? 'public';
+                $tableSchema = $connection->getDatabaseName();
             }
 
-            $this->binaryColumns = DB::connection($this->connectionName)
+            $this->binaryColumns = $connection
                 ->table('information_schema.columns')
                 ->select('column_name')
                 ->where([

@@ -54,7 +54,7 @@ trait TableTestStateMockTrait
             ->willReturnOnConsecutiveCalls($initialState, $responseMock);
     }
 
-    protected function mockGettingBinaryColumns(Collection|string $resultFixture, string $tableName): void
+    protected function mockGettingBinaryColumns(Collection|string $resultFixture, string $tableName, string $driver = 'pgsql'): void
     {
         if (is_string($resultFixture)) {
             $resultFixture = collect($this->getJsonFixture($resultFixture));
@@ -62,9 +62,15 @@ trait TableTestStateMockTrait
 
         $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'get'], true);
 
-        DB::shouldReceive('getDatabaseName')
+        DB::shouldReceive('getDriverName')
             ->once()
-            ->andReturn('public');
+            ->andReturn($driver);
+
+        if ($driver !== 'pgsql') {
+            DB::shouldReceive('getDatabaseName')
+                ->once()
+                ->andReturn('public');
+        }
 
         DB::shouldReceive('table')
             ->with('information_schema.columns')
