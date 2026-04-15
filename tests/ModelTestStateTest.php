@@ -28,7 +28,6 @@ class ModelTestStateTest extends TestCase
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
         $originRecords = collect($this->getJsonFixture('initialization/origin_records.json'));
 
-        $this->mockDBConnection(1);
         $this->mockGettingDataset($datasetMock);
 
         $modelTestState = new ModelTestState(TestModel::class);
