@@ -2,8 +2,10 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
+use RonasIT\Support\Exceptions\UnsupportedDBDriverException;
 use RonasIT\Support\Testing\TableTestState;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
@@ -109,5 +111,24 @@ class TableTestStateTest extends TestCase
         );
 
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set');
+    }
+
+    public function testUnsupportedDriverConnection()
+    {
+        $this->mockDBConnection(3);
+        $this->mockGettingDatasetForChanges(collect(), collect(), 'test_models');
+
+        DB::shouldReceive('getDriverName')
+            ->once()
+            ->andReturn('unsupported_driver');
+
+        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
+
+        $this->assertExceptionThrew(
+            expectedClassName: UnsupportedDBDriverException::class,
+            expectedMessage: 'Unsupported database driver: unsupported_driver',
+        );
+
+        $modelTestState->assertChangesEqualsFixture('');
     }
 }

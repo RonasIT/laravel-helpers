@@ -13,6 +13,21 @@ trait TableTestStateMockTrait
 {
     use MockTestTrait;
 
+    private const array SUPPORTED_DB_DRIVERS = [
+        'mysql',
+        'pgsql',
+    ];
+
+    private const array AVAILABLE_BINARIES_FIELDS = [
+        'bytea',
+        'blob',
+        'tinyblob',
+        'mediumblob',
+        'longblob',
+        'binary',
+        'varbinary',
+    ];
+
     protected function mockGettingDataset(Collection $responseMock, string $uniqueKey = 'id'): void
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
@@ -67,7 +82,7 @@ trait TableTestStateMockTrait
             ->once()
             ->andReturn($driver);
 
-        if ($driver !== 'pgsql') {
+        if ($driver === 'mysql') {
             DB::shouldReceive('getDatabaseName')
                 ->once()
                 ->andReturn('public');
@@ -88,21 +103,15 @@ trait TableTestStateMockTrait
             ->with('table_name', $tableName)
             ->willReturnSelf();
 
+        $tableSchemas = (in_array($driver, self::SUPPORTED_DB_DRIVERS)) ? ['public'] : [];
+
         $builderMock
             ->expects($this->exactly(2))
             ->method('whereIn')
-            ->willReturnCallback(function (string $column, array $values) use ($builderMock) {
+            ->willReturnCallback(function (string $column, array $values) use ($builderMock, $tableSchemas) {
                 match ($column) {
-                    'data_type' => $this->assertEquals($values, [
-                        'bytea',
-                        'blob',
-                        'tinyblob',
-                        'mediumblob',
-                        'longblob',
-                        'binary',
-                        'varbinary',
-                    ]),
-                    'table_schema' => $this->assertEquals($values, ['public']),
+                    'data_type' => $this->assertEquals($values, self::AVAILABLE_BINARIES_FIELDS),
+                    'table_schema' => $this->assertEquals($values, $tableSchemas),
                     default => $this->fail('Unexpected call'),
                 };
 

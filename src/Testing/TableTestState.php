@@ -2,11 +2,13 @@
 
 namespace RonasIT\Support\Testing;
 
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert;
+use RonasIT\Support\Exceptions\UnsupportedDBDriverException;
 use RonasIT\Support\Traits\FixturesTrait;
 
 class TableTestState extends Assert
@@ -139,16 +141,18 @@ class TableTestState extends Assert
             ->toArray();
     }
 
-    protected function getTableSchema(string $driverName, $connection): array
+    protected function getTableSchema(string $driverName, DatabaseManager $connection): array
     {
         $tableSchema = match ($driverName) {
             'pgsql' => config("database.connections.{$this->connectionName}.schema")
                 ?? config("database.connections.{$this->connectionName}.search_path", 'public'),
             'mysql' => $connection->getDatabaseName(),
-            default => '',
+            default => throw new UnsupportedDBDriverException($driverName),
         };
 
-        return Arr::wrap(explode(',', $tableSchema));
+        $tableSchema = array_filter(explode(',', $tableSchema), fn ($schema) => !empty($schema));
+
+        return Arr::wrap($tableSchema);
     }
 
     protected function getFixturePath(string $fixtureName): string
