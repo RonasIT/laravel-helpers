@@ -18,7 +18,7 @@ trait TableTestStateMockTrait
         'pgsql',
     ];
 
-    private const array AVAILABLE_BINARIES_FIELDS = [
+    private const array AVAILABLE_BINARY_FIELD_TYPES = [
         'bytea',
         'blob',
         'tinyblob',
@@ -110,7 +110,7 @@ trait TableTestStateMockTrait
             ->method('whereIn')
             ->willReturnCallback(function (string $column, array $values) use ($builderMock, $tableSchemas) {
                 match ($column) {
-                    'data_type' => $this->assertEquals($values, self::AVAILABLE_BINARIES_FIELDS),
+                    'data_type' => $this->assertEquals($values, self::AVAILABLE_BINARY_FIELD_TYPES),
                     'table_schema' => $this->assertEquals($values, $tableSchemas),
                     default => $this->fail('Unexpected call'),
                 };
