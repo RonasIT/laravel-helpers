@@ -41,6 +41,8 @@ class TableTestState extends Assert
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
         $this->state = $this->getDataSet($tableName, $uniqueKey);
         $this->uniqueKey = $uniqueKey;
+
+        $this->binaryColumns = $this->getBinaryColumns();
     }
 
     public function assertNotChanged(): void
@@ -103,7 +105,7 @@ class TableTestState extends Assert
         return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
                 if (Arr::has($item, $jsonField)) {
-                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $this->getBinaryColumns()))) {
+                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $this->binaryColumns))) {
                         $item[$jsonField] = bin2hex($item[$jsonField]);
                     }
 
@@ -119,33 +121,29 @@ class TableTestState extends Assert
 
     protected function getBinaryColumns(): array
     {
-        if (!isset($this->binaryColumns)) {
-            $connection = DB::connection($this->connectionName);
-            $driverName = $connection->getDriverName();
+        $connection = DB::connection($this->connectionName);
+        $driverName = $connection->getDriverName();
 
-            if ($driverName === 'pgsql') {
-                $tableSchema = config("database.connections.{$this->connectionName}.schema")
-                    ?? config("database.connections.{$this->connectionName}.search_path", 'public');
-            } elseif ($driverName === 'mysql') {
-                $tableSchema = $connection->getDatabaseName();
-            } else {
-                return [];
-            }
-
-            $this->binaryColumns = $connection
-                ->table('information_schema.columns')
-                ->select('column_name')
-                ->where([
-                    'table_name' => $this->tableName,
-                    'table_schema' => $tableSchema,
-                ])
-                ->whereIn('data_type', self::BINARY_COLUMNS)
-                ->get()
-                ->pluck('column_name')
-                ->toArray();
+        if ($driverName === 'pgsql') {
+            $tableSchema = config("database.connections.{$this->connectionName}.schema")
+                ?? config("database.connections.{$this->connectionName}.search_path", 'public');
+        } elseif ($driverName === 'mysql') {
+            $tableSchema = $connection->getDatabaseName();
+        } else {
+            return [];
         }
 
-        return $this->binaryColumns;
+        return $connection
+            ->table('information_schema.columns')
+            ->select('column_name')
+            ->where([
+                'table_name' => $this->tableName,
+                'table_schema' => $tableSchema,
+            ])
+            ->whereIn('data_type', self::BINARY_COLUMNS)
+            ->get()
+            ->pluck('column_name')
+            ->toArray();
     }
 
     protected function getFixturePath(string $fixtureName): string
