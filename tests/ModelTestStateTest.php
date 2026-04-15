@@ -28,9 +28,8 @@ class ModelTestStateTest extends TestCase
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
         $originRecords = collect($this->getJsonFixture('initialization/origin_records.json'));
 
-        $this->mockDBConnection(2);
+        $this->mockDBConnection(1);
         $this->mockGettingDataset($datasetMock);
-        $this->mockGettingBinaryColumns(collect(), 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $reflectionClass = new ReflectionClass($modelTestState);
@@ -59,9 +58,7 @@ class ModelTestStateTest extends TestCase
     {
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
 
-        $this->mockDBConnection(2);
         $this->mockGettingDataset($datasetMock);
-        $this->mockGettingBinaryColumns(collect(), 'test_models');
 
         $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
 
@@ -90,9 +87,8 @@ class ModelTestStateTest extends TestCase
             value: $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
         );
 
-        $this->mockDBConnection(3);
+        $this->mockDBConnection(2);
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_without_json_fields');
-        $this->mockGettingBinaryColumns(collect(), 'test_model_without_json_fields');
 
         $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');

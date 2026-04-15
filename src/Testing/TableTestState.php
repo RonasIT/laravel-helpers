@@ -41,8 +41,6 @@ class TableTestState extends Assert
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
         $this->state = $this->getDataSet($tableName, $uniqueKey);
         $this->uniqueKey = $uniqueKey;
-
-        $this->binaryColumns = $this->getBinaryColumns();
     }
 
     public function assertNotChanged(): void
@@ -100,6 +98,10 @@ class TableTestState extends Assert
 
         if (empty($jsonFields)) {
             return $changes;
+        }
+
+        if (!isset($this->binaryColumns)) {
+            $this->binaryColumns = $this->getBinaryColumns();
         }
 
         return array_map(function ($item) use ($jsonFields) {
