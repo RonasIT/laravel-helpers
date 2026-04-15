@@ -16,6 +16,7 @@ class TableTestStateTest extends TestCase
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
         $originRecords = collect($this->getJsonFixture('initialization/origin_records.json'));
 
+        $this->mockDBConnection(2);
         $this->mockGettingDataset($datasetMock);
         $this->mockGettingBinaryColumns(collect(), 'test_models');
 
@@ -45,6 +46,8 @@ class TableTestStateTest extends TestCase
     public function testInitializationViaPrepareTableTestState(bool $testCaseGlobalExportMode)
     {
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+
+        $this->mockDBConnection(2);
         $this->mockGettingDataset($datasetMock);
         $this->mockGettingBinaryColumns(collect(), 'test_models');
 

@@ -17,8 +17,6 @@ trait TableTestStateMockTrait
     {
         $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
 
-        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-        DB::shouldReceive('connection')->twice()->andReturnSelf();
         DB::shouldReceive('table')->with('test_models')->once()->andReturn($builderMock);
 
         $builderMock
