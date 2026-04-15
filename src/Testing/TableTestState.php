@@ -124,26 +124,29 @@ class TableTestState extends Assert
         $connection = DB::connection($this->connectionName);
         $driverName = $connection->getDriverName();
 
-        if ($driverName === 'pgsql') {
-            $tableSchema = config("database.connections.{$this->connectionName}.schema")
-                ?? config("database.connections.{$this->connectionName}.search_path", 'public');
-        } elseif ($driverName === 'mysql') {
-            $tableSchema = $connection->getDatabaseName();
-        } else {
-            return [];
-        }
+        $tableSchema = $this->getTableSchema($driverName, $connection);
 
         return $connection
             ->table('information_schema.columns')
             ->select('column_name')
-            ->where([
-                'table_name' => $this->tableName,
-                'table_schema' => $tableSchema,
-            ])
+            ->where('table_name', $this->tableName)
+            ->whereIn('table_schema', $tableSchema)
             ->whereIn('data_type', self::BINARY_COLUMNS)
             ->get()
             ->pluck('column_name')
             ->toArray();
+    }
+
+    protected function getTableSchema(string $driverName, $connection): array
+    {
+        $tableSchema = match ($driverName) {
+            'pgsql' => config("database.connections.{$this->connectionName}.schema")
+                ?? config("database.connections.{$this->connectionName}.search_path", 'public'),
+            'mysql' => $connection->getDatabaseName(),
+            default => '',
+        };
+
+        return Arr::wrap(explode(',', $tableSchema));
     }
 
     protected function getFixturePath(string $fixtureName): string

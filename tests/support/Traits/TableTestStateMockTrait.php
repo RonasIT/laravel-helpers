@@ -82,27 +82,29 @@ trait TableTestStateMockTrait
 
         $builderMock
             ->method('where')
-            ->with([
-                'table_name' => $tableName,
-                'table_schema' => 'public',
-            ])
+            ->with('table_name', $tableName)
             ->willReturnSelf();
 
         $builderMock
+            ->expects($this->exactly(2))
             ->method('whereIn')
-            ->with(
-                'data_type',
-                [
-                    'bytea',
-                    'blob',
-                    'tinyblob',
-                    'mediumblob',
-                    'longblob',
-                    'binary',
-                    'varbinary',
-                ],
-            )
-            ->willReturnSelf();
+            ->willReturnCallback(function (string $column, array $values) use ($builderMock) {
+                match ($column) {
+                    'data_type' => $this->assertEquals($values, [
+                        'bytea',
+                        'blob',
+                        'tinyblob',
+                        'mediumblob',
+                        'longblob',
+                        'binary',
+                        'varbinary',
+                    ]),
+                    'table_schema' => $this->assertEquals($values, ['public']),
+                    default => $this->fail('Unexpected call'),
+                };
+
+                return $builderMock;
+            });
 
         $builderMock
             ->expects($this->exactly(1))
