@@ -145,7 +145,11 @@ trait EntityControlTrait
     }
 
     /**
-     * @param  array<array>  $data
+     * Insert rows into the database.
+     *
+     * @param  array<string, mixed>|array<int, array<string, mixed>>  $data  single row or list of rows
+     *
+     * @return bool true if rows were inserted successfully
      */
     public function insert(array $data): bool
     {
@@ -157,9 +161,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Insert rows ignoring duplicate key errors.
+     * Insert rows into the database ignoring duplicate key errors.
      *
-     * @param  array<array>  $data
+     * @param  array<string, mixed>|array<int, array<string, mixed>>  $data  single row or list of rows
      *
      * @return int count of inserted rows
      */
@@ -475,6 +479,10 @@ trait EntityControlTrait
 
     protected function prepareInsertData(array $data): array
     {
+        if (!empty($data) && !is_multidimensional($data)) {
+            $data = [$data];
+        }
+
         $defaultTimestamps = [];
 
         if ($this->model->timestamps) {
