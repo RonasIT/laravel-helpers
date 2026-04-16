@@ -496,8 +496,15 @@ trait EntityControlTrait
 
         return array_map(function (array $item) use ($defaultTimestamps) {
             $fillableFields = Arr::only($item, $this->model->getFillable());
+            $fields = array_merge($defaultTimestamps, $fillableFields);
 
-            return array_merge($defaultTimestamps, $fillableFields);
+            $instance = $this->model->newInstance();
+
+            foreach ($fields as $key => $value) {
+                $instance->setAttribute($key, $value);
+            }
+
+            return $instance->getAttributes();
         }, $data);
     }
 }
