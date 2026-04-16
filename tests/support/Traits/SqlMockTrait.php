@@ -210,6 +210,18 @@ trait SqlMockTrait
         $this->getPdo()->shouldInsert($query, $values);
     }
 
+    protected function mockInsertWithCastableField(): void
+    {
+        $query = 'insert into "test_models" ("castable_field", "created_at", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            '{"key":"value1"}', $this->mockedNow, $this->mockedNow,
+            '{"key":"value2"}', $this->mockedNow, $this->mockedNow,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
     protected function mockInsertSingleRow(): void
     {
         $query = 'insert into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?)';
@@ -265,6 +277,18 @@ trait SqlMockTrait
         $values = [
             [$this->mockedNow, '{"key":"value1"}', $this->mockedNow],
             [$this->mockedNow, '{"key":"value2"}', $this->mockedNow],
+        ];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreWithCastableField(): void
+    {
+        $query = 'insert or ignore into "test_models" ("castable_field", "created_at", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            ['{"key":"value1"}', $this->mockedNow, $this->mockedNow],
+            ['{"key":"value2"}', $this->mockedNow, $this->mockedNow],
         ];
 
         $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));

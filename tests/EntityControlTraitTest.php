@@ -242,6 +242,18 @@ class EntityControlTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertWithCastableField(): void
+    {
+        $this->mockInsertWithCastableField();
+
+        $result = self::$testRepositoryClass->insert([
+            ['castable_field' => ['key' => 'value1']],
+            ['castable_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
     public function testInsertSingleRow(): void
     {
         $this->mockInsertSingleRow();
@@ -353,6 +365,18 @@ class EntityControlTraitTest extends TestCase
         $result = self::$testRepositoryClass->insertOrIgnore([
             ['json_field' => ['key' => 'value1']],
             ['json_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertSame(2, $result);
+    }
+
+    public function testInsertOrIgnoreWithCastableField(): void
+    {
+        $this->mockInsertOrIgnoreWithCastableField();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            ['castable_field' => ['key' => 'value1']],
+            ['castable_field' => ['key' => 'value2']],
         ]);
 
         $this->assertSame(2, $result);
