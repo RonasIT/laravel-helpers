@@ -217,6 +217,28 @@ class EntityControlTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertNonZeroBasedList(): void
+    {
+        $this->mockInsertData();
+
+        $result = self::$testRepositoryClass->insert([
+            1 => ['name' => 'test_name_1'],
+            2 => ['name' => 'test_name_2'],
+            3 => ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertSingleRow(): void
+    {
+        $this->mockInsertSingleRow();
+
+        $result = self::$testRepositoryClass->insert(['name' => 'test_name_1']);
+
+        $this->assertTrue($result);
+    }
+
     public function testInsertWithSettableProperties()
     {
         $this->mockInsertData();
@@ -297,6 +319,28 @@ class EntityControlTraitTest extends TestCase
         ]);
 
         $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreNonZeroBasedList(): void
+    {
+        $this->mockInsertOrIgnore();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            1 => ['name' => 'test_name_1'],
+            2 => ['name' => 'test_name_2'],
+            3 => ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreSingleRow(): void
+    {
+        $this->mockInsertOrIgnoreSingleRow();
+
+        $result = self::$testRepositoryClass->insertOrIgnore(['name' => 'test_name_1']);
+
+        $this->assertSame(1, $result);
     }
 
     public function testInsertOrIgnoreWithSettableProperties(): void

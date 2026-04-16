@@ -198,6 +198,15 @@ trait SqlMockTrait
         $this->getPdo()->shouldInsert($query, $values);
     }
 
+    protected function mockInsertSingleRow(): void
+    {
+        $query = 'insert into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?)';
+
+        $values = [$this->mockedNow, 'test_name_1', $this->mockedNow];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
     protected function mockInsertOrIgnore(): void
     {
         $query = 'insert or ignore into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
@@ -235,6 +244,15 @@ trait SqlMockTrait
         ];
 
         $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreSingleRow(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?)';
+
+        $values = [$this->mockedNow, 'test_name_1', $this->mockedNow];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, $values, 1);
     }
 
     protected function mockUpdate(array $selectResult, $notFillableValue): void
