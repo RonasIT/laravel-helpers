@@ -230,6 +230,18 @@ class EntityControlTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertWithJsonField(): void
+    {
+        $this->mockInsertWithJsonField();
+
+        $result = self::$testRepositoryClass->insert([
+            ['json_field' => ['key' => 'value1']],
+            ['json_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
     public function testInsertSingleRow(): void
     {
         $this->mockInsertSingleRow();
@@ -332,6 +344,18 @@ class EntityControlTraitTest extends TestCase
         ]);
 
         $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreWithJsonField(): void
+    {
+        $this->mockInsertOrIgnoreWithJsonField();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            ['json_field' => ['key' => 'value1']],
+            ['json_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertSame(2, $result);
     }
 
     public function testInsertOrIgnoreSingleRow(): void

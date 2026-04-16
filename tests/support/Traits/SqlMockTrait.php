@@ -190,9 +190,21 @@ trait SqlMockTrait
         $query = 'insert into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            '1999-01-01', 'test_name_1', $this->mockedNow,
-            '1999-01-01', 'test_name_2', $this->mockedNow,
-            '1999-01-01', 'test_name_3', $this->mockedNow,
+            '1999-01-01 00:00:00', 'test_name_1', $this->mockedNow,
+            '1999-01-01 00:00:00', 'test_name_2', $this->mockedNow,
+            '1999-01-01 00:00:00', 'test_name_3', $this->mockedNow,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertWithJsonField(): void
+    {
+        $query = 'insert into "test_models" ("created_at", "json_field", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            $this->mockedNow, '{"key":"value1"}', $this->mockedNow,
+            $this->mockedNow, '{"key":"value2"}', $this->mockedNow,
         ];
 
         $this->getPdo()->shouldInsert($query, $values);
@@ -238,9 +250,21 @@ trait SqlMockTrait
         $query = 'insert or ignore into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            ['1999-01-01', 'test_name_1', $this->mockedNow],
-            ['1999-01-01', 'test_name_2', $this->mockedNow],
-            ['1999-01-01', 'test_name_3', $this->mockedNow],
+            ['1999-01-01 00:00:00', 'test_name_1', $this->mockedNow],
+            ['1999-01-01 00:00:00', 'test_name_2', $this->mockedNow],
+            ['1999-01-01 00:00:00', 'test_name_3', $this->mockedNow],
+        ];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreWithJsonField(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "json_field", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            [$this->mockedNow, '{"key":"value1"}', $this->mockedNow],
+            [$this->mockedNow, '{"key":"value2"}', $this->mockedNow],
         ];
 
         $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
