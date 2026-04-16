@@ -479,7 +479,7 @@ trait EntityControlTrait
 
     protected function prepareInsertData(array $data): array
     {
-        if (!empty($data) && !is_multidimensional($data)) {
+        if (is_string(array_key_first($data))) {
             $data = [$data];
         }
 

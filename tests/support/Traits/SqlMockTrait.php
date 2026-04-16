@@ -231,6 +231,15 @@ trait SqlMockTrait
         $this->getPdo()->shouldInsert($query, $values);
     }
 
+    protected function mockInsertSingleRowWhereFirstValueIsArray(): void
+    {
+        $query = 'insert into "test_models" ("created_at", "json_field", "name", "updated_at") values (?, ?, ?, ?)';
+
+        $values = [$this->mockedNow, '{"key":"value"}', 'test_name', $this->mockedNow];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
     protected function mockInsertOrIgnore(): void
     {
         $query = 'insert or ignore into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
@@ -299,6 +308,15 @@ trait SqlMockTrait
         $query = 'insert or ignore into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?)';
 
         $values = [$this->mockedNow, 'test_name_1', $this->mockedNow];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, $values, 1);
+    }
+
+    protected function mockInsertOrIgnoreSingleRowWhereFirstValueIsArray(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "json_field", "name", "updated_at") values (?, ?, ?, ?)';
+
+        $values = [$this->mockedNow, '{"key":"value"}', 'test_name', $this->mockedNow];
 
         $this->getPdo()->shouldRunAffectingStatementForRows($query, $values, 1);
     }

@@ -263,6 +263,18 @@ class EntityControlTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertSingleRowWhereFirstValueIsArray(): void
+    {
+        $this->mockInsertSingleRowWhereFirstValueIsArray();
+
+        $result = self::$testRepositoryClass->insert([
+            'json_field' => ['key' => 'value'],
+            'name' => 'test_name',
+        ]);
+
+        $this->assertTrue($result);
+    }
+
     public function testInsertWithSettableProperties()
     {
         $this->mockInsertData();
@@ -387,6 +399,18 @@ class EntityControlTraitTest extends TestCase
         $this->mockInsertOrIgnoreSingleRow();
 
         $result = self::$testRepositoryClass->insertOrIgnore(['name' => 'test_name_1']);
+
+        $this->assertSame(1, $result);
+    }
+
+    public function testInsertOrIgnoreSingleRowWhereFirstValueIsArray(): void
+    {
+        $this->mockInsertOrIgnoreSingleRowWhereFirstValueIsArray();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            'json_field' => ['key' => 'value'],
+            'name' => 'test_name',
+        ]);
 
         $this->assertSame(1, $result);
     }
