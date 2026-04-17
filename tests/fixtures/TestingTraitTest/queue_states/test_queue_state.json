@@ -1,0 +1,49 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Jobs\\TestJob": [
+        {
+            "count": 1,
+            "title": "title_1",
+            "isPublished": true,
+            "job": null,
+            "connection": null,
+            "queue": null,
+            "delay": null,
+            "afterCommit": null,
+            "middleware": [],
+            "chained": [],
+            "chainConnection": null,
+            "chainQueue": null,
+            "chainCatchCallbacks": null
+        },
+        {
+            "count": 2,
+            "title": "title_2",
+            "isPublished": true,
+            "job": null,
+            "connection": null,
+            "queue": null,
+            "delay": null,
+            "afterCommit": null,
+            "middleware": [],
+            "chained": [],
+            "chainConnection": null,
+            "chainQueue": null,
+            "chainCatchCallbacks": null
+        },
+        {
+            "count": 3,
+            "title": "title_3",
+            "isPublished": true,
+            "job": null,
+            "connection": null,
+            "queue": null,
+            "delay": null,
+            "afterCommit": null,
+            "middleware": [],
+            "chained": [],
+            "chainConnection": null,
+            "chainQueue": null,
+            "chainCatchCallbacks": null
+        }
+    ]
+}
