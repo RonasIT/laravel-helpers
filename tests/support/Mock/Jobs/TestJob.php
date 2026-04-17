@@ -15,6 +15,8 @@ class TestJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    protected string $foo;
+
     public function __construct(
         protected int $count,
         protected string $title,
@@ -24,5 +26,10 @@ class TestJob implements ShouldQueue
 
     public function handle(): void
     {
+    }
+
+    public function setFoo(string $foo): void
+    {
+        $this->foo = $foo;
     }
 }
