@@ -1,10 +1,13 @@
 {
-    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestOrderNotification": [
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestAnotherNotification": [
         {
             "notification": {
-                "orderId": 1,
-                "trackingNumber": "12345",
-                "status": "shipped"
+                "code": "abc-123",
+                "value": "active",
+                "channels": [
+                    "mail",
+                    "database"
+                ]
             },
             "channels": [
                 "mail",
@@ -14,9 +17,9 @@
                 "id": 1
             },
             "locale": null,
-            "via_method": "shipped",
-            "via_property": "shipped",
-            "via_chain": "shipped",
+            "via_method": "active",
+            "via_property": "active",
+            "via_chain": "active",
             "via_unresolvable": null
         }
     ]

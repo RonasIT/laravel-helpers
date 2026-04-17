@@ -4,8 +4,8 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Notification;
 use RonasIT\Support\Tests\Support\Mock\Models\TestNotifiable;
+use RonasIT\Support\Tests\Support\Mock\Notifications\TestAnotherNotification;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestNotification;
-use RonasIT\Support\Tests\Support\Mock\Notifications\TestOrderNotification;
 
 class NotificationsMockTraitTest extends TestCase
 {
@@ -43,13 +43,11 @@ class NotificationsMockTraitTest extends TestCase
         );
 
         Notification::send(
-            new TestNotifiable(
-                id: 2,
-            ),
+            new TestNotifiable(2),
             new TestNotification(
-                name: 'Jane Doe',
-                email: 'jane@example.com',
-                userId: 2,
+                firstParam: 'value-3',
+                secondParam: 'value-4',
+                thirdParam: 2,
             ),
         );
 
@@ -59,21 +57,21 @@ class NotificationsMockTraitTest extends TestCase
     public function testAssertMultipleNotificationTypesSent(): void
     {
         Notification::send(new TestNotifiable(), new TestNotification());
-        Notification::send(new TestNotifiable(), new TestOrderNotification());
+        Notification::send(new TestNotifiable(), new TestAnotherNotification());
 
         $this->assertNotificationsSent('assert_multiple_notification_types_sent');
     }
 
     public function testAssertNotificationsSentWithOptions(): void
     {
-        Notification::send(new TestNotifiable(), new TestOrderNotification());
+        Notification::send(new TestNotifiable(), new TestAnotherNotification());
 
         $this->assertNotificationsSent(
             fixture: 'assert_notifications_sent_with_options',
             options: [
-                'via_method' => ['getStatus()'],
-                'via_property' => ['status'],
-                'via_chain' => ['getOrder()', 'status'],
+                'via_method' => ['getValue()'],
+                'via_property' => ['value'],
+                'via_chain' => ['getDetails()', 'value'],
                 'via_unresolvable' => ['nonExistentMethod()'],
             ],
         );
@@ -85,7 +83,10 @@ class NotificationsMockTraitTest extends TestCase
 
         Notification::send(new TestNotifiable(), new TestNotification());
 
-        $this->assertNotificationsSent(fixture: 'assert_notifications_sent_with_export', exportMode: true);
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_export',
+            exportMode: true,
+        );
 
         $this->assertFileExists($this->getFixturePath('assert_notifications_sent_with_export.json'));
     }
