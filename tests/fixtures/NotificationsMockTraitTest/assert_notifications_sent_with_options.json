@@ -20,7 +20,9 @@
             "via_method": "active",
             "via_property": "active",
             "via_chain": "active",
-            "via_unresolvable": null
+            "via_unresolvable_method": null,
+            "via_unresolvable_property": null,
+            "via_unresolvable_chain": null
         }
     ]
 }
