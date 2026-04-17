@@ -2,8 +2,8 @@
     "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestNotification": [
         {
             "notification": {
-                "name": "John Smith",
-                "userId": 1,
+                "firstParam": "value-1",
+                "thirdParam": 1,
                 "locale": null
             },
             "channels": [
@@ -16,8 +16,8 @@
         },
         {
             "notification": {
-                "name": "Jane Doe",
-                "userId": 2,
+                "firstParam": "value-3",
+                "thirdParam": 2,
                 "locale": null
             },
             "channels": [

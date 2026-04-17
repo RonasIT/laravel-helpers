@@ -7,9 +7,9 @@ use Illuminate\Notifications\Notification;
 class TestNotification extends Notification
 {
     public function __construct(
-        public readonly string $name = 'John Smith',
-        public readonly string $email = 'john@example.com',
-        protected readonly int $userId = 1,
+        public readonly string $firstParam = 'value-1',
+        public readonly string $secondParam = 'value-2',
+        protected readonly int $thirdParam = 1,
         private readonly array $channels = ['database'],
     ) {
     }
@@ -19,8 +19,8 @@ class TestNotification extends Notification
         return $this->channels;
     }
 
-    public function getName(): string
+    public function getFirstParam(): string
     {
-        return $this->name;
+        return $this->firstParam;
     }
 }
