@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Testing;
 
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +40,7 @@ class TableTestState extends Assert
         $this->tableName = $tableName;
         $this->jsonFields = $jsonFields;
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
+        $this->binaryColumns = $this->getBinaryColumns();
         $this->state = $this->getDataSet($tableName, $uniqueKey);
         $this->uniqueKey = $uniqueKey;
     }
@@ -102,57 +102,19 @@ class TableTestState extends Assert
             return $changes;
         }
 
-        if (!isset($this->binaryColumns)) {
-            $this->binaryColumns = $this->getBinaryColumns();
-        }
-
         return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
-                if (Arr::has($item, $jsonField)) {
-                    if (!is_null($item[$jsonField]) && (in_array($jsonField, $this->binaryColumns))) {
-                        $item[$jsonField] = bin2hex($item[$jsonField]);
-                    }
+                $shouldDecode = Arr::has($item, $jsonField)
+                    && is_string($item[$jsonField])
+                    && json_validate($item[$jsonField]);
 
-                    if (is_string($item[$jsonField]) && json_validate($item[$jsonField])) {
+                    if ($shouldDecode) {
                         $item[$jsonField] = json_decode($item[$jsonField], true);
                     }
                 }
-            }
 
             return $item;
         }, $changes);
-    }
-
-    protected function getBinaryColumns(): array
-    {
-        $connection = DB::connection($this->connectionName);
-        $driverName = $connection->getDriverName();
-
-        $tableSchema = $this->getTableSchema($driverName, $connection);
-
-        return $connection
-            ->table('information_schema.columns')
-            ->select('column_name')
-            ->where('table_name', $this->tableName)
-            ->whereIn('table_schema', $tableSchema)
-            ->whereIn('data_type', self::BINARY_COLUMNS)
-            ->get()
-            ->pluck('column_name')
-            ->toArray();
-    }
-
-    protected function getTableSchema(string $driverName, DatabaseManager $connection): array
-    {
-        $tableSchema = match ($driverName) {
-            'pgsql' => config("database.connections.{$this->connectionName}.schema")
-                ?? config("database.connections.{$this->connectionName}.search_path", 'public'),
-            'mysql' => $connection->getDatabaseName(),
-            default => throw new UnsupportedDBDriverException($driverName),
-        };
-
-        $tableSchema = array_filter(explode(',', $tableSchema), fn ($schema) => !empty($schema));
-
-        return Arr::wrap($tableSchema);
     }
 
     protected function getFixturePath(string $fixtureName): string
@@ -166,10 +128,60 @@ class TableTestState extends Assert
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
     {
-        return DB::connection($this->connectionName)
+        $dataSet = DB::connection($this->connectionName)
             ->table($table)
             ->orderBy($orderField)
             ->get()
             ->map(fn ($record) => (array) $record);
+
+        $this->prepareBinaryFields($dataSet);
+
+        return $dataSet;
+    }
+
+    protected function prepareBinaryFields(Collection $dataSet): void
+    {
+        $dataSet->transform(function (array $record) {
+            array_walk($record, function (mixed &$value, string $field) {
+                if (!is_null($value) && in_array($field, $this->binaryColumns)) {
+                    $value = is_resource($value)
+                        ? stream_get_contents($value)
+                        : bin2hex($value);
+                }
+            });
+
+            return $record;
+        });
+    }
+
+    protected function getBinaryColumns(): array
+    {
+        $connection = DB::connection($this->connectionName);
+
+        $tableSchema = $this->getTableSchema($connection->getDriverName(), $connection->getDatabaseName());
+
+        return $connection
+            ->table('information_schema.columns')
+            ->select('column_name')
+            ->where('table_name', $this->tableName)
+            ->whereIn('table_schema', $tableSchema)
+            ->whereIn('data_type', self::BINARY_COLUMNS)
+            ->get()
+            ->pluck('column_name')
+            ->toArray();
+    }
+
+    protected function getTableSchema(string $driverName, string $databaseName): array
+    {
+        $tableSchema = match ($driverName) {
+            'pgsql' => config("database.connections.{$this->connectionName}.schema")
+                ?? config("database.connections.{$this->connectionName}.search_path", 'public'),
+            'mysql' => $databaseName,
+            default => throw new UnsupportedDBDriverException($driverName),
+        };
+
+        $tableSchema = array_filter(explode(',', $tableSchema), fn ($schema) => !empty($schema));
+
+        return Arr::wrap($tableSchema);
     }
 }

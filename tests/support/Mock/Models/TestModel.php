@@ -18,13 +18,14 @@ class TestModel extends Model
         'name',
         'json_field',
         'castable_field',
+        'cast_binary_field',
         'binary_field',
     ];
 
     protected $casts = [
         'json_field' => 'array',
         'castable_field' => JSONCustomCast::class,
-        'binary_field' => BinaryCast::class,
+        'cast_binary_field' => BinaryCast::class,
     ];
 
     public function relation(): HasMany

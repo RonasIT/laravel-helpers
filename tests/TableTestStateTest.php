@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use RonasIT\Support\Exceptions\UnsupportedDBDriverException;
@@ -59,9 +58,7 @@ class TableTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(), 'test_models');
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
 
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
@@ -76,8 +73,7 @@ class TableTestStateTest extends TestCase
             $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
         );
 
-        $this->mockDBConnection(2);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
 
         $modelTestState = new TableTestState('test_models');
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
@@ -87,9 +83,7 @@ class TableTestStateTest extends TestCase
     {
         $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(), 'test_models');
+        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock);
 
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertNotChanged();
@@ -100,9 +94,12 @@ class TableTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/initial_dataset'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/changed_dataset'));
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models', 'name');
-        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models');
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            binaryColumn: 'cast_binary_field',
+            uniqueKey: 'name',
+        );
 
         $modelTestState = new TableTestState(
             tableName: 'test_models',
@@ -115,19 +112,14 @@ class TableTestStateTest extends TestCase
 
     public function testUnsupportedDriverConnection()
     {
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges(collect(), collect(), 'test_models');
-
-        DB::shouldReceive('getDriverName')
-            ->once()
-            ->andReturn('unsupported_driver');
-
-        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
+        $this->mockUnsupportedDriverName();
 
         $this->assertExceptionThrew(
             expectedClassName: UnsupportedDBDriverException::class,
             expectedMessage: 'Unsupported database driver: unsupported_driver',
         );
+
+        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
 
         $modelTestState->assertChangesEqualsFixture('');
     }

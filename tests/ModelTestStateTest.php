@@ -36,7 +36,7 @@ class ModelTestStateTest extends TestCase
         $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertEquals(['json_field', 'castable_field', 'binary_field'], $jsonFields);
+        $this->assertEquals(['json_field', 'castable_field', 'cast_binary_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
     }
 
@@ -69,9 +69,7 @@ class ModelTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models');
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
@@ -86,28 +84,34 @@ class ModelTestStateTest extends TestCase
             value: $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
         );
 
-        $this->mockDBConnection(2);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_without_json_fields');
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_model_without_json_fields',
+        );
 
         $modelTestState = new ModelTestState(TestModelWithoutJsonFields::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
     }
 
-    public function testAssertChangesBinaryString()
+    public function testAssertChangesBinaryStringMysqlDriver()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
-            'binary_field' => null,
+            'cast_binary_field' => null,
         ]]);
 
         $changedDatasetMock = collect([[
             'id' => 1,
-            'binary_field' => md5('some_string', true),
+            'cast_binary_field' => md5('some_string', true),
         ]]);
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_models', 'mysql');
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            binaryColumn: 'cast_binary_field',
+            dbDriver: 'mysql',
+        );
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes');
@@ -117,17 +121,45 @@ class ModelTestStateTest extends TestCase
     {
         $initialDatasetMock = collect([[
             'id' => 1,
-            'binary_field' => md5('some_string', true),
+            'cast_binary_field' => md5('some_string', true),
         ]]);
 
         $changedDatasetMock = collect([[
             'id' => 1,
+            'cast_binary_field' => null,
+        ]]);
+
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            binaryColumn: 'cast_binary_field',
+        );
+
+        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState->assertChangesEqualsFixture('binary_string_to_null_changes');
+    }
+
+    public function testAssertChangesBinary()
+    {
+        $initialDatasetMock = collect([[
+            'id' => 1,
             'binary_field' => null,
         ]]);
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(), 'test_models');
+        $resource = fopen('php://memory', 'r+b');
+
+        $changedDatasetMock = collect([[
+            'id' => 1,
+            'binary_field' => $resource,
+        ]]);
+
+        fclose($resource);
+
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            binaryColumn: 'binary_field',
+        );
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('binary_string_to_null_changes');
@@ -137,9 +169,7 @@ class ModelTestStateTest extends TestCase
     {
         $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
-        $this->mockGettingBinaryColumns(collect(), 'test_models');
+        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock);
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertNotChanged();
@@ -150,9 +180,12 @@ class ModelTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/initial_dataset'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/changed_dataset'));
 
-        $this->mockDBConnection(3);
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_non_id_primary_keys', 'name');
-        $this->mockGettingBinaryColumns(collect([['column_name' => 'binary_field']]), 'test_model_non_id_primary_keys');
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_model_non_id_primary_keys',
+            uniqueKey: 'name',
+        );
 
         $modelTestState = new ModelTestState(TestModelNonIdPrimaryKey::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key');
