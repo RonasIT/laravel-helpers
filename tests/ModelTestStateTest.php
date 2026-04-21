@@ -114,7 +114,7 @@ class ModelTestStateTest extends TestCase
         );
 
         $modelTestState = new ModelTestState(TestModel::class);
-        $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes');
+        $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes', );
     }
 
     public function testAssertChangesBinaryToNull()
