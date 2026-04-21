@@ -136,8 +136,8 @@ trait TableTestStateMockTrait
             ->method('whereIn')
             ->willReturnCallback(function (string $column, array $values) use ($builderMock) {
                 match ($column) {
-                    'data_type' => $this->assertEquals($values, self::AVAILABLE_BINARY_FIELD_TYPES),
-                    'table_schema' => $this->assertEquals($values, ['public']),
+                    'data_type' => $this->assertEquals(self::AVAILABLE_BINARY_FIELD_TYPES, $values),
+                    'table_schema' => $this->assertEquals(['public'], $values),
                     default => $this->fail('Unexpected call'),
                 };
 

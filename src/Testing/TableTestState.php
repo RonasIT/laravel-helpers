@@ -180,7 +180,9 @@ class TableTestState extends Assert
             default => throw new UnsupportedDBDriverException($driverName),
         };
 
-        $tableSchema = array_filter(explode(',', $tableSchema), fn ($schema) => !empty($schema));
+        $tableSchema = array_map('trim', explode(',', $tableSchema));
+
+        $tableSchema = array_filter($tableSchema, fn ($schema) => !empty($schema));
 
         return Arr::wrap($tableSchema);
     }
