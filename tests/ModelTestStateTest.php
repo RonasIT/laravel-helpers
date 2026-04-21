@@ -146,7 +146,7 @@ class ModelTestStateTest extends TestCase
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_model_aware_casts');
 
         $modelTestState = new ModelTestState(TestModelWithModelAwareCast::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json', true);
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
     }
 
     public function testAssertNoChanges()

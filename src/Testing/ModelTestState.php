@@ -57,20 +57,6 @@ class ModelTestState extends TableTestState
         return class_exists($castType) && is_subclass_of($castType, CastsAttributes::class);
     }
 
-    protected function applyCustomCasts(array $item): array
-    {
-        $model = new $this->modelClassName();
-        $model->setRawAttributes($item);
-
-        foreach ($this->customCastFields as $field => $castClass) {
-            if (Arr::has($item, $field)) {
-                $item[$field] = (new $castClass())->get($model, $field, $item[$field], $item);
-            }
-        }
-
-        return $item;
-    }
-
     protected function prepareChanges(array $changes): array
     {
         $changes = parent::prepareChanges($changes);
@@ -80,5 +66,36 @@ class ModelTestState extends TableTestState
         }
 
         return array_map(fn (array $changesItem) => $this->applyCustomCasts($changesItem), $changes);
+    }
+
+    protected function applyCustomCasts(array $item): array
+    {
+        $attributes = $this->resolveModelAttributes($item);
+
+        $model = new $this->modelClassName();
+        $model->setRawAttributes($attributes);
+
+        foreach ($this->customCastFields as $field => $castClass) {
+            if (Arr::has($item, $field)) {
+                $item[$field] = (new $castClass())->get($model, $field, $attributes[$field], $attributes);
+            }
+        }
+
+        return $item;
+    }
+
+    protected function resolveModelAttributes(array $item): array
+    {
+        if (!array_key_exists($this->uniqueKey, $item)) {
+            return $item;
+        }
+
+        $original = $this->state->first(
+            callback: fn (array $record) => $record[$this->uniqueKey] === $item[$this->uniqueKey],
+        );
+
+        return is_null($original)
+            ? $item
+            : array_merge($original, $item);
     }
 }
