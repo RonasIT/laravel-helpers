@@ -4,9 +4,7 @@ services:
     build: .
     working_dir: /app
     ports:
-      - 81:80
-      - 444:443
+      - 80:80
+      - 443:443
     volumes:
       - ./:/app
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
