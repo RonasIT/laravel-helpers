@@ -56,7 +56,6 @@ class ModelTestStateTest extends TestCase
     public function testInitializationViaPrepareTableTestState(bool $testCaseGlobalExportMode)
     {
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-
         $this->mockGettingDataset($datasetMock);
 
         $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
@@ -94,7 +93,7 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
     }
 
-    public function testAssertChangesBinaryStringMysqlDriver()
+    public function testAssertChangesCastedBinaryStringMysqlDriver()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
@@ -118,7 +117,7 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes', );
     }
 
-    public function testAssertChangesBinaryToNull()
+    public function testAssertChangesCastedBinaryToNull()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
@@ -141,7 +140,7 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('binary_string_to_null_changes');
     }
 
-    public function testAssertChangesBinary()
+    public function testAssertChangesBinaryAsResource()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
