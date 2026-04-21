@@ -4,7 +4,9 @@ namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
+use RonasIT\Support\Exceptions\UnsupportedDBDriverException;
 use RonasIT\Support\Testing\ModelTestState;
+use RonasIT\Support\Testing\TableTestState;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIdPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutJsonFields;
@@ -168,6 +170,20 @@ class ModelTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('null_to_binary_resource_changes');
 
         fclose($resource);
+    }
+
+    public function testUnsupportedDriverConnection()
+    {
+        $this->mockUnsupportedDriverName();
+
+        $this->assertExceptionThrew(
+            expectedClassName: UnsupportedDBDriverException::class,
+            expectedMessage: 'Unsupported database driver: unsupported_driver',
+        );
+
+        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
+
+        $modelTestState->assertChangesEqualsFixture('');
     }
 
     public function testAssertNoChanges()

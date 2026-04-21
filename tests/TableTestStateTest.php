@@ -97,7 +97,6 @@ class TableTestStateTest extends TestCase
             responseMock: $changedDatasetMock,
             initialState: $initialDatasetMock,
             tableName: 'test_models',
-            binaryColumn: 'cast_binary_field',
             uniqueKey: 'name',
         );
 
@@ -108,19 +107,5 @@ class TableTestStateTest extends TestCase
         );
 
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set');
-    }
-
-    public function testUnsupportedDriverConnection()
-    {
-        $this->mockUnsupportedDriverName();
-
-        $this->assertExceptionThrew(
-            expectedClassName: UnsupportedDBDriverException::class,
-            expectedMessage: 'Unsupported database driver: unsupported_driver',
-        );
-
-        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
-
-        $modelTestState->assertChangesEqualsFixture('');
     }
 }
