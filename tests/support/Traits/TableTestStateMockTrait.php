@@ -31,7 +31,7 @@ trait TableTestStateMockTrait
 
     protected function mockGettingDataset(Collection $responseMock, string $uniqueKey = 'id'): void
     {
-        $connectionMock = $this->mockClass(Connection::class, [ 'getDriverName', 'getDatabaseName', 'table'], true);
+        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
         $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
 
         DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
@@ -97,7 +97,7 @@ trait TableTestStateMockTrait
         ?string $binaryColumn = null,
         string $dbDriver = 'pgsql',
     ): void {
-        $connectionMock = $this->mockClass(Connection::class, [ 'getDriverName', 'getDatabaseName', 'table'], true);
+        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
         $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
 
         DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
