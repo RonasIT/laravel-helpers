@@ -4,7 +4,10 @@ namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
+use RonasIT\Support\Exceptions\UnsupportedDBDriverException;
+use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Testing\TableTestState;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class TableTestStateTest extends TestCase
@@ -101,5 +104,96 @@ class TableTestStateTest extends TestCase
         );
 
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set');
+    }
+
+    public function testAssertChangesCastedBinaryStringMysqlDriver()
+    {
+        $initialDatasetMock = collect([[
+            'id' => 1,
+            'cast_binary_field' => null,
+        ]]);
+
+        $changedDatasetMock = collect([[
+            'id' => 1,
+            'cast_binary_field' => md5('some_string', true),
+        ]]);
+
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_models',
+            binaryColumn: 'cast_binary_field',
+            dbDriver: 'mysql',
+        );
+
+        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes', );
+    }
+
+    public function testAssertChangesCastedBinaryToNull()
+    {
+        $initialDatasetMock = collect([[
+            'id' => 1,
+            'cast_binary_field' => md5('some_string', true),
+        ]]);
+
+        $changedDatasetMock = collect([[
+            'id' => 1,
+            'cast_binary_field' => null,
+        ]]);
+
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_models',
+            binaryColumn: 'cast_binary_field',
+        );
+
+        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState->assertChangesEqualsFixture('binary_string_to_null_changes');
+    }
+
+    public function testAssertChangesBinaryAsResource()
+    {
+        $initialDatasetMock = collect([[
+            'id' => 1,
+            'binary_field' => null,
+        ]]);
+
+        $resource = fopen('php://memory', 'r+b');
+        fwrite($resource, md5('some_string', true));
+        rewind($resource);
+
+        $changedDatasetMock = collect([[
+            'id' => 1,
+            'binary_field' => $resource,
+        ]]);
+
+        $this->mockGettingDatasetForChanges(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_models',
+            binaryColumn: 'binary_field',
+        );
+
+        $modelTestState = new ModelTestState(TestModel::class);
+
+        $modelTestState->assertChangesEqualsFixture('null_to_binary_resource_changes');
+
+        fclose($resource);
+    }
+
+    public function testUnsupportedDriverConnection()
+    {
+        $this->mockUnsupportedDriverName();
+
+        $this->assertExceptionThrew(
+            expectedClassName: UnsupportedDBDriverException::class,
+            expectedMessage: 'Unsupported database driver: unsupported_driver',
+        );
+
+        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
+
+        $modelTestState->assertChangesEqualsFixture('');
     }
 }
