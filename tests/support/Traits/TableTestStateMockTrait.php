@@ -93,7 +93,7 @@ trait TableTestStateMockTrait
         Collection $responseMock,
         Collection $initialState,
         string $tableName = 'test_models',
-        string|array $binaryColumn = null,
+        ?string $binaryColumn = null,
         string $dbDriver = 'pgsql',
         string $uniqueKey = 'id',
     ): void {

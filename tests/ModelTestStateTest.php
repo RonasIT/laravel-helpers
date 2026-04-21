@@ -147,13 +147,13 @@ class ModelTestStateTest extends TestCase
         ]]);
 
         $resource = fopen('php://memory', 'r+b');
+        fwrite($resource, md5('some_string', true));
+        rewind($resource);
 
         $changedDatasetMock = collect([[
             'id' => 1,
             'binary_field' => $resource,
         ]]);
-
-        fclose($resource);
 
         $this->mockGettingDatasetForChanges(
             responseMock: $changedDatasetMock,
@@ -162,7 +162,10 @@ class ModelTestStateTest extends TestCase
         );
 
         $modelTestState = new ModelTestState(TestModel::class);
-        $modelTestState->assertChangesEqualsFixture('binary_string_to_null_changes');
+
+        $modelTestState->assertChangesEqualsFixture('null_to_binary_resource_changes');
+
+        fclose($resource);
     }
 
     public function testAssertNoChanges()

@@ -144,14 +144,33 @@ class TableTestState extends Assert
         $dataSet->transform(function (array $record) {
             array_walk($record, function (mixed &$value, string $field) {
                 if (!is_null($value) && in_array($field, $this->binaryColumns)) {
-                    $value = is_resource($value)
-                        ? stream_get_contents($value)
-                        : bin2hex($value);
+                    $value = $this->normalizeBinaryValue($value);
                 }
             });
 
             return $record;
         });
+    }
+
+    protected function normalizeBinaryValue(mixed $value): ?string
+    {
+        if (get_debug_type($value) === 'resource (closed)') {
+            return null;
+        }
+
+        if (is_resource($value)) {
+            $metadata = stream_get_meta_data($value);
+
+            if ($metadata['seekable'] ?? false) {
+                rewind($value);
+            }
+
+            $value = stream_get_contents($value);
+
+            return ($value === false) ? null : bin2hex($value);
+        }
+
+        return is_string($value) ? bin2hex($value) : null;
     }
 
     protected function getBinaryColumns(): array
