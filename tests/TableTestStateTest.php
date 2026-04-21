@@ -93,12 +93,7 @@ class TableTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/initial_dataset'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_primary_key_set/changed_dataset'));
 
-        $this->mockGettingDatasetForChanges(
-            responseMock: $changedDatasetMock,
-            initialState: $initialDatasetMock,
-            tableName: 'test_models',
-            uniqueKey: 'name',
-        );
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models', 'name');
 
         $modelTestState = new TableTestState(
             tableName: 'test_models',

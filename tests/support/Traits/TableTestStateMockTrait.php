@@ -93,9 +93,9 @@ trait TableTestStateMockTrait
         Collection $responseMock,
         Collection $initialState,
         string $tableName,
+        string $uniqueKey = 'id',
         ?string $binaryColumn = null,
         string $dbDriver = 'pgsql',
-        string $uniqueKey = 'id',
     ): void {
         $connectionMock = $this->mockClass(Connection::class, [ 'getDriverName', 'getDatabaseName', 'table'], true);
         $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
