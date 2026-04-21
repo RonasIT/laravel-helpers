@@ -5,7 +5,7 @@ namespace RonasIT\Support\Tests\Support\Mock\Casts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
-class ModelAwareCast implements CastsAttributes
+class ModelDependentCast implements CastsAttributes
 {
     public function get(Model $model, string $key, mixed $value, array $attributes): string
     {
