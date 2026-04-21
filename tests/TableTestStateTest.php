@@ -127,7 +127,7 @@ class TableTestStateTest extends TestCase
         );
 
         $modelTestState = new ModelTestState(TestModel::class);
-         $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes');
+        $modelTestState->assertChangesEqualsFixture('null_to_binary_string_changes');
     }
 
     public function testAssertChangesCastedBinaryToNull()
@@ -192,8 +192,6 @@ class TableTestStateTest extends TestCase
             expectedMessage: 'Unsupported database driver: unsupported_driver',
         );
 
-        $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
-
-        $modelTestState->assertChangesEqualsFixture('');
+        new TableTestState('test_models', ['json_field', 'castable_field']);
     }
 }

@@ -14,11 +14,6 @@ trait TableTestStateMockTrait
 {
     use MockTestTrait;
 
-    private const array SUPPORTED_DB_DRIVERS = [
-        'mysql',
-        'pgsql',
-    ];
-
     private const array AVAILABLE_BINARY_FIELD_TYPES = [
         'bytea',
         'blob',
