@@ -184,4 +184,13 @@ trait TableTestStateMockTrait
 
         return $globalExportMode->getValue($instance);
     }
+
+    protected function getTestResource()
+    {
+        $resource = fopen('php://memory', 'r+b');
+        fwrite($resource, md5('some_string', true));
+        rewind($resource);
+
+        return $resource;
+    }
 }

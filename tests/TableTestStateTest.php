@@ -153,16 +153,14 @@ class TableTestStateTest extends TestCase
         $modelTestState->assertChangesEqualsFixture('binary_string_to_null_changes');
     }
 
-    public function testAssertChangesBinaryAsResource()
+    public function testAssertChangesWithPgsqlBinaryFieldAsResource()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
             'binary_field' => null,
         ]]);
 
-        $resource = fopen('php://memory', 'r+b');
-        fwrite($resource, md5('some_string', true));
-        rewind($resource);
+        $resource = $this->getTestResource();
 
         $changedDatasetMock = collect([[
             'id' => 1,
@@ -193,5 +191,6 @@ class TableTestStateTest extends TestCase
         );
 
         new TableTestState('test_models', ['json_field', 'castable_field']);
+
     }
 }
