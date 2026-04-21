@@ -191,6 +191,5 @@ class TableTestStateTest extends TestCase
         );
 
         new TableTestState('test_models', ['json_field', 'castable_field']);
-
     }
 }
