@@ -69,7 +69,7 @@ class ModelTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
@@ -109,6 +109,7 @@ class ModelTestStateTest extends TestCase
         $this->mockGettingDatasetForChanges(
             responseMock: $changedDatasetMock,
             initialState: $initialDatasetMock,
+            tableName: 'test_models',
             binaryColumn: 'cast_binary_field',
             dbDriver: 'mysql',
         );
@@ -132,6 +133,7 @@ class ModelTestStateTest extends TestCase
         $this->mockGettingDatasetForChanges(
             responseMock: $changedDatasetMock,
             initialState: $initialDatasetMock,
+            tableName: 'test_models',
             binaryColumn: 'cast_binary_field',
         );
 
@@ -158,6 +160,7 @@ class ModelTestStateTest extends TestCase
         $this->mockGettingDatasetForChanges(
             responseMock: $changedDatasetMock,
             initialState: $initialDatasetMock,
+            tableName: 'test_models',
             binaryColumn: 'binary_field',
         );
 
@@ -172,7 +175,7 @@ class ModelTestStateTest extends TestCase
     {
         $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
 
-        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock);
+        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertNotChanged();

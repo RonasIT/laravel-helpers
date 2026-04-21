@@ -45,7 +45,6 @@ class TableTestStateTest extends TestCase
     public function testInitializationViaPrepareTableTestState(bool $testCaseGlobalExportMode)
     {
         $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-
         $this->mockGettingDataset($datasetMock);
 
         $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareTableTestState', 'test_models', $testCaseGlobalExportMode);
@@ -58,7 +57,7 @@ class TableTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
 
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
@@ -73,7 +72,7 @@ class TableTestStateTest extends TestCase
             $this->getJsonFixture('changes_equals_fixture_without_json_fields/changed_dataset.json'),
         );
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock);
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
 
         $modelTestState = new TableTestState('test_models');
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_without_json_fields.json');
@@ -83,7 +82,7 @@ class TableTestStateTest extends TestCase
     {
         $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
 
-        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock);
+        $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
 
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertNotChanged();
@@ -97,6 +96,7 @@ class TableTestStateTest extends TestCase
         $this->mockGettingDatasetForChanges(
             responseMock: $changedDatasetMock,
             initialState: $initialDatasetMock,
+            tableName: 'test_models',
             binaryColumn: 'cast_binary_field',
             uniqueKey: 'name',
         );

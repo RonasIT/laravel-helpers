@@ -92,7 +92,7 @@ trait TableTestStateMockTrait
     protected function mockGettingDatasetForChanges(
         Collection $responseMock,
         Collection $initialState,
-        string $tableName = 'test_models',
+        string $tableName,
         ?string $binaryColumn = null,
         string $dbDriver = 'pgsql',
         string $uniqueKey = 'id',
@@ -163,7 +163,7 @@ trait TableTestStateMockTrait
     {
         DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
 
-        $connectionMock = $this->mockClass(Connection::class, [ 'getDriverName', 'getDatabaseName', 'table'], true);
+        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
 
         $connectionMock
             ->method('getDriverName')
