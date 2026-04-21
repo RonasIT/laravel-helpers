@@ -59,13 +59,11 @@ class ModelTestState extends TableTestState
 
     protected function prepareChanges(array $changes): array
     {
-        $changes = parent::prepareChanges($changes);
-
-        if (empty($this->customCastFields)) {
-            return $changes;
+        if (!empty($this->customCastFields)) {
+            $changes = array_map(fn (array $changesItem) => $this->applyCustomCasts($changesItem), $changes);
         }
 
-        return array_map(fn (array $changesItem) => $this->applyCustomCasts($changesItem), $changes);
+        return parent::prepareChanges($changes);
     }
 
     protected function applyCustomCasts(array $item): array
