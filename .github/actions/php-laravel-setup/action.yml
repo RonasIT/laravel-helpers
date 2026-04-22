@@ -1,0 +1,28 @@
+name: PHP Laravel setup
+description: Shared setup for PHP matrix jobs (PHP, Laravel constraint, dependencies)
+inputs:
+  php-version:
+    description: PHP version for setup-php
+    required: true
+  laravel-version:
+    description: Laravel framework version constraint
+    required: true
+  coverage:
+    description: Coverage driver for setup-php
+    required: false
+    default: none
+runs:
+  using: composite
+  steps:
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        coverage: ${{ inputs.coverage }}
+        tools: composer
+    - name: Install Laravel version
+      shell: bash
+      run: composer require "laravel/framework:${{ inputs.laravel-version }}" --no-update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Install dependencies
+      shell: bash
+      run: composer update -W -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
