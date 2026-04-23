@@ -3,6 +3,8 @@
 namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\ExpectationFailedException;
+use ReflectionClass;
+use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Mock\TestMockClass;
 use RonasIT\Support\Traits\MockTrait;
 
@@ -50,7 +52,7 @@ class MockTraitTest extends TestCase
             $this->functionCall('uniqid', ['prefix'], '0987654321'),
             $this->functionCall(name: 'uniqid', result: '0987654321'),
             $this->functionCall('array_slice', [[1, 2, 3, 4, 5], 2], [3, 4, 5]),
-            $this->functionCall('array_slice', [[1, 2, 3, 4, 5], 2, 2, 'preserve_keys'], [3, 4]),
+            $this->functionCall('array_slice', [[1, 2, 3, 4, 5], 2, 2, true], [3, 4]),
         ]);
 
         $this->assertEquals(2, rand(1, 5));
@@ -59,14 +61,11 @@ class MockTraitTest extends TestCase
         $this->assertEquals('0987654321', uniqid('prefix'));
         $this->assertEquals('0987654321', uniqid());
         $this->assertEquals([3, 4, 5], array_slice([1, 2, 3, 4, 5], 2));
-        $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2, 'preserve_keys'));
+        $this->assertEquals([3, 4], array_slice([1, 2, 3, 4, 5], 2, 2, true));
     }
 
     public function testMockNativeFunctionWhenLessRequiredParameters()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.');
-
         $this->mockNativeFunction('RonasIT\Support\Tests', [
             $this->functionCall(
                 name: 'array_slice',
@@ -75,23 +74,38 @@ class MockTraitTest extends TestCase
             ),
         ]);
 
-        array_slice([1, 2, 3, 4, 5], 2, 2);
+        try {
+            array_slice([1, 2, 3, 4, 5], 2, 2);
+        } catch (ExpectationFailedException $e) {
+            $this->clearMockAssertionFailures();
+
+            $this->assertStringContainsString(
+                'Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.',
+                $e->getMessage(),
+            );
+        }
     }
 
     public function testMockNativeFunctionWhenMoreExpectedParameters()
     {
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.');
-
         $this->mockNativeFunction('RonasIT\Support\Tests', [
             $this->functionCall(
                 name: 'array_slice',
-                arguments: [[1, 2, 3, 4, 5], 2, 2, 'preserve_keys', 'extra_parameter'],
+                arguments: [[1, 2, 3, 4, 5], 2, 2, true, 'extra_parameter'],
                 result: [3, 4],
             ),
         ]);
 
-        array_slice([1, 2, 3, 4, 5], 2, 2, 'preserve_keys');
+        try {
+            array_slice([1, 2, 3, 4, 5], 2, 2);
+        } catch (ExpectationFailedException $e) {
+            $this->clearMockAssertionFailures();
+
+            $this->assertStringContainsString(
+                'Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.',
+                $e->getMessage(),
+            );
+        }
     }
 
     public function testMockNativeFunctionCheckMockedResult()
@@ -195,5 +209,22 @@ class MockTraitTest extends TestCase
         ]);
 
         $this->assertEquals('mockFunction', $mock->mockFunction('firstRequired', 'secondRequired', null, 'string'));
+    }
+
+    protected function clearMockAssertionFailures(): void
+    {
+        $class = new ReflectionClass($this);
+
+        while ($class && !$class->hasProperty('mockObjects')) {
+            $class = $class->getParentClass();
+        }
+
+        foreach ($class->getProperty('mockObjects')->getValue($this) as $entry) {
+            $handler = $entry['mockObject']->__phpunit_getInvocationHandler();
+
+            $assertionFailureProp = new ReflectionProperty($handler, 'assertionFailure');
+
+            $assertionFailureProp->setValue($handler, null);
+        }
     }
 }

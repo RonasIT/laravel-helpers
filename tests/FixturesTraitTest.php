@@ -233,7 +233,6 @@ class FixturesTraitTest extends TestCase
             ->map(fn ($item) => (object) $item);
 
         $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('getQueryGrammar', [], new Grammar()),
             $this->functionCall('getPostProcessor', [], new Processor()),
             $this->functionCall('select', [
                 'select "table_name", "table_schema", "column_name", "column_default" from "information_schema"."columns" where "column_default" LIKE ?',
@@ -242,6 +241,8 @@ class FixturesTraitTest extends TestCase
             ], $sequences),
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
+
+        $connection->setQueryGrammar(new Grammar($connection));
 
         $this->bindMockedDbInstance($connection);
 
@@ -258,7 +259,6 @@ class FixturesTraitTest extends TestCase
         $connection = $this->mockClass(
             class: PostgresConnection::class,
             callChain: [
-                $this->functionCall('getQueryGrammar', [], new Grammar()),
                 $this->functionCall('getPostProcessor', [], new Processor()),
                 $this->functionCall(
                     name: 'select',
@@ -272,6 +272,8 @@ class FixturesTraitTest extends TestCase
             ],
             disableConstructor: true,
         );
+
+        $connection->setQueryGrammar(new Grammar($connection));
 
         $db = $this->mockClass(
             class: DatabaseManager::class,
