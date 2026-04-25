@@ -25,9 +25,9 @@
     "friendsofphp/php-cs-fixer": "^3.62",
     "mockery/mockery": "^1.6.12",
     "mpyw/laravel-database-mock": "^0.0.1-alpha5",
-    "orchestra/testbench": "^10.8",
+    "orchestra/testbench": ">=10.8",
     "php-coveralls/php-coveralls": "^2.7",
-    "phpunit/phpunit": "^11.5.30",
+    "phpunit/phpunit": ">=11.5.30",
     "laravel/pint": "^1.27"
   },
   "autoload": {
