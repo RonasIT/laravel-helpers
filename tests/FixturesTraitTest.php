@@ -18,11 +18,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 use RonasIT\Support\Tests\Support\Traits\FixturesTestTrait;
+use RonasIT\Support\Tests\Support\Traits\FixturesTestTrait;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FixturesTraitTest extends TestCase
 {
+    use FixturesTestTrait;
     use FixturesTestTrait;
     use MockTrait;
 
@@ -94,6 +96,9 @@ class FixturesTraitTest extends TestCase
             unlink($fixturePath);
         }
 
+        $result = [
+            'value' => 1234567890,
+        ];
         $result = [
             'value' => 1234567890,
         ];
@@ -192,15 +197,37 @@ class FixturesTraitTest extends TestCase
 
     #[DataProvider('loadTestDumpData')]
     public function testLoadTestDump(string $driver, string $connectionClass, string $clearSqlFixture)
+    public static function loadTestDumpData(): array
     {
+        return [
+            'mysql' => [
+                'driver' => 'mysql',
+                'connectionClass' => MySqlConnection::class,
+                'clearSqlFixture' => 'clear_database/clear_mysql_db_query.sql',
+            ],
+            'pgsql' => [
+                'driver' => 'pgsql',
+                'connectionClass' => PostgresConnection::class,
+                'clearSqlFixture' => 'clear_database/clear_pgsql_db_query.sql',
+            ],
+        ];
+    }
+
+    #[DataProvider('loadTestDumpData')]
+    public function testLoadTestDump(string $driver, string $connectionClass, string $clearSqlFixture)
+    {
+        $connection = $this->mockClass($connectionClass, [
+            $this->functionCall('unprepared', [$this->getFixture($clearSqlFixture)]),
         $connection = $this->mockClass($connectionClass, [
             $this->functionCall('unprepared', [$this->getFixture($clearSqlFixture)]),
             $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
 
         $this->bindMockedDbInstance($connection);
+        $this->bindMockedDbInstance($connection);
         $this->dumpFileName = 'clear_database/dump.sql';
 
+        Config::set('database.default', $driver);
         Config::set('database.default', $driver);
 
         self::$tables = $this->getJsonFixture('clear_database/tables.json');
@@ -218,6 +245,7 @@ class FixturesTraitTest extends TestCase
             $this->functionCall('getSchemaBuilder', [], $mock),
         ], true);
 
+        $this->bindMockedDbInstance($connection, 1);
         $this->bindMockedDbInstance($connection, 1);
 
         Config::set('database.default', 'mysql');
@@ -244,7 +272,9 @@ class FixturesTraitTest extends TestCase
         ], true);
 
         $connection->setQueryGrammar(new Grammar($connection));
+        $connection->setQueryGrammar(new Grammar($connection));
 
+        $this->bindMockedDbInstance($connection);
         $this->bindMockedDbInstance($connection);
 
         Config::set('database.default', 'pgsql');
@@ -274,6 +304,8 @@ class FixturesTraitTest extends TestCase
             ],
             disableConstructor: true,
         );
+
+        $connection->setQueryGrammar(new Grammar($connection));
 
         $connection->setQueryGrammar(new Grammar($connection));
 
@@ -311,6 +343,29 @@ class FixturesTraitTest extends TestCase
         );
 
         $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);
+    }
+
+    public function testPrepareMySQLAutoIncrement()
+    {
+        $mock = $this->mockClass(MySqlBuilder::class, [
+            $this->functionCall(
+                name: 'getTables',
+                result: $this->getJsonFixture('set_auto_increment/get_tables.json')),
+        ], true);
+
+        $connection = $this->mockClass(MySqlConnection::class, [
+            $this->functionCall(
+                name: 'getSchemaBuilder',
+                result: $mock,
+            ),
+            $this->functionCall('unprepared', [$this->getFixture('set_auto_increment/set_auto_increment.sql')]),
+        ], true);
+
+        $this->bindMockedDbInstance($connection);
+
+        Config::set('database.default', 'mysql');
+
+        $this->resetMySQLAutoIncrement($this->getTables(), ['roles', 'groups']);
     }
 
     public function testPrepareMySQLAutoIncrement()
