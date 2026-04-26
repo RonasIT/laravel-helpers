@@ -25,11 +25,9 @@ class DbTypeRangeRule implements ValidationRule
 
         $ranges = $this->resolver::ranges();
 
-        if (!array_key_exists($this->type, $ranges)) {
-            $availableTypes = implode(', ', array_keys($ranges));
-
+        if (!$this->resolver->hasType($this->type)) {
             throw new InvalidValidationRuleUsageException(
-                message: "db_type_range: Unknown type '{$this->type}' for the {$attribute} field. Available types: {$availableTypes}.",
+                message: "db_type_range: Unknown type '{$this->type}' for the {$attribute} field.",
             );
         }
 

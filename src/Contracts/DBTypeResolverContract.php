@@ -9,6 +9,8 @@ interface DBTypeResolverContract
      */
     public static function ranges(): array;
 
+    public function hasType(string $type): bool;
+
     public function isNumeric(string $type): bool;
 
     public function isString(string $type): bool;
