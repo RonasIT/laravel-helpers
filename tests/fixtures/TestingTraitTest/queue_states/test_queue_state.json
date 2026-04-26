@@ -1,13 +1,16 @@
 {
     "RonasIT\\Support\\Tests\\Support\\Mock\\Jobs\\TestJob": [
         {
+            "foo": null,
             "count": 1,
             "title": "title_1",
             "isPublished": true,
-            "foo": null,
             "job": null,
             "connection": null,
             "queue": null,
+            "messageGroup": null,
+            "deduplicator": null,
+            "debounceOwner": "",
             "delay": null,
             "afterCommit": null,
             "middleware": [],
@@ -17,13 +20,16 @@
             "chainCatchCallbacks": null
         },
         {
+            "foo": null,
             "count": 2,
             "title": "title_2",
             "isPublished": true,
-            "foo": null,
             "job": null,
             "connection": null,
             "queue": null,
+            "messageGroup": null,
+            "deduplicator": null,
+            "debounceOwner": "",
             "delay": null,
             "afterCommit": null,
             "middleware": [],
@@ -33,13 +39,16 @@
             "chainCatchCallbacks": null
         },
         {
+            "foo": null,
             "count": 3,
             "title": "title_3",
             "isPublished": true,
-            "foo": null,
             "job": null,
             "connection": null,
             "queue": null,
+            "messageGroup": null,
+            "deduplicator": null,
+            "debounceOwner": "",
             "delay": null,
             "afterCommit": null,
             "middleware": [],
