@@ -34,13 +34,13 @@ class DBTypeRangeRule implements ValidationRule
         list($min, $max) = $ranges[$this->type];
 
         if ($this->resolver->isNumeric($this->type)) {
-            if (filter_var($value, FILTER_VALIDATE_INT) === false) {
-                $fail("The {$attribute} must be an integer.");
+            if (!is_numeric($value)) {
+                $fail("The {$attribute} must be numeric.");
 
                 return;
             }
 
-            $metric = (int) $value;
+            $metric = (float) $value;
             $errorMessage = "The {$attribute} must be between {$min} and {$max}.";
         } elseif ($this->resolver->isString($this->type)) {
             if (!is_string($value)) {

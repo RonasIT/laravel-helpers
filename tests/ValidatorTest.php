@@ -294,37 +294,6 @@ class ValidatorTest extends TestCase
         ];
     }
 
-    public static function provideDBTypeRangeWrongTypeFails(): array
-    {
-        return [
-            'non-numeric string to integer' => [
-                'value' => 'abc',
-                'type' => 'integer',
-                'error' => 'The value must be an integer.',
-            ],
-            'float to integer' => [
-                'value' => 42.5,
-                'type' => 'integer',
-                'error' => 'The value must be an integer.',
-            ],
-            'float string to integer' => [
-                'value' => '42.5',
-                'type' => 'integer',
-                'error' => 'The value must be an integer.',
-            ],
-            'integer to varchar' => [
-                'value' => 42,
-                'type' => 'varchar',
-                'error' => 'The value must be a string.',
-            ],
-            'array to varchar' => [
-                'value' => ['foo'],
-                'type' => 'varchar',
-                'error' => 'The value must be a string.',
-            ],
-        ];
-    }
-
     #[DataProvider('provideDBTypeRangePasses')]
     public function testDBTypeRangePasses(mixed $value, string $type): void
     {
@@ -401,6 +370,27 @@ class ValidatorTest extends TestCase
             expected: "The value must be between {$range[0]} and {$range[1]}.",
             actual: $validator->errors()->first('value'),
         );
+    }
+
+    public static function provideDBTypeRangeWrongTypeFails(): array
+    {
+        return [
+            'non-numeric string to integer' => [
+                'value' => 'abc',
+                'type' => 'integer',
+                'error' => 'The value must be numeric.',
+            ],
+            'integer to varchar' => [
+                'value' => 42,
+                'type' => 'varchar',
+                'error' => 'The value must be a string.',
+            ],
+            'array to varchar' => [
+                'value' => ['foo'],
+                'type' => 'varchar',
+                'error' => 'The value must be a string.',
+            ],
+        ];
     }
 
     #[DataProvider('provideDBTypeRangeWrongTypeFails')]
