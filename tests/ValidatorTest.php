@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
-use RonasIT\Support\Rules\DbTypeRangeRule;
+use RonasIT\Support\Rules\DBTypeRangeRule;
 use RonasIT\Support\Tests\Support\Mock\Resolvers\TestDBTypeResolver;
 use RonasIT\Support\Tests\Support\Mock\Resolvers\TestDBTypeResolverWithUncategorizedTypes;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
@@ -208,7 +208,7 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->fails());
     }
 
-    public static function provideDbTypeRangePasses(): array
+    public static function provideDBTypeRangePasses(): array
     {
         return [
             'integer min' => [
@@ -294,7 +294,7 @@ class ValidatorTest extends TestCase
         ];
     }
 
-    public static function provideDbTypeRangeWrongTypeFails(): array
+    public static function provideDBTypeRangeWrongTypeFails(): array
     {
         return [
             'non-numeric string to integer' => [
@@ -325,8 +325,8 @@ class ValidatorTest extends TestCase
         ];
     }
 
-    #[DataProvider('provideDbTypeRangePasses')]
-    public function testDbTypeRangePasses(mixed $value, string $type): void
+    #[DataProvider('provideDBTypeRangePasses')]
+    public function testDBTypeRangePasses(mixed $value, string $type): void
     {
         $validator = Validator::make(
             data: ['value' => $value],
@@ -336,7 +336,7 @@ class ValidatorTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public static function provideNumericDbTypeRangeFails(): array
+    public static function provideNumericDBTypeRangeFails(): array
     {
         return [
             'integer below min' => [
@@ -387,8 +387,8 @@ class ValidatorTest extends TestCase
         ];
     }
 
-    #[DataProvider('provideNumericDbTypeRangeFails')]
-    public function testNumericDbTypeRangeFails(mixed $value, string $type, array $range): void
+    #[DataProvider('provideNumericDBTypeRangeFails')]
+    public function testNumericDBTypeRangeFails(mixed $value, string $type, array $range): void
     {
         $validator = Validator::make(
             data: ['value' => $value],
@@ -403,8 +403,8 @@ class ValidatorTest extends TestCase
         );
     }
 
-    #[DataProvider('provideDbTypeRangeWrongTypeFails')]
-    public function testDbTypeRangeWrongTypeFails(mixed $value, string $type, string $error): void
+    #[DataProvider('provideDBTypeRangeWrongTypeFails')]
+    public function testDBTypeRangeWrongTypeFails(mixed $value, string $type, string $error): void
     {
         $validator = Validator::make(
             data: ['value' => $value],
@@ -415,7 +415,7 @@ class ValidatorTest extends TestCase
         $this->assertEquals($error, $validator->errors()->first('value'));
     }
 
-    public function testVarcharDbTypeRangeFails(): void
+    public function testVarcharDBTypeRangeFails(): void
     {
         $value = str_repeat('a', self::VARCHAR_MAX + 1);
         $max = self::VARCHAR_MAX;
@@ -433,21 +433,21 @@ class ValidatorTest extends TestCase
         );
     }
 
-    public function testDbTypeRangeObjectSyntaxPasses(): void
+    public function testDBTypeRangeObjectSyntaxPasses(): void
     {
         $validator = Validator::make(
             data: ['value' => 0],
-            rules: ['value' => [new DbTypeRangeRule('integer')]],
+            rules: ['value' => [new DBTypeRangeRule('integer')]],
         );
 
         $this->assertTrue($validator->passes());
     }
 
-    public function testDbTypeRangeObjectSyntaxFails(): void
+    public function testDBTypeRangeObjectSyntaxFails(): void
     {
         $validator = Validator::make(
             data: ['value' => self::INTEGER_MAX + 1],
-            rules: ['value' => [new DbTypeRangeRule('integer')]],
+            rules: ['value' => [new DBTypeRangeRule('integer')]],
         );
 
         $this->assertTrue($validator->fails());
@@ -458,7 +458,7 @@ class ValidatorTest extends TestCase
         );
     }
 
-    public function testDbTypeRangeUnknownTypeThrows(): void
+    public function testDBTypeRangeUnknownTypeThrows(): void
     {
         $this->assertExceptionThrew(
             expectedClassName: InvalidValidationRuleUsageException::class,
@@ -474,7 +474,7 @@ class ValidatorTest extends TestCase
         $validator->passes();
     }
 
-    public function testDbTypeRangeMissingTypeThrows(): void
+    public function testDBTypeRangeMissingTypeThrows(): void
     {
         $this->assertExceptionThrew(
             expectedClassName: InvalidValidationRuleUsageException::class,
@@ -489,37 +489,37 @@ class ValidatorTest extends TestCase
         $validator->passes();
     }
 
-    public function testDbTypeRangeUncategorizedTypePasses(): void
+    public function testDBTypeRangeUncategorizedTypePasses(): void
     {
         app()->bind(DBTypeResolverContract::class, TestDBTypeResolverWithUncategorizedTypes::class);
 
         $validator = Validator::make(
             data: ['value' => 'not-a-number'],
-            rules: ['value' => [new DbTypeRangeRule(TestDBTypeResolverWithUncategorizedTypes::DECIMAL)]],
+            rules: ['value' => [new DBTypeRangeRule(TestDBTypeResolverWithUncategorizedTypes::DECIMAL)]],
         );
 
         $this->assertTrue($validator->passes());
     }
 
-    public function testDbTypeRangeUsesCustomResolverRangesPasses(): void
+    public function testDBTypeRangeUsesCustomResolverRangesPasses(): void
     {
         app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
 
         $validator = Validator::make(
             data: ['value' => TestDBTypeResolver::INTEGER_MAX],
-            rules: ['value' => [new DbTypeRangeRule(TestDBTypeResolver::INTEGER)]],
+            rules: ['value' => [new DBTypeRangeRule(TestDBTypeResolver::INTEGER)]],
         );
 
         $this->assertTrue($validator->passes());
     }
 
-    public function testDbTypeRangeUsesCustomResolverRangesFails(): void
+    public function testDBTypeRangeUsesCustomResolverRangesFails(): void
     {
         app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
 
         $validator = Validator::make(
             data: ['value' => TestDBTypeResolver::INTEGER_MAX + 1],
-            rules: ['value' => [new DbTypeRangeRule(TestDBTypeResolver::INTEGER)]],
+            rules: ['value' => [new DBTypeRangeRule(TestDBTypeResolver::INTEGER)]],
         );
 
         $this->assertTrue($validator->fails());

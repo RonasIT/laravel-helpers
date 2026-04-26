@@ -20,7 +20,7 @@ use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
-use RonasIT\Support\Rules\DbTypeRangeRule;
+use RonasIT\Support\Rules\DBTypeRangeRule;
 use RonasIT\Support\Support\PostgresDBTypeResolver;
 use RonasIT\Support\Support\UncountableWords;
 
@@ -127,7 +127,7 @@ class HelpersServiceProvider extends ServiceProvider
 
             $failed = false;
 
-            (new DbTypeRangeRule($typeName))->validate(
+            (new DBTypeRangeRule($typeName))->validate(
                 attribute: $attribute,
                 value: $value,
                 fail: function (string $message) use ($validator, &$failed) {

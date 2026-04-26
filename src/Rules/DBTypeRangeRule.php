@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
-class DbTypeRangeRule implements ValidationRule
+class DBTypeRangeRule implements ValidationRule
 {
     protected DBTypeResolverContract $resolver;
 
