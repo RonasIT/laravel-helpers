@@ -41,7 +41,7 @@ trait TestingTrait
         $properties = (new ReflectionClass($object))->getProperties();
 
         foreach ($properties as $property) {
-            $value = $property->isInitialized($object) ? $property->getValue($object)  : null;
+            $value = $property->isInitialized($object) ? $property->getValue($object) : null;
 
             $result[$property->getName()] = $value;
         }
