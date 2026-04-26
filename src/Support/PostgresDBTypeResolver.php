@@ -29,7 +29,7 @@ class PostgresDBTypeResolver implements DBTypeResolverContract
             self::REAL => [-3.4028234663852886e+38, 3.4028234663852886e+38],
             self::DOUBLE => [-PHP_FLOAT_MAX, PHP_FLOAT_MAX],
             self::VARCHAR => [0, 255],
-            self::TEXT => [0, PHP_INT_MAX],
+            self::TEXT => [0, INF],
         ];
     }
 

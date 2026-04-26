@@ -5,7 +5,7 @@ namespace RonasIT\Support\Contracts;
 interface DBTypeResolverContract
 {
     /**
-     * @return array<string, array{0: int, 1: int}>
+     * @return array<string, array{0: int|float, 1: int|float}>
      */
     public static function ranges(): array;
 
