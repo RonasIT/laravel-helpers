@@ -8,8 +8,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Rules\DbTypeRangeRule;
-use RonasIT\Support\Tests\Support\Mock\Enums\CustomDBTypeResolverEnum;
-use RonasIT\Support\Tests\Support\Mock\Enums\DBTypeResolverWithUncategorizedTypesEnum;
+use RonasIT\Support\Tests\Support\Mock\Resolvers\TestDBTypeResolver;
+use RonasIT\Support\Tests\Support\Mock\Resolvers\TestDBTypeResolverWithUncategorizedTypes;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use RonasIT\Support\Traits\TestingTrait;
 
@@ -491,11 +491,11 @@ class ValidatorTest extends TestCase
 
     public function testDbTypeRangeUncategorizedTypePasses(): void
     {
-        app()->bind(DBTypeResolverContract::class, fn () => DBTypeResolverWithUncategorizedTypesEnum::class);
+        app()->bind(DBTypeResolverContract::class, TestDBTypeResolverWithUncategorizedTypes::class);
 
         $validator = Validator::make(
-            data: ['value' => 3.14],
-            rules: ['value' => [new DbTypeRangeRule('decimal')]],
+            data: ['value' => 'not-a-number'],
+            rules: ['value' => [new DbTypeRangeRule(TestDBTypeResolverWithUncategorizedTypes::DECIMAL)]],
         );
 
         $this->assertTrue($validator->passes());
@@ -503,26 +503,29 @@ class ValidatorTest extends TestCase
 
     public function testDbTypeRangeUsesCustomResolverRangesPasses(): void
     {
-        app()->bind(DBTypeResolverContract::class, fn () => CustomDBTypeResolverEnum::class);
+        app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
 
-        $passing = Validator::make(
-            data: ['value' => 50],
-            rules: ['value' => [new DbTypeRangeRule('integer')]],
+        $validator = Validator::make(
+            data: ['value' => TestDBTypeResolver::INTEGER_MAX],
+            rules: ['value' => [new DbTypeRangeRule(TestDBTypeResolver::INTEGER)]],
         );
 
-        $this->assertTrue($passing->passes());
+        $this->assertTrue($validator->passes());
     }
 
     public function testDbTypeRangeUsesCustomResolverRangesFails(): void
     {
-        app()->bind(DBTypeResolverContract::class, fn () => CustomDBTypeResolverEnum::class);
+        app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
 
-        $failing = Validator::make(
-            data: ['value' => 101],
-            rules: ['value' => [new DbTypeRangeRule('integer')]],
+        $validator = Validator::make(
+            data: ['value' => TestDBTypeResolver::INTEGER_MAX + 1],
+            rules: ['value' => [new DbTypeRangeRule(TestDBTypeResolver::INTEGER)]],
         );
 
-        $this->assertTrue($failing->fails());
-        $this->assertEquals('The value must be between 0 and 100.', $failing->errors()->first('value'));
+        $this->assertTrue($validator->fails());
+        $this->assertEquals(
+            expected: sprintf('The value must be between %d and %d.', TestDBTypeResolver::INTEGER_MIN, TestDBTypeResolver::INTEGER_MAX),
+            actual: $validator->errors()->first('value'),
+        );
     }
 }
