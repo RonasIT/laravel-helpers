@@ -4,20 +4,17 @@ namespace RonasIT\Support\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use RonasIT\Support\Contracts\DatabaseTypeRangesContract;
+use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
 class DbTypeRangeRule implements ValidationRule
 {
-    /**
-     * @var class-string<DatabaseTypeRangesContract>
-     */
-    protected string $resolver;
+    protected DBTypeResolverContract $resolver;
 
     public function __construct(
         protected string $type,
     ) {
-        $this->resolver = app(DatabaseTypeRangesContract::class);
+        $this->resolver = app(DBTypeResolverContract::class);
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -38,7 +35,7 @@ class DbTypeRangeRule implements ValidationRule
 
         list($min, $max) = $ranges[$this->type];
 
-        if (in_array($this->type, $this->resolver::integerTypes())) {
+        if ($this->resolver->isNumeric($this->type)) {
             if (filter_var($value, FILTER_VALIDATE_INT) === false) {
                 $fail("The {$attribute} must be an integer.");
 
@@ -47,7 +44,7 @@ class DbTypeRangeRule implements ValidationRule
 
             $metric = (int) $value;
             $errorMessage = "The {$attribute} must be between {$min} and {$max}.";
-        } elseif (in_array($this->type, $this->resolver::stringTypes())) {
+        } elseif ($this->resolver->isString($this->type)) {
             if (!is_string($value)) {
                 $fail("The {$attribute} must be a string.");
 

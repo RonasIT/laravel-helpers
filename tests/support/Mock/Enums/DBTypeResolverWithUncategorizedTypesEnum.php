@@ -2,16 +2,18 @@
 
 namespace RonasIT\Support\Tests\Support\Mock\Enums;
 
-use RonasIT\Support\Contracts\DatabaseTypeRangesContract;
+use RonasIT\Support\Contracts\DBTypeResolverContract;
 
-enum CustomDatabaseTypeRangesEnum: string implements DatabaseTypeRangesContract
+enum DBTypeResolverWithUncategorizedTypesEnum: string implements DBTypeResolverContract
 {
+    case Decimal = 'decimal';
+    case Varchar = 'varchar';
     case Integer = 'integer';
 
     public static function ranges(): array
     {
         return [
-            self::Integer->value => [0, 100],
+            self::Decimal->value => [0, PHP_INT_MAX],
         ];
     }
 
@@ -24,6 +26,8 @@ enum CustomDatabaseTypeRangesEnum: string implements DatabaseTypeRangesContract
 
     public static function stringTypes(): array
     {
-        return [];
+        return [
+            self::Varchar->value,
+        ];
     }
 }

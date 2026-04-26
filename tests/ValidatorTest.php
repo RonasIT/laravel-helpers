@@ -5,12 +5,11 @@ namespace RonasIT\Support\Tests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
-use RonasIT\Support\Contracts\DatabaseTypeRangesContract;
-use RonasIT\Support\Enums\PostgresDatabaseTypeEnum;
+use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Rules\DbTypeRangeRule;
-use RonasIT\Support\Tests\Support\Mock\Enums\CustomDatabaseTypeRangesEnum;
-use RonasIT\Support\Tests\Support\Mock\Enums\DatabaseTypeRangesWithUncategorizedTypesEnum;
+use RonasIT\Support\Tests\Support\Mock\Enums\CustomDBTypeResolverEnum;
+use RonasIT\Support\Tests\Support\Mock\Enums\DBTypeResolverWithUncategorizedTypesEnum;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use RonasIT\Support\Traits\TestingTrait;
 
@@ -438,7 +437,7 @@ class ValidatorTest extends TestCase
     {
         $validator = Validator::make(
             data: ['value' => 0],
-            rules: ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
+            rules: ['value' => [new DbTypeRangeRule('integer')]],
         );
 
         $this->assertTrue($validator->passes());
@@ -448,7 +447,7 @@ class ValidatorTest extends TestCase
     {
         $validator = Validator::make(
             data: ['value' => self::INTEGER_MAX + 1],
-            rules: ['value' => [new DbTypeRangeRule(PostgresDatabaseTypeEnum::Integer->value)]],
+            rules: ['value' => [new DbTypeRangeRule('integer')]],
         );
 
         $this->assertTrue($validator->fails());
@@ -492,7 +491,7 @@ class ValidatorTest extends TestCase
 
     public function testDbTypeRangeUncategorizedTypePasses(): void
     {
-        app()->bind(DatabaseTypeRangesContract::class, fn () => DatabaseTypeRangesWithUncategorizedTypesEnum::class);
+        app()->bind(DBTypeResolverContract::class, fn () => DBTypeResolverWithUncategorizedTypesEnum::class);
 
         $validator = Validator::make(
             data: ['value' => 3.14],
@@ -504,7 +503,7 @@ class ValidatorTest extends TestCase
 
     public function testDbTypeRangeUsesCustomResolverRangesPasses(): void
     {
-        app()->bind(DatabaseTypeRangesContract::class, fn () => CustomDatabaseTypeRangesEnum::class);
+        app()->bind(DBTypeResolverContract::class, fn () => CustomDBTypeResolverEnum::class);
 
         $passing = Validator::make(
             data: ['value' => 50],
@@ -516,7 +515,7 @@ class ValidatorTest extends TestCase
 
     public function testDbTypeRangeUsesCustomResolverRangesFails(): void
     {
-        app()->bind(DatabaseTypeRangesContract::class, fn () => CustomDatabaseTypeRangesEnum::class);
+        app()->bind(DBTypeResolverContract::class, fn () => CustomDBTypeResolverEnum::class);
 
         $failing = Validator::make(
             data: ['value' => 101],

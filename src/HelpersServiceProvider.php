@@ -15,13 +15,13 @@ use Illuminate\Support\Pluralizer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use Maatwebsite\Excel\ExcelServiceProvider;
-use RonasIT\Support\Contracts\DatabaseTypeRangesContract;
+use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
-use RonasIT\Support\Enums\PostgresDatabaseTypeEnum;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
 use RonasIT\Support\Rules\DbTypeRangeRule;
+use RonasIT\Support\Support\PostgresDBTypeResolver;
 use RonasIT\Support\Support\UncountableWords;
 
 class HelpersServiceProvider extends ServiceProvider
@@ -62,7 +62,7 @@ class HelpersServiceProvider extends ServiceProvider
     {
         app(ExcelServiceProvider::class, ['app' => app()])->register();
 
-        $this->app->singleton(DatabaseTypeRangesContract::class, fn () => PostgresDatabaseTypeEnum::class);
+        $this->app->bind(DBTypeResolverContract::class, PostgresDBTypeResolver::class);
     }
 
     protected function extendValidator(): void
