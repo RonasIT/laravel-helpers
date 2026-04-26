@@ -30,6 +30,10 @@ class ValidatorTest extends TestCase
     private const int SMALLSERIAL_MAX = 32767;
     private const int BIGSERIAL_MIN = 1;
     private const int BIGSERIAL_MAX = PHP_INT_MAX;
+    private const float REAL_MIN = -3.4028234663852886e+38;
+    private const float REAL_MAX = 3.4028234663852886e+38;
+    private const float DOUBLE_MIN = -PHP_FLOAT_MAX;
+    private const float DOUBLE_MAX = PHP_FLOAT_MAX;
     private const int VARCHAR_MAX = 255;
 
     public function setUp(): void
@@ -283,6 +287,34 @@ class ValidatorTest extends TestCase
                 'value' => (string) self::SMALLINT_MAX,
                 'type' => 'smallint',
             ],
+            'real min' => [
+                'value' => self::REAL_MIN,
+                'type' => 'real',
+            ],
+            'real max' => [
+                'value' => self::REAL_MAX,
+                'type' => 'real',
+            ],
+            'real with decimal' => [
+                'value' => 3.14,
+                'type' => 'real',
+            ],
+            'real as string' => [
+                'value' => '3.14',
+                'type' => 'real',
+            ],
+            'double min' => [
+                'value' => self::DOUBLE_MIN,
+                'type' => 'double',
+            ],
+            'double max' => [
+                'value' => self::DOUBLE_MAX,
+                'type' => 'double',
+            ],
+            'double with decimal' => [
+                'value' => 3.14,
+                'type' => 'double',
+            ],
             'null to integer' => [
                 'value' => null,
                 'type' => 'integer',
@@ -290,6 +322,14 @@ class ValidatorTest extends TestCase
             'null to varchar' => [
                 'value' => null,
                 'type' => 'varchar',
+            ],
+            'null to real' => [
+                'value' => null,
+                'type' => 'real',
+            ],
+            'null to double' => [
+                'value' => null,
+                'type' => 'double',
             ],
         ];
     }
@@ -352,6 +392,16 @@ class ValidatorTest extends TestCase
                 'value' => self::BIGSERIAL_MIN - 1,
                 'type' => 'bigserial',
                 'range' => [self::BIGSERIAL_MIN, self::BIGSERIAL_MAX],
+            ],
+            'real below min' => [
+                'value' => -4e+38,
+                'type' => 'real',
+                'range' => [self::REAL_MIN, self::REAL_MAX],
+            ],
+            'real above max' => [
+                'value' => 4e+38,
+                'type' => 'real',
+                'range' => [self::REAL_MIN, self::REAL_MAX],
             ],
         ];
     }
