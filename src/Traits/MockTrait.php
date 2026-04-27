@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\ParallelTesting;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use ReflectionFunction;
@@ -136,7 +137,7 @@ trait MockTrait
 
         $reflectionArgs = $reflection->getParameters();
 
-        $this->assertArgumentsCount($actual, $expected, $reflectionArgs, $function);
+        $this->assertArgumentsCount($actual, $expected, $reflection, $function);
 
         $this->fillOptionalArguments($reflectionArgs, $actual, $expected, $isClass);
 
@@ -147,22 +148,28 @@ trait MockTrait
         $this->compareArguments($actual, $expected, $message);
     }
 
-    protected function assertArgumentsCount(array $actual, array $expected, array $reflectionArgs, string $function): void
-    {
+    protected function assertArgumentsCount(
+        array $actual,
+        array $expected,
+        ReflectionMethod|ReflectionFunction $reflection,
+        string $function,
+    ): void {
         $expectedCount = count($expected);
         $actualCount = count($actual);
-        $requiredParametersCount = count(array_filter($reflectionArgs, fn ($param) => !$param->isOptional()));
+        $requiredParametersCount = $reflection->getNumberOfRequiredParameters();
 
         if ($expectedCount !== $actualCount) {
-            $this->assertFalse(
-                $expectedCount < $requiredParametersCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments.",
-            );
+            if ($expectedCount < $requiredParametersCount) {
+                throw new ExpectationFailedException(
+                    "Failed assert that function {$function} was called with {$expectedCount} arguments, actually it has {$requiredParametersCount} required arguments.",
+                );
+            }
 
-            $this->assertFalse(
-                $expectedCount > $actualCount,
-                "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments.",
-            );
+            if ($expectedCount > $actualCount) {
+                throw new ExpectationFailedException(
+                    "Failed assert that function {$function} was called with {$expectedCount} arguments, actually has {$actualCount} arguments.",
+                );
+            }
         }
     }
 
