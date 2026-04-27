@@ -25,6 +25,7 @@ trait TableTestStateMockTrait
         DB::shouldReceive('table')->with($tableName)->once()->andReturn($builderMock);
 
         $builderMock
+            ->expects($this->once())
             ->method('orderBy')
             ->with($uniqueKey)
             ->willReturnSelf();
@@ -43,6 +44,7 @@ trait TableTestStateMockTrait
         DB::shouldReceive('table')->with($tableName)->twice()->andReturn($builderMock);
 
         $builderMock
+            ->expects($this->exactly(2))
             ->method('orderBy')
             ->with($uniqueKey)
             ->willReturnSelf();

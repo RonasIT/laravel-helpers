@@ -4,10 +4,12 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Contracts\VersionEnumContract;
 use RonasIT\Support\Support\Version;
 
+#[AllowMockObjectsWithoutExpectations]
 class VersionTest extends TestCase
 {
     protected Request $request;
