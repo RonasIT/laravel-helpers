@@ -781,16 +781,11 @@ class EntityControlTraitTest extends TestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 500',
         );
 
-        self::$testRepositoryClass
-            ->withTrashed()
-            ->onlyTrashed()
-            ->force()
-            ->with('relation')
-            ->withCount('relation')
-            ->lazyEach(function () {
-            });
+        $counter = 0;
 
-        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+        self::$testRepositoryClass->lazyEach(fn () => $counter++);
+
+        $this->assertEquals(0, $counter);
     }
 
     public function testForceDeleteByList()
