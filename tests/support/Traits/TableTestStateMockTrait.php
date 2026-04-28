@@ -61,6 +61,7 @@ trait TableTestStateMockTrait
             ->willReturnSelf();
 
         $builderMock
+            ->expects($this->once())
             ->method('orderBy')
             ->with($uniqueKey)
             ->willReturnSelf();
@@ -127,6 +128,7 @@ trait TableTestStateMockTrait
             ->willReturnSelf();
 
         $builderMock
+            ->expects($this->exactly(2))
             ->method('orderBy')
             ->with($uniqueKey)
             ->willReturnSelf();
