@@ -758,14 +758,17 @@ class EntityControlTraitTest extends TestCase
     {
         $this->mockLazyEach(self::$selectResult);
 
+        $counter = 0;
+
         self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
             ->with('relation')
             ->withCount('relation')
-            ->lazyEach(function () {
-            });
+            ->lazyEach(fn () => $counter++);
+
+        $this->assertEquals(1, $counter);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
