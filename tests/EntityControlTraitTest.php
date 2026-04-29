@@ -780,7 +780,7 @@ class EntityControlTraitTest extends TestCase
         $this->mockSelect(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 500',
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" is not null order by "id" asc limit 500',
         );
 
         $counter = 0;
