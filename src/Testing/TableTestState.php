@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert;
-use RonasIT\Support\Exceptions\UnsupportedDBDriverException;
 use RonasIT\Support\Traits\FixturesTrait;
 
 class TableTestState extends Assert
@@ -18,8 +17,8 @@ class TableTestState extends Assert
     protected array $jsonFields;
     protected ?string $connectionName;
     protected Collection $state;
-    private array $binaryColumns;
     protected string $uniqueKey;
+    protected ?array $binaryColumns = null;
 
     protected const array BINARY_COLUMNS = [
         'bytea',
@@ -40,7 +39,6 @@ class TableTestState extends Assert
         $this->tableName = $tableName;
         $this->jsonFields = $jsonFields;
         $this->connectionName = $connectionName ?? DB::getDefaultConnection();
-        $this->binaryColumns = $this->getBinaryColumns();
         $this->state = $this->getDataSet($tableName, $uniqueKey);
         $this->uniqueKey = $uniqueKey;
     }
@@ -141,12 +139,12 @@ class TableTestState extends Assert
 
     protected function prepareBinaryFields(Collection $dataSet): void
     {
+        $this->binaryColumns ??= $this->getBinaryColumns();
+
         $dataSet->transform(function (array $record) {
             array_walk($record, function (mixed &$value, string $field) {
                 if (!is_null($value) && in_array($field, $this->binaryColumns)) {
-                    $value = is_resource($value)
-                        ? bin2hex(stream_get_contents($value))
-                        : bin2hex($value);
+                    $value = is_resource($value) ? bin2hex(stream_get_contents($value)) : bin2hex($value);
                 }
             });
 
@@ -160,15 +158,17 @@ class TableTestState extends Assert
 
         $tableSchema = $this->getTableSchema($connection->getDriverName(), $connection->getDatabaseName());
 
-        return $connection
-            ->table('information_schema.columns')
-            ->select('column_name')
-            ->where('table_name', $this->tableName)
-            ->whereIn('table_schema', $tableSchema)
-            ->whereIn('data_type', self::BINARY_COLUMNS)
-            ->get()
-            ->pluck('column_name')
-            ->toArray();
+        return (empty($tableSchema))
+            ? []
+            : $connection
+                ->table('information_schema.columns')
+                ->select('column_name')
+                ->where('table_name', $this->tableName)
+                ->whereIn('table_schema', $tableSchema)
+                ->whereIn('data_type', self::BINARY_COLUMNS)
+                ->get()
+                ->pluck('column_name')
+                ->toArray();
     }
 
     protected function getTableSchema(string $driverName, string $databaseName): array
@@ -177,7 +177,7 @@ class TableTestState extends Assert
             'pgsql' => config("database.connections.{$this->connectionName}.schema")
                 ?? config("database.connections.{$this->connectionName}.search_path", 'public'),
             'mysql' => $databaseName,
-            default => throw new UnsupportedDBDriverException($driverName),
+            default => null,
         };
 
         $tableSchema = array_map('trim', explode(',', $tableSchema));

@@ -82,7 +82,7 @@ trait TableTestStateMockTrait
         $builderMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->willReturnOnConsecutiveCalls(collect(), $responseMock);
+            ->willReturnOnConsecutiveCalls($responseMock, collect());
     }
 
     protected function mockGettingDatasetForChanges(
@@ -150,8 +150,8 @@ trait TableTestStateMockTrait
             ->expects($this->exactly(3))
             ->method('get')
             ->willReturnOnConsecutiveCalls(
-                empty($binaryColumn) ? collect() : collect([['column_name' => $binaryColumn]]),
                 $initialState,
+                empty($binaryColumn) ? collect() : collect([['column_name' => $binaryColumn]]),
                 $responseMock,
             );
     }

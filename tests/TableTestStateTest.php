@@ -180,16 +180,4 @@ class TableTestStateTest extends TestCase
 
         fclose($resource);
     }
-
-    public function testUnsupportedDriverConnection()
-    {
-        $this->mockUnsupportedDriverName();
-
-        $this->assertExceptionThrew(
-            expectedClassName: UnsupportedDBDriverException::class,
-            expectedMessage: 'Unsupported database driver: unsupported_driver',
-        );
-
-        new TableTestState('test_models', ['json_field', 'castable_field']);
-    }
 }
