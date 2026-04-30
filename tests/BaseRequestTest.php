@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Http\BaseRequest;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Request\UpdateTestRequest;
+use RonasIT\Support\Tests\Support\Request\ValidateResolvedTestRequest;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class BaseRequestTest extends TestCase
@@ -67,6 +68,36 @@ class BaseRequestTest extends TestCase
                 'result' => [],
             ],
         ];
+    }
+
+    public function testValidateResolved()
+    {
+        $request = ValidateResolvedTestRequest::create('v1/test', 'get');
+
+        $request->setContainer($this->app);
+
+        $request->validateResolved();
+
+        $this->assertTrue($request->initCalled);
+        $this->assertTrue($request->beforeCalled);
+    }
+
+    public function testInitDefault()
+    {
+        $request = new BaseRequest();
+
+        $result = $this->callEncapsulatedMethod($request, 'init');
+
+        $this->assertNull($result);
+    }
+
+    public function testBeforeDefault()
+    {
+        $request = new BaseRequest();
+
+        $result = $this->callEncapsulatedMethod($request, 'before');
+
+        $this->assertEquals([], $result);
     }
 
     #[DataProvider('getOnlyValidatedRequestData')]
