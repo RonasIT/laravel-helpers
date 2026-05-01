@@ -1,0 +1,41 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestNotification": [
+        {
+            "notification": {
+                "firstParam": "value-1",
+                "secondParam": "value-2",
+                "thirdParam": 1,
+                "channels": [
+                    "database"
+                ]
+            },
+            "channels": [
+                "database"
+            ],
+            "notifiable": {
+                "id": 1
+            },
+            "locale": null
+        }
+    ],
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestAnotherNotification": [
+        {
+            "notification": {
+                "code": "abc-123",
+                "value": "active",
+                "channels": [
+                    "mail",
+                    "database"
+                ]
+            },
+            "channels": [
+                "mail",
+                "database"
+            ],
+            "notifiable": {
+                "id": 1
+            },
+            "locale": null
+        }
+    ]
+}

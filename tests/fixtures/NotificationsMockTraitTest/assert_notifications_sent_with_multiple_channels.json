@@ -1,0 +1,23 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestNotification": [
+        {
+            "notification": {
+                "firstParam": "value-1",
+                "secondParam": "value-2",
+                "thirdParam": 1,
+                "channels": [
+                    "mail",
+                    "database"
+                ]
+            },
+            "channels": [
+                "mail",
+                "database"
+            ],
+            "notifiable": {
+                "id": 1
+            },
+            "locale": null
+        }
+    ]
+}

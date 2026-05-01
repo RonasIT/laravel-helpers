@@ -1,0 +1,28 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestAnotherNotification": [
+        {
+            "notification": {
+                "code": "abc-123",
+                "value": "active",
+                "channels": [
+                    "mail",
+                    "database"
+                ]
+            },
+            "channels": [
+                "mail",
+                "database"
+            ],
+            "notifiable": {
+                "id": 1
+            },
+            "locale": null,
+            "via_method": "active",
+            "via_property": "active",
+            "via_chain": "active",
+            "via_unresolvable_method": null,
+            "via_unresolvable_property": null,
+            "via_unresolvable_chain": null
+        }
+    ]
+}
