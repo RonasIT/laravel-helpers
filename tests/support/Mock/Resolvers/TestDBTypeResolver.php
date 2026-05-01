@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests\Support\Mock\Resolvers;
 
 use RonasIT\Support\Contracts\DBTypeResolverContract;
+use RonasIT\Support\Enums\DBTypeCategoryEnum;
 
 class TestDBTypeResolver implements DBTypeResolverContract
 {
@@ -22,14 +23,13 @@ class TestDBTypeResolver implements DBTypeResolverContract
         ];
     }
 
-    public function isNumeric(string $type): bool
+    public function isTypeCategory(DBTypeCategoryEnum $category, string $type): bool
     {
-        return $type === self::INTEGER;
-    }
-
-    public function isString(string $type): bool
-    {
-        return $type === self::STRING;
+        return match ($category) {
+            DBTypeCategoryEnum::Integer => $type === self::INTEGER,
+            DBTypeCategoryEnum::String => $type === self::STRING,
+            default => false,
+        };
     }
 
     public function hasType(string $type): bool
