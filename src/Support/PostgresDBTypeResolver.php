@@ -16,7 +16,6 @@ class PostgresDBTypeResolver implements DBTypeResolverContract
     public const string REAL = 'real';
     public const string DOUBLE = 'double';
     public const string VARCHAR = 'varchar';
-    public const string TEXT = 'text';
 
     public static function ranges(): array
     {
@@ -30,7 +29,6 @@ class PostgresDBTypeResolver implements DBTypeResolverContract
             self::REAL => [-3.4028234663852886e+38, 3.4028234663852886e+38],
             self::DOUBLE => [-PHP_FLOAT_MAX, PHP_FLOAT_MAX],
             self::VARCHAR => [0, 255],
-            self::TEXT => [0, INF],
         ];
     }
 
@@ -45,7 +43,7 @@ class PostgresDBTypeResolver implements DBTypeResolverContract
             self::REAL, self::DOUBLE,
         ],
         DBTypeCategoryEnum::String->value => [
-            self::VARCHAR, self::TEXT,
+            self::VARCHAR,
         ],
     ];
 
