@@ -40,7 +40,7 @@ class DBTypeRangeRule implements ValidationRule
             $this->resolver->isTypeCategory(DBTypeCategoryEnum::Integer, $this->type) => $this->validateInteger($attribute, $value, $min, $max, $fail),
             $this->resolver->isTypeCategory(DBTypeCategoryEnum::BigInteger, $this->type) => $this->validateBigInteger($attribute, $value, $min, $max, $fail),
             $this->resolver->isTypeCategory(DBTypeCategoryEnum::Float, $this->type) => $this->validateFloat($attribute, $value, $min, $max, $fail),
-            $this->resolver->isTypeCategory(DBTypeCategoryEnum::String, $this->type) => $this->validateString($attribute, $value, $min, $max, $fail),
+            $this->resolver->isTypeCategory(DBTypeCategoryEnum::String, $this->type) => $this->validateString($attribute, $value, $max, $fail),
             default => null,
         };
     }
@@ -96,7 +96,7 @@ class DBTypeRangeRule implements ValidationRule
         }
     }
 
-    protected function validateString(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
+    protected function validateString(string $attribute, mixed $value, mixed $max, Closure $fail): void
     {
         if (!is_string($value)) {
             $fail("The {$attribute} must be a string.");
@@ -106,7 +106,7 @@ class DBTypeRangeRule implements ValidationRule
 
         $metric = mb_strlen($value);
 
-        if ($metric < $min || $metric > $max) {
+        if ($metric > $max) {
             $fail("The {$attribute} length must not exceed {$max} characters.");
         }
     }
