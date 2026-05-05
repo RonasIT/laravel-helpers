@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Generate matrix
         id: generate-matrix
-        uses: ./.github/actions/generate-matrix
+        uses: ronasit/github-actions/generate-matrix@main
 
   tests:
     needs: prepare-matrix
