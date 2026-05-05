@@ -6,20 +6,25 @@ on:
   pull_request:
     branches: [ "master" ]
 
-env:
-  PHP_LATEST: &php-latest "8.5"
-  LARAVEL_LATEST: &laravel-latest "13.*"
-
 jobs:
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+      php-latest: ${{ steps.generate-matrix.outputs.php-latest }}
+      laravel-latest: ${{ steps.generate-matrix.outputs.laravel-latest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate matrix
+        id: generate-matrix
+        uses: ./.github/actions/generate-matrix
+
   tests:
+    needs: prepare-matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        php-version: [ "8.3", "8.4", "8.5" ]
-        laravel-version: [ "11.*", "12.*", "13.*" ]
-        exclude:
-          - php-version: *php-latest
-            laravel-version: *laravel-latest
+      matrix: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +38,7 @@ jobs:
         run: vendor/bin/phpunit
 
   tests-with-coverage:
+    needs: prepare-matrix
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,8 +46,8 @@ jobs:
       - name: Setup
         uses: ronasit/github-actions/php-laravel-setup@d086499bf9f7a688bab222ed90238b1ffba82e11
         with:
-          php-version: *php-latest
-          laravel-version: *laravel-latest
+          php-version: ${{ needs.prepare-matrix.outputs.php-latest }}
+          laravel-version: ${{ needs.prepare-matrix.outputs.laravel-latest }}
           coverage: xdebug
       - name: Format code style via Pint
         run: vendor/bin/pint --test

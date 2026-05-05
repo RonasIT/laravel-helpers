@@ -1,0 +1,29 @@
+name: Generate CI matrix
+description: >
+  Generates a PHP × Laravel test matrix from composer.json min-versions
+  and current supported releases from php.net / Packagist.
+  Excludes the latest+latest combination so it can run separately with code coverage.
+
+outputs:
+  matrix:
+    description: JSON matrix object for strategy.matrix (includes exclude)
+    value: ${{ steps.generate-matrix.outputs.matrix }}
+  php-latest:
+    description: Latest supported PHP major.minor (e.g. "8.5")
+    value: ${{ steps.generate-matrix.outputs.php-latest }}
+  laravel-latest:
+    description: Latest stable Laravel major series (e.g. "13.*")
+    value: ${{ steps.generate-matrix.outputs.laravel-latest }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Generate matrix
+      id: generate-matrix
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: python ./generate-matrix.py
