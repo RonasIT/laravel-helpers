@@ -1,4 +1,4 @@
-name: Run tests with coverage
+name: Run tests
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       matrix: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup
         uses: ronasit/github-actions/php-laravel-setup@main
         with:
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup
         uses: ronasit/github-actions/php-laravel-setup@main
         with:
@@ -54,21 +54,21 @@ jobs:
       - name: Execute unit tests via PHPUnit with coverage
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       - name: Export coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: clover.xml
           path: build/logs
 
   upload-to-coveralls:
-    needs: [ tests, tests-with-coverage ]
+    needs: tests-with-coverage
     runs-on: ubuntu-latest
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Import coverage report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: clover.xml
           path: build/logs
