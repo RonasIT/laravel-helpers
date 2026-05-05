@@ -63,7 +63,7 @@ jobs:
           path: build/logs
 
   upload-to-coveralls:
-    needs: tests-with-coverage
+    needs: [ tests, tests-with-coverage ]
     runs-on: ubuntu-latest
     steps:
       - name: Set up PHP
