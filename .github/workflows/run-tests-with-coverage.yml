@@ -29,7 +29,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup
-        uses: ronasit/github-actions/php-laravel-setup@d086499bf9f7a688bab222ed90238b1ffba82e11
+        uses: ronasit/github-actions/php-laravel-setup@main
         with:
           php-version: ${{ matrix.php-version }}
           laravel-version: ${{ matrix.laravel-version }}
@@ -44,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup
-        uses: ronasit/github-actions/php-laravel-setup@d086499bf9f7a688bab222ed90238b1ffba82e11
+        uses: ronasit/github-actions/php-laravel-setup@main
         with:
           php-version: ${{ needs.prepare-matrix.outputs.php-latest }}
           laravel-version: ${{ needs.prepare-matrix.outputs.laravel-latest }}
