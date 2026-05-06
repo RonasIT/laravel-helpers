@@ -9,4 +9,3 @@ on:
 jobs:
   run-tests:
     uses: ronasit/github-actions/.github/workflows/tests.yml@main
-    secrets: inherit
