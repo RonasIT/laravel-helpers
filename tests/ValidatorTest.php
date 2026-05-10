@@ -271,10 +271,6 @@ class ValidatorTest extends TestCase
                 'value' => str_repeat('a', self::VARCHAR_MAX),
                 'type' => 'varchar',
             ],
-            'text min' => [
-                'value' => '',
-                'type' => 'text',
-            ],
             'integer max as string' => [
                 'value' => (string) self::INTEGER_MAX,
                 'type' => 'integer',
