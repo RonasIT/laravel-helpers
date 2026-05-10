@@ -22,10 +22,10 @@ class PostgresDBTypeResolver implements DBTypeResolverContract
         return [
             self::SMALLINT => [-32768, 32767],
             self::INTEGER => [-2147483648, 2147483647],
-            self::BIGINT => [(string) PHP_INT_MIN, (string) PHP_INT_MAX],
+            self::BIGINT => ['-9223372036854775808', '9223372036854775807'],
             self::SMALLSERIAL => [1, 32767],
             self::SERIAL => [1, 2147483647],
-            self::BIGSERIAL => ['1', (string) PHP_INT_MAX],
+            self::BIGSERIAL => ['1', '9223372036854775807'],
             self::REAL => [-3.4028234663852886e+38, 3.4028234663852886e+38],
             self::DOUBLE => [-PHP_FLOAT_MAX, PHP_FLOAT_MAX],
             self::VARCHAR => [0, 255],

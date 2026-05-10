@@ -22,14 +22,14 @@ class ValidatorTest extends TestCase
     private const int SMALLINT_MAX = 32767;
     private const int INTEGER_MIN = -2147483648;
     private const int INTEGER_MAX = 2147483647;
-    private const int BIGINT_MIN = PHP_INT_MIN;
-    private const int BIGINT_MAX = PHP_INT_MAX;
+    private const string BIGINT_MIN = '-9223372036854775808';
+    private const string BIGINT_MAX = '9223372036854775807';
     private const int SERIAL_MIN = 1;
     private const int SERIAL_MAX = 2147483647;
     private const int SMALLSERIAL_MIN = 1;
     private const int SMALLSERIAL_MAX = 32767;
     private const int BIGSERIAL_MIN = 1;
-    private const int BIGSERIAL_MAX = PHP_INT_MAX;
+    private const string BIGSERIAL_MAX = '9223372036854775807';
     private const float REAL_MIN = -3.4028234663852886e+38;
     private const float REAL_MAX = 3.4028234663852886e+38;
     private const float DOUBLE_MIN = -PHP_FLOAT_MAX;
@@ -388,8 +388,23 @@ class ValidatorTest extends TestCase
                 'type' => 'smallserial',
                 'range' => [self::SMALLSERIAL_MIN, self::SMALLSERIAL_MAX],
             ],
+            'bigint below min' => [
+                'value' => '-9223372036854775809',
+                'type' => 'bigint',
+                'range' => [self::BIGINT_MIN, self::BIGINT_MAX],
+            ],
+            'bigint above max' => [
+                'value' => '9223372036854775808',
+                'type' => 'bigint',
+                'range' => [self::BIGINT_MIN, self::BIGINT_MAX],
+            ],
             'bigserial below min' => [
                 'value' => self::BIGSERIAL_MIN - 1,
+                'type' => 'bigserial',
+                'range' => [self::BIGSERIAL_MIN, self::BIGSERIAL_MAX],
+            ],
+            'bigserial above max' => [
+                'value' => '9223372036854775808',
                 'type' => 'bigserial',
                 'range' => [self::BIGSERIAL_MIN, self::BIGSERIAL_MAX],
             ],
