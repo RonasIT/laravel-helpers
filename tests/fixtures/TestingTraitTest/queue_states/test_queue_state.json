@@ -1,0 +1,61 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Jobs\\TestJob": [
+        {
+            "foo": null,
+            "count": 1,
+            "title": "title_1",
+            "isPublished": true,
+            "job": null,
+            "connection": null,
+            "queue": "my_queue",
+            "messageGroup": null,
+            "deduplicator": null,
+            "debounceOwner": "",
+            "delay": null,
+            "afterCommit": null,
+            "middleware": [],
+            "chained": [],
+            "chainConnection": null,
+            "chainQueue": null,
+            "chainCatchCallbacks": null
+        },
+        {
+            "foo": null,
+            "count": 2,
+            "title": "title_2",
+            "isPublished": true,
+            "job": null,
+            "connection": null,
+            "queue": "my_queue",
+            "messageGroup": null,
+            "deduplicator": null,
+            "debounceOwner": "",
+            "delay": null,
+            "afterCommit": null,
+            "middleware": [],
+            "chained": [],
+            "chainConnection": null,
+            "chainQueue": null,
+            "chainCatchCallbacks": null
+        },
+        {
+            "foo": null,
+            "count": 3,
+            "title": "title_3",
+            "isPublished": true,
+            "job": null,
+            "connection": null,
+            "queue": "my_queue",
+            "messageGroup": null,
+            "deduplicator": null,
+            "debounceOwner": "",
+            "delay": null,
+            "afterCommit": null,
+            "middleware": [],
+            "chained": [],
+            "chainConnection": null,
+            "chainQueue": null,
+            "chainCatchCallbacks": null
+        }
+    ]
+}
