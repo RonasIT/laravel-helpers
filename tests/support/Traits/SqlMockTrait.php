@@ -5,8 +5,10 @@ namespace RonasIT\Support\Tests\Support\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use Mpyw\LaravelDatabaseMock\Proxies\SingleConnectionProxy;
+use Mockery\Matcher\Pattern;
 
 trait SqlMockTrait
 {
@@ -144,12 +146,12 @@ trait SqlMockTrait
 
     protected function mockLazyEach(array $selectResult): void
     {
-        $this->mockSelect(
-            'select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" is not null order by "id" asc limit 500',
-            $selectResult,
-        );
+        $this->mockSelect(Mockery::pattern(
+            '/select "test_models".*, \(select count\(\*\) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id"\) as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null'
+            . '( and "id" is not null)? order by "id" asc limit 500/',
+        ), $selectResult);
 
         $this->mockSelect(
             'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
@@ -561,7 +563,7 @@ trait SqlMockTrait
         $this->getPdo()->expects('lastInsertId')->andReturn($lastInsertId);
     }
 
-    protected function mockSelect(string $query, array $result = [], array $bindings = []): void
+    protected function mockSelect(string|Pattern $query, array $result = [], array $bindings = []): void
     {
         $select = $this->getPdo()->shouldSelect($query, $bindings);
 
