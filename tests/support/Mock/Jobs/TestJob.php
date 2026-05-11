@@ -3,18 +3,15 @@
 namespace RonasIT\Support\Tests\Support\Mock\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class TestJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
 
+    public $messageGroup = null;
+    public $deduplicator = null;
+    public $debounceOwner = '';
     protected string $foo;
 
     public function __construct(
@@ -22,6 +19,7 @@ class TestJob implements ShouldQueue
         protected string $title,
         protected bool $isPublished = true,
     ) {
+        $this->onQueue('my_queue');
     }
 
     public function handle(): void
