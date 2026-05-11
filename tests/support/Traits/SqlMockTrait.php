@@ -6,9 +6,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Mockery;
+use Mockery\Matcher\Pattern;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use Mpyw\LaravelDatabaseMock\Proxies\SingleConnectionProxy;
-use Mockery\Matcher\Pattern;
 
 trait SqlMockTrait
 {
