@@ -9,9 +9,9 @@ use Illuminate\Support\Arr;
 class ModelTestState extends TableTestState
 {
     /**
-     * Map of field names to their custom cast class names.
+     * Map of field names to their cast definitions.
      *
-     * @var array<string, class-string<CastsAttributes>>
+     * @var array<string, string>
      */
     protected array $customCastFields;
 
@@ -54,7 +54,31 @@ class ModelTestState extends TableTestState
 
     protected function isCustomCast(string $castType): bool
     {
-        return class_exists($castType) && is_subclass_of($castType, CastsAttributes::class);
+        $castClass = $this->resolveCastClass($castType);
+
+        return class_exists($castClass) && is_subclass_of($castClass, CastsAttributes::class);
+    }
+
+    protected function resolveCastClass(string $castDefinition): string
+    {
+        return str_contains($castDefinition, ':')
+            ? explode(':', $castDefinition, 2)[0]
+            : $castDefinition;
+    }
+
+    protected function resolveCaster(string $castDefinition): CastsAttributes
+    {
+        $arguments = [];
+
+        if (str_contains($castDefinition, ':')) {
+            list($castClass, $argString) = explode(':', $castDefinition, 2);
+
+            $arguments = explode(',', $argString);
+        } else {
+            $castClass = $castDefinition;
+        }
+
+        return new $castClass(...$arguments);
     }
 
     protected function prepareChanges(array $changes): array
@@ -73,9 +97,11 @@ class ModelTestState extends TableTestState
         $model = new $this->modelClassName();
         $model->setRawAttributes($attributes);
 
-        foreach ($this->customCastFields as $field => $castClass) {
+        foreach ($this->customCastFields as $field => $castDefinition) {
             if (Arr::has($item, $field)) {
-                $item[$field] = (new $castClass())->get($model, $field, $attributes[$field], $attributes);
+                $item[$field] = $this
+                    ->resolveCaster($castDefinition)
+                    ->get($model, $field, $attributes[$field], $attributes);
             }
         }
 
