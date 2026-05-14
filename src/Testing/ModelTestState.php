@@ -47,14 +47,14 @@ class ModelTestState extends TableTestState
         return array_filter($casts, fn (string $castType): bool => $this->isCustomCast($castType));
     }
 
-    protected function isNativeJsonCast(string $castType): bool
+    protected function isNativeJsonCast(string $castDefinition): bool
     {
-        return in_array($castType, ['array', 'json', 'object', 'collection']);
+        return in_array($castDefinition, ['array', 'json', 'object', 'collection']);
     }
 
-    protected function isCustomCast(string $castType): bool
+    protected function isCustomCast(string $castDefinition): bool
     {
-        $castClass = $this->resolveCastClass($castType);
+        $castClass = $this->resolveCastClass($castDefinition);
 
         return class_exists($castClass) && is_subclass_of($castClass, CastsAttributes::class);
     }
@@ -64,21 +64,6 @@ class ModelTestState extends TableTestState
         return str_contains($castDefinition, ':')
             ? explode(':', $castDefinition, 2)[0]
             : $castDefinition;
-    }
-
-    protected function resolveCaster(string $castDefinition): CastsAttributes
-    {
-        $arguments = [];
-
-        if (str_contains($castDefinition, ':')) {
-            list($castClass, $argString) = explode(':', $castDefinition, 2);
-
-            $arguments = explode(',', $argString);
-        } else {
-            $castClass = $castDefinition;
-        }
-
-        return new $castClass(...$arguments);
     }
 
     protected function prepareChanges(array $changes): array
@@ -121,5 +106,16 @@ class ModelTestState extends TableTestState
         return is_null($original)
             ? $item
             : array_merge($original, $item);
+    }
+
+    protected function resolveCaster(string $castDefinition): CastsAttributes
+    {
+        if (!str_contains($castDefinition, ':')) {
+            return new $castDefinition();
+        }
+
+        list($castClass, $argString) = explode(':', $castDefinition, 2);
+
+        return new $castClass(...explode(',', $argString));
     }
 }
