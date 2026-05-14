@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 
 class ModelTestState extends TableTestState
 {
+    protected Model $model;
+
     /**
      * Map of field names to their cast definitions.
      *
@@ -18,18 +20,17 @@ class ModelTestState extends TableTestState
     /**
      * @param  class-string<Model>  $modelClassName
      */
-    public function __construct(
-        protected string $modelClassName,
-    ) {
-        $model = new $this->modelClassName();
+    public function __construct(string $modelClassName)
+    {
+        $this->model = new $modelClassName();
 
-        $casts = $model->getCasts();
+        $casts = $this->model->getCasts();
 
         parent::__construct(
-            tableName: $model->getTable(),
+            tableName: $this->model->getTable(),
             jsonFields: $this->getNativeJsonFields($casts),
-            connectionName: $model->getConnectionName(),
-            uniqueKey: $model->getKeyName(),
+            connectionName: $this->model->getConnectionName(),
+            uniqueKey: $this->model->getKeyName(),
         );
 
         $this->customCastFields = $this->getCustomCastFields($casts);
@@ -79,14 +80,13 @@ class ModelTestState extends TableTestState
     {
         $attributes = $this->resolveModelAttributes($item);
 
-        $model = new $this->modelClassName();
-        $model->setRawAttributes($attributes);
+        $this->model->setRawAttributes($attributes);
 
         foreach ($this->customCastFields as $field => $castDefinition) {
             if (Arr::has($item, $field)) {
                 $item[$field] = $this
                     ->resolveCaster($castDefinition)
-                    ->get($model, $field, $attributes[$field], $attributes);
+                    ->get($this->model, $field, $attributes[$field], $attributes);
             }
         }
 
