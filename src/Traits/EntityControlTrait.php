@@ -147,7 +147,7 @@ trait EntityControlTrait
     /**
      * Insert rows into the database.
      *
-     * @param  array<string, mixed>|array<int, array<string, mixed>>  $data  single row or list of rows
+     * @param  array<string, mixed>|array<array<string, mixed>>  $data  single row or list of rows
      *
      * @return bool true if rows were inserted successfully
      */
@@ -163,7 +163,7 @@ trait EntityControlTrait
     /**
      * Insert rows into the database ignoring duplicate key errors.
      *
-     * @param  array<string, mixed>|array<int, array<string, mixed>>  $data  single row or list of rows
+     * @param  array<string, mixed>|array<array<string, mixed>>  $data  single row or list of rows
      *
      * @return int count of inserted rows
      */
@@ -479,7 +479,7 @@ trait EntityControlTrait
 
     protected function prepareInsertData(array $data): array
     {
-        if (is_string(array_key_first($data))) {
+        if ($this->isSingleInsertRow($data)) {
             $data = [$data];
         }
 
@@ -506,5 +506,12 @@ trait EntityControlTrait
 
             return $instance->getAttributes();
         }, $data);
+    }
+
+    protected function isSingleInsertRow(array $data): bool
+    {
+        $firstKey = array_key_first($data);
+
+        return is_string($firstKey) && in_array($firstKey, $this->fields);
     }
 }
