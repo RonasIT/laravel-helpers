@@ -311,6 +311,59 @@ class FixturesTraitTest extends TestCase
         $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);
     }
 
+    public static function assertEqualsVersionedFixtureData(): array
+    {
+        return [
+            'no_versions_provided' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['default_response'],
+                'versions' => [],
+            ],
+            'version_equals_current' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['default_response'],
+                'versions' => [11],
+            ],
+            'all_versions_below_current' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['default_response'],
+                'versions' => [10],
+            ],
+            'single_version_above_current' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['response_before_v12'],
+                'versions' => [12],
+            ],
+            'multiple_versions_above_current_picks_closest' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['response_before_v12'],
+                'versions' => [13, 12],
+            ],
+            'fixture_in_subdirectory' => [
+                'fixture' => 'assert_versioned_fixture/subdir/response.json',
+                'data' => ['subdir_response_before_v12'],
+                'versions' => [12],
+            ],
+        ];
+    }
+
+    #[DataProvider('assertEqualsVersionedFixtureData')]
+    public function testAssertEqualsVersionedFixture(string $fixture, array $data, array $versions): void
+    {
+        $this->mockLaravelVersion('11.0.0');
+
+        $this->assertEqualsVersionedFixture($fixture, $data, $versions);
+    }
+
+    public function testAssertEqualsVersionedFixtureWithExportMode(): void
+    {
+        $this->mockLaravelVersion('11.0.0');
+
+        $this->expectException(ForbiddenExportModeException::class);
+
+        $this->assertEqualsVersionedFixture('assert_versioned_fixture/response.json', ['default_response'], [12], true);
+    }
+
     public function testPrepareMySQLAutoIncrement()
     {
         $mock = $this->mockClass(MySqlBuilder::class, [

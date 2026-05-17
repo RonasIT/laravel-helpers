@@ -125,6 +125,28 @@ trait FixturesTrait
         );
     }
 
+    public function assertEqualsVersionedFixture(string $fixture, $data, array $versions = [], bool $exportMode = false): void
+    {
+        $currentVersion = (int) app()->version();
+        $directory = dirname($fixture);
+        $filename = basename($fixture);
+        $prefix = ($directory === '.') ? '' : "{$directory}/";
+
+        $fixtureVersion = null;
+
+        foreach ($versions as $version) {
+            if ($version > $currentVersion && (is_null($fixtureVersion) || $version < $fixtureVersion)) {
+                $fixtureVersion = $version;
+            }
+        }
+
+        $finalFixture = (is_null($fixtureVersion))
+            ? $fixture
+            : "{$prefix}laravel_before_v{$fixtureVersion}/{$filename}";
+
+        $this->assertEqualsFixture($finalFixture, $data, $exportMode);
+    }
+
     public function exportJson($fixture, $data): void
     {
         if ($data instanceof TestResponse) {
