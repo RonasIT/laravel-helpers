@@ -510,14 +510,16 @@ trait EntityControlTrait
 
     protected function isSingleInsertRow(array $data): bool
     {
-        foreach ($data as $value) {
+        foreach ($data as $key => $value) {
             if (!is_array($value)) {
+                return true;
+            }
+
+            if (is_string($key) && in_array($key, $this->fields, true)) {
                 return true;
             }
         }
 
-        $firstKey = array_key_first($data);
-
-        return is_string($firstKey) && in_array($firstKey, $this->fields, true);
+        return false;
     }
 }
