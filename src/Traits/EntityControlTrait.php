@@ -145,7 +145,11 @@ trait EntityControlTrait
     }
 
     /**
-     * @param  array<array>  $data
+     * Insert rows into the database.
+     *
+     * @param  array<string, mixed>|array<array<string, mixed>>  $data  single row or list of rows
+     *
+     * @return bool true if rows were inserted successfully
      */
     public function insert(array $data): bool
     {
@@ -157,9 +161,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Insert rows ignoring duplicate key errors.
+     * Insert rows into the database ignoring duplicate key errors.
      *
-     * @param  array<array>  $data
+     * @param  array<string, mixed>|array<array<string, mixed>>  $data  single row or list of rows
      *
      * @return int count of inserted rows
      */
@@ -475,6 +479,10 @@ trait EntityControlTrait
 
     protected function prepareInsertData(array $data): array
     {
+        if ($this->isSingleInsertRow($data)) {
+            $data = [$data];
+        }
+
         $defaultTimestamps = [];
 
         if ($this->model->timestamps) {
@@ -488,8 +496,30 @@ trait EntityControlTrait
 
         return array_map(function (array $item) use ($defaultTimestamps) {
             $fillableFields = Arr::only($item, $this->model->getFillable());
+            $fields = array_merge($defaultTimestamps, $fillableFields);
 
-            return array_merge($defaultTimestamps, $fillableFields);
+            $instance = $this->model->newInstance();
+
+            foreach ($fields as $key => $value) {
+                $instance->setAttribute($key, $value);
+            }
+
+            return $instance->getAttributes();
         }, $data);
+    }
+
+    protected function isSingleInsertRow(array $data): bool
+    {
+        $firstKey = array_key_first($data);
+
+        if (!is_string($firstKey)) {
+            return false;
+        }
+
+        if (!is_array($data[$firstKey])) {
+            return true;
+        }
+
+        return in_array($firstKey, $this->fields, true);
     }
 }
