@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
+use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
+use RonasIT\Support\Rules\DBTypeRangeRule;
+use RonasIT\Support\Support\PostgresDBTypeResolver;
 use RonasIT\Support\Support\UncountableWords;
 
 class HelpersServiceProvider extends ServiceProvider
@@ -54,6 +57,7 @@ class HelpersServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->app->bind(DBTypeResolverContract::class, PostgresDBTypeResolver::class);
     }
 
     protected function extendValidator(): void
@@ -105,6 +109,29 @@ class HelpersServiceProvider extends ServiceProvider
             $validator->addReplacer('list_exists', fn ($message, $attribute) => "Some of the passed {$attribute} are not exists.");
 
             return $existingValueCount === count($value);
+        });
+
+        Validator::extend('db_type_range', function ($attribute, $value, $parameters, $validator) {
+            $typeName = Arr::get($parameters, 0);
+
+            if (empty($typeName)) {
+                throw new InvalidValidationRuleUsageException(
+                    message: "db_type_range: The type parameter is required when checking the {$attribute} field.",
+                );
+            }
+
+            $failed = false;
+
+            (new DBTypeRangeRule($typeName))->validate(
+                attribute: $attribute,
+                value: $value,
+                fail: function (string $message) use ($validator, &$failed) {
+                    $validator->addReplacer('db_type_range', fn () => $message);
+                    $failed = true;
+                },
+            );
+
+            return !$failed;
         });
     }
 
