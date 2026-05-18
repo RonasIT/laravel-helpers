@@ -134,8 +134,7 @@ trait FixturesTrait
     public function assertEqualsVersionedFixture(string $fixture, $data, array $versions = [], bool $exportMode = false): void
     {
         $currentVersion = (int) app()->version();
-        $directory = dirname($fixture);
-        $filename = basename($fixture);
+        list($filename, $directory) = extract_last_part($fixture, DIRECTORY_SEPARATOR);
         $prefix = ($directory === '.') ? '' : "{$directory}/";
 
         $fixtureVersion = null;
