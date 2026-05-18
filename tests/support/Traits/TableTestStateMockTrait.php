@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests\Support\Traits;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -13,13 +14,51 @@ trait TableTestStateMockTrait
 {
     use MockTestTrait;
 
+    private const array AVAILABLE_BINARY_FIELD_TYPES = [
+        'bytea',
+        'blob',
+        'tinyblob',
+        'mediumblob',
+        'longblob',
+        'binary',
+        'varbinary',
+    ];
+
     protected function mockGettingDataset(Collection $responseMock, string $uniqueKey = 'id'): void
     {
-        $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
+        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
+        $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
 
         DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-        DB::shouldReceive('connection')->once()->andReturnSelf();
-        DB::shouldReceive('table')->with('test_models')->once()->andReturn($builderMock);
+
+        $connectionMock
+            ->method('getDriverName')
+            ->willReturn('pgsql');
+
+        $connectionMock
+            ->method('getDatabaseName')
+            ->willReturn('public');
+
+        $connectionMock
+            ->expects($this->exactly(2))
+            ->method('table')
+            ->with($this->callback(fn ($table) => in_array($table, [
+                'information_schema.columns',
+                'test_models',
+            ])))
+            ->willReturn($builderMock);
+
+        DB::shouldReceive('connection')->twice()->andReturn($connectionMock);
+
+        $builderMock
+            ->method('select')
+            ->with('column_name')
+            ->willReturnSelf();
+
+        $builderMock
+            ->method('where')
+            ->with('table_name', 'test_models')
+            ->willReturnSelf();
 
         $builderMock
             ->expects($this->once())
@@ -28,17 +67,65 @@ trait TableTestStateMockTrait
             ->willReturnSelf();
 
         $builderMock
+            ->expects($this->exactly(2))
+            ->method('whereIn')
+            ->willReturnCallback(function (string $column, array $values) use ($builderMock) {
+                match ($column) {
+                    'data_type' => $this->assertEquals($values, self::AVAILABLE_BINARY_FIELD_TYPES),
+                    'table_schema' => $this->assertEquals($values, ['public']),
+                    default => $this->fail('Unexpected call'),
+                };
+
+                return $builderMock;
+            });
+
+        $builderMock
+            ->expects($this->exactly(2))
             ->method('get')
-            ->willReturn($responseMock);
+            ->willReturnOnConsecutiveCalls($responseMock, collect());
     }
 
-    protected function mockGettingDatasetForChanges(Collection $responseMock, Collection $initialState, string $tableName, string $uniqueKey = 'id'): void
-    {
-        $builderMock = $this->mockClass(Builder::class, ['orderBy', 'get'], true);
+    protected function mockGettingDatasetForChanges(
+        Collection $responseMock,
+        Collection $initialState,
+        string $tableName,
+        string $uniqueKey = 'id',
+        ?string $binaryColumn = null,
+        string $dbDriver = 'pgsql',
+    ): void {
+        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
+        $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
 
         DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-        DB::shouldReceive('connection')->twice()->andReturnSelf();
-        DB::shouldReceive('table')->with($tableName)->twice()->andReturn($builderMock);
+
+        $connectionMock
+            ->method('getDriverName')
+            ->willReturn($dbDriver);
+
+        $connectionMock
+            ->method('getDatabaseName')
+            ->willReturn('public');
+
+        $connectionMock
+            ->expects($this->exactly(3))
+            ->method('table')
+            ->with($this->callback(fn ($table) => in_array($table, [
+                'information_schema.columns',
+                $tableName,
+            ])))
+            ->willReturn($builderMock);
+
+        DB::shouldReceive('connection')->times(3)->andReturn($connectionMock);
+
+        $builderMock
+            ->method('select')
+            ->with('column_name')
+            ->willReturnSelf();
+
+        $builderMock
+            ->method('where')
+            ->with('table_name', $tableName)
+            ->willReturnSelf();
 
         $builderMock
             ->expects($this->exactly(2))
@@ -48,8 +135,76 @@ trait TableTestStateMockTrait
 
         $builderMock
             ->expects($this->exactly(2))
+            ->method('whereIn')
+            ->willReturnCallback(function (string $column, array $values) use ($builderMock) {
+                match ($column) {
+                    'data_type' => $this->assertEquals(self::AVAILABLE_BINARY_FIELD_TYPES, $values),
+                    'table_schema' => $this->assertEquals(['public'], $values),
+                    default => $this->fail('Unexpected call'),
+                };
+
+                return $builderMock;
+            });
+
+        $builderMock
+            ->expects($this->exactly(3))
             ->method('get')
-            ->willReturnOnConsecutiveCalls($initialState, $responseMock);
+            ->willReturnOnConsecutiveCalls(
+                $initialState,
+                empty($binaryColumn) ? collect() : collect([['column_name' => $binaryColumn]]),
+                $responseMock,
+            );
+    }
+
+    protected function mockGettingDatasetForChangesUnsupportedDriver(
+        Collection $responseMock,
+        Collection $initialState,
+        string $tableName,
+    ): void {
+        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
+        $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
+
+        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
+
+        $connectionMock
+            ->method('getDriverName')
+            ->willReturn('unknown');
+
+        $connectionMock
+            ->method('getDatabaseName')
+            ->willReturn('public');
+
+        $connectionMock
+            ->expects($this->exactly(2))
+            ->method('table')
+            ->with($this->callback(fn ($table) => in_array($table, [
+                'information_schema.columns',
+                $tableName,
+            ])))
+            ->willReturn($builderMock);
+
+        DB::shouldReceive('connection')->times(3)->andReturn($connectionMock);
+
+        $builderMock
+            ->method('select')
+            ->with('column_name')
+            ->willReturnSelf();
+
+        $builderMock
+            ->method('where')
+            ->with('table_name', $tableName)
+            ->willReturnSelf();
+
+        $builderMock
+            ->expects($this->exactly(2))
+            ->method('orderBy')
+            ->with('id')
+            ->willReturnSelf();
+
+        $builderMock
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnOnConsecutiveCalls($initialState, collect(), $responseMock);
     }
 
     protected function mockTestStateCreationSetGlobalExportMode(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool
@@ -64,5 +219,14 @@ trait TableTestStateMockTrait
         $globalExportMode = $reflectionClass->getProperty('globalExportMode');
 
         return $globalExportMode->getValue($instance);
+    }
+
+    protected function getTestResource()
+    {
+        $resource = fopen('php://memory', 'r+b');
+        fwrite($resource, md5('some_string', true));
+        rewind($resource);
+
+        return $resource;
     }
 }

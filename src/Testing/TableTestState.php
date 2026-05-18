@@ -18,6 +18,17 @@ class TableTestState extends Assert
     protected ?string $connectionName;
     protected Collection $state;
     protected string $uniqueKey;
+    protected ?array $binaryColumns = null;
+
+    protected const array BINARY_COLUMNS = [
+        'bytea',
+        'blob',
+        'tinyblob',
+        'mediumblob',
+        'longblob',
+        'binary',
+        'varbinary',
+    ];
 
     public function __construct(
         string $tableName,
@@ -91,7 +102,11 @@ class TableTestState extends Assert
 
         return array_map(function ($item) use ($jsonFields) {
             foreach ($jsonFields as $jsonField) {
-                if (Arr::has($item, $jsonField)) {
+                $shouldDecode = Arr::has($item, $jsonField)
+                    && is_string($item[$jsonField])
+                    && json_validate($item[$jsonField]);
+
+                if ($shouldDecode) {
                     $item[$jsonField] = json_decode($item[$jsonField], true);
                 }
             }
@@ -111,10 +126,64 @@ class TableTestState extends Assert
 
     protected function getDataSet(string $table, string $orderField = 'id'): Collection
     {
-        return DB::connection($this->connectionName)
+        $dataSet = DB::connection($this->connectionName)
             ->table($table)
             ->orderBy($orderField)
             ->get()
             ->map(fn ($record) => (array) $record);
+
+        $this->prepareBinaryFields($dataSet);
+
+        return $dataSet;
+    }
+
+    protected function prepareBinaryFields(Collection $dataSet): void
+    {
+        $this->binaryColumns ??= $this->getBinaryColumns();
+
+        $dataSet->transform(function (array $record) {
+            array_walk($record, function (mixed &$value, string $field) {
+                if (!is_null($value) && in_array($field, $this->binaryColumns)) {
+                    $value = is_resource($value) ? bin2hex(stream_get_contents($value)) : bin2hex($value);
+                }
+            });
+
+            return $record;
+        });
+    }
+
+    protected function getBinaryColumns(): array
+    {
+        $connection = DB::connection($this->connectionName);
+
+        $tableSchema = $this->getTableSchema($connection->getDriverName(), $connection->getDatabaseName());
+
+        return (empty($tableSchema))
+            ? []
+            : $connection
+                ->table('information_schema.columns')
+                ->select('column_name')
+                ->where('table_name', $this->tableName)
+                ->whereIn('table_schema', $tableSchema)
+                ->whereIn('data_type', self::BINARY_COLUMNS)
+                ->get()
+                ->pluck('column_name')
+                ->toArray();
+    }
+
+    protected function getTableSchema(string $driverName, string $databaseName): array
+    {
+        $tableSchema = match ($driverName) {
+            'pgsql' => config("database.connections.{$this->connectionName}.schema")
+                ?? config("database.connections.{$this->connectionName}.search_path", 'public'),
+            'mysql' => $databaseName,
+            default => '',
+        };
+
+        $tableSchema = array_map('trim', explode(',', $tableSchema));
+
+        $tableSchema = array_filter($tableSchema, fn ($schema) => !empty($schema));
+
+        return Arr::wrap($tableSchema);
     }
 }

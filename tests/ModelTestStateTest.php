@@ -36,7 +36,7 @@ class ModelTestStateTest extends TestCase
         $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
+        $this->assertEquals(['json_field', 'castable_field', 'cast_binary_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
     }
 
