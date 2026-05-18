@@ -177,7 +177,7 @@ class TableTestState extends Assert
             'pgsql' => config("database.connections.{$this->connectionName}.schema")
                 ?? config("database.connections.{$this->connectionName}.search_path", 'public'),
             'mysql' => $databaseName,
-            default => null,
+            default => '',
         };
 
         $tableSchema = array_map('trim', explode(',', $tableSchema));
