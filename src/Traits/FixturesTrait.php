@@ -125,6 +125,12 @@ trait FixturesTrait
         );
     }
 
+    /**
+     * Asserts fixture equality, selecting the fixture variant based on the current Laravel major version.
+     *
+     * @param  int[]  $versions  Laravel major versions where the fixture differs. The closest boundary above the
+     *                           current version is selected; if none match, falls back to $fixture as-is.
+     */
     public function assertEqualsVersionedFixture(string $fixture, $data, array $versions = [], bool $exportMode = false): void
     {
         $currentVersion = (int) app()->version();
