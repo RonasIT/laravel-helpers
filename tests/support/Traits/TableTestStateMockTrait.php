@@ -156,21 +156,55 @@ trait TableTestStateMockTrait
             );
     }
 
-    protected function mockUnsupportedDriverName(): void
-    {
-        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-
+    protected function mockGettingDatasetForChangesUnsupportedDriver(
+        Collection $responseMock,
+        Collection $initialState,
+        string $tableName,
+    ): void {
         $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
+        $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
+
+        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
 
         $connectionMock
             ->method('getDriverName')
-            ->willReturn('unsupported_driver');
+            ->willReturn('unknown');
 
         $connectionMock
             ->method('getDatabaseName')
             ->willReturn('public');
 
-        DB::shouldReceive('connection')->once()->andReturn($connectionMock);
+        $connectionMock
+            ->expects($this->exactly(2))
+            ->method('table')
+            ->with($this->callback(fn ($table) => in_array($table, [
+                'information_schema.columns',
+                $tableName,
+            ])))
+            ->willReturn($builderMock);
+
+        DB::shouldReceive('connection')->times(3)->andReturn($connectionMock);
+
+        $builderMock
+            ->method('select')
+            ->with('column_name')
+            ->willReturnSelf();
+
+        $builderMock
+            ->method('where')
+            ->with('table_name', $tableName)
+            ->willReturnSelf();
+
+        $builderMock
+            ->expects($this->exactly(2))
+            ->method('orderBy')
+            ->with('id')
+            ->willReturnSelf();
+
+        $builderMock
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnOnConsecutiveCalls($initialState, collect(), $responseMock);
     }
 
     protected function mockTestStateCreationSetGlobalExportMode(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool

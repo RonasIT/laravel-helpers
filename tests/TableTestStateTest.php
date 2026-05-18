@@ -179,4 +179,26 @@ class TableTestStateTest extends TestCase
 
         fclose($resource);
     }
+
+    public function testAssertChangesWithUnsupportedMysqlDriver()
+    {
+        $initialDatasetMock = collect([[
+            'id' => 1,
+            'name' => 'name',
+        ]]);
+
+        $changedDatasetMock = collect([[
+            'id' => 1,
+            'name' => 'name_changed',
+        ]]);
+
+        $this->mockGettingDatasetForChangesUnsupportedDriver(
+            responseMock: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_models',
+        );
+
+        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState->assertChangesEqualsFixture('unsupported_db_driver');
+    }
 }
