@@ -3,10 +3,6 @@
 
 # Traits
 
-## EntityControlTrait
-
-Provides CRUD-based methods to work with database-related entities.
-
 ## FixturesTrait
 
 This trait is designed to make testing understandable and cleaner.
@@ -21,49 +17,6 @@ Also you can tune your TestCase for restore dump of database witch will be place
 
 This trait was designed to make external http sources testing more convenient. This trait 
 mocks `HttpRequestService` and give an ability to mock get and post http requests
-
-## SearchTrait
-
-This trait implements `search` data function. It contains methods for filtering by fields of model,
-by model relations, searching by row data as query.
-
-Just init search with `$this->getSearchQuery()` and then you can chain different filters to make
-search you need. Available search methods are:
-* `filterBy()` - filtering by model field
-* `filterByQuery(['field1', 'field2', ...])` - filtering by model field1 and field2 with "LIKE" operator
-* `filterByQueryOnRelation($relation, [fields])` - filtering with "LIKE" operator by related model fields
-* `filterByRelation($relation, $field)` - filtering by related model field.
-
-Also, you can specify results order using `order_by()` method and specify relations by `with()`
-method if you want retrieve related data too.
-
-To get results call `getSearchResults()` method, that's it. You can pass `all` filter to get all results, or use
-`page` or `per_page` if you need paginate your results.
-
-**Example**
-
-```php
-#UserRepository.php
-
-public function search()
-{
-    $filters = [
-        'order_by' => 'udated_at',
-        'email' => 'test@example.com',
-        'role_id' => 2,
-        'with' => ['posts', 'posts.comments'],
-        'per_page' => 20
-    ];
-    
-    $this->getSearchQuery($filters)
-         ->filterBy('email')
-         ->filterByQuery(['name'])
-         ->filterByRelation('role', 'role_id')
-         ->order_by()
-         ->with()
-         ->getSearchResults();
-}
-```
 
 ## TranslationTrait
 
