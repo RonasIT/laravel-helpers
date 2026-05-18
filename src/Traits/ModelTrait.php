@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use BadMethodCallException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
@@ -34,27 +35,11 @@ trait ModelTrait
         return array_map(fn ($field) => "{$tableName}.{$field}", $fields);
     }
 
-    protected function getRelationshipFromMethod($method)
-    {
-        if ($this->disableLazyLoading) {
-            $modelName = static::class;
-
-            throw new BadMethodCallException(
-                message: "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. "
-                . 'See property $disableLazyLoading.',
-            );
-        }
-
-        return parent::getRelationshipFromMethod($method);
-    }
-
     /**
      * This method was added, because native Laravel's method addSelect
      * overwrites existed select clause
-     *
-     * @return mixed
      */
-    public function scopeAddFieldsToSelect($query, array $fields = [])
+    public function scopeAddFieldsToSelect(Builder $query, array $fields = []): mixed
     {
         if (is_null($query->getQuery()->columns)) {
             $query->addSelect("{$this->getTable()}.*");
@@ -70,17 +55,14 @@ trait ModelTrait
     /**
      * Add orderBy By related field,
      * $manyToManyStrategy is affect oneToMany and ManyToMany Relations make orderBy('id', ASC/DESC)
-     *
-     *
-     * @return mixed $query
      */
     public function scopeOrderByRelated(
-        $query,
-        $relations,
+        Builder $query,
+        string $relations,
         string $desc = 'DESC',
         ?string $asField = null,
         string $manyToManyStrategy = 'max',
-    ) {
+    ): mixed {
         if (empty($asField)) {
             $asField = str_replace('.', '_', $relations);
         }
@@ -110,7 +92,43 @@ trait ModelTrait
         return $query->orderBy($asField ?? $orderField, $desc);
     }
 
-    protected function getRelationWithoutConstraints($query, $relation)
+    public function wasExchanged(string $fieldName): bool
+    {
+        return $this->wasChanged($fieldName)
+            && !is_null($this->origin($fieldName))
+            && !is_null($this->getAttribute($fieldName));
+    }
+
+    public function wasFilled(string $fieldName): bool
+    {
+        return $this->wasChanged($fieldName) && is_null($this->origin($fieldName));
+    }
+
+    public function wasCleared(string $fieldName): bool
+    {
+        return $this->wasChanged($fieldName) && is_null($this->getAttribute($fieldName));
+    }
+
+    public function origin(string $fieldName): mixed
+    {
+        return Arr::get($this->getPrevious(), $fieldName);
+    }
+
+    protected function getRelationshipFromMethod($method)
+    {
+        if ($this->disableLazyLoading) {
+            $modelName = static::class;
+
+            throw new BadMethodCallException(
+                message: "Attempting to lazy-load relation '{$method}' on model '{$modelName}'. "
+                . 'See property $disableLazyLoading.',
+            );
+        }
+
+        return parent::getRelationshipFromMethod($method);
+    }
+
+    protected function getRelationWithoutConstraints(Builder $query, string $relation): Relation
     {
         return Relation::noConstraints(fn () => call_user_func([$query->getModel(), $relation]));
     }
@@ -135,7 +153,7 @@ trait ModelTrait
         return $relations;
     }
 
-    protected function getQueriesList($query, array $relations): array
+    protected function getQueriesList(Builder $query, array $relations): array
     {
         $requiredColumns = [];
         $queryCollection = [$query];
@@ -156,7 +174,7 @@ trait ModelTrait
         return array_reverse($queryCollection);
     }
 
-    protected function applyManyToManyStrategy($query, string $strategy)
+    protected function applyManyToManyStrategy(Builder $query, string $strategy): Builder
     {
         if ($strategy === 'max') {
             $query->orderBy('id', 'ASC')->limit(1);
