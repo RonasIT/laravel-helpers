@@ -311,6 +311,80 @@ class FixturesTraitTest extends TestCase
         $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);
     }
 
+    public static function assertEqualsVersionedFixtureData(): array
+    {
+        return [
+            'empty_versions_array' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['default_response'],
+                'versions' => [],
+            ],
+            'single_version_above_current' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['response_before_v12'],
+                'versions' => [12],
+            ],
+            'two_versions_picks_minimum' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['response_before_v12'],
+                'versions' => [13, 12],
+            ],
+            'fixture_in_subdirectory' => [
+                'fixture' => 'assert_versioned_fixture/subdir/response.json',
+                'data' => ['subdir_response_before_v12'],
+                'versions' => [12],
+            ],
+        ];
+    }
+
+    #[DataProvider('assertEqualsVersionedFixtureData')]
+    public function testAssertEqualsVersionedFixture(string $fixture, array $data, array $versions): void
+    {
+        $this->mockLaravelVersion('11.0.0');
+
+        $this->assertEqualsVersionedFixture($fixture, $data, $versions);
+    }
+
+    public static function assertEqualsVersionedFixtureRangesData(): array
+    {
+        return [
+            'current_v9_uses_before_v10' => ['9.0.0', ['response_before_v10']],
+            'current_v10_uses_before_v12' => ['10.0.0', ['response_before_v12']],
+            'current_v10_minor_uses_before_v12' => ['10.1.0', ['response_before_v12']],
+            'current_v11_uses_before_v12' => ['11.0.0', ['response_before_v12']],
+            'current_v12_uses_default' => ['12.0.0', ['default_response']],
+            'current_v13_uses_default' => ['13.0.0', ['default_response']],
+        ];
+    }
+
+    #[DataProvider('assertEqualsVersionedFixtureRangesData')]
+    public function testAssertEqualsVersionedFixtureRanges(string $appVersion, array $data): void
+    {
+        $this->mockLaravelVersion($appVersion);
+
+        $this->assertEqualsVersionedFixture('assert_versioned_fixture/response.json', $data, [10, 12]);
+    }
+
+    public function testAssertEqualsVersionedFixtureWithExportMode(): void
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        $this->mockLaravelVersion('11.0.0');
+
+        $this->assertEqualsVersionedFixture(
+            fixture: 'assert_versioned_fixture/export_response.json',
+            data: ['exported_response'],
+            versions: [12],
+            exportMode: true,
+        );
+
+        $exportedFixturePath = $this->getFixturePath('assert_versioned_fixture/laravel_before_v12/export_response.json');
+
+        $this->assertFileExists($exportedFixturePath);
+
+        unlink($exportedFixturePath);
+    }
+
     public function testPrepareMySQLAutoIncrement()
     {
         $mock = $this->mockClass(MySqlBuilder::class, [
