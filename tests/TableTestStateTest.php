@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
-use RonasIT\Support\Exceptions\UnsupportedDBDriverException;
 use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Testing\TableTestState;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
