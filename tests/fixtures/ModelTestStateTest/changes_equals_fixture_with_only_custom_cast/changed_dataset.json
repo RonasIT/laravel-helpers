@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "name1",
+    "castable_field": "{\"theme\": \"dark\", \"language\": \"de\", \"notifications_email\": true, \"notifications_sms\": true}",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 2,
+    "name": "name2",
+    "castable_field": "{\"theme\": \"light\", \"language\": \"fr\", \"notifications_email\": false, \"notifications_sms\": true}",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 4,
+    "name": "name4",
+    "castable_field": "{\"theme\": \"system\", \"language\": \"pl\", \"notifications_email\": false, \"notifications_sms\": false}",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  }
+]

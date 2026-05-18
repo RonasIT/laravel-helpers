@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "currency": "CAD",
+    "amount": 500,
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 2,
+    "currency": "USD",
+    "amount": 1000,
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 3,
+    "currency": "EUR",
+    "amount": 2000,
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 4,
+    "currency": "GBP",
+    "amount": 3000,
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  }
+]

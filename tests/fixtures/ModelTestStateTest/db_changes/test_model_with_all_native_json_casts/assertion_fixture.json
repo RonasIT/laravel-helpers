@@ -1,0 +1,59 @@
+{
+    "updated": [
+        {
+            "id": 1,
+            "json_field": {
+                "key": "new value"
+            },
+            "object_field": {
+                "prop": "new"
+            }
+        }
+    ],
+    "created": [
+        {
+            "id": 4,
+            "name": "name4",
+            "array_field": [
+                10,
+                20
+            ],
+            "json_field": {
+                "new": true
+            },
+            "object_field": {
+                "created": true
+            },
+            "collection_field": [
+                {
+                    "id": 3
+                }
+            ],
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ],
+    "deleted": [
+        {
+            "id": 3,
+            "name": "name3",
+            "array_field": [
+                "a",
+                "b"
+            ],
+            "json_field": {
+                "x": 1
+            },
+            "object_field": {
+                "y": 2
+            },
+            "collection_field": [
+                {
+                    "id": 2
+                }
+            ],
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ]
+}

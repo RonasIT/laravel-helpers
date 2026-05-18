@@ -4,32 +4,118 @@ namespace RonasIT\Support\Testing;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class ModelTestState extends TableTestState
 {
+    protected Model $model;
+
+    /**
+     * Map of field names to their cast definitions.
+     *
+     * @var array<string, string>
+     */
+    protected array $customCastFields;
+
+    /**
+     * @param  class-string<Model>  $modelClassName
+     */
     public function __construct(string $modelClassName)
     {
-        $model = new $modelClassName();
+        $this->model = new $modelClassName();
+
+        $casts = $this->model->getCasts();
 
         parent::__construct(
-            tableName: $model->getTable(),
-            jsonFields: $this->getModelJSONFields($model),
-            connectionName: $model->getConnectionName($model),
-            uniqueKey: $model->getKeyName(),
+            tableName: $this->model->getTable(),
+            jsonFields: $this->getNativeJsonFields($casts),
+            connectionName: $this->model->getConnectionName(),
+            uniqueKey: $this->model->getKeyName(),
         );
+
+        $this->customCastFields = $this->getCustomCastFields($casts);
     }
 
-    protected function getModelJSONFields(Model $model): array
+    protected function getNativeJsonFields(array $casts): array
     {
-        $casts = $model->getCasts();
+        $nativeCasts = array_filter($casts, fn (string $castType): bool => $this->isNativeJsonCast($castType));
 
-        $jsonCasts = array_filter($casts, fn ($cast) => $this->isJsonCast($cast));
-
-        return array_keys($jsonCasts);
+        return array_keys($nativeCasts);
     }
 
-    protected function isJsonCast(string $cast): bool
+    protected function getCustomCastFields(array $casts): array
     {
-        return ($cast === 'array') || (class_exists($cast) && is_subclass_of($cast, CastsAttributes::class));
+        return array_filter($casts, fn (string $castType): bool => $this->isCustomCast($castType));
+    }
+
+    protected function isNativeJsonCast(string $castDefinition): bool
+    {
+        return in_array($castDefinition, ['array', 'json', 'object', 'collection']);
+    }
+
+    protected function isCustomCast(string $castDefinition): bool
+    {
+        $castClass = $this->resolveCastClass($castDefinition);
+
+        return class_exists($castClass) && is_subclass_of($castClass, CastsAttributes::class);
+    }
+
+    protected function resolveCastClass(string $castDefinition): string
+    {
+        return str_contains($castDefinition, ':')
+            ? explode(':', $castDefinition, 2)[0]
+            : $castDefinition;
+    }
+
+    protected function prepareChanges(array $changes): array
+    {
+        if (!empty($this->customCastFields)) {
+            $changes = array_map(fn (array $changesItem) => $this->applyCustomCasts($changesItem), $changes);
+        }
+
+        return parent::prepareChanges($changes);
+    }
+
+    protected function applyCustomCasts(array $item): array
+    {
+        $attributes = $this->resolveModelAttributes($item);
+
+        $this->model->setRawAttributes($attributes);
+
+        foreach ($this->customCastFields as $field => $castDefinition) {
+            if (Arr::has($item, $field)) {
+                $item[$field] = $this
+                    ->resolveCaster($castDefinition)
+                    ->get($this->model, $field, $attributes[$field], $attributes);
+            }
+        }
+
+        return $item;
+    }
+
+    protected function resolveModelAttributes(array $item): array
+    {
+        if (!array_key_exists($this->uniqueKey, $item)) {
+            return $item;
+        }
+
+        $original = $this->state->first(
+            callback: fn (array $record) => $record[$this->uniqueKey] === $item[$this->uniqueKey],
+        );
+
+        return is_null($original)
+            ? $item
+            : array_merge($original, $item);
+    }
+
+    protected function resolveCaster(string $castDefinition): CastsAttributes
+    {
+        if (!str_contains($castDefinition, ':')) {
+            return new $castDefinition();
+        }
+
+        list($castClass, $argString) = explode(':', $castDefinition, 2);
+
+        return new $castClass(...explode(',', $argString));
     }
 }
