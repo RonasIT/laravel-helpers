@@ -192,11 +192,7 @@ class TableTestStateTest extends TestCase
             'name' => 'name_changed',
         ]]);
 
-        $this->mockGettingDatasetForChangesUnsupportedDriver(
-            responseMock: $changedDatasetMock,
-            initialState: $initialDatasetMock,
-            tableName: 'test_models',
-        );
+        $this->mockGettingDatasetForChangesUnknownDriver($changedDatasetMock, $initialDatasetMock, 'test_models');
 
         $modelTestState = new ModelTestState(TestModel::class);
         $modelTestState->assertChangesEqualsFixture('unsupported_db_driver');

@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Mockery;
+use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 use RonasIT\Support\Testing\TestCase;
 
@@ -26,18 +27,9 @@ trait TableTestStateMockTrait
 
     protected function mockGettingDataset(Collection $responseMock, string $uniqueKey = 'id'): void
     {
-        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
         $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
 
-        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-
-        $connectionMock
-            ->method('getDriverName')
-            ->willReturn('pgsql');
-
-        $connectionMock
-            ->method('getDatabaseName')
-            ->willReturn('public');
+        $connectionMock = $this->createConnectionMock('pgsql');
 
         $connectionMock
             ->expects($this->exactly(2))
@@ -93,18 +85,9 @@ trait TableTestStateMockTrait
         ?string $binaryColumn = null,
         string $dbDriver = 'pgsql',
     ): void {
-        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
         $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
 
-        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-
-        $connectionMock
-            ->method('getDriverName')
-            ->willReturn($dbDriver);
-
-        $connectionMock
-            ->method('getDatabaseName')
-            ->willReturn('public');
+        $connectionMock = $this->createConnectionMock($dbDriver);
 
         $connectionMock
             ->expects($this->exactly(3))
@@ -156,23 +139,14 @@ trait TableTestStateMockTrait
             );
     }
 
-    protected function mockGettingDatasetForChangesUnsupportedDriver(
+    protected function mockGettingDatasetForChangesUnknownDriver(
         Collection $responseMock,
         Collection $initialState,
         string $tableName,
     ): void {
-        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
-        $builderMock = $this->mockClass(Builder::class, ['select', 'where', 'whereIn', 'orderBy', 'get'], true);
+        $builderMock = $this->mockClass(Builder::class, ['select', 'where',  'orderBy', 'get'], true);
 
-        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
-
-        $connectionMock
-            ->method('getDriverName')
-            ->willReturn('unknown');
-
-        $connectionMock
-            ->method('getDatabaseName')
-            ->willReturn('public');
+        $connectionMock = $this->createConnectionMock('unknown_driver');
 
         $connectionMock
             ->expects($this->exactly(2))
@@ -204,7 +178,28 @@ trait TableTestStateMockTrait
         $builderMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->willReturnOnConsecutiveCalls($initialState, collect(), $responseMock);
+            ->willReturnOnConsecutiveCalls(
+                $initialState,
+                empty($binaryColumn) ? collect() : collect([['column_name' => $binaryColumn]]),
+                $responseMock,
+            );
+    }
+
+    private function createConnectionMock(string $dbDriver): MockObject
+    {
+        $connectionMock = $this->mockClass(Connection::class, ['getDriverName', 'getDatabaseName', 'table'], true);
+
+        DB::shouldReceive('getDefaultConnection')->once()->andReturn(null);
+
+        $connectionMock
+            ->method('getDriverName')
+            ->willReturn($dbDriver);
+
+        $connectionMock
+            ->method('getDatabaseName')
+            ->willReturn('public');
+
+        return $connectionMock;
     }
 
     protected function mockTestStateCreationSetGlobalExportMode(string $methodName, string $entity, bool $testCaseGlobalExportMode): bool
