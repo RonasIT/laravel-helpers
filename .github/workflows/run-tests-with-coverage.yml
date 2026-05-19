@@ -6,36 +6,55 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  PHP_LATEST: &php-latest "8.5"
+  LARAVEL_LATEST: &laravel-latest "13.*"
+
 jobs:
-  tests-with-coverage:
+  tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: [ "8.3", "8.4" ]
+        php-version: [ "8.3", "8.4", "8.5" ]
+        laravel-version: [ "11.*", "12.*", "13.*" ]
+        exclude:
+          - php-version: *php-latest
+            laravel-version: *laravel-latest
     steps:
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          coverage: xdebug
-          tools: composer
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Setup
+        uses: ./.github/actions/php-laravel-setup
+        with:
+          php-version: ${{ matrix.php-version }}
+          laravel-version: ${{ matrix.laravel-version }}
+          coverage: none
+      - name: Execute unit tests via PHPUnit
+        run: vendor/bin/phpunit
+
+  tests-with-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/actions/php-laravel-setup
+        with:
+          php-version: *php-latest
+          laravel-version: *laravel-latest
+          coverage: xdebug
       - name: Format code style via Pint
         run: vendor/bin/pint --test
       - name: Execute unit tests via PHPUnit with coverage
         run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       - name: Export coverage report
-        if: ${{ matrix.php-version == '8.4' }}
         uses: actions/upload-artifact@v4
         with:
           name: clover.xml
           path: build/logs
 
   upload-to-coveralls:
-    needs: tests-with-coverage
+    needs: [ tests, tests-with-coverage ]
     runs-on: ubuntu-latest
     steps:
       - name: Set up PHP

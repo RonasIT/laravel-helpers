@@ -17,11 +17,13 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
+use RonasIT\Support\Tests\Support\Traits\FixturesTestTrait;
 use RonasIT\Support\Traits\MockTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FixturesTraitTest extends TestCase
 {
+    use FixturesTestTrait;
     use MockTrait;
 
     public function setUp(): void
@@ -92,7 +94,9 @@ class FixturesTraitTest extends TestCase
             unlink($fixturePath);
         }
 
-        $result = ['value' => 1234567890];
+        $result = [
+            'value' => 1234567890,
+        ];
 
         $this->exportJson('export_json/response', new TestResponse(
             response: new Response(json_encode($result)),
@@ -170,44 +174,34 @@ class FixturesTraitTest extends TestCase
         $this->loadTestDump();
     }
 
-    public function testLoadTestDumpForMysql()
+    public static function loadTestDumpData(): array
     {
-        $connection = $this->mockClass(MysqlConnection::class, [
-            $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_mysql_db_query.sql')]),
-            $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
-        ], true);
-
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
-        $this->dumpFileName = 'clear_database/dump.sql';
-
-        Config::set('database.default', 'mysql');
-
-        self::$tables = $this->getJsonFixture('clear_database/tables.json');
-
-        $this->loadTestDump();
+        return [
+            'mysql' => [
+                'driver' => 'mysql',
+                'connectionClass' => MySqlConnection::class,
+                'clearSqlFixture' => 'clear_database/clear_mysql_db_query.sql',
+            ],
+            'pgsql' => [
+                'driver' => 'pgsql',
+                'connectionClass' => PostgresConnection::class,
+                'clearSqlFixture' => 'clear_database/clear_pgsql_db_query.sql',
+            ],
+        ];
     }
 
-    public function testLoadTestDumpForPgsql()
+    #[DataProvider('loadTestDumpData')]
+    public function testLoadTestDump(string $driver, string $connectionClass, string $clearSqlFixture)
     {
-        $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('unprepared', [$this->getFixture('clear_database/clear_pgsql_db_query.sql')]),
+        $connection = $this->mockClass($connectionClass, [
+            $this->functionCall('unprepared', [$this->getFixture($clearSqlFixture)]),
             $this->functionCall('unprepared', [$this->getFixture('clear_database/dump.sql')]),
         ], true);
 
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
+        $this->bindMockedDbInstance($connection);
         $this->dumpFileName = 'clear_database/dump.sql';
 
-        Config::set('database.default', 'pgsql');
+        Config::set('database.default', $driver);
 
         self::$tables = $this->getJsonFixture('clear_database/tables.json');
 
@@ -224,11 +218,7 @@ class FixturesTraitTest extends TestCase
             $this->functionCall('getSchemaBuilder', [], $mock),
         ], true);
 
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-        ], true);
-
-        $this->app->instance('db', $db);
+        $this->bindMockedDbInstance($connection, 1);
 
         Config::set('database.default', 'mysql');
 
@@ -243,7 +233,6 @@ class FixturesTraitTest extends TestCase
             ->map(fn ($item) => (object) $item);
 
         $connection = $this->mockClass(PostgresConnection::class, [
-            $this->functionCall('getQueryGrammar', [], new Grammar()),
             $this->functionCall('getPostProcessor', [], new Processor()),
             $this->functionCall('select', [
                 'select "table_name", "table_schema", "column_name", "column_default" from "information_schema"."columns" where "column_default" LIKE ?',
@@ -253,12 +242,9 @@ class FixturesTraitTest extends TestCase
             $this->functionCall('unprepared', [$this->getFixture('prepare_sequences/sequences.sql')]),
         ], true);
 
-        $db = $this->mockClass(DatabaseManager::class, [
-            $this->functionCall('connection', [null], $connection),
-            $this->functionCall('connection', [null], $connection),
-        ], true);
+        $connection->setQueryGrammar(new Grammar($connection));
 
-        $this->app->instance('db', $db);
+        $this->bindMockedDbInstance($connection);
 
         Config::set('database.default', 'pgsql');
 
@@ -273,7 +259,6 @@ class FixturesTraitTest extends TestCase
         $connection = $this->mockClass(
             class: PostgresConnection::class,
             callChain: [
-                $this->functionCall('getQueryGrammar', [], new Grammar()),
                 $this->functionCall('getPostProcessor', [], new Processor()),
                 $this->functionCall(
                     name: 'select',
@@ -287,6 +272,8 @@ class FixturesTraitTest extends TestCase
             ],
             disableConstructor: true,
         );
+
+        $connection->setQueryGrammar(new Grammar($connection));
 
         $db = $this->mockClass(
             class: DatabaseManager::class,
@@ -322,5 +309,102 @@ class FixturesTraitTest extends TestCase
         );
 
         $this->assertEqualsFixture($fixtureName, ['content' => 'incorrect']);
+    }
+
+    public static function assertEqualsVersionedFixtureData(): array
+    {
+        return [
+            'empty_versions_array' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['default_response'],
+                'versions' => [],
+            ],
+            'single_version_above_current' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['response_before_v12'],
+                'versions' => [12],
+            ],
+            'two_versions_picks_minimum' => [
+                'fixture' => 'assert_versioned_fixture/response.json',
+                'data' => ['response_before_v12'],
+                'versions' => [13, 12],
+            ],
+            'fixture_in_subdirectory' => [
+                'fixture' => 'assert_versioned_fixture/subdir/response.json',
+                'data' => ['subdir_response_before_v12'],
+                'versions' => [12],
+            ],
+        ];
+    }
+
+    #[DataProvider('assertEqualsVersionedFixtureData')]
+    public function testAssertEqualsVersionedFixture(string $fixture, array $data, array $versions): void
+    {
+        $this->mockLaravelVersion('11.0.0');
+
+        $this->assertEqualsVersionedFixture($fixture, $data, $versions);
+    }
+
+    public static function assertEqualsVersionedFixtureRangesData(): array
+    {
+        return [
+            'current_v9_uses_before_v10' => ['9.0.0', ['response_before_v10']],
+            'current_v10_uses_before_v12' => ['10.0.0', ['response_before_v12']],
+            'current_v10_minor_uses_before_v12' => ['10.1.0', ['response_before_v12']],
+            'current_v11_uses_before_v12' => ['11.0.0', ['response_before_v12']],
+            'current_v12_uses_default' => ['12.0.0', ['default_response']],
+            'current_v13_uses_default' => ['13.0.0', ['default_response']],
+        ];
+    }
+
+    #[DataProvider('assertEqualsVersionedFixtureRangesData')]
+    public function testAssertEqualsVersionedFixtureRanges(string $appVersion, array $data): void
+    {
+        $this->mockLaravelVersion($appVersion);
+
+        $this->assertEqualsVersionedFixture('assert_versioned_fixture/response.json', $data, [10, 12]);
+    }
+
+    public function testAssertEqualsVersionedFixtureWithExportMode(): void
+    {
+        putenv('FAIL_EXPORT_JSON=false');
+
+        $this->mockLaravelVersion('11.0.0');
+
+        $this->assertEqualsVersionedFixture(
+            fixture: 'assert_versioned_fixture/export_response.json',
+            data: ['exported_response'],
+            versions: [12],
+            exportMode: true,
+        );
+
+        $exportedFixturePath = $this->getFixturePath('assert_versioned_fixture/laravel_before_v12/export_response.json');
+
+        $this->assertFileExists($exportedFixturePath);
+
+        unlink($exportedFixturePath);
+    }
+
+    public function testPrepareMySQLAutoIncrement()
+    {
+        $mock = $this->mockClass(MySqlBuilder::class, [
+            $this->functionCall(
+                name: 'getTables',
+                result: $this->getJsonFixture('set_auto_increment/get_tables.json')),
+        ], true);
+
+        $connection = $this->mockClass(MySqlConnection::class, [
+            $this->functionCall(
+                name: 'getSchemaBuilder',
+                result: $mock,
+            ),
+            $this->functionCall('unprepared', [$this->getFixture('set_auto_increment/set_auto_increment.sql')]),
+        ], true);
+
+        $this->bindMockedDbInstance($connection);
+
+        Config::set('database.default', 'mysql');
+
+        $this->resetMySQLAutoIncrement($this->getTables(), ['roles', 'groups']);
     }
 }

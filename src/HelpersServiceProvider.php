@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
-use Maatwebsite\Excel\ExcelServiceProvider;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
@@ -36,8 +35,6 @@ class HelpersServiceProvider extends ServiceProvider
 
         $this->extendValidator();
 
-        app(ExcelServiceProvider::class, ['app' => app()])->boot();
-
         $this->extendRouter();
 
         if ($this->app->runningUnitTests()) {
@@ -57,7 +54,6 @@ class HelpersServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        app(ExcelServiceProvider::class, ['app' => app()])->register();
     }
 
     protected function extendValidator(): void

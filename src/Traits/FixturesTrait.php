@@ -51,7 +51,6 @@ trait FixturesTrait
     ];
 
     protected array $truncateExceptTables = ['migrations', 'password_resets'];
-    protected array $prepareSequencesExceptTables = ['migrations', 'password_resets'];
 
     protected string $dumpFileName = 'dump.sql';
 
@@ -126,6 +125,33 @@ trait FixturesTrait
         );
     }
 
+    /**
+     * Asserts fixture equality, selecting the fixture variant based on the current Laravel major version.
+     *
+     * @param  int[]  $versions  Laravel major versions where the fixture differs. The closest boundary above the
+     *                           current version is selected; if none match, falls back to $fixture as-is.
+     */
+    public function assertEqualsVersionedFixture(string $fixture, $data, array $versions = [], bool $exportMode = false): void
+    {
+        $currentVersion = (int) app()->version();
+        list($filename, $directory) = extract_last_part($fixture, DIRECTORY_SEPARATOR);
+        $prefix = ($directory === '.') ? '' : "{$directory}/";
+
+        $fixtureVersion = null;
+
+        foreach ($versions as $version) {
+            if ($version > $currentVersion && (is_null($fixtureVersion) || $version < $fixtureVersion)) {
+                $fixtureVersion = $version;
+            }
+        }
+
+        $finalFixture = (is_null($fixtureVersion))
+            ? $fixture
+            : "{$prefix}laravel_before_v{$fixtureVersion}/{$filename}";
+
+        $this->assertEqualsFixture($finalFixture, $data, $exportMode);
+    }
+
     public function exportJson($fixture, $data): void
     {
         if ($data instanceof TestResponse) {
@@ -171,7 +197,7 @@ trait FixturesTrait
             if (in_array($table['name'], $except)) {
                 return '';
             } else {
-                return "TRUNCATE TABLE \"{$table['name']}\";\n";
+                return "TRUNCATE TABLE `{$table['name']}`;\n";
             }
         });
 
@@ -180,7 +206,7 @@ trait FixturesTrait
 
     public function prepareSequences(array $except = []): void
     {
-        $except = array_merge($this->postgisTables, $this->prepareSequencesExceptTables, $except);
+        $except = array_merge($this->postgisTables, $this->truncateExceptTables, $except);
 
         $query = array_concat($this->getSequences(), function ($item) use ($except) {
             if (
@@ -197,6 +223,20 @@ trait FixturesTrait
                     "is NULL then false else true end));\n";
             }
         });
+
+        if (!empty($query)) {
+            app('db.connection')->unprepared($query);
+        }
+    }
+
+    public function resetMySQLAutoIncrement(array $tables, array $except = []): void
+    {
+        $except = array_merge($this->truncateExceptTables, $except);
+
+        $query = array_concat($tables, fn ($table) => (in_array($table['name'], $except))
+            ? ''
+            : "ALTER TABLE `{$table['name']}` AUTO_INCREMENT = 1;\n",
+        );
 
         if (!empty($query)) {
             app('db.connection')->unprepared($query);
