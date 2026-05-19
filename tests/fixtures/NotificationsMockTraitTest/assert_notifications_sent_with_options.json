@@ -20,7 +20,8 @@
             "via_chain": "active",
             "via_unresolvable_method": null,
             "via_unresolvable_property": null,
-            "via_unresolvable_chain": null
+            "via_unresolvable_chain": null,
+            "via_non_object_step": null
         }
     ]
 }

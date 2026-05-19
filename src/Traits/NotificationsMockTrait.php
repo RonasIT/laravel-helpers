@@ -70,6 +70,10 @@ trait NotificationsMockTrait
         $value = $notification;
 
         foreach ($chain as $step) {
+            if (!is_object($value)) {
+                return null;
+            }
+
             if (str_ends_with($step, '()') && method_exists($value, rtrim($step, '()'))) {
                 $method = rtrim($step, '()');
                 $value = $value->{$method}();
