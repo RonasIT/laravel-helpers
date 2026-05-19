@@ -1,17 +1,14 @@
 {
-    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestAnotherNotification": [
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestChainableNotification": [
         {
             "notification": {
-                "code": "abc-123",
-                "value": "active",
+                "status": "active",
                 "channels": [
-                    "mail",
                     "database"
                 ],
                 "locale": null
             },
             "channels": [
-                "mail",
                 "database"
             ],
             "notifiable": {

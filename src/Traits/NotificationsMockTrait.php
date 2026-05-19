@@ -39,7 +39,7 @@ trait NotificationsMockTrait
             foreach ($notifiableIDs as $modelNotifications) {
                 foreach ($modelNotifications as $notificationClassName => $modelNotification) {
                     foreach ($modelNotification as $notification) {
-                        $actualData[$notificationClassName][] = $this->prepareNotification($notification, $options);
+                        $actualData[$notificationClassName][] = $this->prepareNotificationFixtureData($notification, $options);
                     }
                 }
             }
@@ -50,7 +50,7 @@ trait NotificationsMockTrait
         $this->assertEqualsFixture($fixture, $preparedActualData, $exportMode);
     }
 
-    protected function prepareNotification(array $notification, array $options): array
+    protected function prepareNotificationFixtureData(array $notification, array $options): array
     {
         foreach ($options as $key => $chain) {
             $notification[$key] = $this->resolveNotificationChain($notification['notification'], $chain);
@@ -71,7 +71,7 @@ trait NotificationsMockTrait
 
         foreach ($chain as $step) {
             if (str_ends_with($step, '()') && method_exists($value, rtrim($step, '()'))) {
-                $method =rtrim($step, '()');
+                $method = rtrim($step, '()');
                 $value = $value->{$method}();
             } elseif (property_exists($value, $step)) {
                 $value = $value->$step;

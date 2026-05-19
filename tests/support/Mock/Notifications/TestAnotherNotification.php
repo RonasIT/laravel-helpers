@@ -17,17 +17,4 @@ class TestAnotherNotification extends Notification
     {
         return $this->channels;
     }
-
-    public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    public function getDetails(): object
-    {
-        return (object) [
-            'code' => $this->code,
-            'value' => $this->value,
-        ];
-    }
 }
