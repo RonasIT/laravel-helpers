@@ -3,11 +3,11 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\Notification;
-use ReflectionClass;
 
 trait NotificationsMockTrait
 {
     use FixturesTrait;
+    use ReflectionTrait;
 
     /**
      * $options should look like the following construction:
@@ -31,11 +31,8 @@ trait NotificationsMockTrait
      *
      * @param  array<string, string[]>  $options
      */
-    protected function assertNotificationsSent(
-        string $fixture,
-        array $options = [],
-        bool $exportMode = false,
-    ): void {
+    protected function assertNotificationsSent(string $fixture, array $options = [], bool $exportMode = false): void
+    {
         $actualData = [];
 
         foreach (Notification::sentNotifications() as $notifiableIDs) {
@@ -59,9 +56,11 @@ trait NotificationsMockTrait
             $notification[$key] = $this->resolveNotificationChain($notification['notification'], $chain);
         }
 
-        $attributes = $this->getNotificationAttributes($notification['notification']);
+        $attributes = $this->getObjectAttributes($notification['notification']);
 
         $notification['notification'] = $attributes;
+
+        unset($notification['notification']['id']);
 
         return $notification;
     }
@@ -72,7 +71,8 @@ trait NotificationsMockTrait
 
         foreach ($chain as $step) {
             if (str_ends_with($step, '()') && method_exists($value, rtrim($step, '()'))) {
-                $value = $value->{rtrim($step, '()')}();
+                $method =rtrim($step, '()');
+                $value = $value->{$method}();
             } elseif (property_exists($value, $step)) {
                 $value = $value->$step;
             } else {
@@ -81,21 +81,5 @@ trait NotificationsMockTrait
         }
 
         return $value;
-    }
-
-    protected function getNotificationAttributes(object $notification): array
-    {
-        $reflection = new ReflectionClass($notification);
-        $attributes = [];
-
-        foreach ($reflection->getProperties() as $property) {
-            if (str_starts_with($property->getDeclaringClass()->getName(), 'Illuminate\\')) {
-                continue;
-            }
-
-            $attributes[$property->getName()] = $property->getValue($notification);
-        }
-
-        return $attributes;
     }
 }

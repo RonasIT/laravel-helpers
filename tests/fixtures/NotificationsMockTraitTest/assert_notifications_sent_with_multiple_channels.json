@@ -8,7 +8,8 @@
                 "channels": [
                     "mail",
                     "database"
-                ]
+                ],
+                "locale": null
             },
             "channels": [
                 "mail",
