@@ -3,6 +3,8 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Tests\Support\Mock\Jobs\TestJob;
 use RonasIT\Support\Traits\TestingTrait;
@@ -29,13 +31,22 @@ class TestingTraitTest extends TestCase
         throw new ModelFactoryNotFound('full error message');
     }
 
+
     public function testAssertQueueEqualsFixture()
     {
         Queue::fake();
 
         TestJob::dispatch('some payload', ['another payload']);
 
-        $this->assertQueueEqualsFixture('assert_queue_equals');
+        $laravelMajorVersion = Str::before($this->app->version(), '.');
+
+        $fixture = match ($laravelMajorVersion) {
+            '11' => 'assert_queue_equals_v11',
+            '12' => 'assert_queue_equals_v12',
+            '13' => 'assert_queue_equals_v13',
+        };
+
+        $this->assertQueueEqualsFixture($fixture);
     }
 
     public function testAssertQueueEmpty()
