@@ -359,7 +359,7 @@ trait SqlMockTrait
     protected function mockGetSearchResult(array $selectResult): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as "aggregate" from "test_models" where "test_models"."deleted_at" is not null',
+            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null',
         );
 
         $this->mockSelect(
@@ -377,7 +377,7 @@ trait SqlMockTrait
     protected function mockGetSearchResultWithTrashed(): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as "aggregate" from "test_models"',
+            'select count(*) as aggregate from "test_models"',
         );
 
         $this->mockSelect(
@@ -388,7 +388,7 @@ trait SqlMockTrait
     protected function mockGetSearchResultWithQuery(array $selectResult): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as "aggregate" from "test_models" '
+            'select count(*) as aggregate from "test_models" '
             . "where ((\"query_field\" like '%search_\'string%') or (\"another_query_field\" like '%search_\'string%')) "
             . 'and "test_models"."deleted_at" is null',
         );
@@ -404,7 +404,7 @@ trait SqlMockTrait
     protected function mockGetSearchResultWithCustomQuery(array $selectResult): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as "aggregate" from "test_models" '
+            'select count(*) as aggregate from "test_models" '
             . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
             . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null',
@@ -422,7 +422,7 @@ trait SqlMockTrait
     protected function mockGetSearchResultWithRelations(array $selectResult): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as "aggregate" from "test_models" '
+            'select count(*) as aggregate from "test_models" '
             . 'where (("query_field" like \'%search_string%\') or exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" '
             . 'and ("another_query_field" like \'%search_string%\'))) and exists (select * from "relation_models" '
@@ -449,7 +449,7 @@ trait SqlMockTrait
     protected function mockGetSearchResultWithFilters(array $selectResult): void
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as "aggregate" from "test_models" where "user_id" in (?, ?) and "user_id" '
+            'select count(*) as aggregate from "test_models" where "user_id" in (?, ?) and "user_id" '
             . 'not in (?, ?) and "name" = ? and "date" >= ? and "date" <= ? '
             . 'and "created_at" >= ? and "created_at" <= ? and "updated_at" > ? '
             . 'and "updated_at" < ? and "test_models"."deleted_at" is null',
@@ -517,7 +517,7 @@ trait SqlMockTrait
         string $keyField = 'user_id',
     ): void {
         $this->mockSelect(
-            query: "select count(distinct \"{$keyField}\") as \"aggregate\" from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
+            query: "select count(distinct \"{$keyField}\") as aggregate from \"{$table}\" where \"{$keyField}\" in (?, ?, ?)",
             result: [['aggregate' => count($result)]],
             bindings: [1, 2, 3],
         );
@@ -549,13 +549,24 @@ trait SqlMockTrait
 
     protected function mockSelect(string $query, array $result = [], array $bindings = []): void
     {
-        $select = $this->getPdo()->shouldSelect($query, $bindings);
+        $select = $this->getPdo()->shouldSelect($this->normalizeAggregateAliasInQuery($query), $bindings);
 
         if (!empty($result)) {
             $select->shouldFetchAllReturns($result);
         } else {
             $select->whenFetchAllCalled();
         }
+    }
+
+    protected function normalizeAggregateAliasInQuery(string $query): string
+    {
+        if (!str_contains($query, ' as aggregate') && !str_contains($query, ' as "aggregate"')) {
+            return $query;
+        }
+
+        $aggregateAlias = version_compare(app()->version(), '13.11.1', '>=') ? '"aggregate"' : 'aggregate';
+
+        return str_replace([' as aggregate', ' as "aggregate"'], " as {$aggregateAlias}", $query);
     }
 
     protected function mockSelectWithAggregate(string $query, array $bindings = [], ?int $result = 1): void
