@@ -564,7 +564,8 @@ trait SqlMockTrait
             return $query;
         }
 
-        $aggregateAlias = version_compare(app()->version(), '13.11.1', '>=') ? '"aggregate"' : 'aggregate';
+        // TODO: remove comparation after increase min Laravel version up to 14
+        $aggregateAlias = (version_compare(app()->version(), '13.11.1', '>=')) ? '"aggregate"' : 'aggregate';
 
         return str_replace([' as aggregate', ' as "aggregate"'], " as {$aggregateAlias}", $query);
     }
