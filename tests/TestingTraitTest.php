@@ -2,7 +2,9 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Facades\Queue;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
+use RonasIT\Support\Tests\Support\Mock\Jobs\TestJob;
 use RonasIT\Support\Traits\TestingTrait;
 
 class TestingTraitTest extends TestCase
@@ -25,5 +27,21 @@ class TestingTraitTest extends TestCase
         );
 
         throw new ModelFactoryNotFound('full error message');
+    }
+
+    public function testAssertQueueEqualsFixture()
+    {
+        Queue::fake();
+
+        TestJob::dispatch('some payload', ['another payload']);
+
+        $this->assertQueueEqualsFixture('assert_queue_equals');
+    }
+
+    public function testAssertQueueEmpty()
+    {
+        Queue::fake();
+
+        $this->assertQueueEmpty();
     }
 }
