@@ -11,7 +11,6 @@
             "queue": null,
             "messageGroup": null,
             "deduplicator": null,
-            "debounceOwner": "",
             "delay": null,
             "afterCommit": null,
             "middleware": [],
