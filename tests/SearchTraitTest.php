@@ -133,7 +133,7 @@ class SearchTraitTest extends TestCase
     public function testGetSearchResultAggregateIsNull()
     {
         $this->mockSelectWithAggregate(
-            query: 'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is null',
+            query: 'select count(*) as "aggregate" from "test_models" where "test_models"."deleted_at" is null',
             result: null,
         );
 
@@ -242,7 +242,7 @@ class SearchTraitTest extends TestCase
     public function testSearchQueryWithNullFilters()
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from "test_models" where "user_id" is null and "test_models"."deleted_at" is null',
+            'select count(*) as "aggregate" from "test_models" where "user_id" is null and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
@@ -259,7 +259,7 @@ class SearchTraitTest extends TestCase
         $this->callEncapsulatedMethod($this->testRepositoryClass, 'setAdditionalReservedFilters', 'user_id');
 
         $this->mockSelectWithAggregate(
-            query: 'select count(*) as aggregate from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null',
+            query: 'select count(*) as "aggregate" from "test_models" where "user_id" in (?, ?, ?) and "test_models"."deleted_at" is null',
             bindings: [1, 2, 3],
         );
 

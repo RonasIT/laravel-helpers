@@ -472,7 +472,7 @@ class EntityControlTraitTest extends TestCase
     public function testCount()
     {
         $this->mockSelectById(
-            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
+            'select count(*) as "aggregate" from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
         );
 
         self::$testRepositoryClass
@@ -849,7 +849,7 @@ class EntityControlTraitTest extends TestCase
     public function testCountByList()
     {
         $this->mockSelectWithAggregate(
-            'select count(*) as aggregate from "test_models" '
+            'select count(*) as "aggregate" from "test_models" '
             . 'where "test_models"."deleted_at" is not null and "id" in (?, ?, ?)',
             [1, 2, 3],
         );
