@@ -30,7 +30,6 @@ class TestingTraitTest extends TestCase
         throw new ModelFactoryNotFound('full error message');
     }
 
-
     public function testAssertQueueEqualsFixture()
     {
         Queue::fake();
