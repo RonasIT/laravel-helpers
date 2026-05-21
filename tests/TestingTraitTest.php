@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Tests\Support\Mock\Jobs\TestJob;
 use RonasIT\Support\Traits\TestingTrait;
