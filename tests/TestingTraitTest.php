@@ -42,8 +42,7 @@ class TestingTraitTest extends TestCase
 
         $fixture = match ($laravelMajorVersion) {
             '11' => 'assert_queue_equals_v11',
-            '12' => 'assert_queue_equals_v12',
-            '13' => 'assert_queue_equals_v13',
+            default => 'assert_queue_equals',
         };
 
         $this->assertQueueEqualsFixture($fixture);
