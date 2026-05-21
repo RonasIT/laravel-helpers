@@ -69,7 +69,7 @@ class ModelTraitTest extends TestCase
 
         $query->addFieldsToSelect();
 
-        $this->assertStringContainsString('"test_models".*', $query->toSql());
+        $this->assertEquals('select "test_models".* from "test_models" where "test_models"."deleted_at" is null', $query->toSql());
     }
 
     public function testScopeAddFieldsToSelectWithFields()
@@ -78,11 +78,10 @@ class ModelTraitTest extends TestCase
 
         $query->addFieldsToSelect(['test_models.id', 'test_models.name']);
 
-        $sql = $query->toSql();
-
-        $this->assertStringContainsString('"test_models".*', $sql);
-        $this->assertStringContainsString('"test_models"."id"', $sql);
-        $this->assertStringContainsString('"test_models"."name"', $sql);
+        $this->assertEquals(
+            'select "test_models".*, "test_models"."id", "test_models"."name" from "test_models" where "test_models"."deleted_at" is null',
+            $query->toSql(),
+        );
     }
 
     public function testScopeAddFieldsToSelectPreservesExistingColumns()
@@ -91,11 +90,10 @@ class ModelTraitTest extends TestCase
 
         $query->addFieldsToSelect(['test_models.name']);
 
-        $sql = $query->toSql();
-
-        $this->assertStringContainsString('"test_models"."id"', $sql);
-        $this->assertStringContainsString('"test_models"."name"', $sql);
-        $this->assertStringNotContainsString('"test_models".*', $sql);
+        $this->assertEquals(
+            'select "test_models"."id", "test_models"."name" from "test_models" where "test_models"."deleted_at" is null',
+            $query->toSql(),
+        );
     }
 
     public function testScopeOrderByRelated()
@@ -104,11 +102,10 @@ class ModelTraitTest extends TestCase
 
         $query->orderByRelated('relation.name');
 
-        $sql = $query->toSql();
-
-        $this->assertStringContainsString('order by', $sql);
-        $this->assertStringContainsString('"relation_name"', $sql);
-        $this->assertStringContainsString('"relation_models"', $sql);
+        $this->assertEquals(
+            'select "test_models".*, (select "name" from "relation_models" where "test_models"."id" = "relation_models"."test_model_id" order by "id" asc limit 1) as "relation_name" from "test_models" where "test_models"."deleted_at" is null order by "relation_name" desc',
+            $query->toSql(),
+        );
     }
 
     public static function getWasExchangedData(): array
