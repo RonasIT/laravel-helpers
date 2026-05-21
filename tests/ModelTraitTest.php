@@ -115,29 +115,29 @@ class ModelTraitTest extends TestCase
     {
         return [
             [
-                'before' => 'old',
-                'after' => 'new',
-                'expected' => true,
+                'origin' => 'old',
+                'updated' => 'new',
+                'result' => true,
             ],
             [
-                'before' => 'old',
-                'after' => null,
-                'expected' => false,
+                'origin' => 'old',
+                'updated' => null,
+                'result' => false,
             ],
             [
-                'before' => null,
-                'after' => 'new',
-                'expected' => false,
+                'origin' => null,
+                'updated' => 'new',
+                'result' => false,
             ],
         ];
     }
 
     #[DataProvider('getWasExchangedData')]
-    public function testWasExchanged(?string $before, ?string $after, bool $expected)
+    public function testWasExchanged(?string $origin, ?string $updated, bool $result)
     {
-        $model = $this->createModelWithTransition($before, $after);
+        $model = $this->createModelWithTransition($origin, $updated);
 
-        $this->assertSame($expected, $model->wasExchanged('name'));
+        $this->assertSame($result, $model->wasExchanged('name'));
     }
 
     public static function getWasFilledData(): array
@@ -225,12 +225,12 @@ class ModelTraitTest extends TestCase
         $this->assertNull($model->origin('name'));
     }
 
-    protected function createModelWithTransition(?string $before, ?string $after): TestModel
+    protected function createModelWithTransition(?string $originName, ?string $newName): TestModel
     {
         $model = new TestModel();
-        $model->forceFill(['name' => $before]);
+        $model->forceFill(['name' => $originName]);
         $model->syncOriginal();
-        $model->forceFill(['name' => $after]);
+        $model->forceFill(['name' => $newName]);
         $model->syncChanges();
         $model->syncOriginal();
 

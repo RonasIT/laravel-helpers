@@ -13,7 +13,7 @@
     "ext-json": "*",
     "guzzlehttp/guzzle": "^7.9.2",
     "laravel/framework": ">=12.28",
-    "php": ">=8.4",
+    "php": ">=8.3",
     "php-mock/php-mock-phpunit": "^2.10",
     "doctrine/dbal": "^4.2",
     "riverline/multipart-parser": "^2.1"
