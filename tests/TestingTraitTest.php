@@ -33,10 +33,12 @@ class TestingTraitTest extends TestCase
     {
         Queue::fake();
 
+        Queue::push(TestJob::class, ['count' => 000, 'title' => 'test_pushed']);
+
         for ($index = 1; $index <= 3; $index++) {
             TestJob::dispatch($index, "title_{$index}");
         }
 
-        $this->assertQueueEqualsFixture('test_queue_state');
+        $this->assertQueueEqualsFixture('test_queue_state', [11, 12, 13]);
     }
 }

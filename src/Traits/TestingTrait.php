@@ -23,15 +23,22 @@ trait TestingTrait
         $this->expectExceptionMessageMatches("/{$expectedMessage}/");
     }
 
-    protected function assertQueueEqualsFixture(string $fixture, bool $exportMode = false): void
+    protected function assertQueueEqualsFixture(string $fixture, $versions = [], bool $exportMode = false): void
     {
         $actualData = [];
 
         foreach (Queue::pushedJobs() as $namespace => $jobs) {
-            $actualData[$namespace] = Arr::map($jobs, fn ($job) => $this->getObjectAttributes($job['job']));
+            $actualData[$namespace] = Arr::map($jobs, fn ($job) => is_string($job['job'])
+                ? $job
+                : $this->getObjectAttributes($job['job'])
+            );
         }
 
-        $this->assertEqualsFixture("queue_states/{$fixture}", $actualData, $exportMode);
+        if (!empty($versions)) {
+            $this->assertEqualsVersionedFixture("queue_states/{$fixture}", $actualData, $versions, $exportMode);
+        } else {
+            $this->assertEqualsFixture("queue_states/{$fixture}", $actualData, $exportMode);
+        }
     }
 
     protected function getObjectAttributes(object $object): array

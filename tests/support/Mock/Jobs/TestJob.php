@@ -9,9 +9,6 @@ class TestJob implements ShouldQueue
 {
     use Queueable;
 
-    public $messageGroup = null;
-    public $deduplicator = null;
-    public $debounceOwner = '';
     protected string $foo;
 
     public function __construct(
