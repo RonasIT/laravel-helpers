@@ -276,7 +276,7 @@ trait FixturesTrait
 
     protected function exportContent(string $content, string $fixture): void
     {
-        if (!env('FAIL_EXPORT_JSON', true)) {
+        if (env('FAIL_EXPORT_JSON', true)) {
             throw new ForbiddenExportModeException();
         }
 
