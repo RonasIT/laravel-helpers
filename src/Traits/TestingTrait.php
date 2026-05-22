@@ -44,11 +44,9 @@ trait TestingTrait
             return $job['job'];
         }
 
-        if (is_array($job['data'])) {
-            return new $job['job'](...$job['data']);
-        }
+        $data = Arr::wrap($job['data']);
 
-        return new $job['job']($job['data']);
+        return new $job['job'](...$data);
     }
 
     protected function assertQueueEmpty(): void
