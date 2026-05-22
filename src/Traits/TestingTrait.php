@@ -45,8 +45,9 @@ trait TestingTrait
         }
 
         $data = Arr::wrap($job['data']);
+        $className = $job['job'];
 
-        return new $job['job'](...$data);
+        return new $className(...$data);
     }
 
     protected function assertQueueEmpty(): void
