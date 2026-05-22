@@ -38,7 +38,7 @@ trait TestingTrait
         $this->assertEqualsFixture("queue_states/{$fixture}", $actualData, $exportMode);
     }
 
-    protected function getJobObject(array $job)
+    protected function getJobObject(array $job): object
     {
         if (is_object($job['job'])) {
             return $job['job'];
