@@ -2,8 +2,6 @@
 
 namespace RonasIT\Support\Tests\Support\Mock\Jobs;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-
 class TestJob extends BaseTestJob
 {
     public function __construct(
