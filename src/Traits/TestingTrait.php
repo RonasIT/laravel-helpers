@@ -30,7 +30,7 @@ trait TestingTrait
         foreach (Queue::pushedJobs() as $namespace => $jobs) {
             $actualData[$namespace] = Arr::map($jobs, fn ($job) => is_string($job['job'])
                 ? $job
-                : $this->getObjectAttributes($job['job'])
+                : $this->getObjectAttributes($job['job']),
             );
         }
 
