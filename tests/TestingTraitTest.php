@@ -15,15 +15,15 @@ class TestingTraitTest extends TestCase
 {
     use TestingTrait, TestingTraitTestTrait;
 
-    public static string $laravelMajorVersion;
+    public static int $laravelMajorVersion;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        Carbon::setTestNow('2020-01-01 00:00:00');
+        Carbon::setTestNow('2020-01-01');
 
-        self::$laravelMajorVersion ??= Str::before($this->app->version(), '.');
+        self::$laravelMajorVersion ??= (int) Str::before($this->app->version(), '.');
     }
 
     public function testAssertExceptionThrew(): void
