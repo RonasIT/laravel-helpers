@@ -125,6 +125,33 @@ trait FixturesTrait
         );
     }
 
+    /**
+     * Asserts fixture equality, selecting the fixture variant based on the current Laravel major version.
+     *
+     * @param  int[]  $versions  Laravel major versions where the fixture differs. The closest boundary above the
+     *                           current version is selected; if none match, falls back to $fixture as-is.
+     */
+    public function assertEqualsVersionedFixture(string $fixture, $data, array $versions = [], bool $exportMode = false): void
+    {
+        $currentVersion = (int) app()->version();
+        list($filename, $directory) = extract_last_part($fixture, DIRECTORY_SEPARATOR);
+        $prefix = ($directory === '.') ? '' : "{$directory}/";
+
+        $fixtureVersion = null;
+
+        foreach ($versions as $version) {
+            if ($version > $currentVersion && (is_null($fixtureVersion) || $version < $fixtureVersion)) {
+                $fixtureVersion = $version;
+            }
+        }
+
+        $finalFixture = (is_null($fixtureVersion))
+            ? $fixture
+            : "{$prefix}laravel_before_v{$fixtureVersion}/{$filename}";
+
+        $this->assertEqualsFixture($finalFixture, $data, $exportMode);
+    }
+
     public function exportJson($fixture, $data): void
     {
         if ($data instanceof TestResponse) {
