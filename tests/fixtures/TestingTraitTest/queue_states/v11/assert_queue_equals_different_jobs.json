@@ -9,9 +9,6 @@
       "job": null,
       "connection": null,
       "queue": null,
-      "messageGroup": null,
-      "deduplicator": null,
-      "debounceOwner": "",
       "delay": null,
       "afterCommit": null,
       "middleware": [],
@@ -19,19 +16,14 @@
       "chainConnection": null,
       "chainQueue": null,
       "chainCatchCallbacks": null
-    },
+    }
+  ],
+  "RonasIT\\Support\\Tests\\Support\\Mock\\Jobs\\AnotherTestJob": [
     {
       "tries": 5,
-      "payload": "some payload",
-      "anotherPayload": [
-        "another payload"
-      ],
       "job": null,
       "connection": null,
       "queue": null,
-      "messageGroup": null,
-      "deduplicator": null,
-      "debounceOwner": "",
       "delay": null,
       "afterCommit": null,
       "middleware": [],

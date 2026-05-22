@@ -31,13 +31,27 @@ trait TestingTrait
         $actualData = [];
 
         foreach (Queue::pushedJobs() as $namespace => $jobs) {
-            $actualData[$namespace] = Arr::map($jobs, fn ($job) => is_object($job['job'])
-                ? $this->getObjectAttributes($job['job'])
-                : $this->getObjectAttributes(new $job['job'](...$job['data'])),
-            );
+            $actualData[$namespace] = Arr::map($jobs, function ($job) {
+                $job = $this->getJobObject($job);
+
+                return $this->getObjectAttributes($job);
+            });
         }
 
         $this->assertEqualsFixture("queue_states/{$fixture}", $actualData, $exportMode);
+    }
+
+    protected function getJobObject(array $job)
+    {
+        if (is_object($job['job'])) {
+            return $job['job'];
+        }
+
+        if (is_array($job['data'])) {
+            return new $job['job'](...$job['data']);
+        }
+
+        return new $job['job']($job['data']);
     }
 
     protected function assertQueueEmpty(): void

@@ -9,17 +9,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class TestJob implements ShouldQueue
+class AnotherTestJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 5;
-
-    public function __construct(
-        protected ?string $payload = null,
-        protected array $anotherPayload = [],
-    ) {
-    }
 
     public function handle(): void
     {
