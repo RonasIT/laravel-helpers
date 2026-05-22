@@ -52,7 +52,9 @@ trait TestingTrait
         $properties = (new ReflectionClass($object))->getProperties();
 
         foreach ($properties as $property) {
-            $result[$property->getName()] = $property->getValue($object);
+            $result[$property->getName()] = $property->isInitialized($object)
+                ? $property->getValue($object)
+                : null;
         }
 
         return json_decode(json_encode($result), true);
