@@ -36,11 +36,16 @@ class TestingTraitTest extends TestCase
 
         TestJob::dispatch('some payload', ['another payload']);
 
+        Queue::push(TestJob::class, [
+            'payload' => 'some payload',
+            'anotherPayload' => ['another payload'],
+        ]);
+
         $laravelMajorVersion = Str::before($this->app->version(), '.');
 
         $fixture = match ($laravelMajorVersion) {
             '11' => 'assert_queue_equals_v11',
-            '13' => 'assert_queue_equals_v13',
+            '12' => 'assert_queue_equals_v12',
             default => 'assert_queue_equals',
         };
 
