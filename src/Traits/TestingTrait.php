@@ -12,11 +12,8 @@ trait TestingTrait
     use MailsMockTrait;
     use MockTrait;
 
-    protected function assertExceptionThrew(
-        string $expectedClassName,
-        string $expectedMessage,
-        bool $isStrict = true,
-    ): void {
+    protected function assertExceptionThrew(string $expectedClassName, string $expectedMessage, bool $isStrict = true): void
+    {
         $this->expectException($expectedClassName);
 
         $expectedMessage = preg_quote($expectedMessage, '/');
