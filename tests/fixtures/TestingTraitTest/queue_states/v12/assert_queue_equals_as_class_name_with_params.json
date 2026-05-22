@@ -8,7 +8,7 @@
             ],
             "job": null,
             "connection": null,
-            "queue": null,
+            "queue": "some_queue",
             "messageGroup": null,
             "deduplicator": null,
             "delay": null,

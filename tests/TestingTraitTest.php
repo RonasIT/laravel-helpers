@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
@@ -19,6 +20,8 @@ class TestingTraitTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        Carbon::setTestNow('2020-01-01 00:00:00');
 
         self::$laravelMajorVersion ??= Str::before($this->app->version(), '.');
     }
@@ -45,7 +48,7 @@ class TestingTraitTest extends TestCase
     {
         Queue::fake();
 
-        TestJob::dispatch('some payload', ['another payload']);
+        TestJob::dispatch('some payload', ['another payload'])->delay(now()->addMinute());
 
         $this->assertQueueEqualsVersionedFixture(self::$laravelMajorVersion, 'assert_queue_equals');
     }

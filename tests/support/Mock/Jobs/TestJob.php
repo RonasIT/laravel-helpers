@@ -2,36 +2,18 @@
 
 namespace RonasIT\Support\Tests\Support\Mock\Jobs;
 
-use Carbon\Carbon;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
-class TestJob implements ShouldQueue
+class TestJob extends BaseTestJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public $tries = 5;
-
     public function __construct(
         protected ?string $payload = null,
         protected array $anotherPayload = [],
     ) {
+        $this->onQueue('some_queue');
     }
 
     public function handle(): void
     {
-    }
-
-    public function backoff(): array
-    {
-        return [
-            30,
-            Carbon::SECONDS_PER_MINUTE * 1,
-            Carbon::SECONDS_PER_MINUTE * 3,
-            Carbon::SECONDS_PER_MINUTE * 5,
-        ];
     }
 }
