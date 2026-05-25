@@ -565,7 +565,9 @@ trait SqlMockTrait
 
     protected function mockSelect(string|Pattern $query, array $result = [], array $bindings = []): void
     {
-        $select = $this->getPdo()->shouldSelect($this->normalizeAggregateAliasInQuery($query), $bindings);
+        $query = is_string($query) ? $this->normalizeAggregateAliasInQuery($query) : $query;
+
+        $select = $this->getPdo()->shouldSelect($query, $bindings);
 
         if (!empty($result)) {
             $select->shouldFetchAllReturns($result);
