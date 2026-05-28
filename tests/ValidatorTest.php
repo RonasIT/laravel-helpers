@@ -9,7 +9,6 @@ use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Rules\DBTypeRangeRule;
 use RonasIT\Support\Tests\Support\Mock\Resolvers\TestDBTypeResolver;
-use RonasIT\Support\Tests\Support\Mock\Resolvers\TestDBTypeResolverWithUncategorizedTypes;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
 use RonasIT\Support\Traits\TestingTrait;
 
@@ -527,18 +526,6 @@ class ValidatorTest extends TestCase
         $validator->passes();
     }
 
-    public function testDBTypeRangeUncategorizedTypePasses(): void
-    {
-        app()->bind(DBTypeResolverContract::class, TestDBTypeResolverWithUncategorizedTypes::class);
-
-        $validator = Validator::make(
-            data: ['value' => 'not-a-number'],
-            rules: ['value' => [new DBTypeRangeRule(TestDBTypeResolverWithUncategorizedTypes::DECIMAL)]],
-        );
-
-        $this->assertTrue($validator->passes());
-    }
-
     public function testDBTypeRangeUsesCustomResolverRangesPasses(): void
     {
         app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
@@ -546,6 +533,18 @@ class ValidatorTest extends TestCase
         $validator = Validator::make(
             data: ['value' => TestDBTypeResolver::INTEGER_MAX],
             rules: ['value' => [new DBTypeRangeRule(TestDBTypeResolver::INTEGER)]],
+        );
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function testDBTypeRangeUncategorizedTypePasses(): void
+    {
+        app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
+
+        $validator = Validator::make(
+            data: ['value' => 'uncategorized'],
+            rules: ['value' => [new DBTypeRangeRule(TestDBTypeResolver::UNCATEGORIZED)]],
         );
 
         $this->assertTrue($validator->passes());
