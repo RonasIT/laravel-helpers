@@ -102,4 +102,20 @@ class TableTestStateTest extends TestCase
 
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set');
     }
+
+    public function testAssertChangesCompareStrict()
+    {
+        $initialDatasetMock = collect($this->getJsonFixture('compare_not_strict_fields/initial_dataset'));
+        $changedDatasetMock = collect($this->getJsonFixture('compare_not_strict_fields/changed_dataset'));
+
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models', 'name');
+
+        $modelTestState = new TableTestState(
+            tableName: 'test_models',
+            jsonFields: ['json_field', 'castable_field'],
+            uniqueKey: 'name',
+        );
+
+        $modelTestState->assertChangesEqualsFixture('assertion_compare_strict_fields');
+    }
 }
