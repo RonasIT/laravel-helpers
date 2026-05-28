@@ -57,7 +57,7 @@ class DBTypeRangeRule implements ValidationRule
 
     protected function validateInteger(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
     {
-        if (!preg_match(self::INTEGER_PATTERN, (string) $value)) {
+        if (!is_scalar($value) || !preg_match(self::INTEGER_PATTERN, (string) $value)) {
             $fail("The {$attribute} must be an integer.");
 
             return;

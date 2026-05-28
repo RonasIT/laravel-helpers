@@ -461,6 +461,11 @@ class ValidatorTest extends TestCase
                 'type' => 'integer',
                 'error' => 'The value must be an integer.',
             ],
+            'array to integer' => [
+                'value' => ['foo'],
+                'type' => 'integer',
+                'error' => 'The value must be an integer.',
+            ],
             'integer to varchar' => [
                 'value' => 42,
                 'type' => 'varchar',
