@@ -451,6 +451,11 @@ class ValidatorTest extends TestCase
                 'type' => 'varchar',
                 'error' => 'The value must be a string.',
             ],
+            'too long string to varchar' => [
+                'value' => str_repeat('a', self::VARCHAR_MAX + 1),
+                'type' => 'varchar',
+                'error' => 'The value length must not exceed ' . self::VARCHAR_MAX . ' characters.',
+            ],
         ];
     }
 
@@ -464,24 +469,6 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($validator->fails());
         $this->assertEquals($error, $validator->errors()->first('value'));
-    }
-
-    public function testVarcharDBTypeRangeFails(): void
-    {
-        $value = str_repeat('a', self::VARCHAR_MAX + 1);
-        $max = self::VARCHAR_MAX;
-
-        $validator = Validator::make(
-            data: ['value' => $value],
-            rules: ['value' => 'db_type_range:varchar'],
-        );
-
-        $this->assertTrue($validator->fails());
-
-        $this->assertEquals(
-            expected: "The value length must not exceed {$max} characters.",
-            actual: $validator->errors()->first('value'),
-        );
     }
 
     public function testDBTypeRangeObjectSyntaxPasses(): void
