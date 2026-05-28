@@ -116,6 +116,6 @@ class TableTestStateTest extends TestCase
             uniqueKey: 'name',
         );
 
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture_falsy_to_null_transitions', true);
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture_falsy_to_null_transitions');
     }
 }
