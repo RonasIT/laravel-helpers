@@ -9,11 +9,13 @@ class TestDBTypeResolverWithUncategorizedTypes implements DBTypeResolverContract
 {
     public const string DECIMAL = 'decimal';
 
-    public static function ranges(): array
+    private const array RANGES = [
+        self::DECIMAL => [0, PHP_FLOAT_MAX],
+    ];
+
+    public function getRange(string $type): array
     {
-        return [
-            self::DECIMAL => [0, PHP_FLOAT_MAX],
-        ];
+        return self::RANGES[$type];
     }
 
     public function isTypeCategory(DBTypeCategoryEnum $category, string $type): bool
@@ -23,6 +25,6 @@ class TestDBTypeResolverWithUncategorizedTypes implements DBTypeResolverContract
 
     public function hasType(string $type): bool
     {
-        return array_key_exists($type, self::ranges());
+        return array_key_exists($type, self::RANGES);
     }
 }

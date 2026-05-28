@@ -15,12 +15,14 @@ class TestDBTypeResolver implements DBTypeResolverContract
     public const int STRING_MIN = 0;
     public const int STRING_MAX = 128;
 
-    public static function ranges(): array
+    private const array RANGES = [
+        self::INTEGER => [self::INTEGER_MIN, self::INTEGER_MAX],
+        self::STRING => [self::STRING_MIN, self::STRING_MAX],
+    ];
+
+    public function getRange(string $type): array
     {
-        return [
-            self::INTEGER => [self::INTEGER_MIN, self::INTEGER_MAX],
-            self::STRING => [self::STRING_MIN, self::STRING_MAX],
-        ];
+        return self::RANGES[$type];
     }
 
     public function isTypeCategory(DBTypeCategoryEnum $category, string $type): bool
@@ -34,6 +36,6 @@ class TestDBTypeResolver implements DBTypeResolverContract
 
     public function hasType(string $type): bool
     {
-        return array_key_exists($type, self::ranges());
+        return array_key_exists($type, self::RANGES);
     }
 }
