@@ -79,9 +79,7 @@ class DBTypeRangeRule implements ValidationRule
             return;
         }
 
-        $metric = mb_strlen($value);
-
-        if ($metric > $max) {
+        if (mb_strlen($value) > $max) {
             $fail("The {$attribute} length must not exceed {$max} characters.");
         }
     }
