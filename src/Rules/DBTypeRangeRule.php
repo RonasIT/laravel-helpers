@@ -10,6 +10,8 @@ use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
 class DBTypeRangeRule implements ValidationRule
 {
+    private const string INTEGER_PATTERN = '/^-?\d+$/';
+
     protected DBTypeResolverContract $resolver;
 
     public function __construct(
@@ -55,8 +57,8 @@ class DBTypeRangeRule implements ValidationRule
 
     protected function validateInteger(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
     {
-        if (!is_numeric($value)) {
-            $fail("The {$attribute} must be numeric.");
+        if (!preg_match(self::INTEGER_PATTERN, (string) $value)) {
+            $fail("The {$attribute} must be an integer.");
 
             return;
         }

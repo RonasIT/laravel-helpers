@@ -430,13 +430,36 @@ class ValidatorTest extends TestCase
         );
     }
 
+    public function testStringDBTypeRangeFails(): void
+    {
+        $value = str_repeat('a', self::VARCHAR_MAX + 1);
+        $max = self::VARCHAR_MAX;
+
+        $validator = Validator::make(
+            data: ['value' => $value],
+            rules: ['value' => 'db_type_range:varchar'],
+        );
+
+        $this->assertTrue($validator->fails());
+
+        $this->assertEquals(
+            expected: "The value length must not exceed {$max} characters.",
+            actual: $validator->errors()->first('value'),
+        );
+    }
+
     public static function provideDBTypeRangeWrongTypeFails(): array
     {
         return [
             'non-numeric string to integer' => [
                 'value' => 'abc',
                 'type' => 'integer',
-                'error' => 'The value must be numeric.',
+                'error' => 'The value must be an integer.',
+            ],
+            'float string to integer' => [
+                'value' => '3.14',
+                'type' => 'integer',
+                'error' => 'The value must be an integer.',
             ],
             'integer to varchar' => [
                 'value' => 42,
@@ -448,10 +471,10 @@ class ValidatorTest extends TestCase
                 'type' => 'varchar',
                 'error' => 'The value must be a string.',
             ],
-            'too long string to varchar' => [
-                'value' => str_repeat('a', self::VARCHAR_MAX + 1),
-                'type' => 'varchar',
-                'error' => 'The value length must not exceed ' . self::VARCHAR_MAX . ' characters.',
+            'non-numeric string to real' => [
+                'value' => 'abc',
+                'type' => 'real',
+                'error' => 'The value must be numeric.',
             ],
         ];
     }
