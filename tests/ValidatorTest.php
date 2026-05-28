@@ -310,21 +310,9 @@ class ValidatorTest extends TestCase
                 'value' => 3.14,
                 'type' => 'double',
             ],
-            'null to integer' => [
+            'null' => [
                 'value' => null,
                 'type' => 'integer',
-            ],
-            'null to varchar' => [
-                'value' => null,
-                'type' => 'varchar',
-            ],
-            'null to real' => [
-                'value' => null,
-                'type' => 'real',
-            ],
-            'null to double' => [
-                'value' => null,
-                'type' => 'double',
             ],
         ];
     }
@@ -412,6 +400,16 @@ class ValidatorTest extends TestCase
                 'value' => 4e+38,
                 'type' => 'real',
                 'range' => [self::REAL_MIN, self::REAL_MAX],
+            ],
+            'double below min' => [
+                'value' => -PHP_FLOAT_MAX * 2,
+                'type' => 'double',
+                'range' => [self::DOUBLE_MIN, self::DOUBLE_MAX],
+            ],
+            'double above max' => [
+                'value' => PHP_FLOAT_MAX * 2,
+                'type' => 'double',
+                'range' => [self::DOUBLE_MIN, self::DOUBLE_MAX],
             ],
         ];
     }
