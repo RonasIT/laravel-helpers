@@ -34,10 +34,7 @@ class PostgresDBTypeResolver implements DBTypeResolverContract
 
     public const array CATEGORIES = [
         DBTypeCategoryEnum::Integer->value => [
-            self::SMALLINT, self::INTEGER, self::SMALLSERIAL, self::SERIAL,
-        ],
-        DBTypeCategoryEnum::BigInteger->value => [
-            self::BIGINT, self::BIGSERIAL,
+            self::SMALLINT, self::INTEGER, self::SMALLSERIAL, self::SERIAL, self::BIGINT, self::BIGSERIAL,
         ],
         DBTypeCategoryEnum::Float->value => [
             self::REAL, self::DOUBLE,

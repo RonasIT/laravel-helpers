@@ -10,8 +10,6 @@ use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
 class DBTypeRangeRule implements ValidationRule
 {
-    protected const string INTEGER_REGEX = '/^-?\d+$/';
-
     protected DBTypeResolverContract $resolver;
 
     public function __construct(
@@ -38,47 +36,10 @@ class DBTypeRangeRule implements ValidationRule
 
         match (true) {
             $this->resolver->isTypeCategory(DBTypeCategoryEnum::Integer, $this->type) => $this->validateInteger($attribute, $value, $min, $max, $fail),
-            $this->resolver->isTypeCategory(DBTypeCategoryEnum::BigInteger, $this->type) => $this->validateBigInteger($attribute, $value, $min, $max, $fail),
             $this->resolver->isTypeCategory(DBTypeCategoryEnum::Float, $this->type) => $this->validateFloat($attribute, $value, $min, $max, $fail),
             $this->resolver->isTypeCategory(DBTypeCategoryEnum::String, $this->type) => $this->validateString($attribute, $value, $max, $fail),
             default => null,
         };
-    }
-
-    protected function validateInteger(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
-    {
-        if (!is_numeric($value)) {
-            $fail("The {$attribute} must be numeric.");
-
-            return;
-        }
-
-        $result = filter_var($value, FILTER_VALIDATE_INT, [
-            'options' => [
-                'min_range' => $min,
-                'max_range' => $max,
-            ],
-        ]);
-
-        if ($result === false) {
-            $fail("The {$attribute} must be between {$min} and {$max}.");
-        }
-    }
-
-    protected function validateBigInteger(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
-    {
-        if (!preg_match(self::INTEGER_REGEX, (string) $value)) {
-            $fail("The {$attribute} must be numeric.");
-
-            return;
-        }
-
-        $tooSmall = bccomp((string) $value, (string) $min) === -1;
-        $tooBig = bccomp((string) $value, (string) $max) === 1;
-
-        if ($tooSmall || $tooBig) {
-            $fail("The {$attribute} must be between {$min} and {$max}.");
-        }
     }
 
     protected function validateFloat(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
@@ -89,9 +50,23 @@ class DBTypeRangeRule implements ValidationRule
             return;
         }
 
-        $metric = (float) $value;
+        if ((float) $value < $min || (float) $value > $max) {
+            $fail("The {$attribute} must be between {$min} and {$max}.");
+        }
+    }
 
-        if ($metric < $min || $metric > $max) {
+    protected function validateInteger(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
+    {
+        if (!is_numeric($value)) {
+            $fail("The {$attribute} must be numeric.");
+
+            return;
+        }
+
+        $tooSmall = bccomp((string) $value, (string) $min) === -1;
+        $tooBig = bccomp((string) $value, (string) $max) === 1;
+
+        if ($tooSmall || $tooBig) {
             $fail("The {$attribute} must be between {$min} and {$max}.");
         }
     }
