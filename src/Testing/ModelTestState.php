@@ -55,16 +55,9 @@ class ModelTestState extends TableTestState
 
     protected function isCustomCast(string $castDefinition): bool
     {
-        $castClass = $this->resolveCastClass($castDefinition);
+        $castClass = explode(':', $castDefinition, 2)[0];
 
         return class_exists($castClass) && is_subclass_of($castClass, CastsAttributes::class);
-    }
-
-    protected function resolveCastClass(string $castDefinition): string
-    {
-        return str_contains($castDefinition, ':')
-            ? explode(':', $castDefinition, 2)[0]
-            : $castDefinition;
     }
 
     protected function prepareChanges(array $changes): array
