@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Testing;
 
+use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -57,7 +58,11 @@ class ModelTestState extends TableTestState
     {
         $castClass = explode(':', $castDefinition, 2)[0];
 
-        return class_exists($castClass) && is_subclass_of($castClass, CastsAttributes::class);
+        return class_exists($castClass)
+            && (
+                is_subclass_of($castClass, CastsAttributes::class)
+                || is_subclass_of($castClass, Castable::class)
+            );
     }
 
     protected function prepareChanges(array $changes): array
@@ -103,12 +108,19 @@ class ModelTestState extends TableTestState
 
     protected function resolveCaster(string $castDefinition): CastsAttributes
     {
-        if (!str_contains($castDefinition, ':')) {
-            return new $castDefinition();
+        $arguments = [];
+
+        if (str_contains($castDefinition, ':')) {
+            list($castClass, $argString) = explode(':', $castDefinition, 2);
+            $arguments = explode(',', $argString);
+        } else {
+            $castClass = $castDefinition;
         }
 
-        list($castClass, $argString) = explode(':', $castDefinition, 2);
+        if (is_subclass_of($castClass, Castable::class)) {
+            return $castClass::castUsing($arguments);
+        }
 
-        return new $castClass(...explode(',', $argString));
+        return new $castClass(...$arguments);
     }
 }

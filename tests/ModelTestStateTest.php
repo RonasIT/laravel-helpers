@@ -9,6 +9,7 @@ use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIdPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithAllNativeJsonCasts;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCastable;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCasts;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCustomParameterizedCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithModelDependentCast;
@@ -147,6 +148,21 @@ class ModelTestStateTest extends TestCase
         $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_custom_parameterized_casts');
 
         $modelTestState = new ModelTestState(TestModelWithCustomParameterizedCast::class);
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
+    }
+
+    public function testAssertChangesWithCastable(): void
+    {
+        $initialDatasetMock = collect(
+            value: $this->getJsonFixture('changes_equals_fixture_with_castable/initial_dataset.json'),
+        );
+        $changedDatasetMock = collect(
+            value: $this->getJsonFixture('changes_equals_fixture_with_castable/changed_dataset.json'),
+        );
+
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_castables');
+
+        $modelTestState = new ModelTestState(TestModelWithCastable::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
     }
 

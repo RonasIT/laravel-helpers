@@ -45,7 +45,7 @@ class TableTestState extends Assert
 
     public function assertChangesEqualsFixture(string $fixture, bool $exportMode = false): void
     {
-        $changes = $this->getChanges();
+        $changes = json_decode(json_encode($this->getChanges()), true);
 
         $this->assertEqualsFixture($fixture, $changes, $exportMode);
     }

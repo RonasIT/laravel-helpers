@@ -1,0 +1,51 @@
+{
+    "updated": [
+        {
+            "id": 2,
+            "castable_field": {
+                "line_one": "200 Oak Ave Updated",
+                "line_two": "Suite 20"
+            },
+            "address_line_one": "200 Oak Ave Updated",
+            "address_line_two": "Suite 20"
+        },
+        {
+            "id": 3,
+            "name": "name3_updated",
+            "castable_field": {
+                "line_one": "300 Pine Rd Updated",
+                "line_two": "Floor 3"
+            },
+            "address_line_one": "300 Pine Rd Updated",
+            "address_line_two": "Floor 3"
+        }
+    ],
+    "created": [
+        {
+            "id": 5,
+            "name": "name5",
+            "castable_field": {
+                "line_one": "500 New Blvd",
+                "line_two": "Lobby"
+            },
+            "address_line_one": "500 New Blvd",
+            "address_line_two": "Lobby",
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ],
+    "deleted": [
+        {
+            "id": 4,
+            "name": "name4",
+            "castable_field": {
+                "line_one": "400 Elm St",
+                "line_two": "Unit 5"
+            },
+            "address_line_one": "400 Elm St",
+            "address_line_two": "Unit 5",
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ]
+}
