@@ -1,42 +1,14 @@
 {
     "updated": [
         {
-            "name": "name1",
-            "json_field": {
-                "field1": "updated_value",
-                "field2": [
-                    2,
-                    3
-                ],
-                "field3": {
-                    "one": 1,
-                    "two": 2
-                }
-            }
-        },
-        {
             "name": "name2",
-            "json_field": {
-                "field1": "added_value"
-            }
+            "value": "beta_updated"
         }
     ],
     "created": [
         {
-            "name": "name5",
-            "castable_field": {
-                "appearance": {
-                    "theme": null
-                },
-                "locale": {
-                    "language": null
-                },
-                "notifications": {
-                    "email": false,
-                    "sms": false
-                }
-            },
-            "json_field": [],
+            "name": "name4",
+            "value": "delta",
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }
@@ -44,22 +16,7 @@
     "deleted": [
         {
             "name": "name3",
-            "castable_field": {
-                "appearance": {
-                    "theme": null
-                },
-                "locale": {
-                    "language": null
-                },
-                "notifications": {
-                    "email": false,
-                    "sms": false
-                }
-            },
-            "json_field": [
-                2,
-                "two"
-            ],
+            "value": "gamma",
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use JsonSerializable;
 
+// Deserializes a JSON-encoded address column into a structured value object.
 readonly class AddressCastable implements Castable, JsonSerializable
 {
     public function __construct(
@@ -25,7 +26,8 @@ readonly class AddressCastable implements Castable, JsonSerializable
 
     public static function castUsing(array $arguments): CastsAttributes
     {
-        return new class implements CastsAttributes {
+        return new class implements CastsAttributes
+        {
             public function get(Model $model, string $key, mixed $value, array $attributes): AddressCastable
             {
                 $data = json_decode($value, true) ?? [];

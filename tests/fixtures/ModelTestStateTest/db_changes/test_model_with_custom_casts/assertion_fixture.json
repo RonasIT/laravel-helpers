@@ -1,8 +1,8 @@
 {
     "updated": [
         {
-            "id": 1,
-            "castable_field": {
+            "id": 2,
+            "settings": {
                 "appearance": {
                     "theme": "dark"
                 },
@@ -11,7 +11,7 @@
                 },
                 "notifications": {
                     "email": true,
-                    "sms": true
+                    "sms": false
                 }
             }
         }
@@ -20,7 +20,7 @@
         {
             "id": 4,
             "name": "name4",
-            "castable_field": {
+            "settings": {
                 "appearance": {
                     "theme": "system"
                 },
@@ -40,15 +40,15 @@
         {
             "id": 3,
             "name": "name3",
-            "castable_field": {
+            "settings": {
                 "appearance": {
-                    "theme": "dark"
+                    "theme": null
                 },
                 "locale": {
-                    "language": "es"
+                    "language": null
                 },
                 "notifications": {
-                    "email": true,
+                    "email": false,
                     "sms": false
                 }
             },

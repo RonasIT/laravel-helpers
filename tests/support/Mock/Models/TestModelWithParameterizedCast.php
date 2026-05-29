@@ -3,16 +3,16 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Tests\Support\Mock\Casts\UserSettingCast;
+use RonasIT\Support\Tests\Support\Mock\Casts\DecimalAmountCast;
 
-class TestModelWithOnlyCustomCast extends Model
+class TestModelWithParameterizedCast extends Model
 {
     protected $fillable = [
         'name',
-        'castable_field',
+        'amount',
     ];
 
     protected $casts = [
-        'castable_field' => UserSettingCast::class,
+        'amount' => DecimalAmountCast::class . ':2',
     ];
 }

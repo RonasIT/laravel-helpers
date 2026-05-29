@@ -3,16 +3,17 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Tests\Support\Mock\Casts\AddressCastable;
 
-class TestModelWithCastable extends Model
+class TestModelWithPrimitiveCasts extends Model
 {
     protected $fillable = [
         'name',
-        'address',
+        'is_active',
+        'score',
     ];
 
     protected $casts = [
-        'address' => AddressCastable::class,
+        'is_active' => 'boolean',
+        'score' => 'integer',
     ];
 }

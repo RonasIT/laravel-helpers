@@ -3,7 +3,7 @@
     "id": 1,
     "name": "name1",
     "array_field": "[1, 2, 3]",
-    "json_field": "{\"key\": \"old value\"}",
+    "json_field": "{\"key\": \"value\"}",
     "object_field": "{\"prop\": \"old\"}",
     "collection_field": "[{\"id\": 1}]",
     "created_at": "2018-10-10 10:10:10",
@@ -12,20 +12,20 @@
   {
     "id": 2,
     "name": "name2",
-    "array_field": "{}",
-    "json_field": "{}",
-    "object_field": "{}",
-    "collection_field": "[]",
+    "array_field": "{\"a\": 2}",
+    "json_field": "{\"x\": false}",
+    "object_field": "{\"y\": 99}",
+    "collection_field": "[{\"id\": 3}]",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
-    "id": 3,
-    "name": "name3",
+    "id": 4,
+    "name": "name4",
     "array_field": "[\"a\", \"b\"]",
-    "json_field": "{\"x\": 1}",
-    "object_field": "{\"y\": 2}",
-    "collection_field": "[{\"id\": 2}]",
+    "json_field": "{\"new\": 1}",
+    "object_field": "{\"z\": true}",
+    "collection_field": "[{\"id\": 4}]",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   }

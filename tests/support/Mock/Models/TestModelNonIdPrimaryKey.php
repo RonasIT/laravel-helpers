@@ -3,30 +3,14 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use RonasIT\Support\Tests\Support\Mock\Casts\UserSettingCast;
-use RonasIT\Support\Traits\ModelTrait;
 
 class TestModelNonIdPrimaryKey extends Model
 {
-    use ModelTrait;
-    use SoftDeletes;
-
     protected $primaryKey = 'name';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'json_field',
-        'castable_field',
+        'value',
     ];
-
-    protected $casts = [
-        'json_field' => 'array',
-        'castable_field' => UserSettingCast::class,
-    ];
-
-    public function relation(): HasMany
-    {
-        return $this->hasMany(RelationModel::class);
-    }
 }
