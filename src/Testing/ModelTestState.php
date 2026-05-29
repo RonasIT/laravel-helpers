@@ -2,8 +2,6 @@
 
 namespace RonasIT\Support\Testing;
 
-use Illuminate\Contracts\Database\Eloquent\Castable;
-use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
@@ -12,11 +10,11 @@ class ModelTestState extends TableTestState
     protected Model $model;
 
     /**
-     * Map of field names to their cast definitions.
+     * Names of fields with Eloquent casts.
      *
-     * @var array<string, string>
+     * @var list<string>
      */
-    protected array $customCastFields;
+    protected array $castFields;
 
     /**
      * @param  class-string<Model>  $modelClassName
@@ -25,66 +23,33 @@ class ModelTestState extends TableTestState
     {
         $this->model = new $modelClassName();
 
-        $casts = $this->model->getCasts();
-
         parent::__construct(
             tableName: $this->model->getTable(),
-            jsonFields: $this->getNativeJsonFields($casts),
             connectionName: $this->model->getConnectionName(),
             uniqueKey: $this->model->getKeyName(),
         );
 
-        $this->customCastFields = $this->getCustomCastFields($casts);
-    }
-
-    protected function getNativeJsonFields(array $casts): array
-    {
-        $nativeCasts = array_filter($casts, fn (string $castType): bool => $this->isNativeJsonCast($castType));
-
-        return array_keys($nativeCasts);
-    }
-
-    protected function getCustomCastFields(array $casts): array
-    {
-        return array_filter($casts, fn (string $castType): bool => $this->isCustomCast($castType));
-    }
-
-    protected function isNativeJsonCast(string $castDefinition): bool
-    {
-        return in_array($castDefinition, ['array', 'json', 'object', 'collection']);
-    }
-
-    protected function isCustomCast(string $castDefinition): bool
-    {
-        $castClass = explode(':', $castDefinition, 2)[0];
-
-        return class_exists($castClass)
-            && (
-                is_subclass_of($castClass, CastsAttributes::class)
-                || is_subclass_of($castClass, Castable::class)
-            );
+        $this->castFields = array_keys($this->model->getCasts());
     }
 
     protected function prepareChanges(array $changes): array
     {
-        if (!empty($this->customCastFields)) {
-            $changes = array_map(fn (array $changesItem) => $this->applyCustomCasts($changesItem), $changes);
+        if (empty($this->castFields)) {
+            return $changes;
         }
 
-        return parent::prepareChanges($changes);
+        return array_map(fn (array $item) => $this->applyCasts($item), $changes);
     }
 
-    protected function applyCustomCasts(array $item): array
+    protected function applyCasts(array $item): array
     {
         $attributes = $this->resolveModelAttributes($item);
 
         $this->model->setRawAttributes($attributes);
 
-        foreach ($this->customCastFields as $field => $castDefinition) {
+        foreach ($this->castFields as $field) {
             if (Arr::has($item, $field)) {
-                $item[$field] = $this
-                    ->resolveCaster($castDefinition)
-                    ->get($this->model, $field, $attributes[$field], $attributes);
+                $item[$field] = $this->model->getAttribute($field);
             }
         }
 
@@ -104,23 +69,5 @@ class ModelTestState extends TableTestState
         return is_null($original)
             ? $item
             : array_merge($original, $item);
-    }
-
-    protected function resolveCaster(string $castDefinition): CastsAttributes
-    {
-        $arguments = [];
-
-        if (str_contains($castDefinition, ':')) {
-            list($castClass, $argString) = explode(':', $castDefinition, 2);
-            $arguments = explode(',', $argString);
-        } else {
-            $castClass = $castDefinition;
-        }
-
-        if (is_subclass_of($castClass, Castable::class)) {
-            return $castClass::castUsing($arguments);
-        }
-
-        return new $castClass(...$arguments);
     }
 }
