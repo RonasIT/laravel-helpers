@@ -3,7 +3,7 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Tests\Support\Mock\Casts\ModelDependentCast;
+use RonasIT\Support\Tests\Support\Mock\Casts\CurrencyFormattedCast;
 
 class TestModelWithModelDependentCast extends Model
 {
@@ -15,7 +15,6 @@ class TestModelWithModelDependentCast extends Model
     ];
 
     protected $casts = [
-        // Cast that reads another model attribute (currency) to format the value
-        'amount' => ModelDependentCast::class,
+        'amount' => CurrencyFormattedCast::class,
     ];
 }

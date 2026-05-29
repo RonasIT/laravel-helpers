@@ -3,7 +3,7 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Tests\Support\Mock\Casts\CustomCastable;
+use RonasIT\Support\Tests\Support\Mock\Casts\AddressCastable;
 use RonasIT\Support\Traits\ModelTrait;
 
 class TestModelWithCastable extends Model
@@ -14,10 +14,10 @@ class TestModelWithCastable extends Model
 
     protected $fillable = [
         'name',
-        'castable_field',
+        'address',
     ];
 
     protected $casts = [
-        'castable_field' => CustomCastable::class,
+        'address' => AddressCastable::class,
     ];
 }

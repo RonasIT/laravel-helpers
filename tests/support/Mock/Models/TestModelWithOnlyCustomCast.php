@@ -3,7 +3,7 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
+use RonasIT\Support\Tests\Support\Mock\Casts\UserSettingCast;
 
 class TestModelWithOnlyCustomCast extends Model
 {
@@ -13,6 +13,6 @@ class TestModelWithOnlyCustomCast extends Model
     ];
 
     protected $casts = [
-        'castable_field' => JSONCustomCast::class,
+        'castable_field' => UserSettingCast::class,
     ];
 }

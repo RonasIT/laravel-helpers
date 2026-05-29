@@ -5,7 +5,7 @@ namespace RonasIT\Support\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use RonasIT\Support\Testing\ModelTestState;
-use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
+use RonasIT\Support\Tests\Support\Mock\Casts\UserSettingCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIdPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithAllNativeJsonCasts;
@@ -53,7 +53,7 @@ class ModelTestStateTest extends TestCase
             ],
             actual: $jsonFields,
         );
-        $this->assertEquals(['castable_field' => JSONCustomCast::class], $customCastFields);
+        $this->assertEquals(['castable_field' => UserSettingCast::class], $customCastFields);
         $this->assertEquals($originRecords, $state);
     }
 

@@ -5,17 +5,19 @@ namespace RonasIT\Support\Tests\Support\Mock\Casts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
-class ModelDependentCast implements CastsAttributes
+class DecimalAmountCast implements CastsAttributes
 {
+    public function __construct(protected int $decimals)
+    {
+    }
+
     public function get(Model $model, string $key, mixed $value, array $attributes): string
     {
-        return $model->currency . ' ' . $value;
+        return number_format((int) $value / (10 ** $this->decimals), $this->decimals);
     }
 
     public function set(Model $model, string $key, mixed $value, array $attributes): int
     {
-        $explodedValue = explode(' ', $value);
-
-        return $explodedValue[1];
+        return (int) round($value * (10 ** $this->decimals));
     }
 }

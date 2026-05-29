@@ -5,19 +5,17 @@ namespace RonasIT\Support\Tests\Support\Mock\Casts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 
-class JSONCustomParameterizedCast implements CastsAttributes
+class CurrencyFormattedCast implements CastsAttributes
 {
-    public function __construct(protected int $decimals)
-    {
-    }
-
     public function get(Model $model, string $key, mixed $value, array $attributes): string
     {
-        return number_format((int) $value / (10 ** $this->decimals), $this->decimals);
+        return $model->currency . ' ' . $value;
     }
 
     public function set(Model $model, string $key, mixed $value, array $attributes): int
     {
-        return (int) round($value * (10 ** $this->decimals));
+        $explodedValue = explode(' ', $value);
+
+        return $explodedValue[1];
     }
 }
