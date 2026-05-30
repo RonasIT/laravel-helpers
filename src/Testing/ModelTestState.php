@@ -9,11 +9,6 @@ class ModelTestState extends TableTestState
 {
     protected Model $model;
 
-    /**
-     * Names of fields with Eloquent casts.
-     *
-     * @var list<string>
-     */
     protected array $castFields;
 
     /**
@@ -58,10 +53,6 @@ class ModelTestState extends TableTestState
 
     protected function resolveModelAttributes(array $item): array
     {
-        if (!array_key_exists($this->uniqueKey, $item)) {
-            return $item;
-        }
-
         $original = $this->state->first(
             callback: fn (array $record) => $record[$this->uniqueKey] === $item[$this->uniqueKey],
         );
