@@ -3,7 +3,9 @@
         {
             "id": 2,
             "is_active": true,
-            "score": 250
+            "score": 250,
+            "balance": "250.70",
+            "published_at": "2021-06-15T08:45:00.000000Z"
         }
     ],
     "created": [
@@ -12,6 +14,8 @@
             "name": "name4",
             "is_active": true,
             "score": 400,
+            "balance": "400.00",
+            "published_at": "2022-12-31T23:59:59.000000Z",
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }
@@ -22,6 +26,8 @@
             "name": "name3",
             "is_active": true,
             "score": 300,
+            "balance": "300.12",
+            "published_at": "2020-05-20T15:30:00.000000Z",
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }

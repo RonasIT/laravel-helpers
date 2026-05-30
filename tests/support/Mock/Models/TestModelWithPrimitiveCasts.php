@@ -10,10 +10,14 @@ class TestModelWithPrimitiveCasts extends Model
         'name',
         'is_active',
         'score',
+        'balance',
+        'published_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'score' => 'integer',
+        'balance' => 'decimal:2',
+        'published_at' => 'datetime',
     ];
 }

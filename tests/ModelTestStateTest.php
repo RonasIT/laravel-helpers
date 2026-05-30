@@ -30,8 +30,8 @@ class ModelTestStateTest extends TestCase
 
     public function testInitialization(): void
     {
-        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
-        $originRecords = collect($this->getJsonFixture('initialization/origin_records.json'));
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset'));
+        $originRecords = collect($this->getJsonFixture('initialization/origin_records'));
 
         $this->mockGettingDataset($datasetMock);
 
@@ -61,7 +61,7 @@ class ModelTestStateTest extends TestCase
     #[DataProvider('getInitializationViaPrepareModelTestStateFilters')]
     public function testInitializationViaPrepareTableTestState(bool $testCaseGlobalExportMode): void
     {
-        $datasetMock = collect($this->getJsonFixture('initialization/dataset.json'));
+        $datasetMock = collect($this->getJsonFixture('initialization/dataset'));
         $this->mockGettingDataset($datasetMock);
 
         $actualGlobalExportModeValue = $this->mockTestStateCreationSetGlobalExportMode('prepareModelTestState', TestModel::class, $testCaseGlobalExportMode);
@@ -69,121 +69,72 @@ class ModelTestStateTest extends TestCase
         $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
     }
 
-    public function testAssertChanges(): void
+    public static function getChangeScenarios(): array
     {
-        $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
-        $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
-
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
-
-        $modelTestState = new ModelTestState(TestModel::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
+        return [
+            'base' => [
+                'fixtureDir' => 'changes_equals_fixture',
+                'table' => 'test_models',
+                'modelClass' => TestModel::class,
+            ],
+            'primitive casts' => [
+                'fixtureDir' => 'changes_equals_fixture_with_primitive_casts',
+                'table' => 'test_model_with_primitive_casts',
+                'modelClass' => TestModelWithPrimitiveCasts::class,
+            ],
+            'native json casts' => [
+                'fixtureDir' => 'changes_equals_fixture_with_native_json_casts',
+                'table' => 'test_model_with_native_json_casts',
+                'modelClass' => TestModelWithNativeJsonCasts::class,
+            ],
+            'custom cast' => [
+                'fixtureDir' => 'changes_equals_fixture_with_custom_cast',
+                'table' => 'test_model_with_custom_casts',
+                'modelClass' => TestModelWithCustomCast::class,
+            ],
+            'parameterized cast' => [
+                'fixtureDir' => 'changes_equals_fixture_with_parameterized_cast',
+                'table' => 'test_model_with_parameterized_casts',
+                'modelClass' => TestModelWithParameterizedCast::class,
+            ],
+            'castable' => [
+                'fixtureDir' => 'changes_equals_fixture_with_castable',
+                'table' => 'test_model_with_castables',
+                'modelClass' => TestModelWithCastable::class,
+            ],
+            'cross attribute cast' => [
+                'fixtureDir' => 'changes_equals_fixture_with_cross_attribute_cast',
+                'table' => 'test_model_with_cross_attribute_casts',
+                'modelClass' => TestModelWithCrossAttributeCast::class,
+            ],
+            'custom primary key' => [
+                'fixtureDir' => 'changes_equals_fixture_primary_key',
+                'table' => 'test_model_non_id_primary_keys',
+                'modelClass' => TestModelNonIdPrimaryKey::class,
+                'uniqueKey' => 'name',
+            ],
+        ];
     }
 
-    public function testAssertChangesWithCustomPrimaryKey(): void
-    {
-        $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/initial_dataset'));
-        $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/changed_dataset'));
+    #[DataProvider('getChangeScenarios')]
+    public function testAssertChanges(
+        string $fixtureDir,
+        string $table,
+        string $modelClass,
+        string $uniqueKey = 'id',
+    ): void {
+        $initialDatasetMock = collect($this->getJsonFixture("{$fixtureDir}/initial_dataset"));
+        $changedDatasetMock = collect($this->getJsonFixture("{$fixtureDir}/changed_dataset"));
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_non_id_primary_keys', 'name');
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, $table, $uniqueKey);
 
-        $modelTestState = new ModelTestState(TestModelNonIdPrimaryKey::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key');
-    }
-
-    public function testAssertChangesWithPrimitiveCasts(): void
-    {
-        $initialDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_primitive_casts/initial_dataset.json'),
-        );
-        $changedDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_primitive_casts/changed_dataset.json'),
-        );
-
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_primitive_casts');
-
-        $modelTestState = new ModelTestState(TestModelWithPrimitiveCasts::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
-    }
-
-    public function testAssertChangesWithNativeJsonCasts(): void
-    {
-        $initialDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_native_json_casts/initial_dataset.json'),
-        );
-        $changedDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_native_json_casts/changed_dataset.json'),
-        );
-
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_native_json_casts');
-
-        $modelTestState = new ModelTestState(TestModelWithNativeJsonCasts::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
-    }
-
-    public function testAssertChangesWithCustomCast(): void
-    {
-        $initialDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_custom_cast/initial_dataset.json'),
-        );
-        $changedDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_custom_cast/changed_dataset.json'),
-        );
-
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_custom_casts');
-
-        $modelTestState = new ModelTestState(TestModelWithCustomCast::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
-    }
-
-    public function testAssertChangesWithParameterizedCast(): void
-    {
-        $initialDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_parameterized_cast/initial_dataset.json'),
-        );
-        $changedDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_parameterized_cast/changed_dataset.json'),
-        );
-
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_parameterized_casts');
-
-        $modelTestState = new ModelTestState(TestModelWithParameterizedCast::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
-    }
-
-    public function testAssertChangesWithCastable(): void
-    {
-        $initialDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_castable/initial_dataset.json'),
-        );
-        $changedDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_castable/changed_dataset.json'),
-        );
-
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_castables');
-
-        $modelTestState = new ModelTestState(TestModelWithCastable::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
-    }
-
-    public function testAssertChangesWithCrossAttributeCast(): void
-    {
-        $initialDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_cross_attribute_cast/initial_dataset.json'),
-        );
-        $changedDatasetMock = collect(
-            value: $this->getJsonFixture('changes_equals_fixture_with_cross_attribute_cast/changed_dataset.json'),
-        );
-
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_with_cross_attribute_casts');
-
-        $modelTestState = new ModelTestState(TestModelWithCrossAttributeCast::class);
-        $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
+        $modelTestState = new ModelTestState($modelClass);
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture');
     }
 
     public function testAssertNoChanges(): void
     {
-        $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset.json'));
+        $datasetMock = collect($this->getJsonFixture('get_without_changes/dataset'));
 
         $this->mockGettingDatasetForChanges($datasetMock, $datasetMock, 'test_models');
 
