@@ -77,7 +77,7 @@ trait SearchTrait
     }
 
     /**
-     * Applies filtering by partial matching (LIKE) of passed fields with the `query` field of the $filter property. 
+     * Applies filtering by partial matching (LIKE) of passed fields with the `query` field of the $filter property.
      * Fields supports dot notation for relation's fields.
      */
     public function filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self

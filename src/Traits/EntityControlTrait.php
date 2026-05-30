@@ -108,7 +108,7 @@ trait EntityControlTrait
 
     /**
      * Mass insert rows
-     * 
+     *
      * @param  array<array>  $data
      */
     public function insert(array $data): bool
