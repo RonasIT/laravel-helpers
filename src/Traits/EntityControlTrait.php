@@ -10,9 +10,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
-/**
- * @property Model $model
- */
 trait EntityControlTrait
 {
     use SearchTrait;
@@ -28,7 +25,7 @@ trait EntityControlTrait
     protected bool $shouldSettablePropertiesBeReset = true;
 
     /**
-     * Enable force mode to bypass fillable restrictions
+     * Enable force mode to bypass fillable  and soft delete protection
      */
     public function force(bool $value = true): self
     {
@@ -85,9 +82,6 @@ trait EntityControlTrait
         return $result;
     }
 
-    /**
-     * Create a new entity and return it with loaded relations
-     */
     public function create(array $data): Model
     {
         $entityData = Arr::only($data, $this->fields);
@@ -113,7 +107,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Mass insert rows with automatic timestamps
+     * Mass insert rows
+     * 
+     * @param  array<array>  $data
      */
     public function insert(array $data): bool
     {
@@ -125,7 +121,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Insert rows ignoring duplicate key errors. Return count of inserted rows
+     * @param  array<array>  $data
+     *
+     * @return int count of inserted rows
      */
     public function insertOrIgnore(array $data): int
     {
@@ -168,12 +166,12 @@ trait EntityControlTrait
     }
 
     /**
-     * Update multiple entities by condition or primary key
+     * Update multiple entities by condition
      */
-    public function updateMany(array|int|string $where, array $data): int
+    public function updateMany(array $where, array $data): int
     {
         $modelClass = get_class($this->model);
-        $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
+        $fields = ($this->forceMode) ? $modelClass::getFields() : $this->model->getFillable();
         $entityData = Arr::only($data, $fields);
 
         $result = $this->getQuery($where)->update($entityData);
@@ -214,7 +212,7 @@ trait EntityControlTrait
 
         $query = $this->getQuery()->whereIn($field, $values);
 
-        $fields = $this->forceMode ? $this->fields : $this->model->getFillable();
+        $fields = ($this->forceMode) ? $this->fields : $this->model->getFillable();
 
         $this->postQueryHook();
 
@@ -222,9 +220,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Get entities by condition or primary key
+     * Get entities by condition
      */
-    public function get(array|int|string $where = []): Collection
+    public function get(array $where = []): Collection
     {
         $result = $this->getQuery($where)->get();
 
@@ -251,9 +249,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Count entities by condition or primary key
+     * Count entities by condition
      */
-    public function count(array|int|string $where = []): int
+    public function count(array $where = []): int
     {
         $result = $this->getQuery($where)->count();
 
@@ -309,9 +307,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Get the last entity matching the given condition or primary key, ordered by the specified column
+     * Get the last entity matching the given condition, ordered by the specified column
      */
-    public function last(array|int|string $where = [], string $column = 'created_at'): ?Model
+    public function last(array $where = [], string $column = 'created_at'): ?Model
     {
         $result = $this
             ->getQuery($where)
@@ -358,11 +356,9 @@ trait EntityControlTrait
     {
         $query = $this->getQuery($where);
 
-        if ($this->forceMode) {
-            $result = $query->forceDelete();
-        } else {
-            $result = $query->delete();
-        }
+        $result = ($this->forceMode)
+            ? $query->forceDelete()
+            : $query->delete();
 
         $this->postQueryHook();
 

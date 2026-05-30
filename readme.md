@@ -26,7 +26,7 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 
 ### Service-Repository Architecture
 
-The package provides base classes for implementing the service-repository pattern in Laravel applications. `EntityService` and `BaseRepository` give you CRUD operations, search/filtering, pagination, and soft delete support out of the box.
+The package provides base classes for implementing the service-repository pattern in Laravel applications. `EntityService` and `BaseRepository` give you base CRUD operations, ability to build your own search operation with filtering and pagination result.
 
 [Follow the service-repository documentation][9] to implement this pattern in your Laravel app.
 

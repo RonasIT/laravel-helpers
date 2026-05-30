@@ -380,7 +380,7 @@ class EntityControlTraitTest extends TestCase
             ->force()
             ->with('relation')
             ->withCount('relation')
-            ->updateMany(1, ['name' => 'test_name']);
+            ->updateMany(['id' => 1], ['name' => 'test_name']);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
@@ -545,7 +545,7 @@ class EntityControlTraitTest extends TestCase
             ->force()
             ->with('relation')
             ->withCount('relation')
-            ->last(1);
+            ->last(['id' => 1]);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }

@@ -35,9 +35,6 @@ trait SearchTrait
         'desc',
     ];
 
-    /**
-     * Paginate the query using per_page and page from filters
-     */
     public function paginate(): LengthAwarePaginator
     {
         $defaultPerPage = config('defaults.items_per_page');
@@ -48,7 +45,7 @@ trait SearchTrait
     }
 
     /**
-     * Applies filtering by the specified field. Supports dot notation for related fields
+     * Applies filtering by the specified field. Supports dot notation for relations's fields
      */
     public function filterBy(string $field, ?string $filterName = null): self
     {
@@ -64,7 +61,7 @@ trait SearchTrait
     }
 
     /**
-     * Filter by a list of values (whereIn). Supports dot notation for relations
+     * Applies filtering by a list of values (whereIn). Supports dot notation for relation's fields
      */
     public function filterByList(string $field, ?string $filterName = null): self
     {
@@ -80,7 +77,8 @@ trait SearchTrait
     }
 
     /**
-     * Search by text query (LIKE) across multiple fields. Supports dot notation for relations
+     * Applies filtering by partial matching (LIKE) of passed fields with the `query` field of the $filter property. 
+     * Fields supports dot notation for relation's fields.
      */
     public function filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self
     {
@@ -104,7 +102,7 @@ trait SearchTrait
     }
 
     /**
-     * Initialize the search query and auto-apply filters
+     * Initialize the search query and auto-apply predefined filters
      */
     public function searchQuery(array $filter = []): self
     {
@@ -178,9 +176,6 @@ trait SearchTrait
         return $this->wrapPaginatedData($data);
     }
 
-    /**
-     * Wrap a collection into a LengthAwarePaginator with a single page
-     */
     public function wrapPaginatedData(Collection $data): LengthAwarePaginator
     {
         $total = $data->count();
@@ -195,9 +190,6 @@ trait SearchTrait
         return $this->getModifiedPaginator($paginator);
     }
 
-    /**
-     * Hook for modifying the paginator before returning results
-     */
     public function getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator
     {
         $collection = $paginator->getCollection();
@@ -206,7 +198,7 @@ trait SearchTrait
     }
 
     /**
-     * Sort results by the order_by filter. Supports dot notation for relations
+     * Applies sorting results by the `order_by` key of the $filter property. Supports dot notation for relation's fields.
      */
     public function orderBy(?string $default = null, bool $defaultDesc = false): self
     {
@@ -252,9 +244,6 @@ trait SearchTrait
         return $this->filterValue($field, '<=', $value);
     }
 
-    /**
-     * Add a where condition with a comparison operator
-     */
     public function filterValue(string $field, string $sign, mixed $value): self
     {
         if (!empty($value)) {
@@ -291,7 +280,7 @@ trait SearchTrait
     }
 
     /**
-     * Filter where field is greater than (or equal to) the filter value
+     * Applies filtering by field is greater than (or equal to) the filter value
      */
     public function filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
@@ -312,7 +301,7 @@ trait SearchTrait
     }
 
     /**
-     * Filter where field is less than (or equal to) the filter value
+     * Applies filtering for field is less than (or equal to) the filter value
      */
     public function filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
@@ -327,7 +316,7 @@ trait SearchTrait
     }
 
     /**
-     * Get the current Eloquent query builder
+     * Get the current Eloquent query builder with applied filters
      */
     public function getSearchQuery(): Query
     {
