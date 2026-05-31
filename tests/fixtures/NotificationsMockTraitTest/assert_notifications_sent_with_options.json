@@ -18,6 +18,7 @@
             "via_method": "active",
             "via_property": "active",
             "via_chain": "active",
+            "via_notifiable_argument": 1,
             "via_unresolvable_method": null,
             "via_unresolvable_property": null,
             "via_unresolvable_chain": null,

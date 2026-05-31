@@ -73,6 +73,7 @@ class NotificationsMockTraitTest extends TestCase
                 'via_method' => ['getStatus()'],
                 'via_property' => ['status'],
                 'via_chain' => ['getDetails()', 'status'],
+                'via_notifiable_argument' => ['getNotifiableKey()'],
                 'via_unresolvable_method' => ['nonExistentMethod()'],
                 'via_unresolvable_property' => ['nonExistentProperty'],
                 'via_unresolvable_chain' => ['getDetails()', 'nonExistentProperty'],

@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\Notification;
+use ReflectionMethod;
 
 trait NotificationsMockTrait
 {
@@ -22,11 +23,15 @@ trait NotificationsMockTrait
      *   'method()' — calls the method on the notification or the result of the previous step
      *   'property' — accesses the property on the notification or the result of the previous step
      *
+     * When a method declares at least one parameter, the current notifiable is passed as the first
+     * argument. This matches Laravel's channel methods (e.g. toMail, toBroadcast, toExpoPush) which
+     * receive the notifiable, while zero-parameter methods (e.g. broadcastOn) are called without it.
+     *
      * Example:
      *   [
-     *      'message'        => ['toExpoPush()', 'toArray()'],  // $notification->toExpoPush()->toArray()
+     *      'message'        => ['toExpoPush()', 'toArray()'],  // $notification->toExpoPush($notifiable)->toArray()
      *      'broadcast_on'   => ['broadcastOn()'],              // $notification->broadcastOn()
-     *      'broadcast_data' => ['toBroadcast()', 'data'],      // $notification->toBroadcast()->data
+     *      'broadcast_data' => ['toBroadcast()', 'data'],      // $notification->toBroadcast($notifiable)->data
      *   ]
      *
      * @param  array<string, string[]>  $options
@@ -53,7 +58,7 @@ trait NotificationsMockTrait
     protected function prepareNotificationFixtureData(array $notification, array $options): array
     {
         foreach ($options as $key => $chain) {
-            $notification[$key] = $this->resolveNotificationChain($notification['notification'], $chain);
+            $notification[$key] = $this->resolveNotificationChain($notification['notification'], $chain, $notification['notifiable']);
         }
 
         $attributes = $this->getObjectAttributes($notification['notification']);
@@ -65,7 +70,7 @@ trait NotificationsMockTrait
         return $notification;
     }
 
-    protected function resolveNotificationChain(object $notification, array $chain): mixed
+    protected function resolveNotificationChain(object $notification, array $chain, object $notifiable): mixed
     {
         $value = $notification;
 
@@ -74,9 +79,18 @@ trait NotificationsMockTrait
                 return null;
             }
 
-            if (str_ends_with($step, '()') && method_exists($value, rtrim($step, '()'))) {
-                $method = rtrim($step, '()');
-                $value = $value->{$method}();
+            if (str_ends_with($step, '()')) {
+                $method = substr($step, 0, -2);
+
+                if (!method_exists($value, $method)) {
+                    return null;
+                }
+
+                $arguments = (new ReflectionMethod($value, $method))->getNumberOfParameters() > 0
+                    ? [$notifiable]
+                    : [];
+
+                $value = $value->{$method}(...$arguments);
             } elseif (property_exists($value, $step)) {
                 $value = $value->$step;
             } else {

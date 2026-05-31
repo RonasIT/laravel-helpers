@@ -26,4 +26,9 @@ class TestChainableNotification extends Notification
     {
         return (object) ['status' => $this->status];
     }
+
+    public function getNotifiableKey(object $notifiable): int
+    {
+        return $notifiable->getKey();
+    }
 }
