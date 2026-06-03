@@ -144,7 +144,7 @@ class TableTestState extends Assert
         $dataSet->transform(function (array $record) {
             array_walk($record, function (mixed &$value, string $field) {
                 if (!is_null($value) && in_array($field, $this->binaryColumns)) {
-                    $value = is_resource($value) ? bin2hex(stream_get_contents($value)) : bin2hex($value);
+                    $value = (is_resource($value)) ? bin2hex(stream_get_contents($value)) : bin2hex($value);
                 }
             });
 
