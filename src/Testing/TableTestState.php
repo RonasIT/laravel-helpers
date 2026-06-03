@@ -182,7 +182,7 @@ class TableTestState extends Assert
 
         $tableSchema = array_map('trim', explode(',', $tableSchema));
 
-        $tableSchema = array_filter($tableSchema, fn ($schema) => !empty($schema));
+        $tableSchema = array_filter($tableSchema);
 
         return Arr::wrap($tableSchema);
     }
