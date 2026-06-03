@@ -13,6 +13,6 @@ class BinaryCast implements CastsAttributes
 
     public function set($model, $key, $value, $attributes)
     {
-        return is_null($value) ? $value : md5($value, true);
+        return (is_null($value)) ? $value : md5($value, true);
     }
 }
