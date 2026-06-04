@@ -60,10 +60,5 @@
         "docker-compose up -d php && docker-compose exec -T php vendor/bin/php-cs-fixer fix && docker-compose exec -T php vendor/bin/tlint"
       ]
     }
-  },
-  "config": {
-    "audit": {
-      "block-insecure": false
-    }
   }
 }
