@@ -58,7 +58,8 @@ class TableTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/initial_dataset.json'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture/changed_dataset.json'));
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models');
+        $this->mockGettingDataset($initialDatasetMock);
+        $this->mockGettingDataset($changedDatasetMock);
 
         $modelTestState = new TableTestState('test_models', ['json_field', 'castable_field']);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture.json');
@@ -118,7 +119,7 @@ class TableTestStateTest extends TestCase
         ]]);
 
         $this->mockGettingDatasetForChanges(
-            responseMock: $changedDatasetMock,
+            changedDataset: $changedDatasetMock,
             initialState: $initialDatasetMock,
             tableName: 'test_models',
             binaryColumn: 'cast_binary_field',
@@ -142,7 +143,7 @@ class TableTestStateTest extends TestCase
         ]]);
 
         $this->mockGettingDatasetForChanges(
-            responseMock: $changedDatasetMock,
+            changedDataset: $changedDatasetMock,
             initialState: $initialDatasetMock,
             tableName: 'test_models',
             binaryColumn: 'cast_binary_field',
@@ -167,7 +168,7 @@ class TableTestStateTest extends TestCase
         ]]);
 
         $this->mockGettingDatasetForChanges(
-            responseMock: $changedDatasetMock,
+            changedDataset: $changedDatasetMock,
             initialState: $initialDatasetMock,
             tableName: 'test_models',
             binaryColumn: 'binary_field',
@@ -180,7 +181,7 @@ class TableTestStateTest extends TestCase
         fclose($resource);
     }
 
-    public function testAssertChangesWithUnsupportedMysqlDriver()
+    public function testAssertChangesWithUnsupportedDBDriver()
     {
         $initialDatasetMock = collect([[
             'id' => 1,
@@ -192,7 +193,12 @@ class TableTestStateTest extends TestCase
             'name' => 'name_changed',
         ]]);
 
-        $this->mockGettingDatasetForChangesUnknownDriver($changedDatasetMock, $initialDatasetMock, 'test_models');
+        $this->mockGettingDatasetForChanges(
+            changedDataset: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_models',
+            dbDriver: 'unknown',
+        );
 
         $modelTestState = new ModelTestState(TestModel::class);
 
