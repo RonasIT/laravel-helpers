@@ -1,10 +1,10 @@
 {
-    "updated": [],
-    "created": [],
-    "deleted": [
+    "updated": [
         {
             "id": 1,
-            "name": "name"
+            "name": "name_changed"
         }
-    ]
+    ],
+    "created": [],
+    "deleted": []
 }

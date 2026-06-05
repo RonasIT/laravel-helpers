@@ -180,7 +180,6 @@ trait TableTestStateMockTrait
             ->method('get')
             ->willReturnOnConsecutiveCalls(
                 $initialState,
-                empty($binaryColumn) ? collect() : collect([['column_name' => $binaryColumn]]),
                 $responseMock,
             );
     }
