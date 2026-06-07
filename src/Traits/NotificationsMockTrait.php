@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
 
 trait NotificationsMockTrait
@@ -40,13 +41,15 @@ trait NotificationsMockTrait
      */
     protected function assertNotificationsSent(string $fixture, array $options = [], bool $exportMode = false): void
     {
+        $this->validateReservedOptions($options);
+
         $actualData = [];
 
-        foreach (Notification::sentNotifications() as $notifiableIDs) {
-            foreach ($notifiableIDs as $modelNotifications) {
-                foreach ($modelNotifications as $notificationClassName => $modelNotification) {
-                    foreach ($modelNotification as $notification) {
-                        $actualData[$notificationClassName][] = $this->prepareNotificationFixtureData($notification, $options);
+        foreach (Notification::sentNotifications() as $notificationsByNotifiable) {
+            foreach ($notificationsByNotifiable as $notificationsByClass) {
+                foreach ($notificationsByClass as $notificationClass => $notifications) {
+                    foreach ($notifications as $notification) {
+                        $actualData[$notificationClass][] = $this->prepareNotificationFixtureData($notification, $options);
                     }
                 }
             }
@@ -57,21 +60,24 @@ trait NotificationsMockTrait
         $this->assertEqualsFixture($fixture, $preparedActualData, $exportMode);
     }
 
-    protected function prepareNotificationFixtureData(array $notification, array $options): array
+    protected function validateReservedOptions(array $options): void
     {
         $reservedKeys = ['notification', 'channels', 'notifiable', 'locale'];
 
-        foreach ($options as $key => $chain) {
+        foreach (array_keys($options) as $key) {
             if (in_array($key, $reservedKeys, true)) {
                 $this->fail("Options field '{$key}' collides with a reserved key. Reserved keys are: " . implode(', ', $reservedKeys) . '.');
             }
+        }
+    }
 
+    protected function prepareNotificationFixtureData(array $notification, array $options): array
+    {
+        foreach ($options as $key => $chain) {
             $notification[$key] = $this->resolveNotificationChain($notification['notification'], $chain, $notification['notifiable']);
         }
 
-        $attributes = $this->getObjectAttributes($notification['notification']);
-
-        $notification['notification'] = $attributes;
+        $notification['notification'] = $this->getObjectAttributes($notification['notification']);
         $notification['notifiable'] = $this->prepareNotifiableFixtureData($notification['notifiable']);
 
         unset($notification['notification']['id']);
@@ -111,6 +117,12 @@ trait NotificationsMockTrait
 
     protected function prepareNotifiableFixtureData(object $notifiable): mixed
     {
+        if ($notifiable instanceof Model) {
+            return [
+                $notifiable->getKeyName() => $notifiable->getKey(),
+            ];
+        }
+
         return $notifiable;
     }
 }
