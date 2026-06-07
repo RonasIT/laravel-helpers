@@ -2,19 +2,20 @@
 
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
-class TestNotifiable
+class TestNotifiable extends Model
 {
     use Notifiable;
 
-    public function __construct(
-        public int $id = 1,
-    ) {
-    }
+    protected $fillable = [
+        'id',
+        'name',
+    ];
 
-    public function getKey(): int
-    {
-        return $this->id;
-    }
+    protected $attributes = [
+        'id' => 1,
+        'name' => 'John Doe',
+    ];
 }

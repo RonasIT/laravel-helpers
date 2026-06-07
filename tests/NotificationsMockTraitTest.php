@@ -47,7 +47,7 @@ class NotificationsMockTraitTest extends TestCase
         );
 
         Notification::send(
-            new TestNotifiable(2),
+            new TestNotifiable(['id' => 2]),
             new TestNotification(
                 firstParam: 'value-3',
                 secondParam: 'value-4',
@@ -56,6 +56,13 @@ class NotificationsMockTraitTest extends TestCase
         );
 
         $this->assertNotificationsSent('assert_notifications_sent_to_multiple_notifiables');
+    }
+
+    public function testAssertNotificationsSentWithAnonymousNotifiable(): void
+    {
+        Notification::route('mail', 'test@example.com')->notify(new TestNotification());
+
+        $this->assertNotificationsSent('assert_notifications_sent_with_anonymous_notifiable');
     }
 
     public function testAssertMultipleNotificationTypesSent(): void
