@@ -72,6 +72,7 @@ trait NotificationsMockTrait
         $attributes = $this->getObjectAttributes($notification['notification']);
 
         $notification['notification'] = $attributes;
+        $notification['notifiable'] = $this->prepareNotifiableFixtureData($notification['notifiable']);
 
         unset($notification['notification']['id']);
 
@@ -106,5 +107,10 @@ trait NotificationsMockTrait
         }
 
         return $value;
+    }
+
+    protected function prepareNotifiableFixtureData(object $notifiable): mixed
+    {
+        return $notifiable;
     }
 }
