@@ -12,6 +12,10 @@ trait ReflectionTrait
         $attributes = [];
 
         foreach ($reflection->getProperties() as $property) {
+            if ($property->isStatic() || !$property->isInitialized($object)) {
+                continue;
+            }
+
             $attributes[$property->getName()] = $property->getValue($object);
         }
 

@@ -3,10 +3,13 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\AssertionFailedError;
 use RonasIT\Support\Tests\Support\Mock\Models\TestNotifiable;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestAnotherNotification;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestChainableNotification;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestNotification;
+use RonasIT\Support\Tests\Support\Mock\Notifications\TestNotificationWithStaticProperty;
+use RonasIT\Support\Tests\Support\Mock\Notifications\TestNotificationWithUninitializedProperty;
 
 class NotificationsMockTraitTest extends TestCase
 {
@@ -74,12 +77,82 @@ class NotificationsMockTraitTest extends TestCase
                 'via_property' => ['status'],
                 'via_chain' => ['getDetails()', 'status'],
                 'via_notifiable_argument' => ['getNotifiableKey()'],
+            ],
+        );
+    }
+
+    public function testAssertNotificationsSentWithUnresolvableMethod(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("doesn't have method 'nonExistentMethod'");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
                 'via_unresolvable_method' => ['nonExistentMethod()'],
+            ],
+        );
+    }
+
+    public function testAssertNotificationsSentWithUnresolvableProperty(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("doesn't have property 'nonExistentProperty'");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
                 'via_unresolvable_property' => ['nonExistentProperty'],
-                'via_unresolvable_chain' => ['getDetails()', 'nonExistentProperty'],
+            ],
+        );
+    }
+
+    public function testAssertNotificationsSentWithNonObjectStep(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('returned a non-object value');
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
                 'via_non_object_step' => ['getStatus()', 'nonExistentProperty'],
             ],
         );
+    }
+
+    public function testAssertNotificationsSentWithReservedOptionKey(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Options field 'channels' collides with a reserved key");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
+                'channels' => ['getStatus()'],
+            ],
+        );
+    }
+
+    public function testAssertNotificationsSentSkipsStaticProperty(): void
+    {
+        Notification::send(new TestNotifiable(), new TestNotificationWithStaticProperty());
+
+        $this->assertNotificationsSent('assert_notifications_sent_skips_static_property');
+    }
+
+    public function testAssertNotificationsSentSkipsUninitializedProperty(): void
+    {
+        Notification::send(new TestNotifiable(), new TestNotificationWithUninitializedProperty());
+
+        $this->assertNotificationsSent('assert_notifications_sent_skips_uninitialized_property');
     }
 
     public function testAssertNotificationsSentWithExportMode(): void

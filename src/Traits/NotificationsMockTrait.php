@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Traits;
 
 use Illuminate\Support\Facades\Notification;
-use ReflectionMethod;
 
 trait NotificationsMockTrait
 {
@@ -17,20 +16,23 @@ trait NotificationsMockTrait
      *   ]
      *
      * where each step is either a method call or a property access resolved sequentially
-     * on the notification object. Returns null if any step cannot be resolved.
+     * on the notification object. The test fails when any step cannot be resolved (e.g. a
+     * misspelled method or property name), so the chain definition is validated loudly.
      *
      * Steps format:
      *   'method()' — calls the method on the notification or the result of the previous step
      *   'property' — accesses the property on the notification or the result of the previous step
      *
-     * When a method declares at least one parameter, the current notifiable is passed as the first
-     * argument. This matches Laravel's channel methods (e.g. toMail, toBroadcast, toExpoPush) which
-     * receive the notifiable, while zero-parameter methods (e.g. broadcastOn) are called without it.
+     * The notifiable is always passed as the first argument to every method call, like Laravel's
+     * channel dispatch (e.g. toMail($notifiable)); methods without parameters simply ignore it.
+     * Intended for the notification's own channel methods.
+     *
+     * Field names must not collide with the reserved keys: 'notification', 'channels', 'notifiable', 'locale'.
      *
      * Example:
      *   [
-     *      'message'        => ['toExpoPush()', 'toArray()'],  // $notification->toExpoPush($notifiable)->toArray()
-     *      'broadcast_on'   => ['broadcastOn()'],              // $notification->broadcastOn()
+     *      'message'        => ['toExpoPush()', 'toArray()'],  // $notification->toExpoPush($notifiable)->toArray($notifiable)
+     *      'broadcast_on'   => ['broadcastOn()'],              // $notification->broadcastOn($notifiable)
      *      'broadcast_data' => ['toBroadcast()', 'data'],      // $notification->toBroadcast($notifiable)->data
      *   ]
      *
@@ -57,7 +59,13 @@ trait NotificationsMockTrait
 
     protected function prepareNotificationFixtureData(array $notification, array $options): array
     {
+        $reservedKeys = ['notification', 'channels', 'notifiable', 'locale'];
+
         foreach ($options as $key => $chain) {
+            if (in_array($key, $reservedKeys, true)) {
+                $this->fail("Options field '{$key}' collides with a reserved key. Reserved keys are: " . implode(', ', $reservedKeys) . '.');
+            }
+
             $notification[$key] = $this->resolveNotificationChain($notification['notification'], $chain, $notification['notifiable']);
         }
 
@@ -72,29 +80,28 @@ trait NotificationsMockTrait
 
     protected function resolveNotificationChain(object $notification, array $chain, object $notifiable): mixed
     {
+        $notificationClass = $notification::class;
         $value = $notification;
 
         foreach ($chain as $step) {
             if (!is_object($value)) {
-                return null;
+                $type = get_debug_type($value);
+
+                $this->fail("Notification {$notificationClass} cannot resolve options step '{$step}' because the previous step returned a non-object value of type '{$type}'.");
             }
 
             if (str_ends_with($step, '()')) {
                 $method = substr($step, 0, -2);
 
                 if (!method_exists($value, $method)) {
-                    return null;
+                    $this->fail("Notification {$notificationClass} doesn't have method '{$method}' required by options step '{$step}'.");
                 }
 
-                $arguments = (new ReflectionMethod($value, $method))->getNumberOfParameters() > 0
-                    ? [$notifiable]
-                    : [];
-
-                $value = $value->{$method}(...$arguments);
+                $value = $value->{$method}($notifiable);
             } elseif (property_exists($value, $step)) {
                 $value = $value->$step;
             } else {
-                return null;
+                $this->fail("Notification {$notificationClass} doesn't have property '{$step}' required by options step '{$step}'.");
             }
         }
 

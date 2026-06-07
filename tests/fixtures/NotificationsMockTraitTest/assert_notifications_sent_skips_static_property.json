@@ -1,5 +1,5 @@
 {
-    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestChainableNotification": [
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestNotificationWithStaticProperty": [
         {
             "notification": {
                 "status": "active",
@@ -14,11 +14,7 @@
             "notifiable": {
                 "id": 1
             },
-            "locale": null,
-            "via_method": "active",
-            "via_property": "active",
-            "via_chain": "active",
-            "via_notifiable_argument": 1
+            "locale": null
         }
     ]
 }
