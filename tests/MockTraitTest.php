@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionClass;
 use ReflectionProperty;
@@ -220,14 +221,8 @@ class MockTraitTest extends TestCase
         }
 
         foreach ($class->getProperty('mockObjects')->getValue($this) as $entry) {
-            $mockObject = (is_array($entry)) ? $entry['mockObject'] : $entry;
-            $handler = $mockObject->__phpunit_getInvocationHandler();
-
-            if (property_exists($handler, 'matchers')) {
-                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
-            } else {
-                (new ReflectionProperty($handler, 'assertionFailure'))->setValue($handler, null);
-            }
+            $handler = $entry->__phpunit_getInvocationHandler();
+            (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
         }
     }
 }
