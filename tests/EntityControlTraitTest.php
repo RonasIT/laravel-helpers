@@ -955,7 +955,7 @@ class EntityControlTraitTest extends TestCase
 
         $counter = 0;
 
-        //TODO: remove withTrashed() after increase min Laravel version up to 13
+        // TODO: remove withTrashed() after increase min Laravel version up to 13
         self::$testRepositoryClass
             ->withTrashed()
             ->lazyEach(function () use (&$counter) {
