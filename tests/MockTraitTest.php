@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Foundation\Application;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionClass;
 use ReflectionProperty;
@@ -219,9 +220,18 @@ class MockTraitTest extends TestCase
             $class = $class->getParentClass();
         }
 
+        // TODO: Remove after increase min Laravel version up to 12
+        $isNewLaravel = version_compare(Application::VERSION, '12.0.0', '>=');
+
         foreach ($class->getProperty('mockObjects')->getValue($this) as $entry) {
-            $handler = $entry->__phpunit_getInvocationHandler();
-            (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
+            if ($isNewLaravel) {
+                $handler = $entry['mockObject']->__phpunit_getInvocationHandler();
+                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
+                (new ReflectionProperty($handler, 'assertionFailure'))->setValue($handler, null);
+            } else {
+                $handler = $entry->__phpunit_getInvocationHandler();
+                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
+            }
         }
     }
 }
