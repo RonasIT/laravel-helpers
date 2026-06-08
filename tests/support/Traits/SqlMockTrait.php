@@ -142,7 +142,7 @@ trait SqlMockTrait
         );
     }
 
-    //TODO: remove after increase min Laravel version up to 13
+    // TODO: remove after increase min Laravel version up to 13
     protected function lazyByIdInitialNullCondition(): string
     {
         return version_compare(app()->version(), '12.4.0', '>=') ? ' and "id" is not null' : '';
