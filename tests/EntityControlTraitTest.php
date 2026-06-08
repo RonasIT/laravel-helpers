@@ -920,6 +920,51 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
+    public function testLazyEach()
+    {
+        $mockResult = $this->getJsonFixture('lazy_each_query_result');
+
+        $this->mockLazyEach($mockResult);
+
+        $counter = 0;
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->lazyEach(function () use (&$counter) {
+                $counter++;
+            }, chunkSize: 1);
+
+        $this->assertEquals(2, $counter);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testLazyEachEmptyResult()
+    {
+        $nullCondition = $this->lazyByIdInitialNullCondition();
+
+        $this->mockSelect(
+            'select * from "test_models"'
+            . ($nullCondition ? ' where "id" is not null' : '')
+            . ' order by "id" asc limit 500',
+        );
+
+        $counter = 0;
+
+        // TODO: remove withTrashed() after increase min Laravel version up to 13
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->lazyEach(function () use (&$counter) {
+                $counter++;
+            });
+
+        $this->assertEquals(0, $counter);
+    }
+
     public function testForceDeleteByList()
     {
         $this->mockDelete(
