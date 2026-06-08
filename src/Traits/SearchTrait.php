@@ -88,10 +88,10 @@ trait SearchTrait
                         list($fieldName, $relations) = extract_last_part($field);
 
                         $query->orWhereHas($relations, function ($query) use ($fieldName, $mask) {
-                            $query->where($this->getQuerySearchCallback($fieldName, $mask, $query->getModel()->getTable()));
+                            $query->where($this->getQuerySearchCallback($fieldName, $mask));
                         });
                     } else {
-                        $query->orWhere($this->getQuerySearchCallback($field, $mask, $query->getModel()->getTable()));
+                        $query->orWhere($this->getQuerySearchCallback($field, $mask));
                     }
                 }
             });
@@ -272,9 +272,9 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getQuerySearchCallback(string $field, string $mask, ?string $table = null): Closure
+    protected function getQuerySearchCallback(string $field, string $mask): Closure
     {
-        return function ($query) use ($field, $mask, $table) {
+        return function (Query $query) use ($field, $mask) {
             $databaseDriver = config('database.default');
             $value = ($databaseDriver === 'pgsql')
                 ? pg_escape_string($this->filter['query'])
@@ -284,9 +284,9 @@ trait SearchTrait
                 ? 'ilike'
                 : 'like';
 
-            $field = is_string($table) ? "{$table}.{$field}" : $field;
+            $column = $query->qualifyColumn($field);
 
-            $query->orWhere($field, $operator, DB::raw($value));
+            $query->orWhere($column, $operator, DB::raw($value));
         };
     }
 
