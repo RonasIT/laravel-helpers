@@ -142,6 +142,12 @@ trait SqlMockTrait
         );
     }
 
+    //TODO: remove after increase min Laravel version up to 13
+    protected function lazyByIdInitialNullCondition(): string
+    {
+        return version_compare(app()->version(), '13.0.0', '>=') ? ' and "id" is not null' : '';
+    }
+
     protected function mockLazyEach(array $selectResult): void
     {
         $mainQuery = 'select "test_models".*, (select count(*) from "relation_models" '
@@ -151,7 +157,7 @@ trait SqlMockTrait
         $firstRow = array_shift($selectResult);
         $lastId = $firstRow['id'];
 
-        $this->mockSelect("{$mainQuery} order by \"id\" asc limit 1", [$firstRow]);
+        $this->mockSelect("{$mainQuery}{$this->lazyByIdInitialNullCondition()} order by \"id\" asc limit 1", [$firstRow]);
         $this->mockSelect("select * from \"relation_models\" where \"relation_models\".\"test_model_id\" in ({$lastId})");
 
         foreach ($selectResult as $row) {

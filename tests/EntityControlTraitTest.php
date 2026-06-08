@@ -946,7 +946,9 @@ class EntityControlTraitTest extends TestCase
     public function testLazyEachEmptyResult()
     {
         $this->mockSelect(
-            'select * from "test_models" where "test_models"."deleted_at" is null order by "id" asc limit 500',
+            'select * from "test_models" where "test_models"."deleted_at" is null'
+            . $this->lazyByIdInitialNullCondition()
+            . ' order by "id" asc limit 500',
         );
 
         $counter = 0;
