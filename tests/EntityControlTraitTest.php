@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
-use Mockery;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidModelException;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
@@ -923,7 +922,9 @@ class EntityControlTraitTest extends TestCase
 
     public function testLazyEach()
     {
-        $this->mockLazyEach(self::$selectResult);
+        $lazyEachResult = $this->getJsonFixture('lazy_each_query_result');
+
+        $this->mockLazyEach($lazyEachResult);
 
         $counter = 0;
 
@@ -935,21 +936,20 @@ class EntityControlTraitTest extends TestCase
             ->withCount('relation')
             ->lazyEach(function () use (&$counter) {
                 $counter++;
-            });
+            }, chunkSize: 1);
 
-        $this->assertEquals(1, $counter);
+        $this->assertEquals(2, $counter);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testLazyEachEmptyResult()
     {
-        $this->mockSelect(Mockery::pattern(
-            '/select "test_models".*, \(select count\(\*\) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id"\) as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null'
-            . '( and "id" is not null)? order by "id" asc limit 500/',
-        ));
+        $this->mockSelect(
+            'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null order by "id" asc limit 500',
+        );
 
         $counter = 0;
 
@@ -964,6 +964,8 @@ class EntityControlTraitTest extends TestCase
             });
 
         $this->assertEquals(0, $counter);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
     public function testForceDeleteByList()

@@ -5,8 +5,6 @@ namespace RonasIT\Support\Tests\Support\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Mockery;
-use Mockery\Matcher\Pattern;
 use Mpyw\LaravelDatabaseMock\Facades\DBMock;
 use Mpyw\LaravelDatabaseMock\Proxies\SingleConnectionProxy;
 
@@ -146,16 +144,23 @@ trait SqlMockTrait
 
     protected function mockLazyEach(array $selectResult): void
     {
-        $this->mockSelect(Mockery::pattern(
-            '/select "test_models".*, \(select count\(\*\) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id"\) as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null'
-            . '( and "id" is not null)? order by "id" asc limit 500/',
-        ), $selectResult);
+        $mainQuery = 'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null';
 
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-        );
+        $firstRow = array_shift($selectResult);
+        $lastId = $firstRow['id'];
+
+        $this->mockSelect("{$mainQuery} order by \"id\" asc limit 1", [$firstRow]);
+        $this->mockSelect("select * from \"relation_models\" where \"relation_models\".\"test_model_id\" in ({$lastId})");
+
+        foreach ($selectResult as $row) {
+            $this->mockSelect("{$mainQuery} and \"id\" > ? order by \"id\" asc limit 1", [$row], [$lastId]);
+            $this->mockSelect("select * from \"relation_models\" where \"relation_models\".\"test_model_id\" in ({$row['id']})");
+            $lastId = $row['id'];
+        }
+
+        $this->mockSelect("{$mainQuery} and \"id\" > ? order by \"id\" asc limit 1", [], [$lastId]);
     }
 
     protected function mockCreate(array $selectResult, $notFillableValue): void
@@ -647,11 +652,9 @@ trait SqlMockTrait
         $this->getPdo()->expects('lastInsertId')->andReturn($lastInsertId);
     }
 
-    protected function mockSelect(string|Pattern $query, array $result = [], array $bindings = []): void
+    protected function mockSelect(string $query, array $result = [], array $bindings = []): void
     {
-        $query = is_string($query) ? $this->normalizeAggregateAliasInQuery($query) : $query;
-
-        $select = $this->getPdo()->shouldSelect($query, $bindings);
+        $select = $this->getPdo()->shouldSelect($this->normalizeAggregateAliasInQuery($query), $bindings);
 
         if (!empty($result)) {
             $select->shouldFetchAllReturns($result);
