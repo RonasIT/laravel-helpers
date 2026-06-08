@@ -142,6 +142,33 @@ trait SqlMockTrait
         );
     }
 
+    // TODO: remove after increase min Laravel version up to 13
+    protected function lazyByIdInitialNullCondition(): string
+    {
+        return version_compare(app()->version(), '12.4.0', '>=') ? ' and "id" is not null' : '';
+    }
+
+    protected function mockLazyEach(array $selectResult): void
+    {
+        $mainQuery = 'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null';
+
+        $firstRow = array_shift($selectResult);
+        $lastId = $firstRow['id'];
+
+        $this->mockSelect("{$mainQuery}{$this->lazyByIdInitialNullCondition()} order by \"id\" asc limit 1", [$firstRow]);
+        $this->mockSelect("select * from \"relation_models\" where \"relation_models\".\"test_model_id\" in ({$lastId})");
+
+        foreach ($selectResult as $row) {
+            $this->mockSelect("{$mainQuery} and \"id\" > ? order by \"id\" asc limit 1", [$row], [$lastId]);
+            $this->mockSelect("select * from \"relation_models\" where \"relation_models\".\"test_model_id\" in ({$row['id']})");
+            $lastId = $row['id'];
+        }
+
+        $this->mockSelect("{$mainQuery} and \"id\" > ? order by \"id\" asc limit 1", [], [$lastId]);
+    }
+
     protected function mockCreate(array $selectResult, $notFillableValue): void
     {
         $this->mockInsert(
@@ -190,10 +217,52 @@ trait SqlMockTrait
         $query = 'insert into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            '1999-01-01', 'test_name_1', $this->mockedNow,
-            '1999-01-01', 'test_name_2', $this->mockedNow,
-            '1999-01-01', 'test_name_3', $this->mockedNow,
+            '1999-01-01 00:00:00', 'test_name_1', $this->mockedNow,
+            '1999-01-01 00:00:00', 'test_name_2', $this->mockedNow,
+            '1999-01-01 00:00:00', 'test_name_3', $this->mockedNow,
         ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertWithJsonField(): void
+    {
+        $query = 'insert into "test_models" ("created_at", "json_field", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            $this->mockedNow, '{"key":"value1"}', $this->mockedNow,
+            $this->mockedNow, '{"key":"value2"}', $this->mockedNow,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertWithCastableField(): void
+    {
+        $query = 'insert into "test_models" ("castable_field", "created_at", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            '{"key":"value1"}', $this->mockedNow, $this->mockedNow,
+            '{"key":"value2"}', $this->mockedNow, $this->mockedNow,
+        ];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertSingleRow(): void
+    {
+        $query = 'insert into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?)';
+
+        $values = [$this->mockedNow, 'test_name_1', $this->mockedNow];
+
+        $this->getPdo()->shouldInsert($query, $values);
+    }
+
+    protected function mockInsertSingleRowWhereFirstValueIsArray(): void
+    {
+        $query = 'insert into "test_models" ("created_at", "json_field", "name", "updated_at") values (?, ?, ?, ?)';
+
+        $values = [$this->mockedNow, '{"key":"value"}', 'test_name', $this->mockedNow];
 
         $this->getPdo()->shouldInsert($query, $values);
     }
@@ -229,12 +298,54 @@ trait SqlMockTrait
         $query = 'insert or ignore into "test_models" ("creation_date", "name", "updated_date") values (?, ?, ?), (?, ?, ?), (?, ?, ?)';
 
         $values = [
-            ['1999-01-01', 'test_name_1', $this->mockedNow],
-            ['1999-01-01', 'test_name_2', $this->mockedNow],
-            ['1999-01-01', 'test_name_3', $this->mockedNow],
+            ['1999-01-01 00:00:00', 'test_name_1', $this->mockedNow],
+            ['1999-01-01 00:00:00', 'test_name_2', $this->mockedNow],
+            ['1999-01-01 00:00:00', 'test_name_3', $this->mockedNow],
         ];
 
         $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreWithJsonField(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "json_field", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            [$this->mockedNow, '{"key":"value1"}', $this->mockedNow],
+            [$this->mockedNow, '{"key":"value2"}', $this->mockedNow],
+        ];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreWithCastableField(): void
+    {
+        $query = 'insert or ignore into "test_models" ("castable_field", "created_at", "updated_at") values (?, ?, ?), (?, ?, ?)';
+
+        $values = [
+            ['{"key":"value1"}', $this->mockedNow, $this->mockedNow],
+            ['{"key":"value2"}', $this->mockedNow, $this->mockedNow],
+        ];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, Arr::flatten($values), count($values));
+    }
+
+    protected function mockInsertOrIgnoreSingleRow(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "name", "updated_at") values (?, ?, ?)';
+
+        $values = [$this->mockedNow, 'test_name_1', $this->mockedNow];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, $values, 1);
+    }
+
+    protected function mockInsertOrIgnoreSingleRowWhereFirstValueIsArray(): void
+    {
+        $query = 'insert or ignore into "test_models" ("created_at", "json_field", "name", "updated_at") values (?, ?, ?, ?)';
+
+        $values = [$this->mockedNow, '{"key":"value"}', 'test_name', $this->mockedNow];
+
+        $this->getPdo()->shouldRunAffectingStatementForRows($query, $values, 1);
     }
 
     protected function mockUpdate(array $selectResult, $notFillableValue): void

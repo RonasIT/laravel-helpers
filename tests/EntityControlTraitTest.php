@@ -217,6 +217,89 @@ class EntityControlTraitTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testInsertNonZeroBasedList(): void
+    {
+        $this->mockInsertData();
+
+        $result = self::$testRepositoryClass->insert([
+            1 => ['name' => 'test_name_1'],
+            2 => ['name' => 'test_name_2'],
+            3 => ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertStringKeyedRows(): void
+    {
+        $this->mockInsertData();
+
+        $result = self::$testRepositoryClass->insert([
+            'row1' => ['name' => 'test_name_1'],
+            'row2' => ['name' => 'test_name_2'],
+            'row3' => ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertWithJsonField(): void
+    {
+        $this->mockInsertWithJsonField();
+
+        $result = self::$testRepositoryClass->insert([
+            ['json_field' => ['key' => 'value1']],
+            ['json_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertWithCastableField(): void
+    {
+        $this->mockInsertWithCastableField();
+
+        $result = self::$testRepositoryClass->insert([
+            ['castable_field' => ['key' => 'value1']],
+            ['castable_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertSingleRow(): void
+    {
+        $this->mockInsertSingleRow();
+
+        $result = self::$testRepositoryClass->insert(['name' => 'test_name_1']);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertSingleRowWhereFirstKeyIsNotModelField(): void
+    {
+        $this->mockInsertSingleRow();
+
+        $result = self::$testRepositoryClass->insert([
+            'ignored' => 'some_value',
+            'name' => 'test_name_1',
+        ]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testInsertSingleRowWhereFirstValueIsArray(): void
+    {
+        $this->mockInsertSingleRowWhereFirstValueIsArray();
+
+        $result = self::$testRepositoryClass->insert([
+            'json_field' => ['key' => 'value'],
+            'name' => 'test_name',
+        ]);
+
+        $this->assertTrue($result);
+    }
+
     public function testInsertWithSettableProperties()
     {
         $this->mockInsertData();
@@ -297,6 +380,89 @@ class EntityControlTraitTest extends TestCase
         ]);
 
         $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreNonZeroBasedList(): void
+    {
+        $this->mockInsertOrIgnore();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            1 => ['name' => 'test_name_1'],
+            2 => ['name' => 'test_name_2'],
+            3 => ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreStringKeyedRows(): void
+    {
+        $this->mockInsertOrIgnore();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            'row1' => ['name' => 'test_name_1'],
+            'row2' => ['name' => 'test_name_2'],
+            'row3' => ['name' => 'test_name_3'],
+        ]);
+
+        $this->assertSame(3, $result);
+    }
+
+    public function testInsertOrIgnoreWithJsonField(): void
+    {
+        $this->mockInsertOrIgnoreWithJsonField();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            ['json_field' => ['key' => 'value1']],
+            ['json_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertSame(2, $result);
+    }
+
+    public function testInsertOrIgnoreWithCastableField(): void
+    {
+        $this->mockInsertOrIgnoreWithCastableField();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            ['castable_field' => ['key' => 'value1']],
+            ['castable_field' => ['key' => 'value2']],
+        ]);
+
+        $this->assertSame(2, $result);
+    }
+
+    public function testInsertOrIgnoreSingleRow(): void
+    {
+        $this->mockInsertOrIgnoreSingleRow();
+
+        $result = self::$testRepositoryClass->insertOrIgnore(['name' => 'test_name_1']);
+
+        $this->assertSame(1, $result);
+    }
+
+    public function testInsertOrIgnoreSingleRowWhereFirstKeyIsNotModelField(): void
+    {
+        $this->mockInsertOrIgnoreSingleRow();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            'ignored' => 'some_value',
+            'name' => 'test_name_1',
+        ]);
+
+        $this->assertSame(1, $result);
+    }
+
+    public function testInsertOrIgnoreSingleRowWhereFirstValueIsArray(): void
+    {
+        $this->mockInsertOrIgnoreSingleRowWhereFirstValueIsArray();
+
+        $result = self::$testRepositoryClass->insertOrIgnore([
+            'json_field' => ['key' => 'value'],
+            'name' => 'test_name',
+        ]);
+
+        $this->assertSame(1, $result);
     }
 
     public function testInsertOrIgnoreWithSettableProperties(): void
@@ -752,6 +918,51 @@ class EntityControlTraitTest extends TestCase
             });
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testLazyEach()
+    {
+        $mockResult = $this->getJsonFixture('lazy_each_query_result');
+
+        $this->mockLazyEach($mockResult);
+
+        $counter = 0;
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->lazyEach(function () use (&$counter) {
+                $counter++;
+            }, chunkSize: 1);
+
+        $this->assertEquals(2, $counter);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testLazyEachEmptyResult()
+    {
+        $nullCondition = $this->lazyByIdInitialNullCondition();
+
+        $this->mockSelect(
+            'select * from "test_models"'
+            . ($nullCondition ? ' where "id" is not null' : '')
+            . ' order by "id" asc limit 500',
+        );
+
+        $counter = 0;
+
+        // TODO: remove withTrashed() after increase min Laravel version up to 13
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->lazyEach(function () use (&$counter) {
+                $counter++;
+            });
+
+        $this->assertEquals(0, $counter);
     }
 
     public function testForceDeleteByList()
