@@ -945,17 +945,22 @@ class EntityControlTraitTest extends TestCase
 
     public function testLazyEachEmptyResult()
     {
+        $nullCondition = $this->lazyByIdInitialNullCondition();
+
         $this->mockSelect(
-            'select * from "test_models" where "test_models"."deleted_at" is null'
-            . $this->lazyByIdInitialNullCondition()
+            'select * from "test_models"'
+            . ($nullCondition ? ' where "id" is not null' : '')
             . ' order by "id" asc limit 500',
         );
 
         $counter = 0;
 
-        self::$testRepositoryClass->lazyEach(function () use (&$counter) {
-            $counter++;
-        });
+        //TODO: remove withTrashed() after increase min Laravel version up to 13
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->lazyEach(function () use (&$counter) {
+                $counter++;
+            });
 
         $this->assertEquals(0, $counter);
     }
