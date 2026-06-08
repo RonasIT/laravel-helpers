@@ -2,7 +2,6 @@
 
 namespace RonasIT\Support\Tests;
 
-
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionClass;
 use ReflectionProperty;
