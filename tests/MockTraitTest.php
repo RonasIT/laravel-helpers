@@ -220,10 +220,14 @@ class MockTraitTest extends TestCase
         }
 
         foreach ($class->getProperty('mockObjects')->getValue($this) as $entry) {
-            $handler = $entry->__phpunit_getInvocationHandler();
+            $mockObject = (is_array($entry)) ? $entry['mockObject'] : $entry;
+            $handler = $mockObject->__phpunit_getInvocationHandler();
 
-            $matchersProp = new ReflectionProperty($handler, 'matchers');
-            $matchersProp->setValue($handler, []);
+            if (property_exists($handler, 'matchers')) {
+                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
+            } else {
+                (new ReflectionProperty($handler, 'assertionFailure'))->setValue($handler, null);
+            }
         }
     }
 }
