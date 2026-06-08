@@ -922,9 +922,9 @@ class EntityControlTraitTest extends TestCase
 
     public function testLazyEach()
     {
-        $lazyEachResult = $this->getJsonFixture('lazy_each_query_result');
+        $mockResult = $this->getJsonFixture('lazy_each_query_result');
 
-        $this->mockLazyEach($lazyEachResult);
+        $this->mockLazyEach($mockResult);
 
         $counter = 0;
 
