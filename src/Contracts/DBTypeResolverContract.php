@@ -13,5 +13,5 @@ interface DBTypeResolverContract
 
     public function hasType(string $type): bool;
 
-    public function isTypeCategory(DBTypeCategoryEnum $category, string $type): bool;
+    public function getTypeCategory(string $type): ?DBTypeCategoryEnum;
 }

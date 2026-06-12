@@ -27,12 +27,12 @@ class TestDBTypeResolver implements DBTypeResolverContract
         return self::RANGES[$type];
     }
 
-    public function isTypeCategory(DBTypeCategoryEnum $category, string $type): bool
+    public function getTypeCategory(string $type): ?DBTypeCategoryEnum
     {
-        return match ($category) {
-            DBTypeCategoryEnum::Integer => $type === self::INTEGER,
-            DBTypeCategoryEnum::String => $type === self::STRING,
-            default => false,
+        return match ($type) {
+            self::INTEGER => DBTypeCategoryEnum::Integer,
+            self::STRING => DBTypeCategoryEnum::String,
+            default => null,
         };
     }
 

@@ -17,18 +17,6 @@ final class PostgresDBTypeResolver implements DBTypeResolverContract
     public const string DOUBLE = 'double';
     public const string VARCHAR = 'varchar';
 
-    private const array CATEGORIES = [
-        DBTypeCategoryEnum::Integer->value => [
-            self::SMALLINT, self::INTEGER, self::SMALLSERIAL, self::SERIAL, self::BIGINT, self::BIGSERIAL,
-        ],
-        DBTypeCategoryEnum::Float->value => [
-            self::REAL, self::DOUBLE,
-        ],
-        DBTypeCategoryEnum::String->value => [
-            self::VARCHAR,
-        ],
-    ];
-
     private const array RANGES = [
         self::SMALLINT => [-32768, 32767],
         self::INTEGER => [-2147483648, 2147483647],
@@ -51,8 +39,14 @@ final class PostgresDBTypeResolver implements DBTypeResolverContract
         return array_key_exists($type, self::RANGES);
     }
 
-    public function isTypeCategory(DBTypeCategoryEnum $category, string $type): bool
+    public function getTypeCategory(string $type): ?DBTypeCategoryEnum
     {
-        return in_array($type, self::CATEGORIES[$category->value], true);
+        return match ($type) {
+            self::SMALLINT, self::INTEGER, self::SMALLSERIAL,
+            self::SERIAL, self::BIGINT, self::BIGSERIAL => DBTypeCategoryEnum::Integer,
+            self::REAL, self::DOUBLE => DBTypeCategoryEnum::Float,
+            self::VARCHAR => DBTypeCategoryEnum::String,
+            default => null,
+        };
     }
 }

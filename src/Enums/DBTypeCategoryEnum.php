@@ -2,9 +2,9 @@
 
 namespace RonasIT\Support\Enums;
 
-enum DBTypeCategoryEnum: string
+enum DBTypeCategoryEnum
 {
-    case Integer = 'int';
-    case Float = 'float';
-    case String = 'string';
+    case Integer;
+    case Float;
+    case String;
 }

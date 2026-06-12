@@ -34,10 +34,10 @@ class DBTypeRangeRule implements ValidationRule
 
         list($min, $max) = $this->resolver->getRange($this->type);
 
-        match (true) {
-            $this->resolver->isTypeCategory(DBTypeCategoryEnum::Integer, $this->type) => $this->validateInteger($attribute, $value, $min, $max, $fail),
-            $this->resolver->isTypeCategory(DBTypeCategoryEnum::Float, $this->type) => $this->validateFloat($attribute, $value, $min, $max, $fail),
-            $this->resolver->isTypeCategory(DBTypeCategoryEnum::String, $this->type) => $this->validateString($attribute, $value, $max, $fail),
+        match ($this->resolver->getTypeCategory($this->type)) {
+            DBTypeCategoryEnum::Integer => $this->validateInteger($attribute, $value, $min, $max, $fail),
+            DBTypeCategoryEnum::Float => $this->validateFloat($attribute, $value, $min, $max, $fail),
+            DBTypeCategoryEnum::String => $this->validateString($attribute, $value, $max, $fail),
             default => null,
         };
     }
