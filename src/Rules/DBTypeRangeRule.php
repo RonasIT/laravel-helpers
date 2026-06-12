@@ -42,19 +42,6 @@ class DBTypeRangeRule implements ValidationRule
         };
     }
 
-    protected function validateFloat(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
-    {
-        if (!is_numeric($value)) {
-            $fail("The {$attribute} must be numeric.");
-
-            return;
-        }
-
-        if ((float) $value < $min || (float) $value > $max) {
-            $fail("The {$attribute} must be between {$min} and {$max}.");
-        }
-    }
-
     protected function validateInteger(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
     {
         if (!is_scalar($value) || !preg_match(self::INTEGER_PATTERN, (string) $value)) {
@@ -67,6 +54,19 @@ class DBTypeRangeRule implements ValidationRule
         $tooBig = bccomp((string) $value, (string) $max) === 1;
 
         if ($tooSmall || $tooBig) {
+            $fail("The {$attribute} must be between {$min} and {$max}.");
+        }
+    }
+
+    protected function validateFloat(string $attribute, mixed $value, mixed $min, mixed $max, Closure $fail): void
+    {
+        if (!is_numeric($value)) {
+            $fail("The {$attribute} must be numeric.");
+
+            return;
+        }
+
+        if ((float) $value < $min || (float) $value > $max) {
             $fail("The {$attribute} must be between {$min} and {$max}.");
         }
     }
