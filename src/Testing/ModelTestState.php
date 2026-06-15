@@ -38,13 +38,15 @@ class ModelTestState extends TableTestState
 
     protected function applyCasts(array $item): array
     {
+        $model = clone $this->model;
+
         $attributes = $this->resolveModelAttributes($item);
 
-        $this->model->setRawAttributes($attributes);
+        $model->setRawAttributes($attributes);
 
         foreach ($this->castFields as $field) {
             if (Arr::has($item, $field)) {
-                $item[$field] = $this->model->getAttribute($field);
+                $item[$field] = $model->getAttribute($field);
             }
         }
 
