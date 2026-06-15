@@ -7,7 +7,7 @@ use RonasIT\Support\Enums\DBTypeCategoryEnum;
 interface DBTypeResolverContract
 {
     /**
-     * @return array{0: int|float|string, 1: int|float|string}
+     * @return array{0: int|float, 1: int|float}
      */
     public function getRange(string $type): array;
 
