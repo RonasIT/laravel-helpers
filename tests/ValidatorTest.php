@@ -562,6 +562,8 @@ class ValidatorTest extends TestCase
         );
 
         $this->assertTrue($validator->passes());
+
+        app()->forgetInstance(DBTypeResolverContract::class);
     }
 
     public function testDBTypeRangeUncategorizedTypePasses(): void
@@ -574,6 +576,8 @@ class ValidatorTest extends TestCase
         );
 
         $this->assertTrue($validator->passes());
+
+        app()->forgetInstance(DBTypeResolverContract::class);
     }
 
     public function testDBTypeRangeUsesCustomResolverRangesFails(): void
@@ -590,5 +594,7 @@ class ValidatorTest extends TestCase
             expected: sprintf('The value must be between %d and %d.', TestDBTypeResolver::INTEGER_MIN, TestDBTypeResolver::INTEGER_MAX),
             actual: $validator->errors()->first('value'),
         );
+
+        app()->forgetInstance(DBTypeResolverContract::class);
     }
 }
