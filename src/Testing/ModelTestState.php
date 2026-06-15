@@ -53,9 +53,7 @@ class ModelTestState extends TableTestState
 
     protected function resolveModelAttributes(array $item): array
     {
-        $original = $this->state->first(
-            callback: fn (array $record) => $record[$this->uniqueKey] === $item[$this->uniqueKey],
-        );
+        $original = $this->state->firstWhere($this->uniqueKey, $item[$this->uniqueKey]);
 
         return is_null($original)
             ? $item
