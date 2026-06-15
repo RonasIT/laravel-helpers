@@ -42,8 +42,7 @@ final class PostgresDBTypeResolver implements DBTypeResolverContract
     public function getTypeCategory(string $type): ?DBTypeCategoryEnum
     {
         return match ($type) {
-            self::SMALLINT, self::INTEGER, self::SMALLSERIAL,
-            self::SERIAL, self::BIGINT, self::BIGSERIAL => DBTypeCategoryEnum::Integer,
+            self::SMALLINT, self::INTEGER, self::SMALLSERIAL, self::SERIAL, self::BIGINT, self::BIGSERIAL => DBTypeCategoryEnum::Integer,
             self::REAL, self::DOUBLE => DBTypeCategoryEnum::Float,
             self::VARCHAR => DBTypeCategoryEnum::String,
             default => null,
