@@ -55,7 +55,7 @@ class ModelTestState extends TableTestState
     {
         $original = $this->state->firstWhere($this->uniqueKey, $item[$this->uniqueKey]);
 
-        return is_null($original)
+        return (is_null($original))
             ? $item
             : array_merge($original, $item);
     }
