@@ -3,6 +3,7 @@
 namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Runner\Version as PhpUnitVersion;
 use ReflectionClass;
 use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Mock\TestMockClass;
@@ -219,12 +220,18 @@ class MockTraitTest extends TestCase
             $class = $class->getParentClass();
         }
 
+        // TODO: Remove after increase min PHPUnit version up to 11
+        $isNewPhpunit = version_compare(PhpUnitVersion::id(), '11.0.0', '>=');
+
         foreach ($class->getProperty('mockObjects')->getValue($this) as $entry) {
-            $handler = $entry['mockObject']->__phpunit_getInvocationHandler();
-
-            $assertionFailureProp = new ReflectionProperty($handler, 'assertionFailure');
-
-            $assertionFailureProp->setValue($handler, null);
+            if ($isNewPhpunit) {
+                $handler = $entry['mockObject']->__phpunit_getInvocationHandler();
+                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
+                (new ReflectionProperty($handler, 'assertionFailure'))->setValue($handler, null);
+            } else {
+                $handler = $entry->__phpunit_getInvocationHandler();
+                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
+            }
         }
     }
 }
