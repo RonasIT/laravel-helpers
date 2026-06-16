@@ -35,10 +35,12 @@ class ModelTestStateTest extends TestCase
         $modelTestState = new ModelTestState(TestModelWithCustomJsonCast::class);
         $reflectionClass = new ReflectionClass($modelTestState);
 
-        $customCastFields = $this->getProtectedProperty($reflectionClass, 'castFields', $modelTestState);
+        $jsonCastFields = $this->getProtectedProperty($reflectionClass, 'jsonCastFields', $modelTestState);
+        $classCastFields = $this->getProtectedProperty($reflectionClass, 'classCastFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertEquals(['id', 'settings'], $customCastFields);
+        $this->assertEquals([], $jsonCastFields);
+        $this->assertEquals(['settings'], $classCastFields);
 
         $this->assertEquals($originRecords, $state);
     }

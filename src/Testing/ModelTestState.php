@@ -7,9 +7,13 @@ use Illuminate\Support\Arr;
 
 class ModelTestState extends TableTestState
 {
+    protected const array NATIVE_JSON_CASTS = ['array', 'json', 'object', 'collection'];
+
     protected Model $model;
 
-    protected array $castFields;
+    protected array $jsonCastFields = [];
+
+    protected array $classCastFields = [];
 
     /**
      * @param  class-string<Model>  $modelClassName
@@ -24,12 +28,25 @@ class ModelTestState extends TableTestState
             uniqueKey: $this->model->getKeyName(),
         );
 
-        $this->castFields = array_keys($this->model->getCasts());
+        $this->resolveCastFields();
+    }
+
+    protected function resolveCastFields(): void
+    {
+        foreach ($this->model->getCasts() as $field => $definition) {
+            $type = explode(':', $definition, 2)[0];
+
+            if (in_array(strtolower($type), self::NATIVE_JSON_CASTS, true)) {
+                $this->jsonCastFields[] = $field;
+            } elseif (class_exists($type)) {
+                $this->classCastFields[] = $field;
+            }
+        }
     }
 
     protected function prepareChanges(array $changes): array
     {
-        if (empty($this->castFields)) {
+        if (empty($this->jsonCastFields) && empty($this->classCastFields)) {
             return $changes;
         }
 
@@ -40,11 +57,15 @@ class ModelTestState extends TableTestState
     {
         $model = clone $this->model;
 
-        $attributes = $this->resolveRawAttributes($item);
+        $model->setRawAttributes($this->resolveRawAttributes($item));
 
-        $model->setRawAttributes($attributes);
+        foreach ($this->jsonCastFields as $field) {
+            if (Arr::has($item, $field) && is_string($item[$field])) {
+                $item[$field] = $model->getAttribute($field);
+            }
+        }
 
-        foreach ($this->castFields as $field) {
+        foreach ($this->classCastFields as $field) {
             if (Arr::has($item, $field) && $this->isJsonBacked($item[$field])) {
                 $item[$field] = $model->getAttribute($field);
             }
