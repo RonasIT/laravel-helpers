@@ -30,17 +30,17 @@ class ModelTestStateTest extends TestCase
         $datasetMock = collect($this->getJsonFixture('initialization/dataset'));
         $originRecords = collect($this->getJsonFixture('initialization/origin_records'));
 
-        $this->mockGettingDataset($datasetMock, 'test_model_with_custom_json_casts');
+        $this->mockGettingDataset($datasetMock);
 
-        $modelTestState = new ModelTestState(TestModelWithCustomJsonCast::class);
+        $modelTestState = new ModelTestState(TestModel::class);
         $reflectionClass = new ReflectionClass($modelTestState);
 
-        $jsonCastFields = $this->getProtectedProperty($reflectionClass, 'jsonCastFields', $modelTestState);
+        $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
         $classCastFields = $this->getProtectedProperty($reflectionClass, 'classCastFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertEquals([], $jsonCastFields);
-        $this->assertEquals(['settings'], $classCastFields);
+        $this->assertEquals(['json_field'], $jsonFields);
+        $this->assertEquals(['custom_cast_field', 'castable_field'], $classCastFields);
 
         $this->assertEquals($originRecords, $state);
     }

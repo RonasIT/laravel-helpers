@@ -2,8 +2,9 @@
 
 namespace RonasIT\Support\Testing;
 
+use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ModelTestState extends TableTestState
@@ -11,8 +12,6 @@ class ModelTestState extends TableTestState
     protected const array NATIVE_JSON_CASTS = ['array', 'json', 'object', 'collection'];
 
     protected Model $model;
-
-    protected array $jsonCastFields = [];
 
     protected array $classCastFields = [];
 
@@ -23,52 +22,55 @@ class ModelTestState extends TableTestState
     {
         $this->model = new $modelClassName();
 
+        $this->classCastFields = $this->resolveClassCastFields();
+
         parent::__construct(
             tableName: $this->model->getTable(),
+            jsonFields: $this->resolveNativeJsonFields(),
             connectionName: $this->model->getConnectionName(),
             uniqueKey: $this->model->getKeyName(),
         );
-
-        $this->resolveCastFields();
     }
 
-    protected function resolveCastFields(): void
+    protected function resolveNativeJsonFields(): array
     {
-        foreach ($this->model->getCasts() as $field => $definition) {
-            $type = Str::before($definition, ':');
+        return collect($this->model->getCasts())
+            ->filter(fn (string $definition) => in_array(strtolower(Str::before($definition, ':')), self::NATIVE_JSON_CASTS, true))
+            ->keys()
+            ->all();
+    }
 
-            if (in_array(strtolower($type), self::NATIVE_JSON_CASTS, true)) {
-                $this->jsonCastFields[] = $field;
-            } elseif (class_exists($type)) {
-                $this->classCastFields[] = $field;
-            }
-        }
+    protected function resolveClassCastFields(): array
+    {
+        return collect($this->model->getCasts())
+            ->filter(fn (string $definition) => $this->isClassCast(Str::before($definition, ':')))
+            ->keys()
+            ->all();
+    }
+
+    protected function isClassCast(string $type): bool
+    {
+        return is_subclass_of($type, CastsAttributes::class)
+            || is_subclass_of($type, Castable::class);
     }
 
     protected function prepareChanges(array $changes): array
     {
-        if (empty($this->jsonCastFields) && empty($this->classCastFields)) {
-            return $changes;
+        if (!empty($this->classCastFields)) {
+            $changes = array_map(fn (array $item) => $this->applyClassCasts($item), $changes);
         }
 
-        return array_map(fn (array $item) => $this->applyJsonCasts($item), $changes);
+        return parent::prepareChanges($changes);
     }
 
-    protected function applyJsonCasts(array $item): array
+    protected function applyClassCasts(array $item): array
     {
         $model = clone $this->model;
 
         $model->setRawAttributes($this->resolveRawAttributes($item));
 
-        $item = $this->decodeFields($item, $model, $this->jsonCastFields, fn ($value) => is_string($value));
-
-        return $this->decodeFields($item, $model, $this->classCastFields, fn ($value) => $this->isJsonBacked($value));
-    }
-
-    protected function decodeFields(array $item, Model $model, array $fields, callable $isDecodable): array
-    {
-        foreach ($fields as $field) {
-            if (Arr::has($item, $field) && $isDecodable($item[$field])) {
+        foreach ($this->classCastFields as $field) {
+            if (array_key_exists($field, $item) && $this->isJsonBacked($item[$field])) {
                 $item[$field] = $model->getAttribute($field);
             }
         }
