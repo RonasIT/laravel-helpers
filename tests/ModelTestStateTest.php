@@ -7,11 +7,8 @@ use ReflectionClass;
 use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIdPrimaryKey;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCastable;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCrossAttributeCast;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCustomCast;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCustomJsonCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithNativeJsonCasts;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithParameterizedCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithPrimitiveCasts;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
@@ -33,15 +30,15 @@ class ModelTestStateTest extends TestCase
         $datasetMock = collect($this->getJsonFixture('initialization/dataset'));
         $originRecords = collect($this->getJsonFixture('initialization/origin_records'));
 
-        $this->mockGettingDataset($datasetMock);
+        $this->mockGettingDataset($datasetMock, 'test_model_with_custom_json_casts');
 
-        $modelTestState = new ModelTestState(TestModel::class);
+        $modelTestState = new ModelTestState(TestModelWithCustomJsonCast::class);
         $reflectionClass = new ReflectionClass($modelTestState);
 
         $customCastFields = $this->getProtectedProperty($reflectionClass, 'castFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertEquals(['id', 'settings', 'deleted_at'], $customCastFields);
+        $this->assertEquals(['id', 'settings'], $customCastFields);
 
         $this->assertEquals($originRecords, $state);
     }
@@ -72,7 +69,7 @@ class ModelTestStateTest extends TestCase
     public static function getChangeScenarios(): array
     {
         return [
-            'base' => [
+            'baseline' => [
                 'fixtureDir' => 'changes_equals_fixture',
                 'table' => 'test_models',
                 'modelClass' => TestModel::class,
@@ -87,25 +84,10 @@ class ModelTestStateTest extends TestCase
                 'table' => 'test_model_with_native_json_casts',
                 'modelClass' => TestModelWithNativeJsonCasts::class,
             ],
-            'custom cast' => [
-                'fixtureDir' => 'changes_equals_fixture_with_custom_cast',
-                'table' => 'test_model_with_custom_casts',
-                'modelClass' => TestModelWithCustomCast::class,
-            ],
-            'parameterized cast' => [
-                'fixtureDir' => 'changes_equals_fixture_with_parameterized_cast',
-                'table' => 'test_model_with_parameterized_casts',
-                'modelClass' => TestModelWithParameterizedCast::class,
-            ],
-            'castable' => [
-                'fixtureDir' => 'changes_equals_fixture_with_castable',
-                'table' => 'test_model_with_castables',
-                'modelClass' => TestModelWithCastable::class,
-            ],
-            'cross attribute cast' => [
-                'fixtureDir' => 'changes_equals_fixture_with_cross_attribute_cast',
-                'table' => 'test_model_with_cross_attribute_casts',
-                'modelClass' => TestModelWithCrossAttributeCast::class,
+            'custom json cast' => [
+                'fixtureDir' => 'changes_equals_fixture_with_custom_json_cast',
+                'table' => 'test_model_with_custom_json_casts',
+                'modelClass' => TestModelWithCustomJsonCast::class,
             ],
             'custom primary key' => [
                 'fixtureDir' => 'changes_equals_fixture_primary_key',

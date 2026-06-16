@@ -3,16 +3,16 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Tests\Support\Mock\Casts\AddressCastable;
+use RonasIT\Support\Tests\Support\Mock\Casts\UserSettingCast;
 
-class TestModelWithCastable extends Model
+class TestModelWithCustomJsonCast extends Model
 {
     protected $fillable = [
         'name',
-        'address',
+        'settings',
     ];
 
     protected $casts = [
-        'address' => AddressCastable::class,
+        'settings' => UserSettingCast::class,
     ];
 }

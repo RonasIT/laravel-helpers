@@ -33,19 +33,19 @@ class ModelTestState extends TableTestState
             return $changes;
         }
 
-        return array_map(fn (array $item) => $this->applyCasts($item), $changes);
+        return array_map(fn (array $item) => $this->applyJsonCasts($item), $changes);
     }
 
-    protected function applyCasts(array $item): array
+    protected function applyJsonCasts(array $item): array
     {
         $model = clone $this->model;
 
-        $attributes = $this->resolveModelAttributes($item);
+        $attributes = $this->resolveRawAttributes($item);
 
         $model->setRawAttributes($attributes);
 
         foreach ($this->castFields as $field) {
-            if (Arr::has($item, $field)) {
+            if (Arr::has($item, $field) && $this->isJsonBacked($item[$field])) {
                 $item[$field] = $model->getAttribute($field);
             }
         }
@@ -53,7 +53,16 @@ class ModelTestState extends TableTestState
         return $item;
     }
 
-    protected function resolveModelAttributes(array $item): array
+    protected function isJsonBacked(mixed $raw): bool
+    {
+        if (!is_string($raw)) {
+            return false;
+        }
+
+        return is_array(json_decode($raw, true));
+    }
+
+    protected function resolveRawAttributes(array $item): array
     {
         $original = $this->state->firstWhere($this->uniqueKey, $item[$this->uniqueKey]);
 
