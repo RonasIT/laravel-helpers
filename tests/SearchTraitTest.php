@@ -283,8 +283,6 @@ class SearchTraitTest extends TestCase
         $this->callEncapsulatedMethod($this->testRepositoryClass, 'setAdditionalReservedFilters',
             'date_greater',
             'date_less',
-            'created_at_less',
-            'created_at_greater',
             'updated_at_greater',
             'updated_at_less',
         );
@@ -296,15 +294,13 @@ class SearchTraitTest extends TestCase
                 'name' => 'text_name',
                 'date_greater' => Carbon::now(),
                 'date_less' => Carbon::now(),
-                'created_at_greater' => Carbon::now(),
-                'created_at_less' => Carbon::now(),
                 'updated_at_greater' => Carbon::now(),
                 'updated_at_less' => Carbon::now(),
             ])
             ->filterGreater('date', false, 'date_greater')
             ->filterLess('date', false, 'date_less')
-            ->filterGreater('created_at', false, 'created_at_greater')
-            ->filterLess('created_at', false, 'created_at_less')
+            ->filterValue('created_at', '>=', Carbon::now())
+            ->filterValue('created_at', '<=', Carbon::now())
             ->filterGreater('updated_at', true, 'updated_at_greater')
             ->filterLess('updated_at', true, 'updated_at_less')
             ->getSearchResults();
