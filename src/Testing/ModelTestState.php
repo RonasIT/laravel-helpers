@@ -4,6 +4,7 @@ namespace RonasIT\Support\Testing;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class ModelTestState extends TableTestState
 {
@@ -34,7 +35,7 @@ class ModelTestState extends TableTestState
     protected function resolveCastFields(): void
     {
         foreach ($this->model->getCasts() as $field => $definition) {
-            $type = explode(':', $definition, 2)[0];
+            $type = Str::before($definition, ':');
 
             if (in_array(strtolower($type), self::NATIVE_JSON_CASTS, true)) {
                 $this->jsonCastFields[] = $field;
@@ -59,14 +60,15 @@ class ModelTestState extends TableTestState
 
         $model->setRawAttributes($this->resolveRawAttributes($item));
 
-        foreach ($this->jsonCastFields as $field) {
-            if (Arr::has($item, $field) && is_string($item[$field])) {
-                $item[$field] = $model->getAttribute($field);
-            }
-        }
+        $item = $this->decodeFields($item, $model, $this->jsonCastFields, fn ($value) => is_string($value));
 
-        foreach ($this->classCastFields as $field) {
-            if (Arr::has($item, $field) && $this->isJsonBacked($item[$field])) {
+        return $this->decodeFields($item, $model, $this->classCastFields, fn ($value) => $this->isJsonBacked($value));
+    }
+
+    protected function decodeFields(array $item, Model $model, array $fields, callable $isDecodable): array
+    {
+        foreach ($fields as $field) {
+            if (Arr::has($item, $field) && $isDecodable($item[$field])) {
                 $item[$field] = $model->getAttribute($field);
             }
         }
