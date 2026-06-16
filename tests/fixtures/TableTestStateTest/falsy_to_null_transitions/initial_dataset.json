@@ -1,0 +1,32 @@
+[
+  {
+    "name": "name1",
+    "some_flag": null,
+    "some_numeric_value": null,
+    "some_string_value": null,
+    "json_field": "{\"field1\": \"updated_value\", \"field2\": [2, 3], \"field3\":  {\"one\": 1, \"two\": 2}}",
+    "castable_field": "{\"field1\": \"value\", \"field2\": [2, 3], \"field3\":  {\"one\": 1, \"two\": 2}}",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "name": "name2",
+    "some_flag": null,
+    "some_numeric_value": null,
+    "some_string_value": null,
+    "json_field": "{\"field1\": \"added_value\"}",
+    "castable_field": "{\"one\": \"first value\", \"two\": \"second value\"}",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "name": "name3",
+    "some_flag": null,
+    "some_numeric_value": null,
+    "some_string_value": null,
+    "castable_field": "{}",
+    "json_field": "{}",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  }
+]

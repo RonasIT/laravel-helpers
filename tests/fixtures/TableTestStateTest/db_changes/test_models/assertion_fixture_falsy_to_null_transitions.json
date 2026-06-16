@@ -1,0 +1,18 @@
+{
+    "updated": [
+        {
+            "name": "name1",
+            "some_flag": false,
+            "some_numeric_value": 0,
+            "some_string_value": ""
+        },
+        {
+            "name": "name2",
+            "some_flag": true,
+            "some_numeric_value": 0,
+            "some_string_value": "value"
+        }
+    ],
+    "created": [],
+    "deleted": []
+}
