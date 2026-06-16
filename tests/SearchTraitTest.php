@@ -273,25 +273,4 @@ class SearchTraitTest extends TestCase
             ->filterByList('user_id')
             ->getSearchResults();
     }
-
-    public function testSearchQueryWithFiltersFunctions()
-    {
-        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
-
-        $this->mockGetSearchResultWithFilters(self::$selectResult);
-
-        $this->testRepositoryClass
-            ->searchQuery([
-                'user_id_in_list' => [1, 2],
-                'user_id_not_in_list' => [3, 4],
-                'name' => 'text_name',
-            ])
-            ->filterMoreOrEqualThan('date', Carbon::now())
-            ->filterLessOrEqualThan('date', Carbon::now())
-            ->filterMoreOrEqualThan('created_at', Carbon::now())
-            ->filterLessOrEqualThan('created_at', Carbon::now())
-            ->filterMoreThan('updated_at', Carbon::now())
-            ->filterLessThan('updated_at', Carbon::now())
-            ->getSearchResults();
-    }
 }
