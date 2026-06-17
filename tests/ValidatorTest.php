@@ -525,8 +525,7 @@ class ValidatorTest extends TestCase
     {
         $this->assertExceptionThrew(
             expectedClassName: InvalidValidationRuleUsageException::class,
-            expectedMessage: 'db_type_range: Unknown type',
-            isStrict: false,
+            expectedMessage: "db_type_range: Unknown type 'unknown_type' for the value field. Available types: smallint, integer, bigint, smallserial, serial, bigserial, real, double, varchar.",
         );
 
         $validator = Validator::make(
