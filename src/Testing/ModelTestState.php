@@ -34,24 +34,15 @@ class ModelTestState extends TableTestState
 
     protected function resolveNativeJsonFields(): array
     {
-        return collect($this->model->getCasts())
-            ->filter(fn (string $definition) => in_array(strtolower(Str::before($definition, ':')), self::NATIVE_JSON_CASTS, true))
-            ->keys()
-            ->all();
+        return $this->getCastFieldsMatching(fn (string $type) => in_array($type, self::NATIVE_JSON_CASTS, true));
     }
 
     protected function resolveClassCastFields(): array
     {
-        return collect($this->model->getCasts())
-            ->filter(fn (string $definition) => $this->isClassCast(Str::before($definition, ':')))
-            ->keys()
-            ->all();
-    }
-
-    protected function isClassCast(string $type): bool
-    {
-        return is_subclass_of($type, CastsAttributes::class)
-            || is_subclass_of($type, Castable::class);
+        return $this->getCastFieldsMatching(fn (string $type) =>
+            is_subclass_of($type, CastsAttributes::class)
+            || is_subclass_of($type, Castable::class)
+        );
     }
 
     protected function prepareChanges(array $changes): array
@@ -94,5 +85,15 @@ class ModelTestState extends TableTestState
         return (is_null($original))
             ? $item
             : array_merge($original, $item);
+    }
+
+    protected function getCastFieldsMatching(callable $predicate): array
+    {
+        $matching = array_filter(
+            array: $this->model->getCasts(),
+            callback: fn (string $definition) => $predicate(Str::before($definition, ':')),
+        );
+
+        return array_keys($matching);
     }
 }
