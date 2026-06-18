@@ -15,11 +15,8 @@ class TestModelWithCustomJsonCast extends Model
         'addresses',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'settings' => UserSettingCast::class,
-            'addresses' => AsCollection::of(Address::class),
-        ];
-    }
+    protected $casts = [
+        'settings' => UserSettingCast::class,
+        'addresses' => AsCollection::class . ':' . Address::class,
+    ];
 }
