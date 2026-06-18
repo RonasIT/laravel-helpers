@@ -142,6 +142,33 @@ trait SqlMockTrait
         );
     }
 
+    // TODO: remove after increase min Laravel version up to 13
+    protected function lazyByIdInitialNullCondition(): string
+    {
+        return version_compare(app()->version(), '12.4.0', '>=') ? ' and "id" is not null' : '';
+    }
+
+    protected function mockLazyEach(array $selectResult): void
+    {
+        $mainQuery = 'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null';
+
+        $firstRow = array_shift($selectResult);
+        $lastId = $firstRow['id'];
+
+        $this->mockSelect("{$mainQuery}{$this->lazyByIdInitialNullCondition()} order by \"id\" asc limit 1", [$firstRow]);
+        $this->mockSelect("select * from \"relation_models\" where \"relation_models\".\"test_model_id\" in ({$lastId})");
+
+        foreach ($selectResult as $row) {
+            $this->mockSelect("{$mainQuery} and \"id\" > ? order by \"id\" asc limit 1", [$row], [$lastId]);
+            $this->mockSelect("select * from \"relation_models\" where \"relation_models\".\"test_model_id\" in ({$row['id']})");
+            $lastId = $row['id'];
+        }
+
+        $this->mockSelect("{$mainQuery} and \"id\" > ? order by \"id\" asc limit 1", [], [$lastId]);
+    }
+
     protected function mockCreate(array $selectResult, $notFillableValue): void
     {
         $this->mockInsert(
