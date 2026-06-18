@@ -3,6 +3,7 @@
         "id": 1,
         "name": "name1",
         "settings": "{\"theme\": \"dark\", \"language\": \"en\", \"notifications_email\": true, \"notifications_sms\": false}",
+        "addresses": "[{\"country\": \"USA\", \"city\": \"New York\", \"street\": \"5th Avenue\"}, {\"country\": \"UK\", \"city\": \"London\", \"street\": \"Baker Street\"}]",
         "created_at": "2018-10-10 10:10:10",
         "updated_at": "2018-10-10 10:10:10"
     },
@@ -10,6 +11,7 @@
         "id": 2,
         "name": "name2",
         "settings": "{\"theme\": \"light\", \"language\": \"fr\", \"notifications_email\": false, \"notifications_sms\": true}",
+        "addresses": "[{\"country\": \"France\", \"city\": \"Paris\", \"street\": \"Rue de Rivoli\"}]",
         "created_at": "2018-10-10 10:10:10",
         "updated_at": "2018-10-10 10:10:10"
     },
@@ -17,6 +19,7 @@
         "id": 3,
         "name": "name3",
         "settings": "{}",
+        "addresses": "[]",
         "created_at": "2018-10-10 10:10:10",
         "updated_at": "2018-10-10 10:10:10"
     }

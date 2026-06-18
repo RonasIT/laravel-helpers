@@ -3,17 +3,15 @@
         {
             "id": 2,
             "settings": {
-                "appearance": {
-                    "theme": "dark"
-                },
-                "locale": {
-                    "language": "de"
-                },
-                "notifications": {
-                    "email": true,
-                    "sms": false
-                }
-            }
+                "theme": "dark",
+                "language": "de",
+                "notifications_email": true,
+                "notifications_sms": false
+            },
+            "addresses": [
+                {"country": "Germany", "city": "Berlin", "street": "Unter den Linden"},
+                {"country": "Italy", "city": "Rome", "street": "Via del Corso"}
+            ]
         }
     ],
     "created": [
@@ -21,17 +19,14 @@
             "id": 4,
             "name": "name4",
             "settings": {
-                "appearance": {
-                    "theme": "system"
-                },
-                "locale": {
-                    "language": "pl"
-                },
-                "notifications": {
-                    "email": false,
-                    "sms": false
-                }
+                "theme": "system",
+                "language": "pl",
+                "notifications_email": false,
+                "notifications_sms": false
             },
+            "addresses": [
+                {"country": "Spain", "city": "Madrid", "street": "Gran Via"}
+            ],
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }
@@ -40,18 +35,8 @@
         {
             "id": 3,
             "name": "name3",
-            "settings": {
-                "appearance": {
-                    "theme": null
-                },
-                "locale": {
-                    "language": null
-                },
-                "notifications": {
-                    "email": false,
-                    "sms": false
-                }
-            },
+            "settings": {},
+            "addresses": [],
             "created_at": "2018-10-10 10:10:10",
             "updated_at": "2018-10-10 10:10:10"
         }

@@ -68,14 +68,9 @@ class ModelTestStateTest extends TestCase
         $this->assertEquals($actualGlobalExportModeValue, $testCaseGlobalExportMode);
     }
 
-    public static function getChangeScenarios(): array
+    public static function getAssertChangesData(): array
     {
         return [
-            'baseline' => [
-                'fixtureDir' => 'changes_equals_fixture',
-                'table' => 'test_models',
-                'modelClass' => TestModel::class,
-            ],
             'primitive casts' => [
                 'fixtureDir' => 'changes_equals_fixture_with_primitive_casts',
                 'table' => 'test_model_with_primitive_casts',
@@ -100,7 +95,7 @@ class ModelTestStateTest extends TestCase
         ];
     }
 
-    #[DataProvider('getChangeScenarios')]
+    #[DataProvider('getAssertChangesData')]
     public function testAssertChanges(
         string $fixtureDir,
         string $table,

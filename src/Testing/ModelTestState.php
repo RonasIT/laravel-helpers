@@ -39,8 +39,7 @@ class ModelTestState extends TableTestState
 
     protected function resolveClassCastFields(): array
     {
-        return $this->getCastFieldsMatching(fn (string $type) =>
-            is_subclass_of($type, CastsAttributes::class)
+        return $this->getCastFieldsMatching(fn (string $type) => is_subclass_of($type, CastsAttributes::class)
             || is_subclass_of($type, Castable::class)
         );
     }
@@ -48,21 +47,17 @@ class ModelTestState extends TableTestState
     protected function prepareChanges(array $changes): array
     {
         if (!empty($this->classCastFields)) {
-            $changes = array_map(fn (array $item) => $this->applyClassCasts($item), $changes);
+            $changes = array_map(fn (array $item) => $this->decodeClassCastFields($item), $changes);
         }
 
         return parent::prepareChanges($changes);
     }
 
-    protected function applyClassCasts(array $item): array
+    protected function decodeClassCastFields(array $item): array
     {
-        $model = clone $this->model;
-
-        $model->setRawAttributes($this->resolveRawAttributes($item));
-
         foreach ($this->classCastFields as $field) {
             if (array_key_exists($field, $item) && $this->isJsonBacked($item[$field])) {
-                $item[$field] = $model->getAttribute($field);
+                $item[$field] = json_decode($item[$field], true);
             }
         }
 
@@ -71,20 +66,7 @@ class ModelTestState extends TableTestState
 
     protected function isJsonBacked(mixed $raw): bool
     {
-        if (!is_string($raw)) {
-            return false;
-        }
-
-        return is_array(json_decode($raw, true));
-    }
-
-    protected function resolveRawAttributes(array $item): array
-    {
-        $original = $this->state->firstWhere($this->uniqueKey, $item[$this->uniqueKey]);
-
-        return (is_null($original))
-            ? $item
-            : array_merge($original, $item);
+        return is_string($raw) && is_array(json_decode($raw, true));
     }
 
     protected function getCastFieldsMatching(callable $predicate): array
