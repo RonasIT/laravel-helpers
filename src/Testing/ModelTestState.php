@@ -5,13 +5,12 @@ namespace RonasIT\Support\Testing;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ModelTestState extends TableTestState
 {
     protected const array NATIVE_JSON_CASTS = ['array', 'json', 'object', 'collection'];
-
-    protected Model $model;
 
     protected array $classCastFields = [];
 
@@ -20,26 +19,26 @@ class ModelTestState extends TableTestState
      */
     public function __construct(string $modelClassName)
     {
-        $this->model = new $modelClassName();
+        $model = new $modelClassName();
 
-        $this->classCastFields = $this->resolveClassCastFields();
+        $this->classCastFields = $this->resolveClassCastFields($model);
 
         parent::__construct(
-            tableName: $this->model->getTable(),
-            jsonFields: $this->resolveNativeJsonFields(),
-            connectionName: $this->model->getConnectionName(),
-            uniqueKey: $this->model->getKeyName(),
+            tableName: $model->getTable(),
+            jsonFields: $this->resolveNativeJsonFields($model),
+            connectionName: $model->getConnectionName(),
+            uniqueKey: $model->getKeyName(),
         );
     }
 
-    protected function resolveNativeJsonFields(): array
+    protected function resolveNativeJsonFields(Model $model): array
     {
-        return $this->getCastFieldsMatching(fn (string $type) => in_array($type, self::NATIVE_JSON_CASTS, true));
+        return $this->getCastFieldsMatching($model, fn (string $type) => in_array($type, self::NATIVE_JSON_CASTS, true));
     }
 
-    protected function resolveClassCastFields(): array
+    protected function resolveClassCastFields(Model $model): array
     {
-        return $this->getCastFieldsMatching(fn (string $type) => $this->isClassCast($type));
+        return $this->getCastFieldsMatching($model, fn (string $type) => $this->isClassCast($type));
     }
 
     protected function isClassCast(string $type): bool
@@ -60,23 +59,22 @@ class ModelTestState extends TableTestState
     protected function decodeClassCastFields(array $item): array
     {
         foreach ($this->classCastFields as $field) {
-            if (array_key_exists($field, $item) && $this->isJsonBacked($item[$field])) {
-                $item[$field] = json_decode($item[$field], true);
+            if (Arr::has($item, $field) && is_string($item[$field])) {
+                $decoded = json_decode($item[$field], true);
+
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $item[$field] = $decoded;
+                }
             }
         }
 
         return $item;
     }
 
-    protected function isJsonBacked(mixed $raw): bool
-    {
-        return is_string($raw) && is_array(json_decode($raw, true));
-    }
-
-    protected function getCastFieldsMatching(callable $predicate): array
+    protected function getCastFieldsMatching(Model $model, callable $predicate): array
     {
         $matching = array_filter(
-            array: $this->model->getCasts(),
+            array: $model->getCasts(),
             callback: fn (string $definition) => $predicate(Str::before($definition, ':')),
         );
 
