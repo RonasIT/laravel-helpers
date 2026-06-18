@@ -39,9 +39,13 @@ class ModelTestState extends TableTestState
 
     protected function resolveClassCastFields(): array
     {
-        return $this->getCastFieldsMatching(fn (string $type) => is_subclass_of($type, CastsAttributes::class)
-            || is_subclass_of($type, Castable::class)
-        );
+        return $this->getCastFieldsMatching(fn (string $type) => $this->isClassCast($type));
+    }
+
+    protected function isClassCast(string $type): bool
+    {
+        return is_subclass_of($type, CastsAttributes::class)
+            || is_subclass_of($type, Castable::class);
     }
 
     protected function prepareChanges(array $changes): array

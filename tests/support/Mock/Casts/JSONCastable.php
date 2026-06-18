@@ -9,7 +9,8 @@ class JSONCastable implements Castable
 {
     public static function castUsing(array $arguments): CastsAttributes
     {
-        return new class implements CastsAttributes {
+        return new class implements CastsAttributes
+        {
             public function get($model, $key, $value, $attributes)
             {
                 return json_decode($value, true);
