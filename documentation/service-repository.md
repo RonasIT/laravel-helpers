@@ -230,23 +230,33 @@ public function search(array $filters): LengthAwarePaginator
 
 ### Predefined filters
 
-Initializes the query with eager loading and soft-delete scoping from `$filters`, then auto-applies all non-reserved filters by suffix:
+The `searchQuery` method automatically apply the predefined filters to the query object. Each key of the `$filters` argument will be interpreted as a filter by full matching (in case it hasn't reserved postfix), e.g.
 
-| Suffix | Operator | Example filter key | Example filter value |
-|--------|----------|--------------------|----------------------|
-| `_in_list` | `whereIn` | `status_in_list` | `['active', 'pending']` |
-| `_not_in_list` | `whereNotIn` | `status_not_in_list` | `[1, 2]` |
-| `_gte` | `>=` | `age_gte` | `18` |
-| `_gt` | `>` | `price_gt` | `100` |
-| `_lte` | `<=` | `age_lte` | `65` |
-| `_lt` | `<` | `price_lt` | `1000` |
-| `_from` | `>=` | `created_at_from` | `'2024-01-01'` |
-| `_to` | `<=` | `created_at_to` | `'2024-12-31'` |
-| *(none)* | `=` | `status` | `'active'` |
+```php
+$this->searchQuery(['name' => 'Foo'])->getSearchResults();
+// Returns all records where the `name` field equals 'Foo'
+```
+
+### Reserved postfixes
+
+In case some of the `$filters` keys contains the special postfix - it will be automatically interpreted as a predefined filter.
+
+| Postfix | Operator | Description |
+|---------|----------|-------------|
+| `_in_list` | `whereIn` | Field value should be one of provided |
+| `_not_in_list` | `whereNotIn` | Field value should not be one of provided |
+| `_gte` | `>=` | Field value should be greater than or equal to provided |
+| `_gt` | `>` | Field value should be greater than provided |
+| `_lte` | `<=` | Field value should be less than or equal to provided |
+| `_lt` | `<` | Field value should be less than provided |
+| `_from` | `>=` | Alias for `_gte` |
+| `_to` | `<=` | Alias for `_lte` |
 
 ### Reserved Filter Names
 
-These filter keys are handled internally and should not be used as field filters: `with`, `with_count`, `with_trashed`, `only_trashed`, `query`, `order_by`, `all`, `per_page`, `page`, `desc`.
+The search uses next reserved fields in the logic: `with`, `with_count`, `with_trashed`, `only_trashed`, `query`, `order_by`, `all`, `per_page`, `page`, `desc`.
+
+We highly recommend do not use these filters to implement a custom logic.
 
 To add custom reserved filter names, call `setAdditionalReservedFilters()` in the repository constructor:
 
@@ -259,39 +269,29 @@ $this->setAdditionalReservedFilters('coach_id', 'contact_id');
 
 ### Manual Filter Methods
 
-Use these after `searchQuery()` for fine-grained control:
+If you need to extend the predefined filters logic - use filters manually with your own logic. Each filter support the fluent syntax.
 
 | Method | Description |
 |--------|-------------|
-| `filterBy(string $field, ?string $filterName = null): self` | Exact match filter. Supports dot notation for relations (e.g., `role.name`) |
-| `filterByList(string $field, ?string $filterName = null): self` | `whereIn` filter |
-| `filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self` | `LIKE` search across multiple fields. Supports relation fields via dot notation |
-| `filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self` | `>` / `>=` filter. Reads from `$filters[$filterName]`, defaults to `'from'` |
-| `filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self` | `<` / `<=` filter. Reads from `$filters[$filterName]`, defaults to `'to'` |
-| `filterValue(string $field, string $sign, mixed $value): self` | Applies a comparison condition with a given value directly. Skips if empty |
-| `orderBy(?string $default = null, bool $defaultDesc = false): self` | Applies ordering by `$filters['order_by']`. Supports dot notation for relation fields |
+| `filterBy` | Exact match filter. Supports dot notation for relations (e.g., `role.name`) |
+| `filterByList` | `whereIn` filter |
+| `filterByQuery` | `LIKE` search across multiple fields. Supports relation fields via dot notation |
+| `filterGreater` | `>` / `>=` filter. Reads from `$filters[$filterName]`, defaults to `'from'` |
+| `filterLess` | `<` / `<=` filter. Reads from `$filters[$filterName]`, defaults to `'to'` |
+| `filterValue` | Applies a comparison condition with a given value directly. Skips if empty |
+| `orderBy` | Applies ordering by `$filters['order_by']`. Supports dot notation for relation fields |
 
 ### Pagination
 
-`getSearchResults()` returns a `LengthAwarePaginator`. Pagination is controlled via filters:
+The pagination is out of the box feature, provided by `getSearchResults()` method. Pagination works using next predefined filters:
 
 | Filter | Description | Default |
 |--------|-------------|---------|
-| `per_page` | Items per page | `config('defaults.items_per_page')` |
+| `per_page` | Items per page | Config value `defaults.items_per_page` |
 | `page` | Current page | `1` |
-| `all` | Return all results without pagination | `false` |
+| `all` | Return all results without pagination, wrapped into the pagination structure | `false` |
 | `order_by` | Field to sort by | Primary key |
 | `desc` | Sort descending | `false` |
-
-### Advanced Methods
-
-| Method | Description |
-|--------|-------------|
-| `paginate(): LengthAwarePaginator` | Executes the query with `per_page` and `page` from `$filters`. Called internally by `getSearchResults()`, but available for custom pagination flows |
-| `wrapPaginatedData(Collection $data): LengthAwarePaginator` | Wraps a `Collection` into a single-page `LengthAwarePaginator`. Used internally when `all: true`. Override to customise the paginator structure |
-| `getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator` | Hook called on every paginator before it is returned. No-op by default. Override to transform results (e.g. append computed fields) |
-| `getSearchQuery(): Query` | Returns the current Eloquent query builder. Useful for raw query modifications or debugging after `searchQuery()` |
-
 
 ### Example
 
