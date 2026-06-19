@@ -450,6 +450,16 @@ trait EntityControlTrait
         $this->postQueryHook();
     }
 
+    public function lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): void
+    {
+        $this
+            ->getQuery($where)
+            ->lazyById($chunkSize)
+            ->each($callback);
+
+        $this->postQueryHook();
+    }
+
     protected function getQuery(array|int|string $where = []): Query
     {
         $query = $this->model->query();
@@ -513,6 +523,10 @@ trait EntityControlTrait
 
     protected function prepareInsertData(array $data): array
     {
+        if ($this->isSingleInsertRow($data)) {
+            $data = [$data];
+        }
+
         $defaultTimestamps = [];
 
         if ($this->model->timestamps) {
@@ -524,10 +538,34 @@ trait EntityControlTrait
             ];
         }
 
-        return array_map(function (array $item) use ($defaultTimestamps) {
-            $fillableFields = Arr::only($item, $this->model->getFillable());
+        $instance = $this->model->newInstance();
 
-            return array_merge($defaultTimestamps, $fillableFields);
+        return array_map(function (array $item) use ($defaultTimestamps, $instance) {
+            $fillableFields = Arr::only($item, $this->model->getFillable());
+            $fields = array_merge($defaultTimestamps, $fillableFields);
+
+            $instance->setRawAttributes([]);
+
+            foreach ($fields as $key => $value) {
+                $instance->setAttribute($key, $value);
+            }
+
+            return Arr::only($instance->getAttributes(), array_keys($fields));
         }, $data);
+    }
+
+    protected function isSingleInsertRow(array $data): bool
+    {
+        $firstKey = array_key_first($data);
+
+        if (!is_string($firstKey)) {
+            return false;
+        }
+
+        if (!is_array($data[$firstKey])) {
+            return true;
+        }
+
+        return in_array($firstKey, $this->fields, true);
     }
 }
