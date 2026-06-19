@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "name": "name1",
+        "status": "active",
+        "created_at": "2018-10-10 10:10:10",
+        "updated_at": "2018-10-10 10:10:10"
+    },
+    {
+        "id": 2,
+        "name": "name2",
+        "status": "blocked",
+        "created_at": "2018-10-10 10:10:10",
+        "updated_at": "2018-10-10 10:10:10"
+    },
+    {
+        "id": 3,
+        "name": "name3",
+        "status": "pending",
+        "created_at": "2018-10-10 10:10:10",
+        "updated_at": "2018-10-10 10:10:10"
+    }
+]

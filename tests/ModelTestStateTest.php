@@ -8,6 +8,7 @@ use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIdPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCustomJsonCast;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCustomNonJsonCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithNativeJsonCasts;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithPrimitiveCasts;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
@@ -85,6 +86,11 @@ class ModelTestStateTest extends TestCase
                 'fixtureDir' => 'changes_equals_fixture_with_custom_json_cast',
                 'table' => 'test_model_with_custom_json_casts',
                 'modelClass' => TestModelWithCustomJsonCast::class,
+            ],
+            'custom non-json cast' => [
+                'fixtureDir' => 'changes_equals_fixture_with_custom_non_json_cast',
+                'table' => 'test_model_with_custom_non_json_casts',
+                'modelClass' => TestModelWithCustomNonJsonCast::class,
             ],
             'custom primary key' => [
                 'fixtureDir' => 'changes_equals_fixture_primary_key',
