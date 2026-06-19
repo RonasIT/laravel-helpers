@@ -1,5 +1,5 @@
 [<< Traits][1]
-[Services >>][2]
+[HttpRequestService >>][2]
 
 # Service-Repository Architecture
 
@@ -321,7 +321,7 @@ $service->search([
 ```
 
 [<< Traits][1]
-[Services >>][2]
+[HttpRequestService >>][2]
 
 [1]:traits.md
-[2]:services.md
+[2]:http-request-service.md

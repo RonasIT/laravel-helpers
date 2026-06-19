@@ -1,9 +1,7 @@
 [<< Traits][1]
 [Iterators >>][2]
 
-# Services
-
-## HttpRequestService
+# HttpRequestService
 
 Service to working with http/https protocols based on Guzzle library.
 

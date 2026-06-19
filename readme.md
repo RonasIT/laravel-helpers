@@ -33,7 +33,7 @@ The package provides base classes for implementing the service-repository patter
 ## Usage
  - [Helper functions][1]
  - [Traits][2]
- - [Services][3]
+ - [HttpRequestService][3]
  - [Iterators][4]
  - [Service-Repository Architecture][9]
 
@@ -44,7 +44,7 @@ The package provides base classes for implementing the service-repository patter
 
 [1]:./documentation/helpers.md
 [2]:./documentation/traits.md
-[3]:./documentation/services.md
+[3]:./documentation/http-request-service.md
 [4]:./documentation/iterators.md
 [5]:./documentation/migration.md#1.1
 [6]:./documentation/migration.md#2.0.0
