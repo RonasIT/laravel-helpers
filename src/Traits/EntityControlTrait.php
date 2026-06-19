@@ -450,6 +450,9 @@ trait EntityControlTrait
         $this->postQueryHook();
     }
 
+    /**
+     * Process entities lazily in chunks by primary key
+     */
     public function lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): void
     {
         $this

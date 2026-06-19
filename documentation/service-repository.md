@@ -117,6 +117,7 @@ $this->update(['email' => 'user@example.com'], ['name' => 'New Name']);
 | `count(array $where = []): int` | Count entities by condition |
 | `countByList(array $values, ?string $field = null): int` | Count entities whose `$field` (defaults to primary key) value is in `$values` list |
 | `chunk(int $limit, Closure $callback, array $where = []): void` | Process entities in chunks ordered by primary key |
+| `lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): void` | Process entities lazily in chunks by primary key |
 
 ### Update
 
@@ -164,7 +165,7 @@ For models using Laravel's `SoftDeletes` trait, the `delete()` and `deleteByList
 | `onlyTrashed(bool $enable = true): self` | Exclude non soft-deleted entities from operations |
 
 > [!NOTE]
-> Both methods are chainable and apply to the next query only.
+> Both methods support call chaining and are applied only to the next request, after which they are reset. 
 
 ### Restore
 
@@ -202,7 +203,8 @@ $this->force()->deleteByList([1, 2, 3]);
 | `with(array\|string $relations): self` | Sets relations to eager load on the next query. |
 | `withCount(array\|string $relations): self` | Loads relation counts. Supports dot notation. |
 
-Both methods are chainable and apply to the next query only. 
+> [!NOTE]
+> Both methods support call chaining and are applied only to the next request, after which they are reset. 
 
 Eager loading is supported by `create`, `update`, `first`, `last`, `find`, `findBy`, `get`, `getByList`, and `searchQuery`.
 
