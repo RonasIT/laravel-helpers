@@ -16,6 +16,9 @@ Controller → Service → Repository → Model
 
 ## Setting Up
 
+The [Entity Generator](https://github.com/RonasIT/laravel-entity-generator) package can scaffold these classes automatically via `php artisan make:entity`.
+Below is how to create them manually.
+
 ### 1. Create a Repository
 
 Extend `BaseRepository` and set the model in the constructor:
@@ -52,6 +55,25 @@ final class UserService extends EntityService
 
 `EntityService` uses `__call()` to delegate method calls to the repository in case it not exists in the service class.
 If a repository method returns `$this` (for chaining), the service returns itself instead, allowing seamless method chaining through the service layer.
+
+Any repository method can be redefined in the service to extend it with business logic. Since PHP resolves instance methods before `__call()`, defining a method on the service overrides the delegation:
+
+```php
+final class UserService extends EntityService
+{
+    public function __construct()
+    {
+        $this->setRepository(UserRepository::class);
+    }
+
+    public function create(array $data): User
+    {
+        $data['password'] = bcrypt($data['password']);
+
+        return $this->repository->create($data);
+    }
+}
+```
 
 ---
 
@@ -132,7 +154,7 @@ $this->force()->updateByList($ids, $data);
 
 ## Soft Delete Support
 
-For models using Laravel's `SoftDeletes` trait, the following methods are available:
+For models using Laravel's `SoftDeletes` trait, the `delete()` and `deleteByList()` methods perform a soft delete by default. To permanently remove records, use `force()->delete()`. The following additional methods are also available:
 
 ### Scoping
 
@@ -173,12 +195,16 @@ $this->force()->deleteByList([1, 2, 3]);
 
 ---
 
-## Eager Loading
+## [Eager Loading](https://laravel.com/docs/eloquent-relationships#eager-loading)
 
 | Method | Description |
 |--------|-------------|
 | `with(array\|string $relations): self` | Sets relations to eager load on the next query. |
 | `withCount(array\|string $relations): self` | Loads relation counts. Supports dot notation. |
+
+Both methods are chainable and apply to the next query only. 
+
+Eager loading is supported by `create`, `update`, `first`, `last`, `find`, `findBy`, `get`, `getByList`, and `searchQuery`.
 
 ---
 
@@ -187,6 +213,11 @@ $this->force()->deleteByList([1, 2, 3]);
 `SearchTrait` (included via `EntityControlTrait`) provides a search pipeline with automatic filter resolution, manual filter methods, ordering, and pagination.
 
 ### Basic Usage
+
+Base search implementation consists of 2 code methods:
+
+1. `searchQuery` which save the filters list, prepare query object and apply predefined filters.
+2. `getSearchResults` generating paginated result of the prepared query.
 
 ```php
 public function search(array $filters): LengthAwarePaginator
