@@ -285,6 +285,8 @@ trait FixturesTrait
         $this->makeFixtureDir($path);
 
         file_put_contents($path, $content);
+
+        chmod($path, 0777);
     }
 
     protected function makeFixtureDir(string $path): void
@@ -292,10 +294,7 @@ trait FixturesTrait
         $dir = Str::beforeLast($path, '/');
 
         if (!is_dir($dir)) {
-            mkdir(
-                directory: $dir,
-                recursive: true,
-            );
+            mkdir($dir, 0777, true);
         }
     }
 

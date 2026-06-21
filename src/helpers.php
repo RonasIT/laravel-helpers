@@ -65,8 +65,10 @@ function is_multidimensional(array $array): bool
 /**
  * Create directory recursively. The native mkdir() function recursively create directory incorrectly.
  * This is solution.
+ *
+ * @param  int|null  $permissions  Optional chmod permissions to apply to each created directory (e.g. 0777).
  */
-function mkdir_recursively(string $path): void
+function mkdir_recursively(string $path, ?int $permissions = null): void
 {
     $currentPath = getcwd();
 
@@ -81,7 +83,7 @@ function mkdir_recursively(string $path): void
     $path = Str::replaceFirst($currentPath, '', $path);
     $explodedPath = explode('/', $path);
 
-    array_walk($explodedPath, function ($dir) use (&$currentPath) {
+    array_walk($explodedPath, function ($dir) use (&$currentPath, $permissions) {
         if ($currentPath !== '/') {
             $currentPath .= '/' . $dir;
         } else {
@@ -92,6 +94,10 @@ function mkdir_recursively(string $path): void
 
         if (!file_exists($currentPath)) {
             mkdir($currentPath);
+
+            if ($permissions !== null) {
+                chmod($currentPath, $permissions);
+            }
         }
     });
 }

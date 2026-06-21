@@ -279,6 +279,17 @@ class HelpersTest extends TestCase
         rmdir_recursively('dir1');
     }
 
+    public function testMkDirRecursivelyWithPermissions()
+    {
+        mkdir_recursively('dir1/dir2/dir3', 0775);
+
+        $this->assertSame(0775, fileperms('dir1') & 0777);
+        $this->assertSame(0775, fileperms('dir1/dir2') & 0777);
+        $this->assertSame(0775, fileperms('dir1/dir2/dir3') & 0777);
+
+        rmdir_recursively('dir1');
+    }
+
     public function testClearFolder()
     {
         mkdir_recursively('dir1/dir2/dir3');
