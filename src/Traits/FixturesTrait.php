@@ -133,13 +133,6 @@ trait FixturesTrait
      */
     public function assertEqualsVersionedFixture(string $fixture, $data, array $versions = [], bool $exportMode = false): void
     {
-        $fixture = $this->getFixturePathForVersion($fixture, $versions);
-
-        $this->assertEqualsFixture($fixture, $data, $exportMode);
-    }
-
-    protected function getFixturePathForVersion(string $fixture, array $versions = []): string
-    {
         $currentVersion = (int) app()->version();
         list($filename, $directory) = extract_last_part($fixture, DIRECTORY_SEPARATOR);
         $prefix = ($directory === '.') ? '' : "{$directory}/";
@@ -152,9 +145,11 @@ trait FixturesTrait
             }
         }
 
-        return (is_null($fixtureVersion))
+        $finalFixture = (is_null($fixtureVersion))
             ? $fixture
             : "{$prefix}laravel_before_v{$fixtureVersion}/{$filename}";
+
+        $this->assertEqualsFixture($finalFixture, $data, $exportMode);
     }
 
     public function exportJson($fixture, $data): void
