@@ -1,9 +1,11 @@
 {
     "RonasIT\\Support\\Tests\\Support\\Mock\\Jobs\\TestJob": [
         {
-            "tries": 5,
             "payload": "some payload",
-            "anotherPayload": [],
+            "anotherPayload": [
+                "another payload"
+            ],
+            "tries": 5,
             "job": null,
             "connection": null,
             "queue": "some_queue",

@@ -4,26 +4,20 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Str;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Tests\Support\Mock\Jobs\AnotherTestJob;
 use RonasIT\Support\Tests\Support\Mock\Jobs\TestJob;
-use RonasIT\Support\Tests\Support\Traits\TestingTraitTestTrait;
 use RonasIT\Support\Traits\TestingTrait;
 
 class TestingTraitTest extends TestCase
 {
-    use TestingTrait, TestingTraitTestTrait;
-
-    public static int $laravelMajorVersion;
+    use TestingTrait;
 
     public function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow('2020-01-01');
-
-        self::$laravelMajorVersion ??= (int) Str::before($this->app->version(), '.');
     }
 
     public function testAssertExceptionThrew(): void
@@ -50,7 +44,7 @@ class TestingTraitTest extends TestCase
 
         TestJob::dispatch('some payload', ['another payload'])->delay(now()->addMinute());
 
-        $this->assertQueueEqualsVersionedFixture(self::$laravelMajorVersion, 'assert_queue_equals');
+        $this->assertQueueEqualsFixture($this->getFixturePathForVersion('assert_queue_equals'));
     }
 
     public function testAssertQueueEqualsFixturePushAsClassName(): void
@@ -59,7 +53,7 @@ class TestingTraitTest extends TestCase
 
         Queue::push(TestJob::class);
 
-        $this->assertQueueEqualsVersionedFixture(self::$laravelMajorVersion, 'assert_queue_equals_as_class_name');
+        $this->assertQueueEqualsFixture($this->getFixturePathForVersion('assert_queue_equals_as_class_name'));
     }
 
     public function testAssertQueueEqualsFixturePushAsStringWithParams(): void
@@ -71,7 +65,7 @@ class TestingTraitTest extends TestCase
             'anotherPayload' => ['another payload'],
         ]);
 
-        $this->assertQueueEqualsVersionedFixture(self::$laravelMajorVersion, 'assert_queue_equals_as_class_name_with_params');
+        $this->assertQueueEqualsFixture($this->getFixturePathForVersion('assert_queue_equals_as_class_name_with_params'));
     }
 
     public function testAssertQueueEqualsFixturePushAsStringWithOneParam(): void
@@ -80,7 +74,8 @@ class TestingTraitTest extends TestCase
 
         Queue::push(TestJob::class, 'some payload');
 
-        $this->assertQueueEqualsVersionedFixture(self::$laravelMajorVersion, 'assert_queue_equals_as_class_name_with_one_param');
+        $this->assertQueueEqualsFixture($this->getFixturePathForVersion('assert_queue_equals_as_class_name_with_one_param'));
+
     }
 
     public function testAssertQueueEqualsFixtureDifferentJobs(): void
@@ -90,7 +85,7 @@ class TestingTraitTest extends TestCase
         TestJob::dispatch('some payload', ['another payload']);
         AnotherTestJob::dispatch('some payload', ['another payload']);
 
-        $this->assertQueueEqualsVersionedFixture(self::$laravelMajorVersion, 'assert_queue_equals_different_jobs');
+        $this->assertQueueEqualsFixture($this->getFixturePathForVersion('assert_queue_equals_different_jobs'));
     }
 
     public function testAssertQueueEmpty()
