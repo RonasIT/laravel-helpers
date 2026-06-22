@@ -30,11 +30,12 @@ trait TestingTrait
         foreach (Queue::pushedJobs() as $namespace => $jobs) {
             $actualData[$namespace] = Arr::map($jobs, function ($job) {
                 $job = $this->getJobObject($job);
-                $job->delay = (string) $job->delay;
 
                 return $this->getObjectAttributes($job);
             });
         }
+
+        $actualData = json_decode(json_encode($actualData), true);
 
         $this->assertEqualsFixture("queue_states/{$fixture}", $actualData, $exportMode);
     }

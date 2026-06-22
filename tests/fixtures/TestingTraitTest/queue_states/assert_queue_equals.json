@@ -5,6 +5,7 @@
             "anotherPayload": [
                 "another payload"
             ],
+            "time": "2020-01-01T00:00:00.000000Z",
             "tries": 5,
             "job": null,
             "connection": null,
@@ -12,7 +13,7 @@
             "messageGroup": null,
             "deduplicator": null,
             "debounceOwner": "",
-            "delay": "2020-01-01 00:01:00",
+            "delay": "2020-01-01T00:01:00.000000Z",
             "afterCommit": null,
             "middleware": [],
             "chained": [],
