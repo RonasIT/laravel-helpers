@@ -1,15 +1,14 @@
 {
     "RonasIT\\Support\\Tests\\Support\\Mock\\Jobs\\TestJob": [
         {
+            "tries": 5,
             "payload": "",
             "anotherPayload": [],
-            "tries": 5,
             "job": null,
             "connection": null,
             "queue": "some_queue",
             "messageGroup": null,
             "deduplicator": null,
-            "debounceOwner": "",
             "delay": null,
             "afterCommit": null,
             "middleware": [],
