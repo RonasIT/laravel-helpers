@@ -5,7 +5,6 @@
             "anotherPayload": [
                 "another payload"
             ],
-            "time": "2020-01-01T00:00:00.000000Z",
             "tries": 5,
             "job": null,
             "connection": null,
