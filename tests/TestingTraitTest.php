@@ -72,7 +72,6 @@ class TestingTraitTest extends TestCase
         Queue::push(TestJob::class, 'some payload');
 
         $this->assertQueueEqualsVersionedFixture(self::$laravelMajorVersion, 'assert_queue_equals_as_class_name_with_one_param');
-
     }
 
     public function testAssertQueueEqualsFixtureDifferentJobs(): void
