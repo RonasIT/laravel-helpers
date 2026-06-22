@@ -23,7 +23,7 @@ trait TestingTrait
         $this->expectExceptionMessageMatches("/{$expectedMessage}/");
     }
 
-    protected function assertQueueEqualsFixture(string $fixture, bool $exportMode = false): void
+    public function assertQueueEqualsFixture(string $fixture, bool $exportMode = false): void
     {
         $actualData = [];
 
