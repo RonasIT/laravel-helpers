@@ -21,8 +21,6 @@ class TestingTraitTest extends TestCase
         parent::setUp();
 
         Carbon::setTestNow('2020-01-01');
-
-        self::$laravelMajorVersion ??= (int)Str::before($this->app->version(), '.');
     }
 
     public function testAssertExceptionThrew(): void
@@ -49,7 +47,7 @@ class TestingTraitTest extends TestCase
 
         TestJob::dispatch('some payload', ['another payload'])->delay(now()->addMinute());
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals', [11, 12]);
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals');
     }
 
     public function testAssertQueueEqualsFixturePushAsStringWithParams(): void
@@ -70,7 +68,7 @@ class TestingTraitTest extends TestCase
 
         Queue::push(TestJob::class, 'some payload');
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_as_class_name_with_one_param', [11, 12]);
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_as_class_name_with_one_param');
     }
 
     public function testAssertQueueEqualsFixtureDifferentJobs(): void
@@ -80,7 +78,7 @@ class TestingTraitTest extends TestCase
         TestJob::dispatch('some payload', ['another payload']);
         AnotherTestJob::dispatch('some payload', ['another payload']);
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_different_jobs', [11, 12]);
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_different_jobs');
     }
 
     public function testAssertQueueEmpty()
