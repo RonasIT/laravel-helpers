@@ -49,6 +49,7 @@ class TestCase extends BaseTest
 
     public function assertQueueEqualsVersioningFixture(string $fixture, bool $exportMode = false): void
     {
+        // TODO: change to assertEqualsFixture after increase min Laravel version to 12
         $fixture = $this->getVersioningFixtureName($fixture, [12, 13]);
 
         $this->assertQueueEqualsFixture($fixture, $exportMode);
