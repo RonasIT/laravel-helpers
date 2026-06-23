@@ -3,12 +3,12 @@
         {
             "tries": 5,
             "payload": "some payload",
-            "anotherPayload": [
-                "another payload"
-            ],
+            "anotherPayload": [],
             "job": null,
             "connection": null,
             "queue": "some_queue",
+            "messageGroup": null,
+            "deduplicator": null,
             "delay": null,
             "afterCommit": null,
             "middleware": [],

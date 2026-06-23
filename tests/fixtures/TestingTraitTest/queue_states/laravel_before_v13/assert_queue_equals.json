@@ -3,11 +3,15 @@
         {
             "tries": 5,
             "payload": "some payload",
-            "anotherPayload": [],
+            "anotherPayload": [
+                "another payload"
+            ],
             "job": null,
             "connection": null,
             "queue": "some_queue",
-            "delay": null,
+            "messageGroup": null,
+            "deduplicator": null,
+            "delay": "2020-01-01T00:01:00.000000Z",
             "afterCommit": null,
             "middleware": [],
             "chained": [],

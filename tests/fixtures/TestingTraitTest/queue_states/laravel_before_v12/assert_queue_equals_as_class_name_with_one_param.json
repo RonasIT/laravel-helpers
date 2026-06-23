@@ -7,8 +7,6 @@
             "job": null,
             "connection": null,
             "queue": "some_queue",
-            "messageGroup": null,
-            "deduplicator": null,
             "delay": null,
             "afterCommit": null,
             "middleware": [],
