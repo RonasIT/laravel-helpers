@@ -23,13 +23,6 @@ trait TestingTrait
         $this->expectExceptionMessageMatches("/{$expectedMessage}/");
     }
 
-    public function assertQueueEqualsVersioningFixture(string $fixture, array $versions = [], bool $exportMode = false): void
-    {
-        $fixture = $this->getVersioningFixtureName($fixture, $versions);
-
-        $this->assertQueueEqualsFixture($fixture, $exportMode);
-    }
-
     public function assertQueueEqualsFixture(string $fixture, bool $exportMode = false): void
     {
         $actualData = [];

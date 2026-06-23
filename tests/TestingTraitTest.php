@@ -46,7 +46,7 @@ class TestingTraitTest extends TestCase
 
         TestJob::dispatch('some payload', ['another payload'])->delay(now()->addMinute());
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals', [13]);
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals');
     }
 
     public function testAssertQueueEqualsFixturePushAsStringWithParams(): void
@@ -67,7 +67,7 @@ class TestingTraitTest extends TestCase
 
         Queue::push(TestJob::class, 'some payload');
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_as_class_name_with_one_param', [13]);
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_as_class_name_with_one_param');
     }
 
     public function testAssertQueueEqualsFixtureDifferentJobs(): void
@@ -77,7 +77,7 @@ class TestingTraitTest extends TestCase
         TestJob::dispatch('some payload', ['another payload']);
         AnotherTestJob::dispatch('some payload', ['another payload']);
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_different_jobs', [13]);
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_different_jobs');
     }
 
     public function testAssertQueueEmpty()

@@ -118,4 +118,11 @@ class TableTestStateTest extends TestCase
 
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_falsy_to_null_transitions');
     }
+
+    public function assertQueueEqualsVersioningFixture(string $fixture, bool $exportMode = false): void
+    {
+        $fixture = $this->getVersioningFixtureName($fixture, [12, 13]);
+
+        $this->assertQueueEqualsFixture($fixture, $exportMode);
+    }
 }
