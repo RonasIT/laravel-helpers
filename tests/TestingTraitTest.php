@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Str;
 use RonasIT\Support\Exceptions\ModelFactoryNotFound;
 use RonasIT\Support\Tests\Support\Mock\Jobs\AnotherTestJob;
 use RonasIT\Support\Tests\Support\Mock\Jobs\TestJob;
@@ -47,7 +46,7 @@ class TestingTraitTest extends TestCase
 
         TestJob::dispatch('some payload', ['another payload'])->delay(now()->addMinute());
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals');
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals', [13]);
     }
 
     public function testAssertQueueEqualsFixturePushAsStringWithParams(): void
@@ -68,7 +67,7 @@ class TestingTraitTest extends TestCase
 
         Queue::push(TestJob::class, 'some payload');
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_as_class_name_with_one_param');
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_as_class_name_with_one_param', [13]);
     }
 
     public function testAssertQueueEqualsFixtureDifferentJobs(): void
@@ -78,7 +77,7 @@ class TestingTraitTest extends TestCase
         TestJob::dispatch('some payload', ['another payload']);
         AnotherTestJob::dispatch('some payload', ['another payload']);
 
-        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_different_jobs');
+        $this->assertQueueEqualsVersioningFixture('assert_queue_equals_different_jobs', [13]);
     }
 
     public function testAssertQueueEmpty()
