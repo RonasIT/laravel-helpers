@@ -24,11 +24,18 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 
 [Follow the versioning documentation][8] to implement versioning in your Laravel app using this package.
 
+### Service-Repository Architecture
+
+The package provides base classes for implementing the service-repository pattern in Laravel applications. `EntityService` and `BaseRepository` give you base CRUD operations, ability to build your own search operation with filtering and pagination result.
+
+[Follow the service-repository documentation][9] to implement this pattern in your Laravel app.
+
 ## Usage
  - [Helper functions][1]
  - [Traits][2]
- - [Services][3]
+ - [HttpRequestService][3]
  - [Iterators][4]
+ - [Service-Repository Architecture][9]
 
 ## Migration guids
  - [1.1][5]
@@ -37,9 +44,10 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 
 [1]:./documentation/helpers.md
 [2]:./documentation/traits.md
-[3]:./documentation/services.md
+[3]:./documentation/http-request-service.md
 [4]:./documentation/iterators.md
 [5]:./documentation/migration.md#1.1
 [6]:./documentation/migration.md#2.0.0
 [7]:./documentation/migration.md#2.0.8
 [8]:./documentation/versioning.md
+[9]:./documentation/service-repository.md

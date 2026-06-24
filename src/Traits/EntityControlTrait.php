@@ -10,45 +10,34 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
-/**
- * @property Model model
- */
 trait EntityControlTrait
 {
     use SearchTrait;
 
-    protected $model;
-    protected $fields;
-    protected $primaryKey;
+    protected Model $model;
+    protected array $fields;
+    protected ?string $primaryKey;
 
-    protected $withTrashed = false;
-    protected $onlyTrashed = false;
-    protected $forceMode = false;
+    protected bool $withTrashed = false;
+    protected bool $onlyTrashed = false;
+    protected bool $forceMode = false;
 
-    protected $shouldSettablePropertiesBeReset = true;
+    protected bool $shouldSettablePropertiesBeReset = true;
 
-    public function all(): Collection
-    {
-        return $this->get();
-    }
-
-    public function truncate(): self
-    {
-        $modelInstance = $this->model;
-
-        $modelInstance::truncate();
-
-        return $this;
-    }
-
-    public function force($value = true): self
+    /**
+     * Enable force mode to bypass fillable  and soft delete protection
+     */
+    public function force(bool $value = true): self
     {
         $this->forceMode = $value;
 
         return $this;
     }
 
-    public function setModel($modelClass): self
+    /**
+     * Set the model class for the repository
+     */
+    public function setModel(string $modelClass): self
     {
         $this->model = new $modelClass();
 
@@ -61,45 +50,18 @@ trait EntityControlTrait
         return $this;
     }
 
-    protected function getQuery($where = []): Query
+    /**
+     * Get all entities without conditions
+     */
+    public function all(): Collection
     {
-        $query = $this->model->query();
-
-        if ($this->onlyTrashed) {
-            $query->onlyTrashed();
-
-            $this->withTrashed = false;
-        }
-
-        if ($this->withTrashed && $this->hasSoftDeleteTrait()) {
-            $query->withTrashed();
-        }
-
-        if (!empty($this->attachedRelations)) {
-            $query->with($this->attachedRelations);
-        }
-
-        if (!empty($this->attachedRelationsCount)) {
-            foreach ($this->attachedRelationsCount as $requestedRelations) {
-                list($countRelation, $relation) = extract_last_part($requestedRelations);
-
-                if (empty($relation)) {
-                    $query->withCount($countRelation);
-                } else {
-                    $query->with([$relation => fn ($query) => $query->withCount($countRelation)]);
-                }
-            }
-        }
-
-        return $this->constructWhere($query, $where);
+        return $this->get();
     }
 
     /**
-     * Check entity existing in database.
-     *
-     * @param  mixed  $where
+     * Check entity existence by condition or primary key
      */
-    public function exists($where): bool
+    public function exists(array|int|string $where): bool
     {
         $result = $this->getQuery($where)->exists();
 
@@ -109,9 +71,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Checking that record with this key value exists
+     * Check entity existence by a specific field value
      */
-    public function existsBy(string $field, $value): bool
+    public function existsBy(string $field, mixed $value): bool
     {
         $result = $this->getQuery([$field => $value])->exists();
 
@@ -145,11 +107,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Insert rows into the database.
+     * Mass insert rows
      *
-     * @param  array<string, mixed>|array<array<string, mixed>>  $data  single row or list of rows
-     *
-     * @return bool true if rows were inserted successfully
+     * @param  array<array>  $data
      */
     public function insert(array $data): bool
     {
@@ -161,9 +121,7 @@ trait EntityControlTrait
     }
 
     /**
-     * Insert rows into the database ignoring duplicate key errors.
-     *
-     * @param  array<string, mixed>|array<array<string, mixed>>  $data  single row or list of rows
+     * @param  array<array>  $data
      *
      * @return int count of inserted rows
      */
@@ -177,29 +135,9 @@ trait EntityControlTrait
     }
 
     /**
-     * Update rows by condition or primary key
-     *
-     * @param  mixed  $where
+     * Update a single entity by condition or primary key
      */
-    public function updateMany($where, array $data): int
-    {
-        $modelClass = get_class($this->model);
-        $fields = $this->forceMode ? $modelClass::getFields() : $this->model->getFillable();
-        $entityData = Arr::only($data, $fields);
-
-        $result = $this->getQuery($where)->update($entityData);
-
-        $this->postQueryHook();
-
-        return $result;
-    }
-
-    /**
-     * Update only one row by condition or primary key value
-     *
-     * @param  array|int  $where
-     */
-    public function update($where, array $data): ?Model
+    public function update(array|int|string $where, array $data): ?Model
     {
         $item = $this->getQuery($where)->first();
 
@@ -227,7 +165,26 @@ trait EntityControlTrait
         return $item;
     }
 
-    public function updateOrCreate($where, $data): Model
+    /**
+     * Update multiple entities by condition
+     */
+    public function updateMany(array $where, array $data): int
+    {
+        $modelClass = get_class($this->model);
+        $fields = ($this->forceMode) ? $modelClass::getFields() : $this->model->getFillable();
+        $entityData = Arr::only($data, $fields);
+
+        $result = $this->getQuery($where)->update($entityData);
+
+        $this->postQueryHook();
+
+        return $result;
+    }
+
+    /**
+     * Update an existing entity or create a new one
+     */
+    public function updateOrCreate(array|int|string $where, array $data): Model
     {
         $this->resetSettableProperties(false);
 
@@ -246,15 +203,25 @@ trait EntityControlTrait
         return $this->create(array_merge($data, $where));
     }
 
-    public function count($where = []): int
+    /**
+     * Update entities by list of field values
+     */
+    public function updateByList(array $values, array $data, ?string $field = null): int
     {
-        $result = $this->getQuery($where)->count();
+        $field = (empty($field)) ? $this->primaryKey : $field;
+
+        $query = $this->getQuery()->whereIn($field, $values);
+
+        $fields = ($this->forceMode) ? $this->fields : $this->model->getFillable();
 
         $this->postQueryHook();
 
-        return $result;
+        return $query->update(Arr::only($data, $fields));
     }
 
+    /**
+     * Get entities by condition
+     */
     public function get(array $where = []): Collection
     {
         $result = $this->getQuery($where)->get();
@@ -264,41 +231,53 @@ trait EntityControlTrait
         return $result;
     }
 
-    public function first($where = []): ?Model
+    /**
+     * Get entities by list of field values
+     */
+    public function getByList(array $values, ?string $field = null): Collection
     {
-        $result = $this->getQuery($where)->first();
+        $field = (empty($field)) ? $this->primaryKey : $field;
 
-        $this->postQueryHook();
-
-        return $result;
-    }
-
-    public function last(array $where = [], string $column = 'created_at'): ?Model
-    {
         $result = $this
-            ->getQuery($where)
-            ->latest($column)
-            ->first();
+            ->getQuery()
+            ->whereIn($field, $values)
+            ->get();
 
         $this->postQueryHook();
 
         return $result;
-    }
-
-    public function findBy(string $field, $value): ?Model
-    {
-        return $this->first([$field => $value]);
-    }
-
-    public function find($id): ?Model
-    {
-        return $this->first($id);
     }
 
     /**
-     * @param  array|string|int  $where  array of conditions or primary key value
+     * Count entities by condition
      */
-    public function firstOrCreate($where, array $data = []): Model
+    public function count(array $where = []): int
+    {
+        $result = $this->getQuery($where)->count();
+
+        $this->postQueryHook();
+
+        return $result;
+    }
+
+    /**
+     * Count entities by list of field values
+     */
+    public function countByList(array $values, ?string $field = null): int
+    {
+        $field = (empty($field)) ? $this->primaryKey : $field;
+
+        $result = $this->getQuery()->whereIn($field, $values)->count();
+
+        $this->postQueryHook();
+
+        return $result;
+    }
+
+    /**
+     * Get the first entity matching the condition or create a new one
+     */
+    public function firstOrCreate(array|string|int $where, array $data = []): Model
     {
         $this->resetSettableProperties(false);
 
@@ -316,76 +295,78 @@ trait EntityControlTrait
     }
 
     /**
-     * Delete rows by condition or primary key
-     *
-     * @param  array|int|string  $where
-     *
-     * @return int count of deleted rows
+     * Get the first entity that matches the given condition or primary key
      */
-    public function delete($where): int
+    public function first(array|int|string $where = []): ?Model
     {
-        $query = $this->getQuery($where);
-
-        if ($this->forceMode) {
-            $result = $query->forceDelete();
-        } else {
-            $result = $query->delete();
-        }
+        $result = $this->getQuery($where)->first();
 
         $this->postQueryHook();
 
         return $result;
-    }
-
-    public function withTrashed($enable = true): self
-    {
-        $this->withTrashed = $enable;
-
-        return $this;
-    }
-
-    public function onlyTrashed($enable = true): self
-    {
-        $this->onlyTrashed = $enable;
-
-        return $this;
-    }
-
-    public function restore($where): int
-    {
-        $result = $this->getQuery($where)->onlyTrashed()->restore();
-
-        $this->postQueryHook();
-
-        return $result;
-    }
-
-    public function chunk(int $limit, Closure $callback, array $where = []): void
-    {
-        $this
-            ->getQuery($where)
-            ->orderBy($this->primaryKey)
-            ->chunk($limit, $callback);
-
-        $this->postQueryHook();
-    }
-
-    public function lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): void
-    {
-        $this
-            ->getQuery($where)
-            ->lazyById($chunkSize)
-            ->each($callback);
-
-        $this->postQueryHook();
     }
 
     /**
-     * Delete rows by list of values a particular field or primary key
-     *
-     * @param  ?string  $field  condition field, primary key is default value
-     *
-     * @return int count of deleted rows
+     * Get the last entity matching the given condition, ordered by the specified column
+     */
+    public function last(array $where = [], string $column = 'created_at'): ?Model
+    {
+        $result = $this
+            ->getQuery($where)
+            ->latest($column)
+            ->first();
+
+        $this->postQueryHook();
+
+        return $result;
+    }
+
+    /**
+     * Find an entity by primary key
+     */
+    public function find(int|string $id): ?Model
+    {
+        return $this->first($id);
+    }
+
+    /**
+     * Find an entity by a specific field value
+     */
+    public function findBy(string $field, mixed $value): ?Model
+    {
+        return $this->first([$field => $value]);
+    }
+
+    /**
+     * Remove all rows from the table
+     */
+    public function truncate(): self
+    {
+        $modelInstance = $this->model;
+
+        $modelInstance::truncate();
+
+        return $this;
+    }
+
+    /**
+     * Delete entities by condition or primary key. Return count of deleted rows
+     */
+    public function delete(array|int|string $where): int
+    {
+        $query = $this->getQuery($where);
+
+        $result = ($this->forceMode)
+            ? $query->forceDelete()
+            : $query->delete();
+
+        $this->postQueryHook();
+
+        return $result;
+    }
+
+    /**
+     * Delete entities by list of field values. Return count of deleted rows
      */
     public function deleteByList(array $values, ?string $field = null): int
     {
@@ -406,6 +387,21 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * Restore soft-deleted entities by condition or primary key
+     */
+    public function restore(array|int|string $where): int
+    {
+        $result = $this->getQuery($where)->onlyTrashed()->restore();
+
+        $this->postQueryHook();
+
+        return $result;
+    }
+
+    /**
+     * Restore soft-deleted entities by list of field values
+     */
     public function restoreByList(array $values, ?string $field = null): int
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
@@ -421,42 +417,83 @@ trait EntityControlTrait
         return $result;
     }
 
-    public function getByList(array $values, ?string $field = null): Collection
+    /**
+     * Include soft-deleted entities in queries
+     */
+    public function withTrashed(bool $enable = true): self
     {
-        $field = (empty($field)) ? $this->primaryKey : $field;
+        $this->withTrashed = $enable;
 
-        $result = $this
-            ->getQuery()
-            ->whereIn($field, $values)
-            ->get();
-
-        $this->postQueryHook();
-
-        return $result;
+        return $this;
     }
 
-    public function countByList(array $values, ?string $field = null): int
+    /**
+     * Query only soft-deleted entities
+     */
+    public function onlyTrashed(bool $enable = true): self
     {
-        $field = (empty($field)) ? $this->primaryKey : $field;
+        $this->onlyTrashed = $enable;
 
-        $result = $this->getQuery()->whereIn($field, $values)->count();
-
-        $this->postQueryHook();
-
-        return $result;
+        return $this;
     }
 
-    public function updateByList(array $values, array $data, $field = null): int
+    /**
+     * Process entities in chunks ordered by primary key
+     */
+    public function chunk(int $limit, Closure $callback, array $where = []): void
     {
-        $field = (empty($field)) ? $this->primaryKey : $field;
-
-        $query = $this->getQuery()->whereIn($field, $values);
-
-        $fields = $this->forceMode ? $this->fields : $this->model->getFillable();
+        $this
+            ->getQuery($where)
+            ->orderBy($this->primaryKey)
+            ->chunk($limit, $callback);
 
         $this->postQueryHook();
+    }
 
-        return $query->update(Arr::only($data, $fields));
+    /**
+     * Process entities lazily in chunks by primary key
+     */
+    public function lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): void
+    {
+        $this
+            ->getQuery($where)
+            ->lazyById($chunkSize)
+            ->each($callback);
+
+        $this->postQueryHook();
+    }
+
+    protected function getQuery(array|int|string $where = []): Query
+    {
+        $query = $this->model->query();
+
+        if ($this->onlyTrashed) {
+            $query->onlyTrashed();
+
+            $this->withTrashed = false;
+        }
+
+        if ($this->withTrashed && $this->hasSoftDeleteTrait()) {
+            $query->withTrashed();
+        }
+
+        if (!empty($this->attachedRelations)) {
+            $query->with($this->attachedRelations);
+        }
+
+        if (!empty($this->attachedRelationsCount)) {
+            foreach ($this->attachedRelationsCount as $requestedRelations) {
+                list($countRelation, $relation) = extract_last_part($requestedRelations);
+
+                if (empty($relation)) {
+                    $query->withCount($countRelation);
+                } else {
+                    $query->with([$relation => fn ($query) => $query->withCount($countRelation)]);
+                }
+            }
+        }
+
+        return $this->constructWhere($query, $where);
     }
 
     protected function getEntityName(): string

@@ -1,0 +1,329 @@
+[<< Traits][1]
+[HttpRequestService >>][2]
+
+# Service-Repository Architecture
+
+The package provides base classes for implementing the service-repository pattern. This pattern separates business logic (services) from data access (repositories), making the codebase more maintainable, testable, and easier to scale.
+
+This results in a clean layered architecture:
+
+```
+Controller → Service → Repository → Model
+```
+
+- **Service** handles business logic, orchestrates application workflows, and delegates data operations to the repository.
+- **Repository** encapsulates work with data storage and provide base CRUD operations.
+
+## Setting Up
+
+The [Entity Generator](https://github.com/RonasIT/laravel-entity-generator) package can scaffold these classes automatically via `php artisan make:entity`.
+Below is how to create them manually.
+
+### 1. Create a Repository
+
+Extend `BaseRepository` and set the model in the constructor:
+
+```php
+use RonasIT\Support\Repositories\BaseRepository;
+
+final class UserRepository extends BaseRepository
+{
+    public function __construct()
+    {
+        $this->setModel(User::class);
+    }
+}
+```
+
+`BaseRepository` uses `EntityControlTrait`, which provides all CRUD and search methods automatically.
+
+### 2. Create a Service
+
+Extend `EntityService` and associate it with a repository:
+
+```php
+use RonasIT\Support\Services\EntityService;
+
+final class UserService extends EntityService
+{
+    public function __construct()
+    {
+        $this->setRepository(UserRepository::class);
+    }
+}
+```
+
+`EntityService` uses `__call()` to delegate method calls to the repository in case it not exists in the service class.
+If a repository method returns `$this` (for chaining), the service returns itself instead, allowing seamless method chaining through the service layer.
+
+Any repository method can be redefined in the service to extend it with business logic. Since PHP resolves instance methods before `__call()`, defining a method on the service overrides the delegation:
+
+```php
+final class UserService extends EntityService
+{
+    public function __construct()
+    {
+        $this->setRepository(UserRepository::class);
+    }
+
+    public function create(array $data): User
+    {
+        $data['password'] = bcrypt($data['password']);
+
+        return $this->repository->create($data);
+    }
+}
+```
+
+---
+
+## CRUD Operations
+
+All methods below are available on both the repository and the service (via delegation).
+
+The most methods support the mixed input for the condition. It accepts a primary key value or an associative array of conditions:
+
+```php
+$this->first($id) === $this->first(['id' => $id]);
+$this->first(['email' => $email, 'is_active' => true]);
+
+$this->update($id, ['name' => 'New Name']);
+$this->update(['email' => 'user@example.com'], ['name' => 'New Name']);
+```
+
+### Create
+
+| Method | Description |
+|--------|-------------|
+| `create(array $data): Model` | Create and return a new entity |
+| `insert(array $data): bool` | Mass insert entities, the timestamps fields filling accordingly to the related model |
+| `insertOrIgnore(array $data): int` | Mass insert rows, silently skipping duplicate key errors. Returns count of inserted rows |
+| `firstOrCreate(array\|int\|string $where, array $data = []): Model` | Get the first entity matching the condition or create a new one |
+| `updateOrCreate(array\|int\|string $where, array $data): Model` | Update an existing entity or create a new one |
+
+### Read
+
+| Method | Description |
+|--------|-------------|
+| `find(int\|string $id): ?Model` | Find an entity by primary key |
+| `findBy(string $field, mixed $value): ?Model` | Find an entity by a specific field value |
+| `first(array\|int\|string $where = []): ?Model` | Find the first entity matching the condition |
+| `last(array $where = [], string $column = 'created_at'): ?Model` | Find the last entity matching the condition, ordered by `$column` |
+| `get(array $where = []): Collection` | Get a list of all entities matching the condition |
+| `getByList(array $values, ?string $field = null): Collection` | Get the list of entities whose `$field` (defaults to primary key) value is in the list of `$values` |
+| `all(): Collection` | Get the list of all entities without conditions |
+| `exists(array\|int\|string $where): bool` | Check entity existence by condition or primary key |
+| `existsBy(string $field, mixed $value): bool` | Check entity existence by a specific field value |
+| `count(array $where = []): int` | Count entities by condition |
+| `countByList(array $values, ?string $field = null): int` | Count entities whose `$field` (defaults to primary key) value is in `$values` list |
+| `chunk(int $limit, Closure $callback, array $where = []): void` | Process entities in chunks ordered by primary key |
+| `lazyEach(Closure $callback, array $where = [], int $chunkSize = 500): void` | Process entities lazily in chunks by primary key |
+
+### Update
+
+| Method | Description |
+|--------|-------------|
+| `update(array\|int\|string $where, array $data): ?Model` | Update and return a single entity |
+| `updateMany(array $where, array $data): int` | Update all entities matching the condition. Returns count of updated rows |
+| `updateByList(array $values, array $data, ?string $field = null): int` | Update entities whose `$field` (defaults to primary key) value is in the `$values` list. Returns count of updated rows |
+
+### Delete
+
+| Method | Description |
+|--------|-------------|
+| `delete(array\|int\|string $where): int` | Delete entities by condition or primary key. Returns count of deleted rows |
+| `deleteByList(array $values, ?string $field = null): int` | Delete entities whose `$field` (defaults to primary key) value is in the `$values` list. Returns count of deleted rows |
+| `truncate(): self` | Remove all rows from the table |
+
+### `force(bool $value = true): self`
+
+The force mode makes different affect for the different cases:
+1. For the `delete` operation, force mode makes force delete operation even the model has SoftDeletes trait
+2. For the create/update operations force mode allows to fill the guarded or non defined fields of the model.
+
+```php
+$this->force()->create($data);
+$this->force()->update($where, $data);
+$this->force()->delete($where);
+$this->force()->updateByList($ids, $data);
+```
+
+> [!NOTE]
+> `force()` is chainable and resets automatically after the next query.
+
+---
+
+## Soft Delete Support
+
+For models using Laravel's `SoftDeletes` trait, the `delete()` and `deleteByList()` methods perform a soft delete by default. To permanently remove records, use `force()->delete()`. The following additional methods are also available:
+
+### Scoping
+
+| Method | Description |
+|--------|-------------|
+| `withTrashed(bool $enable = true): self` | Include soft-deleted entities into operations |
+| `onlyTrashed(bool $enable = true): self` | Exclude non soft-deleted entities from operations |
+
+> [!NOTE]
+> Both methods support call chaining and are applied only to the next request, after which they are reset. 
+
+### Restore
+
+| Method | Description |
+|--------|-------------|
+| `restore(array\|int\|string $where): int` | Restore soft-deleted entities by condition or primary key. Returns count of restored rows |
+| `restoreByList(array $values, ?string $field = null): int` | Restore soft-deleted entities whose `$field` (defaults to primary key) value is in the `$values` list. Returns count of restored rows |
+
+### Examples
+
+```php
+// Include soft-deleted entities in results
+$this->withTrashed()->get();
+
+// Get only soft-deleted entities
+$this->onlyTrashed()->get();
+
+// Restore by condition
+$this->restore(['status' => 'banned']);
+
+// Restore by list of IDs
+$this->restoreByList([1, 2, 3]);
+
+// Permanently delete (bypass soft delete)
+$this->force()->delete($where);
+$this->force()->deleteByList([1, 2, 3]);
+```
+
+---
+
+## [Eager Loading](https://laravel.com/docs/eloquent-relationships#eager-loading)
+
+| Method | Description |
+|--------|-------------|
+| `with(array\|string $relations): self` | Sets relations to eager load on the next query. |
+| `withCount(array\|string $relations): self` | Loads relation counts. Supports dot notation. |
+
+> [!NOTE]
+> Both methods support call chaining and are applied only to the next request, after which they are reset. 
+
+Eager loading is supported by `create`, `update`, `first`, `last`, `find`, `findBy`, `get`, `getByList`, and `searchQuery`.
+
+---
+
+## Search and Filtering
+
+`SearchTrait` (included via `EntityControlTrait`) provides a search pipeline with automatic filter resolution, manual filter methods, ordering, and pagination.
+
+### Basic Usage
+
+Base search implementation consists of 2 code methods:
+
+1. `searchQuery` which save the filters list, prepare query object and apply predefined filters.
+2. `getSearchResults` generating paginated result of the prepared query.
+
+```php
+public function search(array $filters): LengthAwarePaginator
+{
+    return $this
+        ->searchQuery($filters)
+        ->getSearchResults();
+}
+```
+
+### Predefined filters
+
+The `searchQuery` method automatically apply the predefined filters to the query object. Each key of the `$filters` argument will be interpreted as a filter by full matching (in case it hasn't reserved postfix), e.g.
+
+```php
+$this->searchQuery(['name' => 'Foo'])->getSearchResults();
+// Returns all records where the `name` field equals 'Foo'
+```
+
+### Reserved postfixes
+
+In case some of the `$filters` keys contains the special postfix - it will be automatically interpreted as a predefined filter.
+
+| Postfix | Operator | Description |
+|---------|----------|-------------|
+| `_in_list` | `whereIn` | Field value should be one of provided |
+| `_not_in_list` | `whereNotIn` | Field value should not be one of provided |
+| `_gte` | `>=` | Field value should be greater than or equal to provided |
+| `_gt` | `>` | Field value should be greater than provided |
+| `_lte` | `<=` | Field value should be less than or equal to provided |
+| `_lt` | `<` | Field value should be less than provided |
+| `_from` | `>=` | Alias for `_gte` |
+| `_to` | `<=` | Alias for `_lte` |
+
+### Reserved Filter Names
+
+The search uses next reserved fields in the logic: `with`, `with_count`, `with_trashed`, `only_trashed`, `query`, `order_by`, `all`, `per_page`, `page`, `desc`.
+
+We highly recommend do not use these filters to implement a custom logic.
+
+To add custom reserved filter names, call `setAdditionalReservedFilters()` in the repository constructor:
+
+```php
+$this->setAdditionalReservedFilters('coach_id', 'contact_id');
+```
+
+> [!NOTE]
+> These keys will be skipped by the auto-filter logic and can be handled manually in a custom `search()` method.
+
+### Manual Filter Methods
+
+If you need to extend the predefined filters logic - use filters manually with your own logic. Each filter support the fluent syntax.
+
+| Method | Description |
+|--------|-------------|
+| `filterBy` | Exact match filter. Supports dot notation for relations (e.g., `role.name`) |
+| `filterByList` | `whereIn` filter |
+| `filterByQuery` | `LIKE` search across multiple fields. Supports relation fields via dot notation |
+| `filterGreater` | `>` / `>=` filter. Reads from `$filters[$filterName]`, defaults to `'from'` |
+| `filterLess` | `<` / `<=` filter. Reads from `$filters[$filterName]`, defaults to `'to'` |
+| `filterValue` | Applies a comparison condition with a given value directly. Skips if empty |
+| `orderBy` | Applies ordering by `$filters['order_by']`. Supports dot notation for relation fields |
+
+### Pagination
+
+The pagination is out of the box feature, provided by `getSearchResults()` method. Pagination works using next predefined filters:
+
+| Filter | Description | Default |
+|--------|-------------|---------|
+| `per_page` | Items per page | Config value `defaults.items_per_page` |
+| `page` | Current page | `1` |
+| `all` | Return all results without pagination, wrapped into the pagination structure | `false` |
+| `order_by` | Field to sort by | Primary key |
+| `desc` | Sort descending | `false` |
+
+### Example
+
+```php
+// service layer
+public function search(array $filters): LengthAwarePaginator
+{
+    return $this
+        ->searchQuery($filters)
+        ->filterBy('role.name', 'role_name')
+        ->filterByQuery(['name'])
+        ->getSearchResults();
+}
+
+// controller or another service
+$service->search([
+    'role_name' => 'admin',
+    'query' => 'john',
+    'age_from' => 18,
+    'age_to' => 65,
+    'order_by' => 'created_at',
+    'desc' => true,
+    'per_page' => 20,
+    'with' => ['posts', 'role'],
+    'with_count' => ['posts'],
+]);
+```
+
+[<< Traits][1]
+[HttpRequestService >>][2]
+
+[1]:traits.md
+[2]:http-request-service.md

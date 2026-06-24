@@ -54,6 +54,6 @@ foreach($iterator->getGenerator() as $category) {
 //['id' => 5, 'name' => 'second', 'created_at' => '2018-01-23 07:20:06']
 ```
 
-[<< Services][1]
+[<< HttpRequestService][1]
 
-[1]:services.md
+[1]:http-request-service.md

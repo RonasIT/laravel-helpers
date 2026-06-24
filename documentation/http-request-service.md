@@ -1,19 +1,7 @@
 [<< Traits][1]
 [Iterators >>][2]
 
-# Services
-
-## EntityService
-
-The base class for service classes related to database entities. It allows to use pseudo inheritance
-between the service class and related repository class;
-
-### setRepository($repository)
-
-Associate service class with the repository class which will using in pseudo inheritance.
-- $repository - valid class name of repository class.
-
-## HttpRequestService
+# HttpRequestService
 
 Service to working with http/https protocols based on Guzzle library.
 

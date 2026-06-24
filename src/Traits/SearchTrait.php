@@ -12,17 +12,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * @property Query query
+ * @property Query $query
  */
 trait SearchTrait
 {
-    protected $query;
-    protected $filter;
+    protected Query $query;
+    protected array $filter;
 
-    protected $attachedRelations = [];
-    protected $attachedRelationsCount = [];
+    protected array $attachedRelations = [];
+    protected array $attachedRelationsCount = [];
 
-    protected $reservedFilters = [
+    protected array $reservedFilters = [
         'with',
         'with_count',
         'with_trashed',
@@ -35,11 +35,6 @@ trait SearchTrait
         'desc',
     ];
 
-    protected function setAdditionalReservedFilters(...$filterNames)
-    {
-        array_push($this->reservedFilters, ...$filterNames);
-    }
-
     public function paginate(): LengthAwarePaginator
     {
         $defaultPerPage = config('defaults.items_per_page');
@@ -50,8 +45,7 @@ trait SearchTrait
     }
 
     /**
-     * @param  $field  string filtered field, you can pass field name with dots to filter by field of relation
-     * @param  $filterName  string|null key from filters which contains filter value
+     * Applies filtering by the specified field. Supports dot notation for relations's fields
      */
     public function filterBy(string $field, ?string $filterName = null): self
     {
@@ -66,6 +60,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * Applies filtering by a list of values (whereIn). Supports dot notation for relation's fields
+     */
     public function filterByList(string $field, ?string $filterName = null): self
     {
         $filterName ??= $this->getFilterName($field);
@@ -79,6 +76,10 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * Applies filtering by partial matching (LIKE) of passed fields with the `query` field of the $filter property.
+     * Fields supports dot notation for relation's fields.
+     */
     public function filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self
     {
         if (!empty($this->filter['query'])) {
@@ -100,6 +101,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * Initialize the search query and auto-apply predefined filters
+     */
     public function searchQuery(array $filter = []): self
     {
         if (!empty($filter['with_trashed'])) {
@@ -154,6 +158,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * Finalize the search: apply ordering and return paginated results
+     */
     public function getSearchResults(): LengthAwarePaginator
     {
         $this->orderBy();
@@ -190,6 +197,9 @@ trait SearchTrait
         return $paginator->setCollection($collection);
     }
 
+    /**
+     * Applies sorting results by the `order_by` key of the $filter property. Supports dot notation for relation's fields.
+     */
     public function orderBy(?string $default = null, bool $defaultDesc = false): self
     {
         $default = (empty($default)) ? $this->primaryKey : $default;
@@ -210,36 +220,31 @@ trait SearchTrait
         return $this;
     }
 
-    protected function getDesc(bool $isDesc): string
-    {
-        return ($isDesc) ? 'DESC' : 'ASC';
-    }
-
     /** @deprecated use filterGreater instead */
-    public function filterMoreThan(string $field, $value): self
+    public function filterMoreThan(string $field, mixed $value): self
     {
         return $this->filterValue($field, '>', $value);
     }
 
     /** @deprecated use filterLess instead */
-    public function filterLessThan(string $field, $value): self
+    public function filterLessThan(string $field, mixed $value): self
     {
         return $this->filterValue($field, '<', $value);
     }
 
     /** @deprecated use filterGreater instead */
-    public function filterMoreOrEqualThan(string $field, $value): self
+    public function filterMoreOrEqualThan(string $field, mixed $value): self
     {
         return $this->filterValue($field, '>=', $value);
     }
 
     /** @deprecated use filterLess instead */
-    public function filterLessOrEqualThan(string $field, $value): self
+    public function filterLessOrEqualThan(string $field, mixed $value): self
     {
         return $this->filterValue($field, '<=', $value);
     }
 
-    public function filterValue(string $field, string $sign, $value): self
+    public function filterValue(string $field, string $sign, mixed $value): self
     {
         if (!empty($value)) {
             $this->query->where($field, $sign, $value);
@@ -249,9 +254,7 @@ trait SearchTrait
     }
 
     /**
-     * @param  $relations  array|string
-     *
-     * @return $this
+     * Set relations for eager loading
      */
     public function with(array|string $relations): self
     {
@@ -261,15 +264,73 @@ trait SearchTrait
     }
 
     /**
-     * @param  $relations  array|string
-     *
-     * @return $this
+     * Set relations for counting
      */
     public function withCount(array|string $relations): self
     {
         $this->attachedRelationsCount = Arr::wrap($relations);
 
         return $this;
+    }
+
+    /** @deprecated use filterGreater instead */
+    public function filterFrom(string $field, bool $isStrict = true, ?string $filterName = null): self
+    {
+        return $this->filterGreater($field, $isStrict, $filterName);
+    }
+
+    /**
+     * Applies filtering by field is greater than (or equal to) the filter value
+     */
+    public function filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self
+    {
+        $filterName = empty($filterName) ? 'from' : $filterName;
+        $sign = ($isStrict) ? '>' : '>=';
+
+        if (isset($this->filter[$filterName])) {
+            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
+        }
+
+        return $this;
+    }
+
+    /** @deprecated use filterLess instead */
+    public function filterTo(string $field, bool $isStrict = true, ?string $filterName = null): self
+    {
+        return $this->filterLess($field, $isStrict, $filterName);
+    }
+
+    /**
+     * Applies filtering for field is less than (or equal to) the filter value
+     */
+    public function filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self
+    {
+        $filterName = (empty($filterName)) ? 'to' : $filterName;
+        $sign = ($isStrict) ? '<' : '<=';
+
+        if (isset($this->filter[$filterName])) {
+            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the current Eloquent query builder with applied filters
+     */
+    public function getSearchQuery(): Query
+    {
+        return $this->query;
+    }
+
+    protected function setAdditionalReservedFilters(string ...$filterNames): void
+    {
+        array_push($this->reservedFilters, ...$filterNames);
+    }
+
+    protected function getDesc(bool $isDesc): string
+    {
+        return ($isDesc) ? 'DESC' : 'ASC';
     }
 
     protected function getQuerySearchCallback(string $field, string $mask): Closure
@@ -290,53 +351,12 @@ trait SearchTrait
         };
     }
 
-    /** @deprecated use filterGreater instead */
-    public function filterFrom(string $field, bool $isStrict = true, ?string $filterName = null): self
-    {
-        return $this->filterGreater($field, $isStrict, $filterName);
-    }
-
-    public function filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self
-    {
-        $filterName = empty($filterName) ? 'from' : $filterName;
-        $sign = ($isStrict) ? '>' : '>=';
-
-        if (isset($this->filter[$filterName])) {
-            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
-        }
-
-        return $this;
-    }
-
-    /** @deprecated use filterLess instead */
-    public function filterTo(string $field, bool $isStrict = true, ?string $filterName = null): self
-    {
-        return $this->filterLess($field, $isStrict, $filterName);
-    }
-
-    public function filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self
-    {
-        $filterName = (empty($filterName)) ? 'to' : $filterName;
-        $sign = ($isStrict) ? '<' : '<=';
-
-        if (isset($this->filter[$filterName])) {
-            $this->addWhere($this->query, $field, $this->filter[$filterName], $sign);
-        }
-
-        return $this;
-    }
-
-    public function getSearchQuery(): Query
-    {
-        return $this->query;
-    }
-
-    protected function addWhere(Query &$query, string $field, $value, string $sign = '='): void
+    protected function addWhere(Query &$query, string $field, mixed $value, string $sign = '='): void
     {
         $this->applyWhereCallback($query, $field, fn (&$query, $field) => $query->where($field, $sign, $value));
     }
 
-    protected function constructWhere(Query $query, $where = [], ?string $field = null): Query
+    protected function constructWhere(Query $query, array|int|string $where = [], ?string $field = null): Query
     {
         if (!is_array($where)) {
             $field = (empty($field)) ? $this->primaryKey : $field;
