@@ -75,7 +75,12 @@ class TableTestState extends Assert
                 $deletedRecords[] = $originItem;
             } else {
                 $updatedItem = $updatedData->get($updatedItemIndex);
-                $changes = array_diff_assoc($updatedItem, $originItem);
+
+                $changes = array_filter(
+                    array: $updatedItem,
+                    callback: fn ($value, $key) => !array_key_exists($key, $originItem) || $value !== $originItem[$key],
+                    mode: ARRAY_FILTER_USE_BOTH,
+                );
 
                 if (!empty($changes)) {
                     $updatedRecords[] = array_merge([$this->uniqueKey => $originItem[$this->uniqueKey]], $changes);
