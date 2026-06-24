@@ -500,13 +500,13 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
-            . "where ((\"query_field\" like '%search_\'string%') or (\"another_query_field\" like '%search_\'string%')) "
+            . "where ((\"test_models\".\"query_field\" like '%search_\'string%') or (\"test_models\".\"another_query_field\" like '%search_\'string%')) "
             . 'and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
-            "select * from \"test_models\" where ((\"query_field\" like '%search_\'string%') "
-            . "or (\"another_query_field\" like '%search_\'string%')) and \"test_models\".\"deleted_at\" is null "
+            "select * from \"test_models\" where ((\"test_models\".\"query_field\" like '%search_\'string%') "
+            . "or (\"test_models\".\"another_query_field\" like '%search_\'string%')) and \"test_models\".\"deleted_at\" is null "
             . 'order by "id" asc limit 15 offset 0',
             $selectResult,
         );
@@ -516,15 +516,15 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
-            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
-            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
+            . 'where (("test_models"."query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
+            . 'or ("test_models"."another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
             'select * from "test_models" '
-            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
-            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
+            . 'where (("test_models"."query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
+            . 'or ("test_models"."another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
             $selectResult,
         );
@@ -534,9 +534,9 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
-            . 'where (("query_field" like \'%search_string%\') or exists (select * from "relation_models" '
+            . 'where (("test_models"."query_field" like \'%search_string%\') or exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" '
-            . 'and ("another_query_field" like \'%search_string%\'))) and exists (select * from "relation_models" '
+            . 'and ("relation_models"."another_query_field" like \'%search_string%\'))) and exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" and "name" = ?) '
             . 'and "test_models"."deleted_at" is null',
             ['some_value'],
@@ -545,10 +545,10 @@ trait SqlMockTrait
         $this->mockSelect(
             'select "test_models".*, (select "id" from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" order by "id" asc limit 1) '
-            . 'as "relation_id" from "test_models" where (("query_field" like \'%search_string%\') '
+            . 'as "relation_id" from "test_models" where (("test_models"."query_field" like \'%search_string%\') '
             . 'or exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" '
-            . 'and ("another_query_field" like \'%search_string%\'))) and '
+            . 'and ("relation_models"."another_query_field" like \'%search_string%\'))) and '
             . 'exists (select * from "relation_models" where "test_models"."id" = "relation_models"."test_model_id" '
             . 'and "name" = ?) and "test_models"."deleted_at" is null '
             . 'order by "relation_id" asc, "id" asc limit 15 offset 0',
