@@ -274,7 +274,7 @@ trait SearchTrait
 
     protected function getQuerySearchCallback(string $field, string $mask): Closure
     {
-        return function ($query) use ($field, $mask) {
+        return function (Query $query) use ($field, $mask) {
             $databaseDriver = config('database.default');
             $value = ($databaseDriver === 'pgsql')
                 ? pg_escape_string($this->filter['query'])
@@ -283,6 +283,8 @@ trait SearchTrait
             $operator = ($databaseDriver === 'pgsql')
                 ? 'ilike'
                 : 'like';
+
+            $field = $query->qualifyColumn($field);
 
             $query->orWhere($field, $operator, DB::raw($value));
         };
