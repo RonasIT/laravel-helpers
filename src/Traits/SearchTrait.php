@@ -284,9 +284,9 @@ trait SearchTrait
                 ? 'ilike'
                 : 'like';
 
-            $column = $query->qualifyColumn($field);
+            $field = $query->qualifyColumn($field);
 
-            $query->orWhere($column, $operator, DB::raw($value));
+            $query->orWhere($field, $operator, DB::raw($value));
         };
     }
 
