@@ -68,7 +68,7 @@ class FixturesTraitTest extends TestCase
 
         $this->mockNativeFunction(
             'RonasIT\Support\Traits',
-            $this->functionCall('chmod', [$fixturePath, 0777], true),
+            $this->functionCall('chmod', [$fixturePath, 0666], true),
         );
 
         $result = [

@@ -286,7 +286,7 @@ trait FixturesTrait
 
         file_put_contents($path, $content);
 
-        chmod($path, 0777);
+        chmod($path, 0666);
     }
 
     protected function makeFixtureDir(string $path): void
