@@ -652,7 +652,7 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->mockGet(self::$selectResult);
 
@@ -684,12 +684,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testGetByStringPrimaryKey(): void
     {
-        $this->mockSelect(
-            query: 'select "test_models".*, (select count(*) from "relation_models" '
-                . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-                . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
-            bindings: ['test_id_1'],
-        );
+        $this->mockGet(self::$selectResult, ['test_id_1']);
 
         self::$testRepositoryClass
             ->withTrashed()
@@ -702,7 +697,7 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
-    public function testGetEmptyResult()
+    public function testGetEmptyResult(): void
     {
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
