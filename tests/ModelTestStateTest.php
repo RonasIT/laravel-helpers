@@ -36,7 +36,7 @@ class ModelTestStateTest extends TestCase
         $jsonFields = $this->getProtectedProperty($reflectionClass, 'jsonFields', $modelTestState);
         $state = $this->getProtectedProperty($reflectionClass, 'state', $modelTestState);
 
-        $this->assertEquals(['json_field', 'castable_field'], $jsonFields);
+        $this->assertEquals(['json_field', 'castable_field', 'cast_binary_field'], $jsonFields);
         $this->assertEquals($originRecords, $state);
     }
 
@@ -104,7 +104,12 @@ class ModelTestStateTest extends TestCase
         $initialDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/initial_dataset'));
         $changedDatasetMock = collect($this->getJsonFixture('changes_equals_fixture_primary_key/changed_dataset'));
 
-        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_model_non_id_primary_keys', 'name');
+        $this->mockGettingDatasetForChanges(
+            changedDataset: $changedDatasetMock,
+            initialState: $initialDatasetMock,
+            tableName: 'test_model_non_id_primary_keys',
+            uniqueKey: 'name',
+        );
 
         $modelTestState = new ModelTestState(TestModelNonIdPrimaryKey::class);
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key');
