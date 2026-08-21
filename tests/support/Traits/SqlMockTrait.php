@@ -28,17 +28,18 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockGet(array $selectResult): void
+    protected function mockGet(array $selectResult, array $bindings = [1]): void
     {
         $this->mockSelectById(
-            'select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
-            $selectResult,
+            query: 'select "test_models".*, (select count(*) from "relation_models" '
+                . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+                . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
+            result: $selectResult,
+            bindings: $bindings,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
+            query: 'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -500,13 +501,13 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
-            . "where ((\"query_field\" like '%search_\'string%') or (\"another_query_field\" like '%search_\'string%')) "
+            . "where ((\"test_models\".\"query_field\" like '%search_\'string%') or (\"test_models\".\"another_query_field\" like '%search_\'string%')) "
             . 'and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
-            "select * from \"test_models\" where ((\"query_field\" like '%search_\'string%') "
-            . "or (\"another_query_field\" like '%search_\'string%')) and \"test_models\".\"deleted_at\" is null "
+            "select * from \"test_models\" where ((\"test_models\".\"query_field\" like '%search_\'string%') "
+            . "or (\"test_models\".\"another_query_field\" like '%search_\'string%')) and \"test_models\".\"deleted_at\" is null "
             . 'order by "id" asc limit 15 offset 0',
             $selectResult,
         );
@@ -516,15 +517,15 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
-            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
-            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
+            . 'where (("test_models"."query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
+            . 'or ("test_models"."another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null',
         );
 
         $this->mockSelect(
             'select * from "test_models" '
-            . 'where (("query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
-            . 'or ("another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
+            . 'where (("test_models"."query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\') '
+            . 'or ("test_models"."another_query_field"::text ilike \'%\' || unaccent(\'search_\'\'string\') || \'%\')) '
             . 'and "test_models"."deleted_at" is null order by "id" asc limit 15 offset 0',
             $selectResult,
         );
@@ -534,9 +535,9 @@ trait SqlMockTrait
     {
         $this->mockSelectWithAggregate(
             'select count(*) as aggregate from "test_models" '
-            . 'where (("query_field" like \'%search_string%\') or exists (select * from "relation_models" '
+            . 'where (("test_models"."query_field" like \'%search_string%\') or exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" '
-            . 'and ("another_query_field" like \'%search_string%\'))) and exists (select * from "relation_models" '
+            . 'and ("relation_models"."another_query_field" like \'%search_string%\'))) and exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" and "name" = ?) '
             . 'and "test_models"."deleted_at" is null',
             ['some_value'],
@@ -545,10 +546,10 @@ trait SqlMockTrait
         $this->mockSelect(
             'select "test_models".*, (select "id" from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" order by "id" asc limit 1) '
-            . 'as "relation_id" from "test_models" where (("query_field" like \'%search_string%\') '
+            . 'as "relation_id" from "test_models" where (("test_models"."query_field" like \'%search_string%\') '
             . 'or exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" '
-            . 'and ("another_query_field" like \'%search_string%\'))) and '
+            . 'and ("relation_models"."another_query_field" like \'%search_string%\'))) and '
             . 'exists (select * from "relation_models" where "test_models"."id" = "relation_models"."test_model_id" '
             . 'and "name" = ?) and "test_models"."deleted_at" is null '
             . 'order by "relation_id" asc, "id" asc limit 15 offset 0',
@@ -686,9 +687,9 @@ trait SqlMockTrait
         $this->mockSelect($query, [['aggregate' => $result]], $bindings);
     }
 
-    protected function mockSelectById(string $query, array $result = []): void
+    protected function mockSelectById(string $query, array $result = [], array $bindings = [1]): void
     {
-        $this->mockSelect($query, $result, [1]);
+        $this->mockSelect($query, $result, $bindings);
     }
 
     protected function mockSelectExists(string $query, bool $isExist = true, array $bindings = [1]): void
