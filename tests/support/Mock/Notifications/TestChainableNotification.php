@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests\Support\Mock\Notifications;
 
+use DateTimeImmutable;
 use Illuminate\Notifications\Notification;
 
 class TestChainableNotification extends Notification
@@ -30,5 +31,10 @@ class TestChainableNotification extends Notification
     public function getNotifiableKey(object $notifiable): int
     {
         return $notifiable->getKey();
+    }
+
+    public function getDate(): DateTimeImmutable
+    {
+        return new DateTimeImmutable('@1541934671');
     }
 }

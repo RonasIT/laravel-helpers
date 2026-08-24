@@ -1,0 +1,21 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestChainableNotification": [
+        {
+            "notification": {
+                "status": "active",
+                "channels": [
+                    "database"
+                ],
+                "locale": null
+            },
+            "channels": [
+                "database"
+            ],
+            "notifiable": {
+                "id": 1
+            },
+            "locale": null,
+            "via_internal_method": 1541934671
+        }
+    ]
+}

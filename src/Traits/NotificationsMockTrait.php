@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
+use ReflectionMethod;
 
 trait NotificationsMockTrait
 {
@@ -24,9 +25,10 @@ trait NotificationsMockTrait
      *   'method()' — calls the method on the notification or the result of the previous step
      *   'property' — accesses the property on the notification or the result of the previous step
      *
-     * The notifiable is always passed as the first argument to every method call, like Laravel's
-     * channel dispatch (e.g. toMail($notifiable)); methods without parameters simply ignore it.
-     * Intended for the notification's own channel methods.
+     * The notifiable is passed as the first argument to every method that accepts at least one
+     * parameter, like Laravel's channel dispatch (e.g. toMail($notifiable)); parameterless methods
+     * are called without arguments, so chaining into internal classes (e.g. DateTimeImmutable::getTimestamp())
+     * works as well. Intended for the notification's own channel methods.
      *
      * Field names must not collide with the reserved keys: 'notification', 'channels', 'notifiable', 'locale'.
      *
@@ -104,7 +106,11 @@ trait NotificationsMockTrait
                     $this->fail("Notification {$notificationClass} doesn't have method '{$method}' required by options step '{$step}'.");
                 }
 
-                $value = $value->{$method}($notifiable);
+                $reflectionMethod = new ReflectionMethod($value, $method);
+
+                $value = ($reflectionMethod->getNumberOfParameters() > 0)
+                    ? $value->{$method}($notifiable)
+                    : $value->{$method}();
             } elseif (property_exists($value, $step)) {
                 $value = $value->$step;
             } else {

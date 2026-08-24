@@ -88,6 +88,18 @@ class NotificationsMockTraitTest extends TestCase
         );
     }
 
+    public function testAssertNotificationsSentWithParameterlessInternalMethod(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_parameterless_internal_method',
+            options: [
+                'via_internal_method' => ['getDate()', 'getTimestamp()'],
+            ],
+        );
+    }
+
     public function testAssertNotificationsSentWithUnresolvableMethod(): void
     {
         Notification::send(new TestNotifiable(), new TestChainableNotification());
