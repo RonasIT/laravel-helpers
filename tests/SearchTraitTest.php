@@ -274,13 +274,15 @@ class SearchTraitTest extends TestCase
             ->getSearchResults();
     }
 
-    public function testSearchQueryWithFiltersFunctions()
+    public function testSearchQueryWithChainedFilters()
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
         $this->mockGetSearchResultWithFilters(self::$selectResult);
 
-        $this->callEncapsulatedMethod($this->testRepositoryClass, 'setAdditionalReservedFilters',
+        $this->callEncapsulatedMethod(
+            $this->testRepositoryClass,
+            'setAdditionalReservedFilters',
             'date_greater',
             'date_less',
             'updated_at_greater',
