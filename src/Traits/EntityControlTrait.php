@@ -48,7 +48,7 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function setModel($modelClass): self
+    protected function setModel($modelClass): self
     {
         $this->model = new $modelClass();
 
