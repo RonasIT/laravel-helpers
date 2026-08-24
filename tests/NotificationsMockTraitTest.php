@@ -130,6 +130,51 @@ class NotificationsMockTraitTest extends TestCase
         );
     }
 
+    public function testAssertNotificationsSentWithNonPublicMethod(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("method 'getPrivateStatus' is not public");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
+                'via_non_public_method' => ['getPrivateStatus()'],
+            ],
+        );
+    }
+
+    public function testAssertNotificationsSentWithNonPublicProperty(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("property 'channels' is not accessible");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
+                'via_non_public_property' => ['channels'],
+            ],
+        );
+    }
+
+    public function testAssertNotificationsSentWithUninitializedProperty(): void
+    {
+        Notification::send(new TestNotifiable(), new TestNotificationWithUninitializedProperty());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("property 'uninitialized' is not accessible");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_skips_uninitialized_property',
+            options: [
+                'via_uninitialized_property' => ['uninitialized'],
+            ],
+        );
+    }
+
     public function testAssertNotificationsSentWithNonObjectStep(): void
     {
         Notification::send(new TestNotifiable(), new TestChainableNotification());

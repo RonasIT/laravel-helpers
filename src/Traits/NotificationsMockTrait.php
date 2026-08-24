@@ -25,6 +25,10 @@ trait NotificationsMockTrait
      *   'method()' — calls the method on the notification or the result of the previous step
      *   'property' — accesses the property on the notification or the result of the previous step
      *
+     * Only public members are resolvable, a non-public one fails the test instead of raising a PHP
+     * error. Note that the 'notification' fixture key still contains all the properties of the
+     * notification, including the non-public ones.
+     *
      * The notifiable is passed as the first argument to every method that accepts at least one
      * parameter, like Laravel's channel dispatch (e.g. toMail($notifiable)); parameterless methods
      * are called without arguments, so chaining into internal classes (e.g. DateTimeImmutable::getTimestamp())
@@ -108,11 +112,17 @@ trait NotificationsMockTrait
 
                 $reflectionMethod = new ReflectionMethod($value, $method);
 
+                if (!$reflectionMethod->isPublic()) {
+                    $this->fail("Notification {$notificationClass} cannot resolve options step '{$step}' because method '{$method}' is not public.");
+                }
+
                 $value = ($reflectionMethod->getNumberOfParameters() > 0)
                     ? $value->{$method}($notifiable)
                     : $value->{$method}();
-            } elseif (property_exists($value, $step)) {
+            } elseif (array_key_exists($step, get_object_vars($value))) {
                 $value = $value->$step;
+            } elseif (property_exists($value, $step)) {
+                $this->fail("Notification {$notificationClass} cannot resolve options step '{$step}' because property '{$step}' is not accessible, it's either non-public or uninitialized.");
             } else {
                 $this->fail("Notification {$notificationClass} doesn't have property '{$step}' required by options step '{$step}'.");
             }

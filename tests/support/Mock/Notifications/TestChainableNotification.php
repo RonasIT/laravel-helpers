@@ -37,4 +37,9 @@ class TestChainableNotification extends Notification
     {
         return new DateTimeImmutable('@1541934671');
     }
+
+    private function getPrivateStatus(): string
+    {
+        return $this->status;
+    }
 }
