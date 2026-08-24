@@ -14,6 +14,7 @@
                 "database"
             ],
             "notifiable": {
+                "class": "Illuminate\\Notifications\\AnonymousNotifiable",
                 "routes": {
                     "mail": "test@example.com"
                 }

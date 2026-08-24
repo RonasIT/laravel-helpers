@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\AssertionFailedError;
+use RonasIT\Support\Tests\Support\Mock\Models\TestAnotherNotifiable;
 use RonasIT\Support\Tests\Support\Mock\Models\TestNotifiable;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestAnotherNotification;
 use RonasIT\Support\Tests\Support\Mock\Notifications\TestChainableNotification;
@@ -56,6 +57,14 @@ class NotificationsMockTraitTest extends TestCase
         );
 
         $this->assertNotificationsSent('assert_notifications_sent_to_multiple_notifiables');
+    }
+
+    public function testAssertNotificationsSentToNotifiablesOfDifferentClasses(): void
+    {
+        Notification::send(new TestNotifiable(), new TestNotification());
+        Notification::send(new TestAnotherNotifiable(), new TestNotification());
+
+        $this->assertNotificationsSent('assert_notifications_sent_to_notifiables_of_different_classes');
     }
 
     public function testAssertNotificationsSentWithAnonymousNotifiable(): void

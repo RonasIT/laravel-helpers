@@ -36,6 +36,11 @@ trait NotificationsMockTrait
      *
      * Field names must not collide with the reserved keys: 'notification', 'channels', 'notifiable', 'locale'.
      *
+     * The 'notifiable' fixture key always contains the notifiable class, so notifiables of different
+     * classes sharing a primary key stay distinguishable. Models are reduced to their class and
+     * primary key, other notifiables to their class and public properties, override
+     * prepareNotifiableFixtureData() to change that.
+     *
      * Example:
      *   [
      *      'message'        => ['toExpoPush()', 'toArray()'],  // $notification->toExpoPush($notifiable)->toArray($notifiable)
@@ -135,14 +140,15 @@ trait NotificationsMockTrait
         return $value;
     }
 
-    protected function prepareNotifiableFixtureData(object $notifiable): mixed
+    protected function prepareNotifiableFixtureData(object $notifiable): array
     {
-        if ($notifiable instanceof Model) {
-            return [
-                $notifiable->getKeyName() => $notifiable->getKey(),
-            ];
-        }
+        $attributes = ($notifiable instanceof Model)
+            ? [$notifiable->getKeyName() => $notifiable->getKey()]
+            : get_object_vars($notifiable);
 
-        return $notifiable;
+        return [
+            'class' => $notifiable::class,
+            ...$attributes,
+        ];
     }
 }

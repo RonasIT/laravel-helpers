@@ -14,6 +14,7 @@
                 "database"
             ],
             "notifiable": {
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
                 "id": 1
             },
             "locale": null
@@ -32,6 +33,7 @@
                 "database"
             ],
             "notifiable": {
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
                 "id": 2
             },
             "locale": null

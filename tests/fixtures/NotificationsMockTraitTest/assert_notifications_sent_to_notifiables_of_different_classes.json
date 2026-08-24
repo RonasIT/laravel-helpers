@@ -18,25 +18,22 @@
                 "id": 1
             },
             "locale": null
-        }
-    ],
-    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestAnotherNotification": [
+        },
         {
             "notification": {
-                "code": "abc-123",
-                "value": "active",
+                "firstParam": "value-1",
+                "secondParam": "value-2",
+                "thirdParam": 1,
                 "channels": [
-                    "mail",
                     "database"
                 ],
                 "locale": null
             },
             "channels": [
-                "mail",
                 "database"
             ],
             "notifiable": {
-                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestAnotherNotifiable",
                 "id": 1
             },
             "locale": null
