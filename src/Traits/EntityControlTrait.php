@@ -255,7 +255,7 @@ trait EntityControlTrait
         return $result;
     }
 
-    public function get(array $where = []): Collection
+    public function get(int|string|array $where = []): Collection
     {
         $result = $this->getQuery($where)->get();
 
