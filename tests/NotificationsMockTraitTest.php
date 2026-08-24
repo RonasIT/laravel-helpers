@@ -130,12 +130,27 @@ class NotificationsMockTraitTest extends TestCase
         );
     }
 
+    public function testAssertNotificationsSentWithUnresolvableNestedStep(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("stdClass doesn't have property 'nonExistentProperty'");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
+                'via_unresolvable_nested_step' => ['getDetails()', 'nonExistentProperty'],
+            ],
+        );
+    }
+
     public function testAssertNotificationsSentWithNonPublicMethod(): void
     {
         Notification::send(new TestNotifiable(), new TestChainableNotification());
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("method 'getPrivateStatus' is not public");
+        $this->expectExceptionMessage("method 'getPrivateStatus' of " . TestChainableNotification::class . ' is not public');
 
         $this->assertNotificationsSent(
             fixture: 'assert_notifications_sent_with_options',
@@ -150,7 +165,7 @@ class NotificationsMockTraitTest extends TestCase
         Notification::send(new TestNotifiable(), new TestChainableNotification());
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("property 'channels' is not accessible");
+        $this->expectExceptionMessage("property 'channels' of " . TestChainableNotification::class . ' is not accessible');
 
         $this->assertNotificationsSent(
             fixture: 'assert_notifications_sent_with_options',
@@ -165,7 +180,7 @@ class NotificationsMockTraitTest extends TestCase
         Notification::send(new TestNotifiable(), new TestNotificationWithUninitializedProperty());
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("property 'uninitialized' is not accessible");
+        $this->expectExceptionMessage("property 'uninitialized' of " . TestNotificationWithUninitializedProperty::class . ' is not accessible');
 
         $this->assertNotificationsSent(
             fixture: 'assert_notifications_sent_skips_uninitialized_property',

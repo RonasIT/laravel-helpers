@@ -97,23 +97,27 @@ trait NotificationsMockTrait
         $value = $notification;
 
         foreach ($chain as $step) {
+            $context = "Notification {$notificationClass} cannot resolve options step '{$step}'";
+
             if (!is_object($value)) {
                 $type = get_debug_type($value);
 
-                $this->fail("Notification {$notificationClass} cannot resolve options step '{$step}' because the previous step returned a non-object value of type '{$type}'.");
+                $this->fail("{$context} because the previous step returned a non-object value of type '{$type}'.");
             }
+
+            $valueClass = $value::class;
 
             if (str_ends_with($step, '()')) {
                 $method = substr($step, 0, -2);
 
                 if (!method_exists($value, $method)) {
-                    $this->fail("Notification {$notificationClass} doesn't have method '{$method}' required by options step '{$step}'.");
+                    $this->fail("{$context} because {$valueClass} doesn't have method '{$method}'.");
                 }
 
                 $reflectionMethod = new ReflectionMethod($value, $method);
 
                 if (!$reflectionMethod->isPublic()) {
-                    $this->fail("Notification {$notificationClass} cannot resolve options step '{$step}' because method '{$method}' is not public.");
+                    $this->fail("{$context} because method '{$method}' of {$valueClass} is not public.");
                 }
 
                 $value = ($reflectionMethod->getNumberOfParameters() > 0)
@@ -122,9 +126,9 @@ trait NotificationsMockTrait
             } elseif (array_key_exists($step, get_object_vars($value))) {
                 $value = $value->$step;
             } elseif (property_exists($value, $step)) {
-                $this->fail("Notification {$notificationClass} cannot resolve options step '{$step}' because property '{$step}' is not accessible, it's either non-public or uninitialized.");
+                $this->fail("{$context} because property '{$step}' of {$valueClass} is not accessible, it's either non-public or uninitialized.");
             } else {
-                $this->fail("Notification {$notificationClass} doesn't have property '{$step}' required by options step '{$step}'.");
+                $this->fail("{$context} because {$valueClass} doesn't have property '{$step}'.");
             }
         }
 
