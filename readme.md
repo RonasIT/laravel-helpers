@@ -40,6 +40,7 @@ The package asserts the notifications sent during a test against a json fixture,
  - [1.1][5]
  - [2.0.0][6]
  - [2.0.8][7]
+ - [3.9.0][10]
 
 [1]:./documentation/helpers.md
 [2]:./documentation/traits.md
@@ -50,3 +51,4 @@ The package asserts the notifications sent during a test against a json fixture,
 [7]:./documentation/migration.md#2.0.8
 [8]:./documentation/versioning.md
 [9]:./documentation/traits.md#notificationsmocktrait
+[10]:./documentation/migration.md#3.9.0
