@@ -59,6 +59,15 @@ class NotificationsMockTraitTest extends TestCase
         $this->assertNotificationsSent('assert_notifications_sent_to_multiple_notifiables');
     }
 
+    public function testAssertNotificationsSentGroupsEntriesByNotifiable(): void
+    {
+        Notification::send(new TestNotifiable(), new TestNotification(firstParam: 'value-first'));
+        Notification::send(new TestNotifiable(['id' => 2]), new TestNotification(firstParam: 'value-second'));
+        Notification::send(new TestNotifiable(), new TestNotification(firstParam: 'value-third'));
+
+        $this->assertNotificationsSent('assert_notifications_sent_groups_entries_by_notifiable');
+    }
+
     public function testAssertNotificationsSentToNotifiablesOfDifferentClasses(): void
     {
         Notification::send(new TestNotifiable(), new TestNotification());

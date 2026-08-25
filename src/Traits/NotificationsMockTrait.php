@@ -36,6 +36,11 @@ trait NotificationsMockTrait
      *
      * Field names must not collide with the reserved keys: 'notification', 'channels', 'notifiable', 'locale'.
      *
+     * Entries are ordered the way the Notification fake groups them: by notifiable class, then by
+     * notifiable key, and only then by the send order within that group. Sending a notification to
+     * one notifiable, then to another one, and then to the first one again puts the third entry
+     * before the second one, so the fixture must not be read as a chronological sequence.
+     *
      * The 'notifiable' fixture key always contains the notifiable class, so notifiables of different
      * classes sharing a primary key stay distinguishable. Models are reduced to their class and
      * primary key, other notifiables to their class and public properties, override
