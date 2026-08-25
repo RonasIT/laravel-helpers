@@ -271,6 +271,12 @@ class NotificationsMockTraitTest extends TestCase
     {
         putenv('FAIL_EXPORT_JSON=false');
 
+        $fixturePath = $this->getFixturePath('assert_notifications_sent_with_export.json');
+
+        if (file_exists($fixturePath)) {
+            unlink($fixturePath);
+        }
+
         Notification::send(new TestNotifiable(), new TestNotification());
 
         $this->assertNotificationsSent(
@@ -278,7 +284,12 @@ class NotificationsMockTraitTest extends TestCase
             exportMode: true,
         );
 
-        $this->assertFileExists($this->getFixturePath('assert_notifications_sent_with_export.json'));
+        $this->assertFileExists($fixturePath);
+
+        $this->assertEqualsFixture(
+            fixture: 'assert_notifications_sent_with_export_example',
+            data: json_decode(file_get_contents($fixturePath), true),
+        );
     }
 
     public function testAssertNotificationsSentWithGlobalExportMode(): void
@@ -286,10 +297,23 @@ class NotificationsMockTraitTest extends TestCase
         putenv('FAIL_EXPORT_JSON=false');
         $this->globalExportMode = true;
 
+        $fixturePath = $this->getFixturePath('assert_notifications_sent_with_export.json');
+
+        if (file_exists($fixturePath)) {
+            unlink($fixturePath);
+        }
+
         Notification::send(new TestNotifiable(), new TestNotification());
 
         $this->assertNotificationsSent('assert_notifications_sent_with_export');
 
-        $this->assertFileExists($this->getFixturePath('assert_notifications_sent_with_export.json'));
+        $this->assertFileExists($fixturePath);
+
+        $this->globalExportMode = false;
+
+        $this->assertEqualsFixture(
+            fixture: 'assert_notifications_sent_with_export_example',
+            data: json_decode(file_get_contents($fixturePath), true),
+        );
     }
 }
