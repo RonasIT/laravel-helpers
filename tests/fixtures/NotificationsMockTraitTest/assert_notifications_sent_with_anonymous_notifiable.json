@@ -6,12 +6,12 @@
                 "secondParam": "value-2",
                 "thirdParam": 1,
                 "channels": [
-                    "database"
+                    "mail"
                 ],
                 "locale": null
             },
             "channels": [
-                "database"
+                "mail"
             ],
             "notifiable": {
                 "class": "Illuminate\\Notifications\\AnonymousNotifiable",

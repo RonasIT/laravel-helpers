@@ -78,7 +78,11 @@ class NotificationsMockTraitTest extends TestCase
 
     public function testAssertNotificationsSentWithAnonymousNotifiable(): void
     {
-        Notification::route('mail', 'test@example.com')->notify(new TestNotification());
+        $notification = new TestNotification(
+            channels: ['mail'],
+        );
+
+        Notification::route('mail', 'test@example.com')->notify($notification);
 
         $this->assertNotificationsSent('assert_notifications_sent_with_anonymous_notifiable');
     }
