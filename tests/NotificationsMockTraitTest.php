@@ -258,6 +258,16 @@ class NotificationsMockTraitTest extends TestCase
         );
     }
 
+    public function testAssertNotificationsSentSkipsNotificationId(): void
+    {
+        $notification = new TestNotification();
+        $notification->id = 'notification-id';
+
+        Notification::send(new TestNotifiable(), $notification);
+
+        $this->assertNotificationsSent('assert_notifications_sent');
+    }
+
     public function testAssertNotificationsSentSkipsStaticProperty(): void
     {
         Notification::send(new TestNotifiable(), new TestNotificationWithStaticProperty());
