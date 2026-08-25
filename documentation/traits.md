@@ -82,7 +82,8 @@ The properties of a notification rarely describe what a channel delivers, the ch
 The `$options` argument adds such data to every entry, describing each field by a chain of steps
 resolved on the notification:
 
-* a step ending with `()` is a method call, any other step is a property access,
+* a step ending with `()` is a method call, any other step is a property access, resolving public
+properties, the magic ones exposed via `__isset()` and the attributes of an Eloquent model,
 * the first step is applied to the notification, every next one to the result of the previous step,
 * the notifiable is passed as the first argument to every method that accepts at least one parameter,
 the way Laravel dispatches channel methods, so parameterless methods of nested objects, e.g.

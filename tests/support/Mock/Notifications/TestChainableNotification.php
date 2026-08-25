@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests\Support\Mock\Notifications;
 
 use DateTimeImmutable;
 use Illuminate\Notifications\Notification;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 
 class TestChainableNotification extends Notification
 {
@@ -36,6 +37,13 @@ class TestChainableNotification extends Notification
     public function getDate(): DateTimeImmutable
     {
         return new DateTimeImmutable('@1541934671');
+    }
+
+    public function getModel(): TestModel
+    {
+        return new TestModel([
+            'name' => 'John Doe',
+        ]);
     }
 
     public function getMalformedString(): string

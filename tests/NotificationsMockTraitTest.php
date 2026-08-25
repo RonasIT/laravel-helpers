@@ -122,6 +122,33 @@ class NotificationsMockTraitTest extends TestCase
         );
     }
 
+    public function testAssertNotificationsSentWithModelAttributeStep(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_model_attribute_step',
+            options: [
+                'via_model_attribute' => ['getModel()', 'name'],
+            ],
+        );
+    }
+
+    public function testAssertNotificationsSentWithUnresolvableModelAttribute(): void
+    {
+        Notification::send(new TestNotifiable(), new TestChainableNotification());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("TestModel doesn't have property 'nonExistentAttribute'");
+
+        $this->assertNotificationsSent(
+            fixture: 'assert_notifications_sent_with_options',
+            options: [
+                'via_unresolvable_model_attribute' => ['getModel()', 'nonExistentAttribute'],
+            ],
+        );
+    }
+
     public function testAssertNotificationsSentWithUnresolvableMethod(): void
     {
         Notification::send(new TestNotifiable(), new TestChainableNotification());

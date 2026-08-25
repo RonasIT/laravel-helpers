@@ -27,8 +27,10 @@ trait NotificationsMockTrait
      *      'broadcast_data' => ['toBroadcast()', 'data'], // $notification->toBroadcast($notifiable)->data
      *   ]
      *
-     * A step ending with '()' is a method call, any other step is a property access, applied to the
-     * notification on the first step and to the result of the previous one afterwards. The notifiable
+     * A step ending with '()' is a method call, any other step is a property access, resolving public
+     * properties, the magic ones exposed via __isset() and the attributes of an Eloquent model. Both
+     * are applied to the notification on the first step and to the result of the previous one
+     * afterwards. The notifiable
      * is passed as the first argument to every method that accepts at least one parameter. Only public
      * members are resolvable, an unresolvable step fails the test.
      *
@@ -116,7 +118,7 @@ trait NotificationsMockTrait
                 $value = ($reflectionMethod->getNumberOfParameters() > 0)
                     ? $value->{$method}($notifiable)
                     : $value->{$method}();
-            } elseif (array_key_exists($step, get_object_vars($value))) {
+            } elseif ($this->isNotificationChainPropertyAccessible($value, $step)) {
                 $value = $value->$step;
             } elseif (property_exists($value, $step)) {
                 $this->fail("{$context} because property '{$step}' of {$valueClass} is not accessible, it's either non-public or uninitialized.");
@@ -126,6 +128,13 @@ trait NotificationsMockTrait
         }
 
         return $value;
+    }
+
+    protected function isNotificationChainPropertyAccessible(object $value, string $step): bool
+    {
+        return array_key_exists($step, get_object_vars($value))
+            || isset($value->$step)
+            || (($value instanceof Model) && array_key_exists($step, $value->getAttributes()));
     }
 
     protected function prepareNotifiableFixtureData(object $notifiable): array
