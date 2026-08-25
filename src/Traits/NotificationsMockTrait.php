@@ -156,7 +156,7 @@ trait NotificationsMockTrait
 
         return [
             'class' => $notifiable::class,
-            ...$attributes,
+            'attributes' => $attributes,
         ];
     }
 }

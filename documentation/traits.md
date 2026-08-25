@@ -49,9 +49,10 @@ the same way the other fixture assertions of the package work.
 
 Every entry of the fixture is placed under the notification class name and contains the
 `notification` properties of any visibility except `id`, the `channels` returned by `via()`, the
-`notifiable` and the `locale`. A model notifiable is reduced to its class and primary key, any other
-one, e.g. `Illuminate\Notifications\AnonymousNotifiable`, to its class and public properties, so
-notifiables of different classes sharing a key stay distinguishable:
+`notifiable` and the `locale`. The `notifiable` always keeps its `class` next to the `attributes`, so
+notifiables of different classes sharing a primary key stay distinguishable. The attributes of a
+model are its primary key, of any other notifiable, e.g. `Illuminate\Notifications\AnonymousNotifiable`,
+its public properties:
 
 ```json
 {
@@ -65,7 +66,9 @@ notifiables of different classes sharing a key stay distinguishable:
             ],
             "notifiable": {
                 "class": "App\\Models\\User",
-                "id": 1
+                "attributes": {
+                    "id": 1
+                }
             },
             "locale": null
         }

@@ -15,8 +15,10 @@
             ],
             "notifiable": {
                 "class": "Illuminate\\Notifications\\AnonymousNotifiable",
-                "routes": {
-                    "mail": "test@example.com"
+                "attributes": {
+                    "routes": {
+                        "mail": "test@example.com"
+                    }
                 }
             },
             "locale": null
