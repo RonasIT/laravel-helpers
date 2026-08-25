@@ -11,6 +11,8 @@ trait NotificationsMockTrait
     use FixturesTrait;
     use ReflectionTrait;
 
+    protected const array RESERVED_NOTIFICATION_FIELDS = ['notification', 'channels', 'notifiable', 'locale'];
+
     /**
      * $options should look like the following construction:
      *   [
@@ -57,7 +59,7 @@ trait NotificationsMockTrait
      */
     protected function assertNotificationsSent(string $fixture, array $options = [], bool $exportMode = false): void
     {
-        $this->validateReservedOptions($options);
+        $this->validateNotificationOptions($options);
 
         $actualData = [];
 
@@ -74,14 +76,16 @@ trait NotificationsMockTrait
         $this->assertEqualsFixture($fixture, $this->castToJsonStructure($actualData), $exportMode);
     }
 
-    protected function validateReservedOptions(array $options): void
+    protected function validateNotificationOptions(array $options): void
     {
-        $reservedKeys = ['notification', 'channels', 'notifiable', 'locale'];
+        $collisions = array_keys(array_intersect_key($options, array_flip(self::RESERVED_NOTIFICATION_FIELDS)));
 
-        foreach (array_keys($options) as $key) {
-            if (in_array($key, $reservedKeys, true)) {
-                $this->fail("Options field '{$key}' collides with a reserved key. Reserved keys are: " . implode(', ', $reservedKeys) . '.');
-            }
+        if (!empty($collisions)) {
+            $this->fail(sprintf(
+                "Options fields '%s' collide with the reserved notification fields: %s.",
+                implode("', '", $collisions),
+                implode(', ', self::RESERVED_NOTIFICATION_FIELDS),
+            ));
         }
     }
 

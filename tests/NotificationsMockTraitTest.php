@@ -242,16 +242,17 @@ class NotificationsMockTraitTest extends TestCase
         );
     }
 
-    public function testAssertNotificationsSentWithReservedOptionKey(): void
+    public function testAssertNotificationsSentWithReservedOptionKeys(): void
     {
         Notification::send(new TestNotifiable(), new TestChainableNotification());
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Options field 'channels' collides with a reserved key");
+        $this->expectExceptionMessage("Options fields 'locale', 'channels' collide with the reserved notification fields");
 
         $this->assertNotificationsSent(
             fixture: 'assert_notifications_sent_with_options',
             options: [
+                'locale' => ['getStatus()'],
                 'channels' => ['getStatus()'],
             ],
         );
