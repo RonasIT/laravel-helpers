@@ -14,46 +14,27 @@ trait NotificationsMockTrait
     protected const array RESERVED_NOTIFICATION_FIELDS = ['notification', 'channels', 'notifiable', 'locale'];
 
     /**
+     * Asserts the notifications sent during the test against the $fixture.
+     *
      * $options should look like the following construction:
      *   [
      *      'field_name' => ['step1', 'step2', ...],
      *   ]
      *
-     * where each step is either a method call or a property access resolved sequentially
-     * on the notification object. The test fails when any step cannot be resolved (e.g. a
-     * misspelled method or property name), so the chain definition is validated loudly.
-     *
-     * Steps format:
-     *   'method()' — calls the method on the notification or the result of the previous step
-     *   'property' — accesses the property on the notification or the result of the previous step
-     *
-     * Only public members are resolvable, a non-public one fails the test instead of raising a PHP
-     * error. Note that the 'notification' fixture key still contains all the properties of the
-     * notification, including the non-public ones.
-     *
-     * The notifiable is passed as the first argument to every method that accepts at least one
-     * parameter, like Laravel's channel dispatch (e.g. toMail($notifiable)); parameterless methods
-     * are called without arguments, so chaining into internal classes (e.g. DateTimeImmutable::getTimestamp())
-     * works as well. Intended for the notification's own channel methods.
-     *
-     * Field names must not collide with the reserved keys: 'notification', 'channels', 'notifiable', 'locale'.
-     *
-     * Entries are ordered the way the Notification fake groups them: by notifiable class, then by
-     * notifiable key, and only then by the send order within that group. Sending a notification to
-     * one notifiable, then to another one, and then to the first one again puts the third entry
-     * before the second one, so the fixture must not be read as a chronological sequence.
-     *
-     * The 'notifiable' fixture key always contains the notifiable class, so notifiables of different
-     * classes sharing a primary key stay distinguishable. Models are reduced to their class and
-     * primary key, other notifiables to their class and public properties, override
-     * prepareNotifiableFixtureData() to change that.
-     *
-     * Example:
+     * It adds a field to every fixture entry, resolving it by a chain of steps on the notification:
      *   [
-     *      'message'        => ['toExpoPush()', 'toArray()'],  // $notification->toExpoPush($notifiable)->toArray($notifiable)
-     *      'broadcast_on'   => ['broadcastOn()'],              // $notification->broadcastOn($notifiable)
-     *      'broadcast_data' => ['toBroadcast()', 'data'],      // $notification->toBroadcast($notifiable)->data
+     *      'message' => ['toExpoPush()', 'toArray()'],    // $notification->toExpoPush($notifiable)->toArray($notifiable)
+     *      'broadcast_data' => ['toBroadcast()', 'data'], // $notification->toBroadcast($notifiable)->data
      *   ]
+     *
+     * A step ending with '()' is a method call, any other step is a property access, applied to the
+     * notification on the first step and to the result of the previous one afterwards. The notifiable
+     * is passed as the first argument to every method that accepts at least one parameter. Only public
+     * members are resolvable, an unresolvable step fails the test.
+     *
+     * Field names must not collide with self::RESERVED_NOTIFICATION_FIELDS.
+     *
+     * @see documentation/traits.md#notificationsmocktrait
      *
      * @param  array<string, string[]>  $options
      */
