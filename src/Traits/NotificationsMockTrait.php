@@ -31,9 +31,8 @@ trait NotificationsMockTrait
      * A step ending with '()' is a method call, any other step is a property access, resolving public
      * properties, the magic ones exposed via __isset() and the attributes of an Eloquent model. Both
      * are applied to the notification on the first step and to the result of the previous one
-     * afterwards. The notifiable
-     * is passed as the first argument to every method that accepts at least one parameter. Only public
-     * members are resolvable, an unresolvable step fails the test.
+     * afterwards. The notifiable is passed as the first argument to every method that accepts at
+     * least one parameter. Only public members are resolvable, an unresolvable step fails the test.
      *
      * Field names must not collide with self::RESERVED_NOTIFICATION_FIELDS.
      *
