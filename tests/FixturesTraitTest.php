@@ -299,30 +299,6 @@ class FixturesTraitTest extends TestCase
         $this->assertEqualsFixture('get_fixture/export_fixture.json', $content);
     }
 
-    public function testCastToJsonStructure(): void
-    {
-        $data = [
-            'object' => (object) ['nested' => (object) ['key' => 'value']],
-            'scalar' => 1,
-        ];
-
-        $this->assertEquals(
-            expected: [
-                'object' => ['nested' => ['key' => 'value']],
-                'scalar' => 1,
-            ],
-            actual: $this->castToJsonStructure($data),
-        );
-    }
-
-    public function testCastToJsonStructureUnencodableData(): void
-    {
-        $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed to cast the provided data to a JSON structure: Malformed UTF-8 characters');
-
-        $this->castToJsonStructure(['malformed' => "\xB1\x31"]);
-    }
-
     public function testAssertEqualsFixtureNotEqualErrorMessage()
     {
         $fixturePath = $this->getFixturePath($fixtureName = 'get_fixture/export_fixture.json');

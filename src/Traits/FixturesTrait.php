@@ -6,7 +6,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
-use JsonException;
 use RonasIT\Support\Exceptions\ForbiddenExportModeException;
 
 trait FixturesTrait
@@ -151,19 +150,6 @@ trait FixturesTrait
             : "{$prefix}laravel_before_v{$fixtureVersion}/{$filename}";
 
         $this->assertEqualsFixture($finalFixture, $data, $exportMode);
-    }
-
-    public function castToJsonStructure(mixed $data): mixed
-    {
-        try {
-            return json_decode(
-                json: json_encode($data, JSON_THROW_ON_ERROR),
-                associative: true,
-                flags: JSON_THROW_ON_ERROR,
-            );
-        } catch (JsonException $exception) {
-            $this->fail("Failed to cast the provided data to a JSON structure: {$exception->getMessage()}.");
-        }
     }
 
     public function exportJson($fixture, $data): void

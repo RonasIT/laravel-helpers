@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
+use JsonException;
 use ReflectionMethod;
 
 trait NotificationsMockTrait
@@ -56,7 +57,17 @@ trait NotificationsMockTrait
             }
         }
 
-        $this->assertEqualsFixture($fixture, $this->castToJsonStructure($actualData), $exportMode);
+        try {
+            $preparedData = json_decode(
+                json: json_encode($actualData, JSON_THROW_ON_ERROR),
+                associative: true,
+                flags: JSON_THROW_ON_ERROR,
+            );
+        } catch (JsonException $exception) {
+            $this->fail("Failed to prepare the sent notifications for the fixture comparison: {$exception->getMessage()}.");
+        }
+
+        $this->assertEqualsFixture($fixture, $preparedData, $exportMode);
     }
 
     protected function validateNotificationOptions(array $options): void

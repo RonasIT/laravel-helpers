@@ -259,7 +259,7 @@ class NotificationsMockTraitTest extends TestCase
         Notification::send(new TestNotifiable(), new TestChainableNotification());
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed to cast the provided data to a JSON structure: Malformed UTF-8 characters');
+        $this->expectExceptionMessage('Failed to prepare the sent notifications for the fixture comparison: Malformed UTF-8 characters');
 
         $this->assertNotificationsSent(
             fixture: 'assert_notifications_sent_with_options',
