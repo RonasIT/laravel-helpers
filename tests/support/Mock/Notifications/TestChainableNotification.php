@@ -38,6 +38,11 @@ class TestChainableNotification extends Notification
         return new DateTimeImmutable('@1541934671');
     }
 
+    public function getMalformedString(): string
+    {
+        return "\xB1\x31";
+    }
+
     private function getPrivateStatus(): string
     {
         return $this->status;

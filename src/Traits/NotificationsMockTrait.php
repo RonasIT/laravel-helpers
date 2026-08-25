@@ -66,9 +66,7 @@ trait NotificationsMockTrait
             }
         }
 
-        $preparedActualData = json_decode(json_encode($actualData), true);
-
-        $this->assertEqualsFixture($fixture, $preparedActualData, $exportMode);
+        $this->assertEqualsFixture($fixture, $this->castToJsonStructure($actualData), $exportMode);
     }
 
     protected function validateReservedOptions(array $options): void
