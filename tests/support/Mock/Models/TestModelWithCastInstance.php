@@ -3,7 +3,7 @@
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
+use RonasIT\Support\Tests\Support\Mock\Casts\StringableJSONCast;
 
 class TestModelWithCastInstance extends Model
 {
@@ -15,7 +15,7 @@ class TestModelWithCastInstance extends Model
     protected function casts(): array
     {
         return [
-            'payload' => new JSONCustomCast(),
+            'payload' => new StringableJSONCast(),
         ];
     }
 }
