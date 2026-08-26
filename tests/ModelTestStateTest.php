@@ -7,6 +7,7 @@ use ReflectionClass;
 use RonasIT\Support\Testing\ModelTestState;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelNonIdPrimaryKey;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCastInstance;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCustomJsonCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithCustomNonJsonCast;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithNativeJsonCasts;
@@ -72,6 +73,16 @@ class ModelTestStateTest extends TestCase
     public static function getAssertChangesData(): array
     {
         return [
+            'mixed native, custom and castable casts' => [
+                'fixtureDir' => 'changes_equals_fixture',
+                'table' => 'test_models',
+                'modelClass' => TestModel::class,
+            ],
+            'cast defined as an instance' => [
+                'fixtureDir' => 'changes_equals_fixture_with_cast_instance',
+                'table' => 'test_model_with_cast_instances',
+                'modelClass' => TestModelWithCastInstance::class,
+            ],
             'primitive casts' => [
                 'fixtureDir' => 'changes_equals_fixture_with_primitive_casts',
                 'table' => 'test_model_with_primitive_casts',

@@ -75,9 +75,16 @@ class ModelTestState extends TableTestState
     {
         $matching = array_filter(
             array: $model->getCasts(),
-            callback: fn (string $definition) => $predicate(Str::before($definition, ':')),
+            callback: fn (mixed $definition) => $predicate($this->resolveCastType($definition)),
         );
 
         return array_keys($matching);
+    }
+
+    protected function resolveCastType(mixed $definition): string
+    {
+        return (is_string($definition))
+            ? Str::before($definition, ':')
+            : $definition::class;
     }
 }
