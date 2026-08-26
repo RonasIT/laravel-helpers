@@ -102,4 +102,20 @@ class TableTestStateTest extends TestCase
 
         $modelTestState->assertChangesEqualsFixture('assertion_fixture_primary_key_set');
     }
+
+    public function testAssertChangesDetectsFalsyToNullTransitions()
+    {
+        $initialDatasetMock = collect($this->getJsonFixture('falsy_to_null_transitions/initial_dataset'));
+        $changedDatasetMock = collect($this->getJsonFixture('falsy_to_null_transitions/changed_dataset'));
+
+        $this->mockGettingDatasetForChanges($changedDatasetMock, $initialDatasetMock, 'test_models', 'name');
+
+        $modelTestState = new TableTestState(
+            tableName: 'test_models',
+            jsonFields: ['json_field', 'castable_field'],
+            uniqueKey: 'name',
+        );
+
+        $modelTestState->assertChangesEqualsFixture('assertion_fixture_falsy_to_null_transitions');
+    }
 }
