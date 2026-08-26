@@ -33,12 +33,12 @@ class ModelTestState extends TableTestState
 
     protected function resolveNativeJsonFields(Model $model): array
     {
-        return $this->getCastFieldsMatching($model, fn (string $type) => in_array($type, self::NATIVE_JSON_CASTS, true));
+        return $this->getFilteredCasts($model, fn (string $type) => in_array($type, self::NATIVE_JSON_CASTS, true));
     }
 
     protected function resolveClassCastFields(Model $model): array
     {
-        return $this->getCastFieldsMatching($model, fn (string $type) => $this->isClassCast($type));
+        return $this->getFilteredCasts($model, fn (string $type) => $this->isClassCast($type));
     }
 
     protected function isClassCast(string $type): bool
@@ -71,14 +71,14 @@ class ModelTestState extends TableTestState
         return $item;
     }
 
-    protected function getCastFieldsMatching(Model $model, callable $predicate): array
+    protected function getFilteredCasts(Model $model, callable $callback): array
     {
-        $matching = array_filter(
+        $filtered = array_filter(
             array: $model->getCasts(),
-            callback: fn (mixed $definition) => $predicate($this->resolveCastType($definition)),
+            callback: fn (mixed $definition) => $callback($this->resolveCastType($definition)),
         );
 
-        return array_keys($matching);
+        return array_keys($filtered);
     }
 
     protected function resolveCastType(mixed $definition): string
