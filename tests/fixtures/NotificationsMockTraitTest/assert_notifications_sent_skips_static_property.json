@@ -1,0 +1,23 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestNotificationWithStaticProperty": [
+        {
+            "notification": {
+                "status": "active",
+                "channels": [
+                    "database"
+                ],
+                "locale": null
+            },
+            "channels": [
+                "database"
+            ],
+            "notifiable": {
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
+                "attributes": {
+                    "id": 1
+                }
+            },
+            "locale": null
+        }
+    ]
+}

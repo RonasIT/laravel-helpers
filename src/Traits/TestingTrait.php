@@ -7,6 +7,7 @@ trait TestingTrait
     use FixturesTrait;
     use MailsMockTrait;
     use MockTrait;
+    use NotificationsMockTrait;
 
     protected function assertExceptionThrew(string $expectedClassName, string $expectedMessage, bool $isStrict = true): void
     {

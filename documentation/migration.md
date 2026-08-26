@@ -204,3 +204,21 @@ $data = $httpRequestService->get($url)->json();
 
 - now return generated file name instead of url/path
 - `$returnUrl` third argument had been removed
+
+## 3.9.0
+
+### TestCase
+
+#### Notification::fake()
+
+`RonasIT\Support\Testing\TestCase` now calls `Notification::fake()` in `setUp`, next to the already
+called `Mail::fake()`, so the notification channels no longer execute during the tests. Nothing is
+written to the `notifications` table anymore, and the custom channels of the application are not
+called at all, so the tests asserting such records or channel side effects will fail.
+
+Assert the notifications themselves instead, see the
+[NotificationsMockTrait documentation](traits.md#notificationsmocktrait):
+
+```php
+$this->assertNotificationsSent('create_order_notifications');
+```
