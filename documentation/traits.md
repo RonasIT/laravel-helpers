@@ -91,7 +91,7 @@ properties, the magic ones exposed via `__isset()` and the attributes of an Eloq
 * the notifiable is passed as the first argument to every method that accepts at least one parameter,
 the way Laravel dispatches channel methods, so parameterless methods of nested objects, e.g.
 `DateTimeImmutable::getTimestamp()`, are called without arguments,
-* only public methods and properties are resolvable,
+* a non-public member is not resolvable, a step pointing at one fails the test,
 * field names must not collide with the reserved ones: `notification`, `channels`, `notifiable`,
 `locale`.
 
