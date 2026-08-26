@@ -35,7 +35,7 @@ trait NotificationsMockTrait
      *
      * Field names must not collide with {@see self::RESERVED_NOTIFICATION_FIELDS}.
      *
-     * @see documentation/traits.md#notificationsmocktrait
+     * @see https://github.com/RonasIT/laravel-helpers/blob/master/documentation/traits.md#assertnotificationssent
      *
      * @param  array<string, string[]>  $options
      */

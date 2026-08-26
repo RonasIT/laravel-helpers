@@ -42,17 +42,20 @@ public function testCreate()
 }
 ```
 
-Methods list:
-* `assertNotificationsSent($fixture, $options = [], $exportMode = false)` - compares all the sent
-notifications with the `$fixture`, exporting it instead of comparing when `$exportMode` is enabled,
-the same way the other fixture assertions of the package work.
+### assertNotificationsSent()
+
+`assertNotificationsSent(string $fixture, array $options = [], bool $exportMode = false): void`
+
+Compares all the sent notifications with the `$fixture`, exporting it instead of comparing when
+`$exportMode` is enabled, the same way the other fixture assertions of the package work.
 
 Every entry of the fixture is placed under the notification class name and contains the
 `notification` properties of any visibility except `id`, the `channels` returned by `via()`, the
-`notifiable` and the `locale`. The `notifiable` always keeps its `class` next to the `attributes`, so
-notifiables of different classes sharing a primary key stay distinguishable. The attributes of a
-model are its primary key, of any other notifiable, e.g. `Illuminate\Notifications\AnonymousNotifiable`,
-its public properties:
+`notifiable` and the `locale`. The `id` is dropped because it is a random uuid assigned on sending,
+which would make every fixture unstable. The `notifiable` always keeps its `class` next to the
+`attributes`, so notifiables of different classes sharing a primary key stay distinguishable. The
+attributes of a model are its primary key. For any other notifiable, e.g.
+`Illuminate\Notifications\AnonymousNotifiable`, they are its public properties:
 
 ```json
 {
@@ -81,7 +84,7 @@ notifiable key, and only then by the send order within that group. Sending a not
 notifiable, then to another one, and then to the first one again puts the third entry before the
 second one, so the fixture must not be read as a chronological sequence.
 
-The properties of a notification rarely describe what a channel delivers, the channel methods do.
+The properties of a notification rarely describe what a channel delivers — the channel methods do.
 The `$options` argument adds such data to every entry, describing each field by a chain of steps
 resolved on the notification:
 
@@ -91,7 +94,6 @@ properties, the magic ones exposed via `__isset()` and the attributes of an Eloq
 * the notifiable is passed as the first argument to every method that accepts at least one parameter,
 the way Laravel dispatches channel methods, so parameterless methods of nested objects, e.g.
 `DateTimeImmutable::getTimestamp()`, are called without arguments,
-* a non-public member is not resolvable, a step pointing at one fails the test,
 * field names must not collide with the reserved ones: `notification`, `channels`, `notifiable`,
 `locale`.
 
@@ -108,8 +110,8 @@ $this->assertNotificationsSent(
 );
 ```
 
-The chain of a channel is the same in every test, so declare an assertion per channel in the project
-`TestCase` and keep the tests free of the chain definitions.
+The chain of a channel is usually the same in every test, so declare an assertion per channel in the
+project `TestCase` and keep the tests free of the chain definitions.
 
 **Example**
 
@@ -150,7 +152,7 @@ An internal helper of `NotificationsMockTrait`, not meant to be used directly.
 Methods list:
 * `getObjectAttributes($object)` - dumps the object properties of any visibility into an array,
 skipping the static ones and the typed ones that were never initialized. Private properties declared
-on parent classes are not captured, since they are not accessible on the object class reflection.
+on parent classes are not captured.
 
 ## SearchTrait
 
