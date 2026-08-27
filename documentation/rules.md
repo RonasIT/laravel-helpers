@@ -4,8 +4,8 @@
 
 `ValidationServiceProvider` registers a set of custom validation rules on boot. If your app relies on Laravel's
 package auto-discovery, this happens automatically. Otherwise you need to add
-`RonasIT\Support\ValidationServiceProvider::class` to `config/app.php` yourself (see the
-[3.9 migration note][2] for details).
+`RonasIT\Support\ValidationServiceProvider::class` to `bootstrap/providers.php` yourself (or `config/app.php` on
+apps still using the pre-11 structure; see the [3.9 migration note][2] for details).
 
 Every rule below can be used either with Laravel's string syntax (`'field' => 'rule_name:param1,param2'`) or with
 the object syntax (`'field' => [new SomeRule(...)]`).
