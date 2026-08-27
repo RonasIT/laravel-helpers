@@ -16,8 +16,8 @@ abstract class BaseValidationRule implements ValidationRule
             value: $value,
             fail: function (string $message) use ($validator, &$success) {
                 $validator->addReplacer(
-                    static::ruleName(),
-                    fn (string $resolvedMessage) => $resolvedMessage === 'validation.' . static::ruleName()
+                    rule: static::ruleName(),
+                    replacer: fn (string $resolvedMessage) => $resolvedMessage === 'validation.' . static::ruleName()
                         ? $message
                         : $resolvedMessage,
                 );
