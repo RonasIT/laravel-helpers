@@ -13,9 +13,11 @@ class TestModelWithGuardedFields extends Model
 
     protected $fillable = [
         'name',
+        'created_at',
     ];
 
     protected $guarded = [
+        'id',
         'secret_field',
     ];
 }

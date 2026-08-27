@@ -5,7 +5,6 @@ namespace RonasIT\Support\Tests;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithGuardedFields;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithGuardedWildcard;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutTimestamps;
 
 class ModelTraitTest extends TestCase
 {
@@ -35,17 +34,10 @@ class ModelTraitTest extends TestCase
         $this->assertEquals(['id', 'created_at', 'updated_at'], $fields);
     }
 
-    public function testGetFieldsWithGuardedFields()
+    public function testGetFieldsNotContainDuplicates()
     {
         $fields = TestModelWithGuardedFields::getFields();
 
-        $this->assertEquals(['id', 'name', 'secret_field', 'created_at', 'updated_at'], $fields);
-    }
-
-    public function testGetFieldsDoesNotContainDuplicates()
-    {
-        $fields = TestModelWithoutTimestamps::getFields();
-
-        $this->assertEquals(['id', 'name', 'created_at'], $fields);
+        $this->assertEquals(['id', 'name', 'created_at', 'secret_field', 'updated_at'], $fields);
     }
 }
