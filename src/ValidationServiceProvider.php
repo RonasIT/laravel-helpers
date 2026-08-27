@@ -18,7 +18,9 @@ class ValidationServiceProvider extends ServiceProvider
     protected function extendValidator(): void
     {
         Validator::extend('unique_except_of_authorized_user', UniqueExceptOfAuthorizedUserRule::extend(...));
+
         Validator::extend('list_exists', ListExistsRule::extend(...));
+
         Validator::extend('db_type_range', DBTypeRangeRule::extend(...));
     }
 }
