@@ -1,25 +1,22 @@
 [
   {
     "id": 1,
-    "name": "name1 updated",
+    "name": "name1",
+    "payload": "{\"key\": \"value\"}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
     "id": 2,
     "name": "name2",
+    "payload": "{\"key\": \"old\"}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
     "id": 3,
     "name": "name3",
-    "created_at": "2018-10-10 10:10:10",
-    "updated_at": "2018-10-10 10:10:10"
-  },
-  {
-    "id": 4,
-    "name": "name44",
+    "payload": "{}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   }
