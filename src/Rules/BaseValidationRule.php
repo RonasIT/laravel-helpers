@@ -9,7 +9,7 @@ abstract class BaseValidationRule implements ValidationRule
 {
     public static function extend(string $attribute, mixed $value, array $parameters, ValidatorContract $validator): bool
     {
-        $success = false;
+        $success = true;
 
         static::fromParameters($parameters, $attribute)->validate(
             attribute: $attribute,
