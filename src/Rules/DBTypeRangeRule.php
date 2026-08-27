@@ -8,7 +8,7 @@ use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Enums\DBTypeCategoryEnum;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
-class DBTypeRangeRule extends ValidatorExtensionRule
+class DBTypeRangeRule extends BaseValidationRule
 {
     private const string INTEGER_PATTERN = '/^-?\d+$/';
 

@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class UniqueExceptOfAuthorizedUserRule extends ValidatorExtensionRule
+class UniqueExceptOfAuthorizedUserRule extends BaseValidationRule
 {
     public function __construct(
         protected string $table = 'users',

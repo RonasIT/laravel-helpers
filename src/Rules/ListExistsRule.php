@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
-class ListExistsRule extends ValidatorExtensionRule
+class ListExistsRule extends BaseValidationRule
 {
     public function __construct(
         protected string $table,

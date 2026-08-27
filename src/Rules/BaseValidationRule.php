@@ -5,16 +5,20 @@ namespace RonasIT\Support\Rules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
-abstract class ValidatorExtensionRule implements ValidationRule
+abstract class BaseValidationRule implements ValidationRule
 {
     public static function extend(string $attribute, mixed $value, array $parameters, ValidatorContract $validator): bool
     {
         $failed = false;
 
-        static::fromParameters($parameters, $attribute)->validate($attribute, $value, function (string $message) use ($validator, &$failed) {
-            $validator->addReplacer(static::ruleName(), fn () => $message);
-            $failed = true;
-        });
+        static::fromParameters($parameters, $attribute)->validate(
+            attribute: $attribute,
+            value: $value,
+            fail: function (string $message) use ($validator, &$failed) {
+                $validator->addReplacer(static::ruleName(), fn () => $message);
+                $failed = true;
+            },
+        );
 
         return !$failed;
     }
