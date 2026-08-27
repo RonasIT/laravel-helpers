@@ -8,6 +8,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use RonasIT\Support\HelpersServiceProvider;
 use RonasIT\Support\Traits\TestingTrait;
+use RonasIT\Support\ValidationServiceProvider;
 
 class TestCase extends BaseTest
 {
@@ -24,6 +25,7 @@ class TestCase extends BaseTest
     {
         return [
             HelpersServiceProvider::class,
+            ValidationServiceProvider::class,
         ];
     }
 
