@@ -204,3 +204,15 @@ $data = $httpRequestService->get($url)->json();
 
 - now return generated file name instead of url/path
 - `$returnUrl` third argument had been removed
+
+## 3.9
+
+### Validation rules
+
+Validation rules (`unique_except_of_authorized_user`, `list_exists`, `db_type_range`) are now registered from a dedicated `ValidationServiceProvider` instead of `HelpersServiceProvider`.
+
+If your project relies on Laravel's package auto-discovery, no action is required. If you disabled auto-discovery for this package or list providers manually in `config/app.php`, add the new provider:
+
+```php
+RonasIT\Support\ValidationServiceProvider::class,
+```
