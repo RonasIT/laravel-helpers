@@ -7,9 +7,14 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
+use RonasIT\Support\Traits\RegistersValidatorExtensionTrait;
 
 class ListExistsRule implements ValidationRule
 {
+    use RegistersValidatorExtensionTrait;
+
+    protected const string RULE_NAME = 'list_exists';
+
     public function __construct(
         protected string $table,
         protected string $keyField = 'id',
@@ -41,5 +46,18 @@ class ListExistsRule implements ValidationRule
         if ($existingValueCount !== count($values)) {
             $fail("Some of the passed {$attribute} are not exists.");
         }
+    }
+
+    protected static function fromParameters(array $parameters, string $attribute): static
+    {
+        if (count($parameters) < 1) {
+            throw new InvalidValidationRuleUsageException("list_exists: At least 1 parameter must be added when checking the {$attribute} field in the request.");
+        }
+
+        return new self(
+            table: Arr::get($parameters, 0),
+            keyField: Arr::get($parameters, 1, 'id'),
+            fieldName: Arr::get($parameters, 2),
+        );
     }
 }

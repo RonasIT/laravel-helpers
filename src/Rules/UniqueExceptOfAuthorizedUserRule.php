@@ -7,9 +7,14 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use RonasIT\Support\Traits\RegistersValidatorExtensionTrait;
 
 class UniqueExceptOfAuthorizedUserRule implements ValidationRule
 {
+    use RegistersValidatorExtensionTrait;
+
+    protected const string RULE_NAME = 'unique_except_of_authorized_user';
+
     public function __construct(
         protected string $table = 'users',
         protected string $keyField = 'id',
@@ -26,5 +31,13 @@ class UniqueExceptOfAuthorizedUserRule implements ValidationRule
         if ($exists) {
             $fail("The {$attribute} has already been taken.");
         }
+    }
+
+    protected static function fromParameters(array $parameters, string $attribute): static
+    {
+        return new self(
+            table: Arr::get($parameters, 0, 'users'),
+            keyField: Arr::get($parameters, 1, 'id'),
+        );
     }
 }
