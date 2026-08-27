@@ -9,18 +9,18 @@ abstract class BaseValidationRule implements ValidationRule
 {
     public static function extend(string $attribute, mixed $value, array $parameters, ValidatorContract $validator): bool
     {
-        $failed = false;
+        $success = false;
 
         static::fromParameters($parameters, $attribute)->validate(
             attribute: $attribute,
             value: $value,
-            fail: function (string $message) use ($validator, &$failed) {
+            fail: function (string $message) use ($validator, &$success) {
                 $validator->addReplacer(static::ruleName(), fn () => $message);
-                $failed = true;
+                $success = false;
             },
         );
 
-        return !$failed;
+        return $success;
     }
 
     abstract protected static function ruleName(): string;
