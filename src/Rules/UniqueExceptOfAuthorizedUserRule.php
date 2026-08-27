@@ -3,13 +3,11 @@
 namespace RonasIT\Support\Rules;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class UniqueExceptOfAuthorizedUserRule implements ValidationRule
+class UniqueExceptOfAuthorizedUserRule extends ValidatorExtensionRule
 {
     public function __construct(
         protected string $table = 'users',
@@ -29,20 +27,16 @@ class UniqueExceptOfAuthorizedUserRule implements ValidationRule
         }
     }
 
-    public static function extend(string $attribute, mixed $value, array $parameters, ValidatorContract $validator): bool
+    protected static function ruleName(): string
     {
-        $rule = new self(
+        return 'unique_except_of_authorized_user';
+    }
+
+    protected static function fromParameters(array $parameters, string $attribute): static
+    {
+        return new self(
             table: Arr::get($parameters, 0, 'users'),
             keyField: Arr::get($parameters, 1, 'id'),
         );
-
-        $failed = false;
-
-        $rule->validate($attribute, $value, function (string $message) use ($validator, &$failed) {
-            $validator->addReplacer('unique_except_of_authorized_user', fn () => $message);
-            $failed = true;
-        });
-
-        return !$failed;
     }
 }

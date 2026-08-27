@@ -3,14 +3,12 @@
 namespace RonasIT\Support\Rules;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Arr;
 use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Enums\DBTypeCategoryEnum;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
-class DBTypeRangeRule implements ValidationRule
+class DBTypeRangeRule extends ValidatorExtensionRule
 {
     private const string INTEGER_PATTERN = '/^-?\d+$/';
 
@@ -86,7 +84,12 @@ class DBTypeRangeRule implements ValidationRule
         }
     }
 
-    public static function extend(string $attribute, mixed $value, array $parameters, ValidatorContract $validator): bool
+    protected static function ruleName(): string
+    {
+        return 'db_type_range';
+    }
+
+    protected static function fromParameters(array $parameters, string $attribute): static
     {
         $typeName = Arr::get($parameters, 0);
 
@@ -96,15 +99,6 @@ class DBTypeRangeRule implements ValidationRule
             );
         }
 
-        $rule = new self($typeName);
-
-        $failed = false;
-
-        $rule->validate($attribute, $value, function (string $message) use ($validator, &$failed) {
-            $validator->addReplacer('db_type_range', fn () => $message);
-            $failed = true;
-        });
-
-        return !$failed;
+        return new self($typeName);
     }
 }

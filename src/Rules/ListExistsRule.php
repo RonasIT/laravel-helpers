@@ -3,13 +3,11 @@
 namespace RonasIT\Support\Rules;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
-class ListExistsRule implements ValidationRule
+class ListExistsRule extends ValidatorExtensionRule
 {
     public function __construct(
         protected string $table,
@@ -44,25 +42,21 @@ class ListExistsRule implements ValidationRule
         }
     }
 
-    public static function extend(string $attribute, mixed $value, array $parameters, ValidatorContract $validator): bool
+    protected static function ruleName(): string
+    {
+        return 'list_exists';
+    }
+
+    protected static function fromParameters(array $parameters, string $attribute): static
     {
         if (count($parameters) < 1) {
             throw new InvalidValidationRuleUsageException("list_exists: At least 1 parameter must be added when checking the {$attribute} field in the request.");
         }
 
-        $rule = new self(
+        return new self(
             table: Arr::get($parameters, 0),
             keyField: Arr::get($parameters, 1, 'id'),
             fieldName: Arr::get($parameters, 2),
         );
-
-        $failed = false;
-
-        $rule->validate($attribute, $value, function (string $message) use ($validator, &$failed) {
-            $validator->addReplacer('list_exists', fn () => $message);
-            $failed = true;
-        });
-
-        return !$failed;
     }
 }
