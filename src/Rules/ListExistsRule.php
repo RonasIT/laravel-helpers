@@ -10,7 +10,7 @@ use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 class ListExistsRule extends BaseValidationRule
 {
     public function __construct(
-        protected string $table,
+        protected ?string $table = null,
         protected string $keyField = 'id',
         protected ?string $fieldName = null,
     ) {
@@ -22,6 +22,10 @@ class ListExistsRule extends BaseValidationRule
             $fail("The {$attribute} field must be an array.");
 
             return;
+        }
+
+        if (empty($this->table)) {
+            throw new InvalidValidationRuleUsageException("list_exists: At least 1 parameter must be added when checking the {$attribute} field in the request.");
         }
 
         if (is_multidimensional($value) && empty($this->fieldName)) {
@@ -49,11 +53,7 @@ class ListExistsRule extends BaseValidationRule
 
     protected static function fromParameters(array $parameters, string $attribute): static
     {
-        if (count($parameters) < 1) {
-            throw new InvalidValidationRuleUsageException("list_exists: At least 1 parameter must be added when checking the {$attribute} field in the request.");
-        }
-
-        return new self(
+        return new static(
             table: Arr::get($parameters, 0),
             keyField: Arr::get($parameters, 1, 'id'),
             fieldName: Arr::get($parameters, 2),

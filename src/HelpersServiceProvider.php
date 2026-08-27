@@ -50,6 +50,8 @@ class HelpersServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(DBTypeResolverContract::class, PostgresDBTypeResolver::class);
+
+        $this->app->register(ValidationServiceProvider::class);
     }
 
     protected function extendRouter(): void

@@ -99,6 +99,6 @@ class DBTypeRangeRule extends BaseValidationRule
             );
         }
 
-        return new self($typeName);
+        return new static($typeName);
     }
 }

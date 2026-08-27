@@ -15,7 +15,13 @@ abstract class BaseValidationRule implements ValidationRule
             attribute: $attribute,
             value: $value,
             fail: function (string $message) use ($validator, &$success) {
-                $validator->addReplacer(static::ruleName(), fn () => $message);
+                $validator->addReplacer(
+                    static::ruleName(),
+                    fn (string $resolvedMessage) => $resolvedMessage === 'validation.' . static::ruleName()
+                        ? $message
+                        : $resolvedMessage,
+                );
+
                 $success = false;
             },
         );

@@ -34,7 +34,7 @@ class UniqueExceptOfAuthorizedUserRule extends BaseValidationRule
 
     protected static function fromParameters(array $parameters, string $attribute): static
     {
-        return new self(
+        return new static(
             table: Arr::get($parameters, 0, 'users'),
             keyField: Arr::get($parameters, 1, 'id'),
         );
