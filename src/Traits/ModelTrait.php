@@ -17,13 +17,15 @@ trait ModelTrait
         $model = (new static());
 
         $keyName = $model->getKeyName();
-        $guarded = $model->getGuarded();
+        $guarded = array_diff($model->getGuarded(), ['*']);
         $fillable = $model->getFillable();
         $timeStamps = ($model->timestamps) ? ['created_at', 'updated_at'] : [];
 
         array_unshift($fillable, $keyName);
 
-        return array_merge($fillable, $guarded, $timeStamps);
+        $result = array_merge($fillable, $guarded, $timeStamps);
+
+        return array_values(array_unique($result));
     }
 
     public function getAllFieldsWithTable(): array
