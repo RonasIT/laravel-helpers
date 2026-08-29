@@ -71,6 +71,21 @@ trait SqlMockTrait
         );
     }
 
+    protected function mockFirstCaseInsensitive(array $selectResult, string $value): void
+    {
+        $this->mockSelect(
+            'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null and LOWER("email") = LOWER(?) limit 1',
+            $selectResult,
+            [$value],
+        );
+
+        $this->mockSelect(
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
+        );
+    }
+
     protected function mockLast(array $selectResult): void
     {
         $this->mockSelectById(
