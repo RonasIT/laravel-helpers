@@ -96,10 +96,8 @@ trait EntityControlTrait
 
     /**
      * Check entity existing in database.
-     *
-     * @param  mixed  $where
      */
-    public function exists($where): bool
+    public function exists(int|string|array $where): bool
     {
         $result = $this->getQuery($where)->exists();
 
@@ -196,10 +194,8 @@ trait EntityControlTrait
 
     /**
      * Update only one row by condition or primary key value
-     *
-     * @param  array|int  $where
      */
-    public function update($where, array $data): ?Model
+    public function update(int|string|array $where, array $data): ?Model
     {
         $item = $this->getQuery($where)->first();
 
@@ -246,7 +242,7 @@ trait EntityControlTrait
         return $this->create(array_merge($data, $where));
     }
 
-    public function count($where = []): int
+    public function count(int|string|array $where = []): int
     {
         $result = $this->getQuery($where)->count();
 
@@ -264,7 +260,7 @@ trait EntityControlTrait
         return $result;
     }
 
-    public function first($where = []): ?Model
+    public function first(int|string|array $where = []): ?Model
     {
         $result = $this->getQuery($where)->first();
 
@@ -273,7 +269,7 @@ trait EntityControlTrait
         return $result;
     }
 
-    public function last(array $where = [], string $column = 'created_at'): ?Model
+    public function last(int|string|array $where = [], string $column = 'created_at'): ?Model
     {
         $result = $this
             ->getQuery($where)
@@ -318,11 +314,9 @@ trait EntityControlTrait
     /**
      * Delete rows by condition or primary key
      *
-     * @param  array|int|string  $where
-     *
      * @return int count of deleted rows
      */
-    public function delete($where): int
+    public function delete(int|string|array $where): int
     {
         $query = $this->getQuery($where);
 
@@ -351,7 +345,7 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function restore($where): int
+    public function restore(int|string|array $where): int
     {
         $result = $this->getQuery($where)->onlyTrashed()->restore();
 
