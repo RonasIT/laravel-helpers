@@ -579,6 +579,23 @@ class ValidatorTest extends TestCase
         app()->forgetInstance(DBTypeResolverContract::class);
     }
 
+    public function testDBTypeRangeUnknownTypeThrowsWithCustomResolverTypes(): void
+    {
+        app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
+
+        $this->assertExceptionThrew(
+            expectedClassName: InvalidValidationRuleUsageException::class,
+            expectedMessage: "db_type_range: Unknown type 'unknown_type' for the value field. Available types: integer, string, uncategorized.",
+        );
+
+        $validator = Validator::make(
+            data: ['value' => 0],
+            rules: ['value' => 'db_type_range:unknown_type'],
+        );
+
+        $validator->passes();
+    }
+
     public function testDBTypeRangeUsesCustomResolverRangesFails(): void
     {
         app()->bind(DBTypeResolverContract::class, TestDBTypeResolver::class);
