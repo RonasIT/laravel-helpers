@@ -40,7 +40,7 @@ trait SearchTrait
         array_push($this->reservedFilters, ...$filterNames);
     }
 
-    public function paginate(): LengthAwarePaginator
+    protected function paginate(): LengthAwarePaginator
     {
         $defaultPerPage = config('defaults.items_per_page');
         $perPage = Arr::get($this->filter, 'per_page', $defaultPerPage);
@@ -138,10 +138,10 @@ trait SearchTrait
                     $this->filterLess($field, true, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_from')) {
                     $field = Str::replace('_from', '', $fieldName);
-                    $this->filterFrom($field, false, $fieldName);
+                    $this->filterGreater($field, false, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_to')) {
                     $field = Str::replace('_to', '', $fieldName);
-                    $this->filterTo($field, false, $fieldName);
+                    $this->filterLess($field, false, $fieldName);
                 } elseif (Str::endsWith($fieldName, '_in_list')) {
                     $field = Str::replace('_in_list', '', $fieldName);
                     $this->filterByList($field, $fieldName);
@@ -169,7 +169,7 @@ trait SearchTrait
         return $this->wrapPaginatedData($data);
     }
 
-    public function wrapPaginatedData(Collection $data): LengthAwarePaginator
+    protected function wrapPaginatedData(Collection $data): LengthAwarePaginator
     {
         $total = $data->count();
 
@@ -183,7 +183,7 @@ trait SearchTrait
         return $this->getModifiedPaginator($paginator);
     }
 
-    public function getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator
+    protected function getModifiedPaginator(LengthAwarePaginator $paginator): LengthAwarePaginator
     {
         $collection = $paginator->getCollection();
 
@@ -213,30 +213,6 @@ trait SearchTrait
     protected function getDesc(bool $isDesc): string
     {
         return ($isDesc) ? 'DESC' : 'ASC';
-    }
-
-    /** @deprecated use filterGreater instead */
-    public function filterMoreThan(string $field, $value): self
-    {
-        return $this->filterValue($field, '>', $value);
-    }
-
-    /** @deprecated use filterLess instead */
-    public function filterLessThan(string $field, $value): self
-    {
-        return $this->filterValue($field, '<', $value);
-    }
-
-    /** @deprecated use filterGreater instead */
-    public function filterMoreOrEqualThan(string $field, $value): self
-    {
-        return $this->filterValue($field, '>=', $value);
-    }
-
-    /** @deprecated use filterLess instead */
-    public function filterLessOrEqualThan(string $field, $value): self
-    {
-        return $this->filterValue($field, '<=', $value);
     }
 
     public function filterValue(string $field, string $sign, $value): self
@@ -274,7 +250,7 @@ trait SearchTrait
 
     protected function getQuerySearchCallback(string $field, string $mask): Closure
     {
-        return function ($query) use ($field, $mask) {
+        return function (Query $query) use ($field, $mask) {
             $databaseDriver = config('database.default');
             $value = ($databaseDriver === 'pgsql')
                 ? pg_escape_string($this->filter['query'])
@@ -284,14 +260,10 @@ trait SearchTrait
                 ? 'ilike'
                 : 'like';
 
+            $field = $query->qualifyColumn($field);
+
             $query->orWhere($field, $operator, DB::raw($value));
         };
-    }
-
-    /** @deprecated use filterGreater instead */
-    public function filterFrom(string $field, bool $isStrict = true, ?string $filterName = null): self
-    {
-        return $this->filterGreater($field, $isStrict, $filterName);
     }
 
     public function filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self
@@ -304,12 +276,6 @@ trait SearchTrait
         }
 
         return $this;
-    }
-
-    /** @deprecated use filterLess instead */
-    public function filterTo(string $field, bool $isStrict = true, ?string $filterName = null): self
-    {
-        return $this->filterLess($field, $isStrict, $filterName);
     }
 
     public function filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self

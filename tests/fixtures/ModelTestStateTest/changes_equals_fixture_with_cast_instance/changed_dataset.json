@@ -1,19 +1,22 @@
 [
   {
+    "id": 1,
     "name": "name1",
-    "value": "alpha",
+    "payload": "{\"key\": \"value\"}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
+    "id": 2,
     "name": "name2",
-    "value": "beta",
+    "payload": "{\"key\": \"new\"}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
-    "name": "name3",
-    "value": "gamma",
+    "id": 4,
+    "name": "name4",
+    "payload": "[1, 2]",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   }

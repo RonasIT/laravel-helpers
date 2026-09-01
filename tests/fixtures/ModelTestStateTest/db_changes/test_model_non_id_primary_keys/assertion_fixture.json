@@ -1,0 +1,24 @@
+{
+    "updated": [
+        {
+            "name": "name2",
+            "value": "beta_updated"
+        }
+    ],
+    "created": [
+        {
+            "name": "name4",
+            "value": "delta",
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ],
+    "deleted": [
+        {
+            "name": "name3",
+            "value": "gamma",
+            "created_at": "2018-10-10 10:10:10",
+            "updated_at": "2018-10-10 10:10:10"
+        }
+    ]
+}
