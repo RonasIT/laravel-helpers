@@ -34,7 +34,7 @@ class ModelTraitTest extends TestCase
         $this->assertEquals(['id', 'created_at', 'updated_at'], $fields);
     }
 
-    public function testGetFieldsNotContainDuplicates()
+    public function testGetFieldsDoesNotContainDuplicates()
     {
         $fields = TestModelWithGuardedFields::getFields();
 
