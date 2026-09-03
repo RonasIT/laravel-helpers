@@ -9,3 +9,10 @@ on:
 jobs:
   run-tests:
     uses: ronasit/github-actions/.github/workflows/tests.yml@main
+    with:
+      additional-package: guzzlehttp/guzzle
+      custom-exclude: |
+        [
+          {"laravel-version": "11.*", "additional-package-version": "8.*"},
+          {"laravel-version": "12.*", "additional-package-version": "8.*"}
+        ]
