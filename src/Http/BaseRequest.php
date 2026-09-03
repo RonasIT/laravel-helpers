@@ -53,6 +53,15 @@ class BaseRequest extends FormRequest
         // Override in child classes if needed
     }
 
+    /**
+     * Returns the handlers to run before the authorization check.
+     *
+     * Every element must be an already instantiated invokable object.
+     * Handlers are invoked without arguments, in the order
+     * of the returned array, and may interrupt the request only by throwing an exception.
+     *
+     * @return object[]
+     */
     protected function beforeAuthorization(): array
     {
         return [];
