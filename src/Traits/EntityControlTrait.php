@@ -48,7 +48,7 @@ trait EntityControlTrait
         return $this;
     }
 
-    public function setModel($modelClass): self
+    protected function setModel($modelClass): self
     {
         $this->model = new $modelClass();
 
@@ -255,7 +255,7 @@ trait EntityControlTrait
         return $result;
     }
 
-    public function get(array $where = []): Collection
+    public function get(int|string|array $where = []): Collection
     {
         $result = $this->getQuery($where)->get();
 
