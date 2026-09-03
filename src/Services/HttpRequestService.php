@@ -119,7 +119,8 @@ class HttpRequestService
 
             return $this;
         } catch (RequestException $exception) {
-            $this->response = $exception->getResponse();
+            // Guzzle 8 keeps getResponse() only on ResponseException, which does not exist in Guzzle 7
+            $this->response = method_exists($exception, 'getResponse') ? $exception->getResponse() : null;
 
             throw $exception;
         } finally {
@@ -213,8 +214,12 @@ class HttpRequestService
             logger('-------------------------------------');
             logger('');
             logger('getting response: ');
-            logger('code', ["<{$this->response->getStatusCode()}>"]);
-            logger('body', ["<{$this->response->getBody()}>"]);
+
+            if (!empty($this->response)) {
+                logger('code', ["<{$this->response->getStatusCode()}>"]);
+                logger('body', ["<{$this->response->getBody()}>"]);
+            }
+
             logger('time', [$endTime]);
             logger('');
         }
