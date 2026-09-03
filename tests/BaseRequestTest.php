@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Routing\Redirector;
+use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Http\BaseRequest;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
@@ -78,17 +80,21 @@ class BaseRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertTrue($request->initCalled);
-        $this->assertTrue($request->beforeCalled);
+        $this->assertEquals(['init', 'before'], $request->calls);
     }
 
-    public function testInitDefault()
+    public function testValidateResolvedFailedValidation()
     {
-        $request = new BaseRequest();
+        $request = ValidateResolvedTestRequest::create('v1/test', 'get');
 
-        $result = $this->callEncapsulatedMethod($request, 'init');
+        $request->setContainer($this->app);
+        $request->setRedirector($this->app->make(Redirector::class));
 
-        $this->assertNull($result);
+        $request->validationRules = ['name' => 'required'];
+
+        $this->expectException(ValidationException::class);
+
+        $request->validateResolved();
     }
 
     public function testBeforeDefault()

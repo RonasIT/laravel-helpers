@@ -6,22 +6,22 @@ use RonasIT\Support\Http\BaseRequest;
 
 class ValidateResolvedTestRequest extends BaseRequest
 {
-    public bool $initCalled = false;
-    public bool $beforeCalled = false;
+    public array $calls = [];
+    public array $validationRules = [];
 
     public function rules(): array
     {
-        return [];
+        return $this->validationRules;
     }
 
     protected function init(): void
     {
-        $this->initCalled = true;
+        $this->calls[] = 'init';
     }
 
     protected function before(): array
     {
-        $this->beforeCalled = true;
+        $this->calls[] = 'before';
 
         return [];
     }
