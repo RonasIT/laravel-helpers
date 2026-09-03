@@ -8,6 +8,7 @@ class ValidateResolvedTestRequest extends BaseRequest
 {
     public array $calls = [];
     public array $validationRules = [];
+    public array $beforeAuthorizationHandlers = [];
 
     public function rules(): array
     {
@@ -19,10 +20,10 @@ class ValidateResolvedTestRequest extends BaseRequest
         $this->calls[] = 'init';
     }
 
-    protected function before(): array
+    protected function beforeAuthorization(): array
     {
-        $this->calls[] = 'before';
+        $this->calls[] = 'beforeAuthorization';
 
-        return [];
+        return $this->beforeAuthorizationHandlers;
     }
 }

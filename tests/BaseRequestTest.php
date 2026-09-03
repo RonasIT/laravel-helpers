@@ -6,6 +6,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Http\BaseRequest;
+use RonasIT\Support\Tests\Support\Mock\Handlers\TestRequestHandler;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Request\UpdateTestRequest;
 use RonasIT\Support\Tests\Support\Request\ValidateResolvedTestRequest;
@@ -80,7 +81,7 @@ class BaseRequestTest extends TestCase
 
         $request->validateResolved();
 
-        $this->assertEquals(['init', 'before'], $request->calls);
+        $this->assertEquals(['init', 'beforeAuthorization'], $request->calls);
     }
 
     public function testValidateResolvedFailedValidation()
@@ -97,11 +98,29 @@ class BaseRequestTest extends TestCase
         $request->validateResolved();
     }
 
-    public function testBeforeDefault()
+    public function testValidateResolvedCallsBeforeAuthorizationHandlers()
+    {
+        TestRequestHandler::$calls = [];
+
+        $request = ValidateResolvedTestRequest::create('v1/test', 'get');
+
+        $request->setContainer($this->app);
+
+        $request->beforeAuthorizationHandlers = [
+            new TestRequestHandler('first'),
+            new TestRequestHandler('second'),
+        ];
+
+        $request->validateResolved();
+
+        $this->assertEquals(['first', 'second'], TestRequestHandler::$calls);
+    }
+
+    public function testBeforeAuthorizationDefault()
     {
         $request = new BaseRequest();
 
-        $result = $this->callEncapsulatedMethod($request, 'before');
+        $result = $this->callEncapsulatedMethod($request, 'beforeAuthorization');
 
         $this->assertEquals([], $result);
     }

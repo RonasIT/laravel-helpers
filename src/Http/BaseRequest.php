@@ -43,7 +43,7 @@ class BaseRequest extends FormRequest
     {
         $this->init();
 
-        $this->before();
+        $this->callBeforeAuthorizationHandlers();
 
         parent::validateResolved();
     }
@@ -53,9 +53,16 @@ class BaseRequest extends FormRequest
         // Override in child classes if needed
     }
 
-    protected function before(): array
+    protected function beforeAuthorization(): array
     {
         return [];
+    }
+
+    protected function callBeforeAuthorizationHandlers(): void
+    {
+        foreach ($this->beforeAuthorization() as $handler) {
+            $handler();
+        }
     }
 
     protected function getOrderableFields(string $modelName, array $additionalFields = []): string
