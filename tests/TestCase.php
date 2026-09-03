@@ -50,6 +50,14 @@ class TestCase extends BaseTest
         $this->assertEquals([], $attachedRelationsCount);
     }
 
+    public function assertQueueEqualsVersioningFixture(string $fixture, bool $exportMode = false): void
+    {
+        // TODO: change to assertEqualsFixture after increase min Laravel version to 12
+        $fixture = $this->getVersioningFixtureName($fixture, [12, 13]);
+
+        $this->assertQueueEqualsFixture($fixture, $exportMode);
+    }
+
     public function getLoginSession($session, $guard = 'session'): array
     {
         return array_filter(
