@@ -2,7 +2,9 @@
 
 namespace RonasIT\Support\Exceptions;
 
-class ForbiddenExportModeException extends EntityCreateException
+use Exception;
+
+class ForbiddenExportModeException extends Exception
 {
     public function __construct()
     {
