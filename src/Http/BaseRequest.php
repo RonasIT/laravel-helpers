@@ -39,6 +39,41 @@ class BaseRequest extends FormRequest
             : Arr::only($validatedFields, $keys);
     }
 
+    public function validateResolved(): void
+    {
+        $this->init();
+
+        $this->callBeforeAuthorizationHandlers();
+
+        parent::validateResolved();
+    }
+
+    protected function init(): void
+    {
+        // Override in child classes if needed
+    }
+
+    /**
+     * Returns the handlers to run before the authorization check.
+     *
+     * Every element must be an already instantiated invokable object.
+     * Handlers are invoked without arguments, in the order
+     * of the returned array, and may interrupt the request only by throwing an exception.
+     *
+     * @return object[]
+     */
+    protected function beforeAuthorization(): array
+    {
+        return [];
+    }
+
+    protected function callBeforeAuthorizationHandlers(): void
+    {
+        foreach ($this->beforeAuthorization() as $handler) {
+            $handler();
+        }
+    }
+
     protected function getOrderableFields(string $modelName, array $additionalFields = []): string
     {
         if (!class_exists($modelName)) {

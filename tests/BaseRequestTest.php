@@ -2,10 +2,14 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Routing\Redirector;
+use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Http\BaseRequest;
+use RonasIT\Support\Tests\Support\Mock\Handlers\TestRequestHandler;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Request\UpdateTestRequest;
+use RonasIT\Support\Tests\Support\Request\ValidateResolvedTestRequest;
 use RonasIT\Support\Tests\Support\Traits\TableTestStateMockTrait;
 
 class BaseRequestTest extends TestCase
@@ -67,6 +71,58 @@ class BaseRequestTest extends TestCase
                 'result' => [],
             ],
         ];
+    }
+
+    public function testValidateResolved()
+    {
+        $request = ValidateResolvedTestRequest::create('v1/test', 'get');
+
+        $request->setContainer($this->app);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['init', 'beforeAuthorization'], $request->calls);
+    }
+
+    public function testValidateResolvedFailedValidation()
+    {
+        $request = ValidateResolvedTestRequest::create('v1/test', 'get');
+
+        $request->setContainer($this->app);
+        $request->setRedirector($this->app->make(Redirector::class));
+
+        $request->validationRules = ['name' => 'required'];
+
+        $this->expectException(ValidationException::class);
+
+        $request->validateResolved();
+    }
+
+    public function testValidateResolvedCallsBeforeAuthorizationHandlers()
+    {
+        TestRequestHandler::$calls = [];
+
+        $request = ValidateResolvedTestRequest::create('v1/test', 'get');
+
+        $request->setContainer($this->app);
+
+        $request->beforeAuthorizationHandlers = [
+            new TestRequestHandler('first'),
+            new TestRequestHandler('second'),
+        ];
+
+        $request->validateResolved();
+
+        $this->assertEquals(['first', 'second'], TestRequestHandler::$calls);
+    }
+
+    public function testBeforeAuthorizationDefault()
+    {
+        $request = new BaseRequest();
+
+        $result = $this->callEncapsulatedMethod($request, 'beforeAuthorization');
+
+        $this->assertEquals([], $result);
     }
 
     #[DataProvider('getOnlyValidatedRequestData')]
