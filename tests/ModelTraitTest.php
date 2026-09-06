@@ -29,8 +29,6 @@ class ModelTraitTest extends TestCase
                 'expected' => [null, 'name', 'json_field', '*', 'created_at', 'updated_at'],
             ],
             [
-                // getFields uses the default timestamp names,
-                // the CREATED_AT/UPDATED_AT constants of the model are not taken into account
                 'model' => GetFieldsTestModelWithCustomTimestamps::class,
                 'expected' => ['id', 'name', 'creation_date', '*', 'created_at', 'updated_at'],
             ],
