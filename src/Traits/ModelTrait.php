@@ -100,7 +100,7 @@ trait ModelTrait
     {
         return $this->wasChanged($fieldName)
             && !is_null($this->getPreviousValue($fieldName))
-            && !is_null($this->getRawValue($fieldName));
+            && !is_null($this->getRawOriginal($fieldName));
     }
 
     /**
@@ -118,7 +118,7 @@ trait ModelTrait
      */
     public function wasCleared(string $fieldName): bool
     {
-        return $this->wasChanged($fieldName) && is_null($this->getRawValue($fieldName));
+        return $this->wasChanged($fieldName) && is_null($this->getRawOriginal($fieldName));
     }
 
     /**
@@ -131,15 +131,6 @@ trait ModelTrait
     public function getPreviousValue(string $fieldName): mixed
     {
         return Arr::get($this->getPrevious(), $fieldName);
-    }
-
-    /**
-     * Get the current value of the field as it is stored in the database,
-     * without casts and accessors applied.
-     */
-    protected function getRawValue(string $fieldName): mixed
-    {
-        return Arr::get($this->getAttributes(), $fieldName);
     }
 
     protected function getRelationshipFromMethod($method)
