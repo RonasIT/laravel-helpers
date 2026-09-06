@@ -1,0 +1,24 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Jobs\\TestJob": [
+        {
+            "payload": "some payload",
+            "anotherPayload": [
+                "another payload"
+            ],
+            "tries": 5,
+            "job": null,
+            "connection": null,
+            "queue": "some_queue",
+            "messageGroup": null,
+            "deduplicator": null,
+            "debounceOwner": "",
+            "delay": "2020-01-01T00:01:00.000000Z",
+            "afterCommit": null,
+            "middleware": [],
+            "chained": [],
+            "chainConnection": null,
+            "chainQueue": null,
+            "chainCatchCallbacks": null
+        }
+    ]
+}
