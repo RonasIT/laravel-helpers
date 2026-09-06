@@ -2,12 +2,14 @@
 
 namespace RonasIT\Support\Tests;
 
+use BadMethodCallException;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
+use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModel;
+use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelNoPrimaryKey;
+use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithCustomTimestamps;
+use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithoutTimestamps;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelNoPrimaryKey;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithDifferentTimestampNames;
-use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithoutTimestamps;
 
 class ModelTraitTest extends TestCase
 {
@@ -15,20 +17,22 @@ class ModelTraitTest extends TestCase
     {
         return [
             [
-                'model' => TestModel::class,
-                'expected' => ['id', 'name', 'json_field', 'castable_field', '*', 'created_at', 'updated_at'],
+                'model' => GetFieldsTestModel::class,
+                'expected' => ['id', 'name', 'json_field', '*', 'created_at', 'updated_at'],
             ],
             [
-                'model' => TestModelWithoutTimestamps::class,
-                'expected' => ['id', 'name', 'json_field', 'castable_field', 'created_at', '*'],
+                'model' => GetFieldsTestModelWithoutTimestamps::class,
+                'expected' => ['id', 'name', 'json_field', '*'],
             ],
             [
-                'model' => TestModelNoPrimaryKey::class,
-                'expected' => [null, 'name', 'json_field', 'castable_field', '*', 'created_at', 'updated_at'],
+                'model' => GetFieldsTestModelNoPrimaryKey::class,
+                'expected' => [null, 'name', 'json_field', '*', 'created_at', 'updated_at'],
             ],
             [
-                'model' => TestModelWithDifferentTimestampNames::class,
-                'expected' => ['id', 'name', 'json_field', 'castable_field', 'creation_date', '*', 'created_at', 'updated_at'],
+                // getFields uses the default timestamp names,
+                // the CREATED_AT/UPDATED_AT constants of the model are not taken into account
+                'model' => GetFieldsTestModelWithCustomTimestamps::class,
+                'expected' => ['id', 'name', 'creation_date', '*', 'created_at', 'updated_at'],
             ],
         ];
     }
@@ -108,6 +112,67 @@ class ModelTraitTest extends TestCase
         );
     }
 
+    public function testScopeOrderByRelatedAsc()
+    {
+        $query = TestModel::query();
+
+        $query->orderByRelated('relation.name', 'ASC');
+
+        $this->assertEquals(
+            'select "test_models".*, (select "name" from "relation_models" where "test_models"."id" = "relation_models"."test_model_id" order by "id" asc limit 1) as "relation_name" from "test_models" where "test_models"."deleted_at" is null order by "relation_name" asc',
+            $query->toSql(),
+        );
+    }
+
+    public function testScopeOrderByRelatedWithAsField()
+    {
+        $query = TestModel::query();
+
+        $query->orderByRelated('relation.name', asField: 'sort_field');
+
+        $this->assertEquals(
+            'select "test_models".*, (select "name" from "relation_models" where "test_models"."id" = "relation_models"."test_model_id" order by "id" asc limit 1) as "sort_field" from "test_models" where "test_models"."deleted_at" is null order by "sort_field" desc',
+            $query->toSql(),
+        );
+    }
+
+    public function testScopeOrderByRelatedWithMinStrategy()
+    {
+        $query = TestModel::query();
+
+        $query->orderByRelated('relation.name', manyToManyStrategy: 'min');
+
+        $this->assertEquals(
+            'select "test_models".*, (select "name" from "relation_models" where "test_models"."id" = "relation_models"."test_model_id" order by "id" desc limit 1) as "relation_name" from "test_models" where "test_models"."deleted_at" is null order by "relation_name" desc',
+            $query->toSql(),
+        );
+    }
+
+    public function testScopeOrderByRelatedNestedRelations()
+    {
+        $query = TestModel::query();
+
+        $query->orderByRelated('relation.child_relation.name');
+
+        $this->assertEquals(
+            'select "test_models".*, (select (select "name" from "child_relation_models" where "relation_models"."id" = "child_relation_models"."relation_model_id" order by "id" asc limit 1) as "relation_child_relation_name" from "relation_models" where "test_models"."id" = "relation_models"."test_model_id" order by "id" asc limit 1) as "relation_child_relation_name" from "test_models" where "test_models"."deleted_at" is null order by "relation_child_relation_name" desc',
+            $query->toSql(),
+        );
+    }
+
+    public function testLazyLoadingDisabled()
+    {
+        $model = new TestModel();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage(
+            "Attempting to lazy-load relation 'relation' on model '" . TestModel::class . "'. "
+            . 'See property $disableLazyLoading.',
+        );
+
+        $model->relation;
+    }
+
     public static function getWasExchangedData(): array
     {
         return [
@@ -143,6 +208,11 @@ class ModelTraitTest extends TestCase
             [
                 'before' => null,
                 'after' => 'new',
+                'expected' => true,
+            ],
+            [
+                'before' => null,
+                'after' => '',
                 'expected' => true,
             ],
             [
@@ -195,6 +265,49 @@ class ModelTraitTest extends TestCase
         $this->assertSame($expected, $model->wasCleared('name'));
     }
 
+    public static function getCastableFieldTransitionData(): array
+    {
+        return [
+            [
+                'before' => ['key' => 'old'],
+                'after' => ['key' => 'new'],
+                'expected' => [
+                    'wasExchanged' => true,
+                    'wasFilled' => false,
+                    'wasCleared' => false,
+                ],
+            ],
+            [
+                'before' => null,
+                'after' => ['key' => 'new'],
+                'expected' => [
+                    'wasExchanged' => false,
+                    'wasFilled' => true,
+                    'wasCleared' => false,
+                ],
+            ],
+            [
+                'before' => ['key' => 'old'],
+                'after' => null,
+                'expected' => [
+                    'wasExchanged' => false,
+                    'wasFilled' => false,
+                    'wasCleared' => true,
+                ],
+            ],
+        ];
+    }
+
+    #[DataProvider('getCastableFieldTransitionData')]
+    public function testCastableFieldTransition(?array $before, ?array $after, array $expected)
+    {
+        $model = $this->createModelWithTransition($before, $after, 'json_field');
+
+        $this->assertSame($expected['wasExchanged'], $model->wasExchanged('json_field'));
+        $this->assertSame($expected['wasFilled'], $model->wasFilled('json_field'));
+        $this->assertSame($expected['wasCleared'], $model->wasCleared('json_field'));
+    }
+
     public function testNoChange()
     {
         $model = new TestModel();
@@ -206,28 +319,35 @@ class ModelTraitTest extends TestCase
         $this->assertFalse($model->wasCleared('name'));
     }
 
-    public function testOrigin()
+    public function testGetPreviousValue()
     {
         $model = $this->createModelWithTransition('old', 'new');
 
-        $this->assertSame('old', $model->origin('name'));
+        $this->assertSame('old', $model->getPreviousValue('name'));
     }
 
-    public function testOriginReturnsNullWhenNoPreviousValue()
+    public function testGetPreviousValueReturnsRawValue()
+    {
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'json_field');
+
+        $this->assertSame('{"key":"old"}', $model->getPreviousValue('json_field'));
+    }
+
+    public function testGetPreviousValueReturnsNullWhenNoPreviousValue()
     {
         $model = new TestModel();
         $model->forceFill(['name' => 'value']);
         $model->syncOriginal();
 
-        $this->assertNull($model->origin('name'));
+        $this->assertNull($model->getPreviousValue('name'));
     }
 
-    protected function createModelWithTransition(?string $originName, ?string $newName): TestModel
+    protected function createModelWithTransition(mixed $originValue, mixed $newValue, string $fieldName = 'name'): TestModel
     {
         $model = new TestModel();
-        $model->forceFill(['name' => $originName]);
+        $model->forceFill([$fieldName => $originValue]);
         $model->syncOriginal();
-        $model->forceFill(['name' => $newName]);
+        $model->forceFill([$fieldName => $newValue]);
         $model->syncChanges();
         $model->syncOriginal();
 

@@ -39,7 +39,7 @@ trait ModelTrait
      * This method was added, because native Laravel's method addSelect
      * overwrites existed select clause
      */
-    public function scopeAddFieldsToSelect(Builder $query, array $fields = []): mixed
+    public function scopeAddFieldsToSelect(Builder $query, array $fields = []): Builder
     {
         if (is_null($query->getQuery()->columns)) {
             $query->addSelect("{$this->getTable()}.*");
@@ -62,7 +62,7 @@ trait ModelTrait
         string $desc = 'DESC',
         ?string $asField = null,
         string $manyToManyStrategy = 'max',
-    ): mixed {
+    ): Builder {
         if (empty($asField)) {
             $asField = str_replace('.', '_', $relations);
         }
@@ -92,26 +92,54 @@ trait ModelTrait
         return $query->orderBy($asField ?? $orderField, $desc);
     }
 
+    /**
+     * Determine if the field was changed from one non-empty value to another
+     * during the last save.
+     */
     public function wasExchanged(string $fieldName): bool
     {
         return $this->wasChanged($fieldName)
-            && !is_null($this->origin($fieldName))
-            && !is_null($this->getAttribute($fieldName));
+            && !is_null($this->getPreviousValue($fieldName))
+            && !is_null($this->getRawValue($fieldName));
     }
 
+    /**
+     * Determine if the field was filled during the last save,
+     * i.e. its previous value was empty and the new one is not.
+     */
     public function wasFilled(string $fieldName): bool
     {
-        return $this->wasChanged($fieldName) && is_null($this->origin($fieldName));
+        return $this->wasChanged($fieldName) && is_null($this->getPreviousValue($fieldName));
     }
 
+    /**
+     * Determine if the field was cleared during the last save,
+     * i.e. its previous value was not empty and the new one is.
+     */
     public function wasCleared(string $fieldName): bool
     {
-        return $this->wasChanged($fieldName) && is_null($this->getAttribute($fieldName));
+        return $this->wasChanged($fieldName) && is_null($this->getRawValue($fieldName));
     }
 
-    public function origin(string $fieldName): mixed
+    /**
+     * Get the value the field had before the last save.
+     *
+     * The value is returned as it is stored in the database, without casts
+     * and accessors applied. Available only after the model was saved,
+     * otherwise `null` is returned.
+     */
+    public function getPreviousValue(string $fieldName): mixed
     {
         return Arr::get($this->getPrevious(), $fieldName);
+    }
+
+    /**
+     * Get the current value of the field as it is stored in the database,
+     * without casts and accessors applied.
+     */
+    protected function getRawValue(string $fieldName): mixed
+    {
+        return Arr::get($this->getAttributes(), $fieldName);
     }
 
     protected function getRelationshipFromMethod($method)
