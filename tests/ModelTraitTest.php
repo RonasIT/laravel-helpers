@@ -10,9 +10,12 @@ use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelNoPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithCustomTimestamps;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithoutTimestamps;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
+use RonasIT\Support\Tests\Support\Traits\ModelTestTrait;
 
 class ModelTraitTest extends TestCase
 {
+    use ModelTestTrait;
+
     public static function getGetFieldsData(): array
     {
         return [
@@ -340,17 +343,5 @@ class ModelTraitTest extends TestCase
         $model->syncOriginal();
 
         $this->assertNull($model->getPreviousValue('name'));
-    }
-
-    protected function createModelWithTransition(mixed $originValue, mixed $newValue, string $fieldName = 'name'): TestModel
-    {
-        $model = new TestModel();
-        $model->forceFill([$fieldName => $originValue]);
-        $model->syncOriginal();
-        $model->forceFill([$fieldName => $newValue]);
-        $model->syncChanges();
-        $model->syncOriginal();
-
-        return $model;
     }
 }
