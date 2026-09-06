@@ -28,17 +28,18 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockGet(array $selectResult): void
+    protected function mockGet(array $selectResult, array $bindings = [1]): void
     {
         $this->mockSelectById(
-            'select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
-            $selectResult,
+            query: 'select "test_models".*, (select count(*) from "relation_models" '
+                . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+                . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
+            result: $selectResult,
+            bindings: $bindings,
         );
 
         $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
+            query: 'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
         );
     }
 
@@ -686,9 +687,9 @@ trait SqlMockTrait
         $this->mockSelect($query, [['aggregate' => $result]], $bindings);
     }
 
-    protected function mockSelectById(string $query, array $result = []): void
+    protected function mockSelectById(string $query, array $result = [], array $bindings = [1]): void
     {
-        $this->mockSelect($query, $result, [1]);
+        $this->mockSelect($query, $result, $bindings);
     }
 
     protected function mockSelectExists(string $query, bool $isExist = true, array $bindings = [1]): void

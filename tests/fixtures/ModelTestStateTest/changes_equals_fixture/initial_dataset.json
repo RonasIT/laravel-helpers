@@ -2,8 +2,9 @@
   {
     "id": 1,
     "name": "name1",
-    "json_field": "{\"field1\": \"updated value\", \"field2\": [2, 3], \"field3\":  {\"one\": 1, \"two\": 2}}",
-    "castable_field": "{\"field1\": \"updated value\", \"field2\": [2, 3], \"field3\":  {\"one\": 1, \"two\": 2}}",
+    "json_field": "{\"field1\": \"value\", \"field2\": [2, 3], \"field3\":  {\"one\": 1, \"two\": 2}}",
+    "custom_cast_field": "{\"one\": \"first value\", \"two\": \"second value\"}",
+    "castable_field": "{\"theme\": \"dark\"}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
@@ -11,23 +12,26 @@
     "id": 2,
     "name": "name2",
     "json_field": "{}",
-    "castable_field": "{\"one\": \"first value\", \"two\": \"second value\"}",
+    "custom_cast_field": "{}",
+    "castable_field": "{\"theme\": \"dark\"}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
     "id": 3,
     "name": "name3",
-    "castable_field": "{}",
     "json_field": "[2, \"two\"]",
+    "custom_cast_field": "plain text",
+    "castable_field": "{}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
     "id": 5,
     "name": "name5",
-    "castable_field": "{}",
     "json_field": "{}",
+    "custom_cast_field": "{}",
+    "castable_field": "{}",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   }

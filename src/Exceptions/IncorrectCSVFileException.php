@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Exceptions;
 
-class IncorrectCSVFileException extends EntityCreateException
+use Exception;
+
+class IncorrectCSVFileException extends Exception
 {
 }

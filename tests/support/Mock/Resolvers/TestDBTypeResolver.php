@@ -27,6 +27,11 @@ class TestDBTypeResolver implements DBTypeResolverContract
         return self::RANGES[$type];
     }
 
+    public function getTypes(): array
+    {
+        return array_keys(self::RANGES);
+    }
+
     public function getTypeCategory(string $type): ?DBTypeCategoryEnum
     {
         return match ($type) {

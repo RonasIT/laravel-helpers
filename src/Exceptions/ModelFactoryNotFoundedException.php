@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Exceptions;
 
-class ModelFactoryNotFoundedException extends EntityCreateException
+use Exception;
+
+class ModelFactoryNotFoundedException extends Exception
 {
 }

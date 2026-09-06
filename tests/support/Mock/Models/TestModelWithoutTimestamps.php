@@ -4,7 +4,6 @@ namespace RonasIT\Support\Tests\Support\Mock\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use RonasIT\Support\Tests\Support\Mock\Casts\JSONCustomCast;
 use RonasIT\Support\Traits\ModelTrait;
 
 class TestModelWithoutTimestamps extends Model
@@ -18,13 +17,6 @@ class TestModelWithoutTimestamps extends Model
 
     protected $fillable = [
         'name',
-        'json_field',
-        'castable_field',
         'created_at',
-    ];
-
-    protected $casts = [
-        'json_field' => 'array',
-        'castable_field' => JSONCustomCast::class,
     ];
 }

@@ -2,24 +2,21 @@
   {
     "id": 1,
     "name": "name1",
+    "status": "active",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
     "id": 2,
     "name": "name2",
+    "status": "suspended",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   },
   {
-    "id": 3,
-    "name": "name3",
-    "created_at": "2018-10-10 10:10:10",
-    "updated_at": "2018-10-10 10:10:10"
-  },
-  {
-    "id": 5,
-    "name": "name5",
+    "id": 4,
+    "name": "name4",
+    "status": "archived",
     "created_at": "2018-10-10 10:10:10",
     "updated_at": "2018-10-10 10:10:10"
   }

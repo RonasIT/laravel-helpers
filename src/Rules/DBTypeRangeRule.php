@@ -27,8 +27,10 @@ class DBTypeRangeRule implements ValidationRule
         }
 
         if (!$this->resolver->hasType($this->type)) {
+            $availableTypes = implode(', ', $this->resolver->getTypes());
+
             throw new InvalidValidationRuleUsageException(
-                message: "db_type_range: Unknown type '{$this->type}' for the {$attribute} field.",
+                message: "db_type_range: Unknown type '{$this->type}' for the {$attribute} field. Available types: {$availableTypes}.",
             );
         }
 

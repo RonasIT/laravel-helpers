@@ -34,6 +34,11 @@ final class PostgresDBTypeResolver implements DBTypeResolverContract
         return self::RANGES[$type];
     }
 
+    public function getTypes(): array
+    {
+        return array_keys(self::RANGES);
+    }
+
     public function hasType(string $type): bool
     {
         return array_key_exists($type, self::RANGES);

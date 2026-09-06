@@ -11,6 +11,11 @@ interface DBTypeResolverContract
      */
     public function getRange(string $type): array;
 
+    /**
+     * @return list<string>
+     */
+    public function getTypes(): array;
+
     public function hasType(string $type): bool;
 
     public function getTypeCategory(string $type): ?DBTypeCategoryEnum;
