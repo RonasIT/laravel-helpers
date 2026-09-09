@@ -1,0 +1,27 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestChainableNotification": [
+        {
+            "notification": {
+                "status": "active",
+                "channels": [
+                    "database"
+                ],
+                "locale": null
+            },
+            "channels": [
+                "database"
+            ],
+            "notifiable": {
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
+                "attributes": {
+                    "id": 1
+                }
+            },
+            "locale": null,
+            "via_method": "active",
+            "via_property": "active",
+            "via_chain": "active",
+            "via_notifiable_argument": 1
+        }
+    ]
+}

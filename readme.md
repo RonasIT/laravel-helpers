@@ -24,6 +24,12 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 
 [Follow the versioning documentation][8] to implement versioning in your Laravel app using this package.
 
+### Notifications testing
+
+The package asserts the notifications sent during a test against a json fixture, covering the whole payload instead of the notification class name, and lets you describe the data of a channel by chains of the notification methods and properties.
+
+[Follow the `NotificationsMockTrait` documentation][9] to use it in your tests.
+
 ## Usage
  - [Helper functions][1]
  - [Traits][2]
@@ -34,6 +40,7 @@ Versioning is a mechanism to keep your API applications in a workable state for 
  - [1.1][5]
  - [2.0.0][6]
  - [2.0.8][7]
+ - [3.9.0][10]
 
 [1]:./documentation/helpers.md
 [2]:./documentation/traits.md
@@ -43,3 +50,5 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 [6]:./documentation/migration.md#2.0.0
 [7]:./documentation/migration.md#2.0.8
 [8]:./documentation/versioning.md
+[9]:./documentation/traits.md#notificationsmocktrait
+[10]:./documentation/migration.md#3.9.0
