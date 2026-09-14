@@ -780,6 +780,21 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
+    public function testFirstCaseInsensitive()
+    {
+        $this->mockFirstCaseInsensitive(self::$selectResult, 'JOHN@example.com');
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->firstCaseInsensitive('email', 'JOHN@example.com');
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
     public function testFindByEmptyResult()
     {
         $this->mockSelectById(

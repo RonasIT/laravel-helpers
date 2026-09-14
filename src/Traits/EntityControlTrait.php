@@ -290,6 +290,21 @@ trait EntityControlTrait
         return $this->first([$field => $value]);
     }
 
+    public function firstCaseInsensitive(string $field, string $value): ?Model
+    {
+        $query = $this->getQuery();
+
+        $wrappedField = $query->getGrammar()->wrap($field);
+
+        $result = $query
+            ->whereRaw("LOWER({$wrappedField}) = LOWER(?)", [$value])
+            ->first();
+
+        $this->postQueryHook();
+
+        return $result;
+    }
+
     public function find($id): ?Model
     {
         return $this->first($id);
