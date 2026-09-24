@@ -90,10 +90,10 @@ $array = [1.4, 2.9, 1.534];
 array_round($array); //[1, 3, 2]
 ````
 
-### mkdir_recursively($path)
+### mkdir_recursively($path, $permissions = null)
 
 Create directory recursively. The native mkdir() function recursively create directory incorrectly.
-Here is solution of this problem.
+Here is solution of this problem. Optionally accepts `$permissions` (e.g. `0777`) to apply `chmod` to each created directory, bypassing umask.
 
 ### rmdir_recursively($path)
 
