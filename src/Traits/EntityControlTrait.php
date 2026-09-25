@@ -300,14 +300,37 @@ trait EntityControlTrait
      */
     public function firstOrCreate($where, array $data = []): Model
     {
-        $this->resetSettableProperties(false);
+        if (!is_array($where)) {
+            $where = [$this->primaryKey => $where];
+        }
 
-        $entity = $this->first($where);
+        $availableFields = ($this->forceMode)
+            ? $this->fields
+            : array_intersect($this->fields, $this->model->getFillable());
 
-        $this->resetSettableProperties();
+        $query = $this->getQuery(Arr::except($where, $availableFields));
 
-        if (empty($entity)) {
-            return $this->create(array_merge($data, $where));
+        $where = Arr::only($where, $availableFields);
+        $data = Arr::only(Arr::except($data, array_keys($where)), $availableFields);
+
+        $entity = ($this->forceMode)
+            ? Model::unguarded(fn () => $query->firstOrCreate($where, $data))
+            : $query->firstOrCreate($where, $data);
+
+        if ($entity->wasRecentlyCreated) {
+            $entity
+                ->refresh()
+                ->load($this->attachedRelations);
+
+            foreach ($this->attachedRelationsCount as $requestedRelations) {
+                list($countRelation, $relation) = extract_last_part($requestedRelations);
+
+                if (empty($relation)) {
+                    $entity->loadCount($countRelation);
+                } else {
+                    $entity->load([$relation => fn ($query) => $query->withCount($countRelation)]);
+                }
+            }
         }
 
         $this->postQueryHook();
