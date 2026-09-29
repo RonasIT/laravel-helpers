@@ -35,7 +35,7 @@ class TestCase extends BaseTest
         $app->setBasePath(__DIR__ . '/..');
     }
 
-    protected function assertSettablePropertiesReset($class): void
+    protected function assertSettablePropertiesNotChanged($class): void
     {
         $onlyTrashed = $this->onlyTrashedProperty->getValue($class);
         $withTrashed = $this->withTrashedProperty->getValue($class);

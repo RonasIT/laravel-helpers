@@ -35,6 +35,13 @@ trait SearchTrait
         'desc',
     ];
 
+    public function __clone(): void
+    {
+        if (!empty($this->query)) {
+            $this->query = clone $this->query;
+        }
+    }
+
     protected function setAdditionalReservedFilters(...$filterNames)
     {
         array_push($this->reservedFilters, ...$filterNames);
@@ -100,20 +107,30 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * Returns a copy of the repository with the built search query, the repository itself stays untouched
+     */
     public function searchQuery(array $filter = []): self
     {
+        $repository = clone $this;
+
+        return $repository->prepareSearchQuery($filter);
+    }
+
+    protected function prepareSearchQuery(array $filter): self
+    {
         if (!empty($filter['with_trashed'])) {
-            $this->withTrashed();
+            $this->withTrashed = true;
         }
 
         if (!empty($filter['only_trashed'])) {
-            $this->onlyTrashed();
+            $this->onlyTrashed = true;
         }
 
-        $this->query = $this
-            ->with(Arr::get($filter, 'with', $this->attachedRelations))
-            ->withCount(Arr::get($filter, 'with_count', $this->attachedRelationsCount))
-            ->getQuery();
+        $this->attachedRelations = Arr::wrap(Arr::get($filter, 'with', $this->attachedRelations));
+        $this->attachedRelationsCount = Arr::wrap(Arr::get($filter, 'with_count', $this->attachedRelationsCount));
+
+        $this->query = $this->getQuery();
 
         $this->filter = $filter;
 
@@ -157,8 +174,6 @@ trait SearchTrait
     public function getSearchResults(): LengthAwarePaginator
     {
         $this->orderBy();
-
-        $this->postQueryHook();
 
         if (empty($this->filter['all'])) {
             return $this->getModifiedPaginator($this->paginate());
@@ -231,9 +246,7 @@ trait SearchTrait
      */
     public function with(array|string $relations): self
     {
-        $this->attachedRelations = Arr::wrap($relations);
-
-        return $this;
+        return $this->cloneWith('attachedRelations', Arr::wrap($relations));
     }
 
     /**
@@ -243,9 +256,7 @@ trait SearchTrait
      */
     public function withCount(array|string $relations): self
     {
-        $this->attachedRelationsCount = Arr::wrap($relations);
-
-        return $this;
+        return $this->cloneWith('attachedRelationsCount', Arr::wrap($relations));
     }
 
     protected function getQuerySearchCallback(string $field, string $mask): Closure
@@ -337,17 +348,6 @@ trait SearchTrait
         $defaultPerPage = config('defaults.items_per_page', 1);
 
         return Arr::get($this->filter, 'per_page', $defaultPerPage);
-    }
-
-    protected function postQueryHook(): void
-    {
-        if ($this->shouldSettablePropertiesBeReset) {
-            $this->onlyTrashed(false);
-            $this->withTrashed(false);
-            $this->force(false);
-            $this->with([]);
-            $this->withCount([]);
-        }
     }
 
     protected function getFilterName(string $field): string

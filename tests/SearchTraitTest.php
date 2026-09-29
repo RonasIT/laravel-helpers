@@ -21,7 +21,6 @@ class SearchTraitTest extends TestCase
     protected ReflectionProperty $forceModeProperty;
     protected ReflectionProperty $attachedRelationsProperty;
     protected ReflectionProperty $attachedRelationsCountProperty;
-    protected ReflectionProperty $shouldSettablePropertiesBeResetProperty;
 
     public function setUp(): void
     {
@@ -42,17 +41,12 @@ class SearchTraitTest extends TestCase
             'attachedRelationsCount',
         );
 
-        $this->shouldSettablePropertiesBeResetProperty = new ReflectionProperty(
-            TestRepository::class,
-            'shouldSettablePropertiesBeReset',
-        );
-
         self::$selectResult ??= $this->getJsonFixture('select_query_result.json');
     }
 
     public function testSearchQuery()
     {
-        $this->testRepositoryClass
+        $repository = $this->testRepositoryClass
             ->force()
             ->searchQuery([
                 'with_trashed' => true,
@@ -61,13 +55,13 @@ class SearchTraitTest extends TestCase
                 'with_count' => ['relation'],
             ]);
 
-        $sql = $this->testRepositoryClass->getSearchQuery()->toSql();
+        $sql = $repository->getSearchQuery()->toSql();
 
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
-        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
-        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
-        $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
-        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
+        $onlyTrashed = $this->onlyTrashedProperty->getValue($repository);
+        $withTrashed = $this->withTrashedProperty->getValue($repository);
+        $forceMode = $this->forceModeProperty->getValue($repository);
+        $attachedRelations = $this->attachedRelationsProperty->getValue($repository);
+        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($repository);
 
         $this->assertTrue($onlyTrashed);
         $this->assertFalse($withTrashed);
@@ -76,6 +70,28 @@ class SearchTraitTest extends TestCase
         $this->assertEquals(['relation'], $attachedRelationsCount);
 
         $this->assertEqualsFixture('search_query_sql.json', $sql);
+
+        $this->assertSettablePropertiesNotChanged($this->testRepositoryClass);
+    }
+
+    public function testSearchQueryReturnsCopy()
+    {
+        $repository = $this->testRepositoryClass->searchQuery();
+
+        $this->assertNotSame($this->testRepositoryClass, $repository);
+
+        $query = (new ReflectionProperty(TestRepository::class, 'query'))->getValue($this->testRepositoryClass);
+
+        $this->assertNull($query);
+    }
+
+    public function testCopyOfSearchQueryDoesNotShareQuery()
+    {
+        $repository = $this->testRepositoryClass->searchQuery();
+
+        $copy = $repository->with('relation');
+
+        $this->assertNotSame($repository->getSearchQuery(), $copy->getSearchQuery());
     }
 
     public function testGetSearchResultWithAll()
@@ -116,7 +132,7 @@ class SearchTraitTest extends TestCase
             ])
             ->getSearchResults();
 
-        $this->assertSettablePropertiesReset($this->testRepositoryClass);
+        $this->assertSettablePropertiesNotChanged($this->testRepositoryClass);
     }
 
     public function testGetSearchResultWithTrashed()
@@ -140,38 +156,8 @@ class SearchTraitTest extends TestCase
         $this->testRepositoryClass->searchQuery()->getSearchResults();
     }
 
-    public function testPostQueryHookMethodPropertyFalse()
-    {
-        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
-
-        $this->mockGetSearchResult(self::$selectResult);
-
-        $this->testRepositoryClass
-            ->onlyTrashed()
-            ->withTrashed()
-            ->force()
-            ->with('relation')
-            ->withCount('relation')
-            ->searchQuery()
-            ->getSearchResults();
-
-        $onlyTrashed = $this->onlyTrashedProperty->getValue($this->testRepositoryClass);
-        $withTrashed = $this->withTrashedProperty->getValue($this->testRepositoryClass);
-        $forceMode = $this->forceModeProperty->getValue($this->testRepositoryClass);
-        $attachedRelations = $this->attachedRelationsProperty->getValue($this->testRepositoryClass);
-        $attachedRelationsCount = $this->attachedRelationsCountProperty->getValue($this->testRepositoryClass);
-
-        $this->assertTrue($onlyTrashed);
-        $this->assertFalse($withTrashed);
-        $this->assertTrue($forceMode);
-        $this->assertEquals(['relation'], $attachedRelations);
-        $this->assertEquals(['relation'], $attachedRelationsCount);
-    }
-
     public function testSearchQueryWithQuery()
     {
-        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
-
         $this->mockGetSearchResultWithQuery(self::$selectResult);
 
         $this->testRepositoryClass
@@ -186,8 +172,6 @@ class SearchTraitTest extends TestCase
     {
         Config::set('database.default', 'pgsql');
 
-        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
-
         $this->mockGetSearchResultWithCustomQuery(self::$selectResult);
 
         $this->testRepositoryClass
@@ -200,8 +184,6 @@ class SearchTraitTest extends TestCase
 
     public function testSearchQueryWithRelations()
     {
-        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
-
         $this->mockGetSearchResultWithRelations(self::$selectResult);
 
         $this->callEncapsulatedMethod($this->testRepositoryClass, 'setAdditionalReservedFilters', 'relation_name');
@@ -220,8 +202,6 @@ class SearchTraitTest extends TestCase
 
     public function testSearchQueryWithFilters()
     {
-        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
-
         $this->mockGetSearchResultWithFilters(self::$selectResult);
 
         $this->testRepositoryClass
@@ -276,8 +256,6 @@ class SearchTraitTest extends TestCase
 
     public function testSearchQueryWithChainedFilters()
     {
-        $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
-
         $this->mockGetSearchResultWithFilters(self::$selectResult);
 
         $this->callEncapsulatedMethod(

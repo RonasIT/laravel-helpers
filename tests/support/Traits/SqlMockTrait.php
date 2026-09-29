@@ -101,20 +101,6 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockFirstOrCreateEntityExists(array $selectResult): void
-    {
-        $this->mockSelectById(
-            'select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and ("id" = ?) limit 1',
-            $selectResult,
-        );
-
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-        );
-    }
-
     protected function mockGetByList(array $selectResult): void
     {
         $this->mockSelect(
@@ -383,52 +369,12 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockUpdateOrCreateEntityExists(array $selectResult): void
+    protected function mockFirstOrCreateEntityDoesntExist(array $selectResult): void
     {
-        $this->mockSelectExists(
-            'select exists(select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
-        );
-
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-            $selectResult,
-        );
-
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-            $selectResult,
-        );
-
-        $this->mockUpdateSqlQuery(
-            'update "test_models" set "name" = ?, "updated_at" = ? where "id" = ?',
-            ['test_name', Carbon::now(), 1],
-        );
-
-        $this->mockSelectById(
-            'select * from "test_models" where "id" = ? limit 1',
-            $selectResult,
-        );
-
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-        );
-
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-        );
-    }
-
-    protected function mockUpdateOrCreateEntityDoesntExist(array $selectResult): void
-    {
-        $this->mockSelectExists(
-            'select exists(select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
-            false,
         );
 
         $this->mockInsert(
@@ -436,58 +382,15 @@ trait SqlMockTrait
             ['test_name', 1, Carbon::now(), Carbon::now()],
         );
 
-        $this->mockSelectById(
-            'select * from "test_models" where "id" = ? limit 1',
-            $selectResult,
-        );
+        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
 
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-        );
+        $this->mockSelect('select * from "relation_models" where "relation_models"."test_model_id" in (1)');
     }
 
-    protected function mockFirstOrCreateEntityDoesntExists(array $selectResult): void
-    {
-        $this->mockSelectById(
-            'select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and ("id" = ?) limit 1',
-        );
-
-        $this->mockInsert(
-            'insert into "test_models" ("id", "name", "updated_at", "created_at") values (?, ?, ?, ?)',
-            [1, 'test_name', Carbon::now(), Carbon::now()],
-        );
-
-        $this->mockSelectById(
-            'select * from "test_models" where "id" = ? limit 1',
-            $selectResult,
-        );
-
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
-            [['id' => 1, 'test_model_id' => 1]],
-        );
-
-        $this->mockSelect(
-            'select "id", (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."id" in (1)',
-            [['id' => 1, 'relation_count' => 1]],
-        );
-
-        $this->mockSelect(
-            'select "relation_models".*, (select count(*) from "child_relation_models" '
-            . 'where "relation_models"."id" = "child_relation_models"."relation_model_id") as "child_relation_count" '
-            . 'from "relation_models" where "relation_models"."test_model_id" in (1)',
-            [['id' => 1, 'test_model_id' => 1, 'child_relation_count' => 2]],
-        );
-    }
-
-    protected function mockFirstOrCreateWhereOverrideData(array $selectResult): void
+    protected function mockFirstOrCreateWhereOverridesData(array $selectResult): void
     {
         $this->mockSelect(
-            'select * from "test_models" where ("name" = ?) and "test_models"."deleted_at" is null limit 1',
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
             [],
             ['test_name'],
         );
@@ -505,30 +408,14 @@ trait SqlMockTrait
         $this->mockSelect(
             'select * from "test_models" where exists (select * from "relation_models" '
             . 'where "test_models"."id" = "relation_models"."test_model_id" and "id" = ?) '
-            . 'and ("name" = ?) and "test_models"."deleted_at" is null limit 1',
+            . 'and "name" = ? and "test_models"."deleted_at" is null limit 1',
             [],
             [2, 'test_name'],
         );
 
         $this->mockInsert(
-            'insert into "test_models" ("name", "json_field", "updated_at", "created_at") values (?, ?, ?, ?)',
-            ['test_name', '{"key":"value"}', Carbon::now(), Carbon::now()],
-        );
-
-        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
-    }
-
-    protected function mockFirstOrCreateWithNotFillableConditions(array $selectResult): void
-    {
-        $this->mockSelect(
-            'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1',
-            [],
-            [1],
-        );
-
-        $this->mockInsert(
-            'insert into "test_models" ("name", "updated_at", "created_at") values (?, ?, ?)',
-            ['test_name', Carbon::now(), Carbon::now()],
+            'insert into "test_models" ("json_field", "name", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['{"key":"value"}', 'test_name', Carbon::now(), Carbon::now()],
         );
 
         $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
@@ -537,7 +424,7 @@ trait SqlMockTrait
     protected function mockFirstOrCreateWhenEntityCreatedConcurrently(array $selectResult): void
     {
         $this->mockSelect(
-            'select * from "test_models" where ("name" = ?) and "test_models"."deleted_at" is null limit 1',
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
             [],
             ['test_name'],
         );
@@ -553,10 +440,140 @@ trait SqlMockTrait
             ->andThrow(new PDOException('UNIQUE constraint failed: test_models.name'));
 
         $this->mockSelect(
-            'select * from "test_models" where ("name" = ?) and "test_models"."deleted_at" is null limit 1',
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
             $selectResult,
             ['test_name'],
         );
+    }
+
+    protected function mockFirstOrCreateWhenEntityCreatedConcurrentlyInTransaction(array $selectResult): void
+    {
+        $this->mockBeginTransaction();
+
+        $this->mockSelect(
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
+            [],
+            ['test_name'],
+        );
+
+        $this->getPdo()->expects('exec')->with('SAVEPOINT trans2')->andReturn(0);
+
+        $this
+            ->getPdo()
+            ->shouldPrepareForEffect(
+                'insert into "test_models" ("name", "updated_at", "created_at") values (?, ?, ?)',
+                ['test_name', Carbon::now(), Carbon::now()],
+            )
+            ->shouldExecute()
+            ->getExpectation()
+            ->andThrow(new PDOException('UNIQUE constraint failed: test_models.name'));
+
+        $this->getPdo()->expects('exec')->with('ROLLBACK TO SAVEPOINT trans2')->andReturn(0);
+
+        $this->mockSelect(
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
+            $selectResult,
+            ['test_name'],
+        );
+
+        $this->getPdo()->expects('commit')->andReturnTrue();
+    }
+
+    protected function mockFirstOrCreateUsesServiceCreate(array $selectResult): void
+    {
+        $this->mockSelect(
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
+            [],
+            ['test_name'],
+        );
+
+        $this->mockInsert(
+            'insert into "test_models" ("name", "json_field", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['test_name', '{"prepared_by":"create"}', Carbon::now(), Carbon::now()],
+        );
+
+        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
+    }
+
+    protected function mockUpdateOrCreateEntityExistsUsesServiceUpdate(array $selectResult): void
+    {
+        $this->mockFirst($selectResult);
+
+        $this->mockSelectById(
+            'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            $selectResult,
+        );
+
+        $this->mockSelect(
+            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
+            $selectResult,
+        );
+
+        $this->mockUpdateSqlQuery(
+            'update "test_models" set "name" = ?, "json_field" = ?, "updated_at" = ? where "id" = ?',
+            ['test_name', '{"prepared_by":"update"}', Carbon::now(), 1],
+        );
+
+        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
+
+        $this->mockSelect('select * from "relation_models" where "relation_models"."test_model_id" in (1)');
+
+        $this->mockSelect('select * from "relation_models" where "relation_models"."test_model_id" in (1)');
+    }
+
+    protected function mockUpdateOrCreateWhenEntityCreatedConcurrently(array $selectResult): void
+    {
+        $this->mockSelect(
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
+            [],
+            ['test_name'],
+        );
+
+        $this
+            ->getPdo()
+            ->shouldPrepareForEffect(
+                'insert into "test_models" ("json_field", "name", "updated_at", "created_at") values (?, ?, ?, ?)',
+                ['{"prepared_by":"create"}', 'test_name', Carbon::now(), Carbon::now()],
+            )
+            ->shouldExecute()
+            ->getExpectation()
+            ->andThrow(new PDOException('UNIQUE constraint failed: test_models.name'));
+
+        $this->mockSelect(
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
+            $selectResult,
+            ['test_name'],
+        );
+
+        $this->mockSelectById(
+            'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1',
+            $selectResult,
+        );
+
+        $this->mockUpdateSqlQuery(
+            'update "test_models" set "json_field" = ?, "updated_at" = ? where "id" = ?',
+            ['{"prepared_by":"update"}', Carbon::now(), 1],
+        );
+
+        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
+    }
+
+    protected function mockUpdateOrCreateEntityDoesntExistUsesServiceCreate(array $selectResult): void
+    {
+        $this->mockSelect(
+            'select * from "test_models" where "name" = ? and "test_models"."deleted_at" is null limit 1',
+            [],
+            ['test_name'],
+        );
+
+        $this->mockInsert(
+            'insert into "test_models" ("json_field", "name", "updated_at", "created_at") values (?, ?, ?, ?)',
+            ['{"prepared_by":"create"}', 'test_name', Carbon::now(), Carbon::now()],
+        );
+
+        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
     }
 
     protected function mockGetSearchResult(array $selectResult): void
@@ -748,6 +765,16 @@ trait SqlMockTrait
     {
         $this->getPdo()->shouldInsert($sql, $data);
         $this->getPdo()->expects('lastInsertId')->andReturn($lastInsertId);
+    }
+
+    protected function mockBeginTransaction(): void
+    {
+        // SQLite connection starts transaction by statement since PHP 8.4
+        if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
+            $this->getPdo()->expects('exec')->with('BEGIN DEFERRED TRANSACTION')->andReturn(0);
+        } else {
+            $this->getPdo()->expects('beginTransaction')->andReturnTrue();
+        }
     }
 
     protected function mockSelect(string $query, array $result = [], array $bindings = []): void
