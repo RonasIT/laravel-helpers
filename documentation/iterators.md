@@ -55,5 +55,7 @@ foreach($iterator->getGenerator() as $category) {
 ```
 
 [<< Services][1]
+[Rules >>][2]
 
 [1]:services.md
+[2]:rules.md

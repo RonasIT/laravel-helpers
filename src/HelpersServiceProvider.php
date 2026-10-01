@@ -4,22 +4,16 @@ namespace RonasIT\Support;
 
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\Concerns\TestDatabases;
 use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Contracts\VersionEnumContract as Version;
 use RonasIT\Support\Exceptions\BindingVersionEnumException;
-use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 use RonasIT\Support\Http\Middleware\SecurityMiddleware;
-use RonasIT\Support\Rules\DBTypeRangeRule;
 use RonasIT\Support\Support\PostgresDBTypeResolver;
 use RonasIT\Support\Support\UncountableWords;
 
@@ -35,8 +29,6 @@ class HelpersServiceProvider extends ServiceProvider
 
         $router->prependMiddlewareToGroup('web', SecurityMiddleware::class);
         $router->prependMiddlewareToGroup('api', SecurityMiddleware::class);
-
-        $this->extendValidator();
 
         $this->extendRouter();
 
@@ -58,81 +50,6 @@ class HelpersServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(DBTypeResolverContract::class, PostgresDBTypeResolver::class);
-    }
-
-    protected function extendValidator(): void
-    {
-        Validator::extend('unique_except_of_authorized_user', function ($attribute, $value, $parameters = []) {
-            $table = Arr::get($parameters, 0, 'users');
-            $keyField = Arr::get($parameters, 1, 'id');
-            $userId = Auth::id();
-
-            $result = DB::table($table)
-                ->where($keyField, '<>', $userId)
-                ->whereIn($attribute, Arr::flatten((array) $value))
-                ->exists();
-
-            return !$result;
-        });
-
-        Validator::extend('list_exists', function ($attribute, $value, $parameters, $validator) {
-            if (!is_array($value)) {
-                $validator->addReplacer('list_exists', fn ($message, $attribute) => "The {$attribute} field must be an array.");
-
-                return false;
-            }
-
-            if (count($parameters) < 1) {
-                throw new InvalidValidationRuleUsageException("list_exists: At least 1 parameter must be added when checking the {$attribute} field in the request.");
-            }
-
-            $hasFieldNameParam = !empty(Arr::get($parameters, 2));
-
-            if (is_multidimensional($value) && !$hasFieldNameParam) {
-                throw new InvalidValidationRuleUsageException("list_exists: The third parameter should be filled when checking the {$attribute} field if we are using a collection in request.");
-            }
-
-            if ($hasFieldNameParam) {
-                $value = Arr::pluck($value, Arr::get($parameters, 2));
-            }
-
-            $value = array_unique($value);
-
-            $table = Arr::get($parameters, 0);
-            $keyField = Arr::get($parameters, 1, 'id');
-
-            $existingValueCount = DB::table($table)
-                ->whereIn($keyField, $value)
-                ->distinct()
-                ->count($keyField);
-
-            $validator->addReplacer('list_exists', fn ($message, $attribute) => "Some of the passed {$attribute} are not exists.");
-
-            return $existingValueCount === count($value);
-        });
-
-        Validator::extend('db_type_range', function ($attribute, $value, $parameters, $validator) {
-            $typeName = Arr::get($parameters, 0);
-
-            if (empty($typeName)) {
-                throw new InvalidValidationRuleUsageException(
-                    message: "db_type_range: The type parameter is required when checking the {$attribute} field.",
-                );
-            }
-
-            $failed = false;
-
-            (new DBTypeRangeRule($typeName))->validate(
-                attribute: $attribute,
-                value: $value,
-                fail: function (string $message) use ($validator, &$failed) {
-                    $validator->addReplacer('db_type_range', fn () => $message);
-                    $failed = true;
-                },
-            );
-
-            return !$failed;
-        });
     }
 
     protected function extendRouter(): void

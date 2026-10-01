@@ -88,6 +88,7 @@ class ValidatorTest extends TestCase
         );
 
         $this->assertTrue($validator->fails());
+        $this->assertEquals('The email has already been taken.', $validator->errors()->first('email'));
     }
 
     public function testListExists()

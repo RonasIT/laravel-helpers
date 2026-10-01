@@ -3,12 +3,12 @@
 namespace RonasIT\Support\Rules;
 
 use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Arr;
 use RonasIT\Support\Contracts\DBTypeResolverContract;
 use RonasIT\Support\Enums\DBTypeCategoryEnum;
 use RonasIT\Support\Exceptions\InvalidValidationRuleUsageException;
 
-class DBTypeRangeRule implements ValidationRule
+class DBTypeRangeRule extends BaseValidationRule
 {
     private const string INTEGER_PATTERN = '/^-?\d+$/';
 
@@ -84,5 +84,23 @@ class DBTypeRangeRule implements ValidationRule
         if (mb_strlen($value) > $max) {
             $fail("The {$attribute} length must not exceed {$max} characters.");
         }
+    }
+
+    protected static function ruleName(): string
+    {
+        return 'db_type_range';
+    }
+
+    protected static function fromParameters(array $parameters, string $attribute): static
+    {
+        $typeName = Arr::get($parameters, 0);
+
+        if (empty($typeName)) {
+            throw new InvalidValidationRuleUsageException(
+                message: "db_type_range: The type parameter is required when checking the {$attribute} field.",
+            );
+        }
+
+        return new static($typeName);
     }
 }
