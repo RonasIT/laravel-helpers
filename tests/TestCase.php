@@ -5,6 +5,7 @@ namespace RonasIT\Support\Tests;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase as BaseTest;
+use PHPUnit\Runner\Version as PhpUnitVersion;
 use ReflectionClass;
 use ReflectionMethod;
 use RonasIT\Support\HelpersServiceProvider;
@@ -80,5 +81,14 @@ class TestCase extends BaseTest
         $reflection = new ReflectionMethod($object, $methodName);
 
         return $reflection->invoke($object, ...$args);
+    }
+
+    protected function expectExceptionMessageCompat(string $message): void
+    {
+        if (version_compare(PhpUnitVersion::id(), '13.2.0', '>=')) {
+            $this->expectExceptionMessageIsOrContains($message);
+        } else {
+            $this->expectExceptionMessage($message);
+        }
     }
 }

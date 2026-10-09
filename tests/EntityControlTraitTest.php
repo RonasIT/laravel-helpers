@@ -1136,7 +1136,7 @@ class EntityControlTraitTest extends TestCase
     public function testModelWithoutPrimaryKey()
     {
         $this->expectException(InvalidModelException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageCompat(
             'Model RonasIT\Support\Tests\Support\Mock\Models\TestModelNoPrimaryKey must have primary key.',
         );
 

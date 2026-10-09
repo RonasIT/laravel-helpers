@@ -159,7 +159,7 @@ class FixturesTraitTest extends TestCase
     public function testGetFixtureNotExistsWithException()
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('not_exists_fixture.json fixture does not exist');
+        $this->expectExceptionMessageCompat('not_exists_fixture.json fixture does not exist');
 
         $this->getFixture('get_fixture/not_exists_fixture.json');
     }
@@ -306,7 +306,7 @@ class FixturesTraitTest extends TestCase
         $fixturePath = $this->getFixturePath($fixtureName = 'get_fixture/export_fixture.json');
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageCompat(
             "Failed asserting that the provided data equal to fixture: {$fixturePath}",
         );
 
