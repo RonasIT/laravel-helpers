@@ -88,7 +88,7 @@ class MigrationTraitTest extends TestCase
         Config::set('database.default', 'testing');
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Database driver "testing" not available');
+        $this->expectExceptionMessageCompat('Database driver "testing" not available');
 
         $this->migration->changeEnum('some_table', 'enum_field', [
             'first_value',
