@@ -392,6 +392,14 @@ class ModelTraitTest extends TestCase
         $this->assertEquals((object) ['key' => 'old'], $model->getPreviousValue('custom_cast_field'));
     }
 
+    public function testGetPreviousValueReturnsOldValueWhenCurrentAccessorValueIsCached()
+    {
+        $model = $this->createModelWithTransition('old', 'new', 'meta', new TestModelWithDependentAccessors());
+
+        $this->assertEquals((object) ['value' => 'new'], $model->meta);
+        $this->assertEquals((object) ['value' => 'old'], $model->getPreviousValue('meta'));
+    }
+
     public function testGetPreviousValueAccessorSeesOtherAttributes()
     {
         $model = (new TestModelWithDependentAccessors())->forceFill(['surname' => 'Smith']);
