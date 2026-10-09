@@ -128,8 +128,9 @@ trait ModelTrait
     /**
      * Get the value the field had before the last save.
      *
-     * Casts and accessors are applied the same way as in `getOriginal()`.
-     * Available only after the model was saved, otherwise `null` is returned.
+     * Casts and accessors are applied the same way as when reading the attribute.
+     * Available inside the `updated` and `saved` events and after the save,
+     * `null` is returned when the field was not changed.
      */
     public function getPreviousValue(string $fieldName): mixed
     {
@@ -140,10 +141,10 @@ trait ModelTrait
         }
 
         return (clone $this)
-            ->setRawAttributes(array_replace($this->getRawOriginal(), $previous))
+            ->setRawAttributes(array_replace($this->getRawOriginal(), $this->getChanges(), $previous))
             ->syncOriginal()
             ->syncChanges()
-            ->getAttributeValue($fieldName);
+            ->getAttribute($fieldName);
     }
 
     protected function getRawPreviousValue(string $fieldName): mixed
