@@ -427,6 +427,13 @@ class ModelTraitTest extends TestCase
         $this->assertSame('90 EUR', $model->getPreviousValue('price'));
     }
 
+    public function testGetPreviousValueAccessorSeesConsistentOriginal()
+    {
+        $model = $this->createModelWithTransition('draft', 'published', 'status', new TestModelWithDependentAccessors());
+
+        $this->assertSame('draft', $model->getPreviousValue('status'));
+    }
+
     public function testGetPreviousValueAppliesCastsAddedAtRuntime()
     {
         $model = (new TestModel())->mergeCasts(['name' => 'array']);
@@ -434,6 +441,41 @@ class ModelTraitTest extends TestCase
         $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'name', $model);
 
         $this->assertSame(['key' => 'old'], $model->getPreviousValue('name'));
+    }
+
+    public function testGetPreviousValueAccessorReadingPreviousValueOfItself()
+    {
+        $model = $this->createModelWithTransition('v1', 'v2', 'history', new TestModelWithDependentAccessors());
+
+        $this->assertSame('v2 (was v1)', $model->history);
+    }
+
+    public function testGetPreviousValueOfNumericColumn()
+    {
+        $model = $this->createModelWithTransition('old', 'new', '2023');
+
+        $this->assertSame('old', $model->getPreviousValue('2023'));
+    }
+
+    public function testGetPreviousValueDoesNotChangeModel()
+    {
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'json_field');
+
+        $attributes = $model->getAttributes();
+        $original = $model->getRawOriginal();
+
+        $model->getPreviousValue('json_field');
+
+        $this->assertSame($attributes, $model->getAttributes());
+        $this->assertSame($original, $model->getRawOriginal());
+        $this->assertSame(['key' => 'new'], $model->json_field);
+    }
+
+    public function testGetPreviousValueInUpdatedAndSavedEventsAppliesCast()
+    {
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'custom_cast_field', isSaveFinished: false);
+
+        $this->assertEquals((object) ['key' => 'old'], $model->getPreviousValue('custom_cast_field'));
     }
 
     public function testGetPreviousValueReturnsNullWhenNoPreviousValue()

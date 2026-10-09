@@ -20,6 +20,16 @@ class TestModelWithDependentAccessors extends TestModel
         return "{$value} {$this->currency}";
     }
 
+    public function getStatusAttribute(?string $value): ?string
+    {
+        return $this->isDirty('status') ? "{$value} (dirty)" : $value;
+    }
+
+    public function getHistoryAttribute(?string $value): ?string
+    {
+        return $this->wasChanged('history') ? "{$value} (was {$this->getPreviousValue('history')})" : $value;
+    }
+
     public function getNameAttribute(?string $value): string
     {
         return "{$value} {$this->surname}";
