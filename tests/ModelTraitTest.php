@@ -9,7 +9,9 @@ use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelNoPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithCustomTimestamps;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithoutTimestamps;
+use RonasIT\Support\Tests\Support\Mock\Models\RelationModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithDependentAccessors;
 use RonasIT\Support\Tests\Support\Traits\ModelTestTrait;
 
 class ModelTraitTest extends TestCase
@@ -327,11 +329,39 @@ class ModelTraitTest extends TestCase
         $this->assertSame('old', $model->getPreviousValue('name'));
     }
 
-    public function testGetPreviousValueReturnsRawValue()
+    public function testGetPreviousValueReturnsOldValueWhenCurrentValueIsCached()
     {
-        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'json_field');
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'custom_cast_field');
 
-        $this->assertSame('{"key":"old"}', $model->getPreviousValue('json_field'));
+        $this->assertEquals((object) ['key' => 'new'], $model->custom_cast_field);
+        $this->assertEquals((object) ['key' => 'old'], $model->getPreviousValue('custom_cast_field'));
+    }
+
+    public function testGetPreviousValueAccessorSeesOtherAttributes()
+    {
+        $model = (new TestModelWithDependentAccessors())->forceFill(['surname' => 'Smith']);
+
+        $model = $this->createModelWithTransition('Old', 'New', 'name', $model);
+
+        $this->assertSame('Old Smith', $model->getPreviousValue('name'));
+    }
+
+    public function testGetPreviousValueAccessorSeesLoadedRelations()
+    {
+        $model = $this->createModelWithTransition('old', 'new', 'title', new TestModelWithDependentAccessors());
+
+        $model->setRelation('relation', collect([new RelationModel(), new RelationModel()]));
+
+        $this->assertSame('old (2)', $model->getPreviousValue('title'));
+    }
+
+    public function testGetPreviousValueAppliesCastsAddedAtRuntime()
+    {
+        $model = (new TestModel())->mergeCasts(['name' => 'array']);
+
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'name', $model);
+
+        $this->assertSame(['key' => 'old'], $model->getPreviousValue('name'));
     }
 
     public function testGetPreviousValueReturnsNullWhenNoPreviousValue()

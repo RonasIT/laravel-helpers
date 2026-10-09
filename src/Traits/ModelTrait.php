@@ -99,7 +99,7 @@ trait ModelTrait
     public function wasExchanged(string $fieldName): bool
     {
         return $this->wasChanged($fieldName)
-            && !is_null($this->getPreviousValue($fieldName))
+            && !is_null($this->getRawPreviousValue($fieldName))
             && !is_null($this->getRawOriginal($fieldName));
     }
 
@@ -109,7 +109,7 @@ trait ModelTrait
      */
     public function wasFilled(string $fieldName): bool
     {
-        return $this->wasChanged($fieldName) && is_null($this->getPreviousValue($fieldName));
+        return $this->wasChanged($fieldName) && is_null($this->getRawPreviousValue($fieldName));
     }
 
     /**
@@ -124,11 +124,24 @@ trait ModelTrait
     /**
      * Get the value the field had before the last save.
      *
-     * The value is returned as it is stored in the database, without casts
-     * and accessors applied. Available only after the model was saved,
-     * otherwise `null` is returned.
+     * Casts and accessors are applied the same way as in `getOriginal()`.
+     * Available only after the model was saved, otherwise `null` is returned.
      */
     public function getPreviousValue(string $fieldName): mixed
+    {
+        $previous = $this->getPrevious();
+
+        if (!array_key_exists($fieldName, $previous)) {
+            return null;
+        }
+
+        return $this->newInstance([], $this->exists)
+            ->setRawAttributes(array_merge($this->getRawOriginal(), $previous), true)
+            ->setRelations($this->getRelations())
+            ->getOriginalWithoutRewindingModel($fieldName);
+    }
+
+    protected function getRawPreviousValue(string $fieldName): mixed
     {
         return Arr::get($this->getPrevious(), $fieldName);
     }
