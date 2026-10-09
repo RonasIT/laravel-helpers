@@ -366,6 +366,19 @@ class ModelTraitTest extends TestCase
         $this->assertSame('old', $model->getPreviousValue('name'));
     }
 
+    public function testTransitionOfMissingAttributeToNull()
+    {
+        $model = new TestModel();
+        $model->syncOriginal();
+        $model->forceFill(['name' => null]);
+        $model->syncChanges();
+        $model->syncOriginal();
+
+        $this->assertFalse($model->wasExchanged('name'));
+        $this->assertFalse($model->wasFilled('name'));
+        $this->assertFalse($model->wasCleared('name'));
+    }
+
     public function testNoChange()
     {
         $model = new TestModel();

@@ -100,7 +100,7 @@ trait ModelTrait
     {
         return $this->wasChanged($fieldName)
             && !is_null($this->getRawPreviousValue($fieldName))
-            && !is_null($this->getRawCurrentValue($fieldName));
+            && !is_null($this->getRawSavedValue($fieldName));
     }
 
     /**
@@ -109,7 +109,9 @@ trait ModelTrait
      */
     public function wasFilled(string $fieldName): bool
     {
-        return $this->wasChanged($fieldName) && is_null($this->getRawPreviousValue($fieldName));
+        return $this->wasChanged($fieldName)
+            && is_null($this->getRawPreviousValue($fieldName))
+            && !is_null($this->getRawSavedValue($fieldName));
     }
 
     /**
@@ -118,7 +120,9 @@ trait ModelTrait
      */
     public function wasCleared(string $fieldName): bool
     {
-        return $this->wasChanged($fieldName) && is_null($this->getRawCurrentValue($fieldName));
+        return $this->wasChanged($fieldName)
+            && !is_null($this->getRawPreviousValue($fieldName))
+            && is_null($this->getRawSavedValue($fieldName));
     }
 
     /**
@@ -147,7 +151,7 @@ trait ModelTrait
         return Arr::get($this->getPrevious(), $fieldName);
     }
 
-    protected function getRawCurrentValue(string $fieldName): mixed
+    protected function getRawSavedValue(string $fieldName): mixed
     {
         return Arr::get($this->getChanges(), $fieldName);
     }
