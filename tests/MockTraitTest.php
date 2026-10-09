@@ -178,7 +178,7 @@ class MockTraitTest extends TestCase
     public function testMockClassMethodWhenLessRequiredParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 1 arguments, actually it has 2 required arguments.');
+        $this->expectExceptionMessageCompat('Failed assert that function mockFunction was called with 1 arguments, actually it has 2 required arguments.');
 
         $this->assertArguments(
             actual: ['firstRequired', 'secondRequired', 'string', null],
@@ -192,7 +192,7 @@ class MockTraitTest extends TestCase
     public function testMockClassMethodWhenMoreExpectedParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 5 arguments, actually has 4 arguments.');
+        $this->expectExceptionMessageCompat('Failed assert that function mockFunction was called with 5 arguments, actually has 4 arguments.');
 
         $this->assertArguments(
             actual: ['firstRequired', 'secondRequired', 'string', null],

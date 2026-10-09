@@ -171,7 +171,7 @@ class ValidatorTest extends TestCase
     public function testListExistsWithoutArgs()
     {
         $this->expectException(InvalidValidationRuleUsageException::class);
-        $this->expectExceptionMessage('list_exists: At least 1 parameter must be added when checking the ids field in the request.');
+        $this->expectExceptionMessageCompat('list_exists: At least 1 parameter must be added when checking the ids field in the request.');
 
         $validator = Validator::make(
             ['ids' => [1, 2, 3]],
@@ -184,7 +184,7 @@ class ValidatorTest extends TestCase
     public function testListExistsIncorrectParameters()
     {
         $this->expectException(InvalidValidationRuleUsageException::class);
-        $this->expectExceptionMessage('The third parameter should be filled when checking the ids field if we are using a collection in request.');
+        $this->expectExceptionMessageCompat('The third parameter should be filled when checking the ids field if we are using a collection in request.');
 
         $validator = Validator::make(
             [
