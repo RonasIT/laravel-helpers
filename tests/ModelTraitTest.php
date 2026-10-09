@@ -9,7 +9,9 @@ use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModel;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelNoPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithCustomTimestamps;
 use RonasIT\Support\Tests\Support\Mock\Models\GetFieldsTestModelWithoutTimestamps;
+use RonasIT\Support\Tests\Support\Mock\Models\RelationModel;
 use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModelWithDependentAccessors;
 use RonasIT\Support\Tests\Support\Traits\ModelTestTrait;
 
 class ModelTraitTest extends TestCase
@@ -166,7 +168,7 @@ class ModelTraitTest extends TestCase
         $model = new TestModel();
 
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageCompat(
             "Attempting to lazy-load relation 'relation' on model '" . TestModel::class . "'. "
             . 'See property $disableLazyLoading.',
         );
@@ -309,6 +311,74 @@ class ModelTraitTest extends TestCase
         $this->assertSame($expected['wasCleared'], $model->wasCleared('json_field'));
     }
 
+    public static function getTransitionInUpdatedAndSavedEventsData(): array
+    {
+        return [
+            [
+                'before' => 'old',
+                'after' => 'new',
+                'expected' => [
+                    'wasExchanged' => true,
+                    'wasFilled' => false,
+                    'wasCleared' => false,
+                ],
+            ],
+            [
+                'before' => null,
+                'after' => 'new',
+                'expected' => [
+                    'wasExchanged' => false,
+                    'wasFilled' => true,
+                    'wasCleared' => false,
+                ],
+            ],
+            [
+                'before' => 'old',
+                'after' => null,
+                'expected' => [
+                    'wasExchanged' => false,
+                    'wasFilled' => false,
+                    'wasCleared' => true,
+                ],
+            ],
+        ];
+    }
+
+    #[DataProvider('getTransitionInUpdatedAndSavedEventsData')]
+    public function testTransitionInUpdatedAndSavedEvents(?string $before, ?string $after, array $expected)
+    {
+        $model = $this->createModelWithTransition($before, $after, isSaveFinished: false);
+
+        $this->assertSame($expected['wasExchanged'], $model->wasExchanged('name'));
+        $this->assertSame($expected['wasFilled'], $model->wasFilled('name'));
+        $this->assertSame($expected['wasCleared'], $model->wasCleared('name'));
+        $this->assertSame($before, $model->getPreviousValue('name'));
+    }
+
+    public function testTransitionIgnoresUnsavedChanges()
+    {
+        $model = $this->createModelWithTransition('old', 'new');
+
+        $model->name = null;
+
+        $this->assertTrue($model->wasExchanged('name'));
+        $this->assertFalse($model->wasCleared('name'));
+        $this->assertSame('old', $model->getPreviousValue('name'));
+    }
+
+    public function testTransitionOfMissingAttributeToNull()
+    {
+        $model = new TestModel();
+        $model->syncOriginal();
+        $model->forceFill(['name' => null]);
+        $model->syncChanges();
+        $model->syncOriginal();
+
+        $this->assertFalse($model->wasExchanged('name'));
+        $this->assertFalse($model->wasFilled('name'));
+        $this->assertFalse($model->wasCleared('name'));
+    }
+
     public function testNoChange()
     {
         $model = new TestModel();
@@ -327,11 +397,122 @@ class ModelTraitTest extends TestCase
         $this->assertSame('old', $model->getPreviousValue('name'));
     }
 
-    public function testGetPreviousValueReturnsRawValue()
+    public function testGetPreviousValueReturnsOldValueWhenCurrentValueIsCached()
     {
-        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'json_field');
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'custom_cast_field');
 
-        $this->assertSame('{"key":"old"}', $model->getPreviousValue('json_field'));
+        $this->assertEquals((object) ['key' => 'new'], $model->custom_cast_field);
+        $this->assertEquals((object) ['key' => 'old'], $model->getPreviousValue('custom_cast_field'));
+    }
+
+    public function testGetPreviousValueReturnsOldValueWhenCurrentAccessorValueIsCached()
+    {
+        $model = $this->createModelWithTransition('old', 'new', 'meta', new TestModelWithDependentAccessors());
+
+        $this->assertEquals((object) ['value' => 'new'], $model->meta);
+        $this->assertEquals((object) ['value' => 'old'], $model->getPreviousValue('meta'));
+    }
+
+    public function testGetPreviousValueAccessorSeesOtherAttributes()
+    {
+        $model = (new TestModelWithDependentAccessors())->forceFill(['surname' => 'Smith']);
+
+        $model = $this->createModelWithTransition('Old', 'New', 'name', $model);
+
+        $this->assertSame('Old Smith', $model->getPreviousValue('name'));
+    }
+
+    public function testGetPreviousValueAccessorSeesLoadedRelations()
+    {
+        $model = $this->createModelWithTransition('old', 'new', 'title', new TestModelWithDependentAccessors());
+
+        $model->setRelation('relation', collect([new RelationModel(), new RelationModel()]));
+
+        $this->assertSame('old (2)', $model->getPreviousValue('title'));
+    }
+
+    public function testGetPreviousValueAccessorSeesModelState()
+    {
+        $model = (new TestModelWithDependentAccessors())->setCurrency('EUR');
+
+        $model = $this->createModelWithTransition('90', '100', 'price', $model);
+
+        $this->assertSame('90 EUR', $model->getPreviousValue('price'));
+    }
+
+    public function testGetPreviousValueAccessorSeesConsistentOriginal()
+    {
+        $model = $this->createModelWithTransition('draft', 'published', 'status', new TestModelWithDependentAccessors());
+
+        $this->assertSame('draft', $model->getPreviousValue('status'));
+    }
+
+    public function testGetPreviousValueAppliesCastsAddedAtRuntime()
+    {
+        $model = (new TestModel())->mergeCasts(['name' => 'array']);
+
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'name', $model);
+
+        $this->assertSame(['key' => 'old'], $model->getPreviousValue('name'));
+    }
+
+    public function testGetPreviousValueAccessorReadingPreviousValueOfItself()
+    {
+        $model = $this->createModelWithTransition('v1', 'v2', 'history', new TestModelWithDependentAccessors());
+
+        $this->assertSame('v2 (was v1)', $model->history);
+    }
+
+    public function testGetPreviousValueOfNumericColumn()
+    {
+        $model = $this->createModelWithTransition('old', 'new', '2023');
+
+        $this->assertSame('old', $model->getPreviousValue('2023'));
+    }
+
+    public function testGetPreviousValueDoesNotChangeModel()
+    {
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'custom_cast_field');
+
+        $current = $model->custom_cast_field;
+        $original = $model->getRawOriginal();
+
+        $model->getPreviousValue('custom_cast_field');
+
+        $this->assertSame($current, $model->custom_cast_field);
+        $this->assertSame($original, $model->getRawOriginal());
+    }
+
+    public static function getIsSaveFinishedData(): array
+    {
+        return [
+            ['isSaveFinished' => true],
+            ['isSaveFinished' => false],
+        ];
+    }
+
+    #[DataProvider('getIsSaveFinishedData')]
+    public function testGetPreviousValueAccessorSeesAttributeChangedInSameSave(bool $isSaveFinished)
+    {
+        $model = new TestModelWithDependentAccessors();
+
+        $model->forceFill(['name' => 'Old']);
+        $model->syncOriginal();
+        $model->forceFill(['name' => 'New', 'surname' => 'Smith']);
+        $model->syncChanges();
+
+        if ($isSaveFinished) {
+            $model->syncOriginal();
+        }
+
+        $this->assertSame('Old Smith', $model->getPreviousValue('name'));
+    }
+
+    public function testGetPreviousValueInUpdatedAndSavedEventsAppliesCast()
+    {
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'custom_cast_field', isSaveFinished: false);
+
+        $this->assertEquals((object) ['key' => 'old'], $model->getPreviousValue('custom_cast_field'));
     }
 
     public function testGetPreviousValueReturnsNullWhenNoPreviousValue()
