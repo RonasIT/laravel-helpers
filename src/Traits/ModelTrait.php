@@ -135,10 +135,9 @@ trait ModelTrait
             return null;
         }
 
-        return $this->newInstance([], $this->exists)
-            ->setRawAttributes(array_merge($this->getRawOriginal(), $previous), true)
-            ->setRelations($this->getRelations())
-            ->getOriginalWithoutRewindingModel($fieldName);
+        return (clone $this)
+            ->setRawAttributes(array_merge($this->getRawOriginal(), $previous))
+            ->getAttributeValue($fieldName);
     }
 
     protected function getRawPreviousValue(string $fieldName): mixed

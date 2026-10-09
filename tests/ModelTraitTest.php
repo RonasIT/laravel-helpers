@@ -410,6 +410,15 @@ class ModelTraitTest extends TestCase
         $this->assertSame('old (2)', $model->getPreviousValue('title'));
     }
 
+    public function testGetPreviousValueAccessorSeesModelState()
+    {
+        $model = (new TestModelWithDependentAccessors())->setCurrency('EUR');
+
+        $model = $this->createModelWithTransition('90', '100', 'price', $model);
+
+        $this->assertSame('90 EUR', $model->getPreviousValue('price'));
+    }
+
     public function testGetPreviousValueAppliesCastsAddedAtRuntime()
     {
         $model = (new TestModel())->mergeCasts(['name' => 'array']);
