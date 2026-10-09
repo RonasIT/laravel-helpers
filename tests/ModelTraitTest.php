@@ -472,16 +472,40 @@ class ModelTraitTest extends TestCase
 
     public function testGetPreviousValueDoesNotChangeModel()
     {
-        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'json_field');
+        $model = $this->createModelWithTransition(['key' => 'old'], ['key' => 'new'], 'custom_cast_field');
 
-        $attributes = $model->getAttributes();
+        $current = $model->custom_cast_field;
         $original = $model->getRawOriginal();
 
-        $model->getPreviousValue('json_field');
+        $model->getPreviousValue('custom_cast_field');
 
-        $this->assertSame($attributes, $model->getAttributes());
+        $this->assertSame($current, $model->custom_cast_field);
         $this->assertSame($original, $model->getRawOriginal());
-        $this->assertSame(['key' => 'new'], $model->json_field);
+    }
+
+    public static function getIsSaveFinishedData(): array
+    {
+        return [
+            ['isSaveFinished' => true],
+            ['isSaveFinished' => false],
+        ];
+    }
+
+    #[DataProvider('getIsSaveFinishedData')]
+    public function testGetPreviousValueAccessorSeesAttributeChangedInSameSave(bool $isSaveFinished)
+    {
+        $model = new TestModelWithDependentAccessors();
+
+        $model->forceFill(['name' => 'Old']);
+        $model->syncOriginal();
+        $model->forceFill(['name' => 'New', 'surname' => 'Smith']);
+        $model->syncChanges();
+
+        if ($isSaveFinished) {
+            $model->syncOriginal();
+        }
+
+        $this->assertSame('Old Smith', $model->getPreviousValue('name'));
     }
 
     public function testGetPreviousValueInUpdatedAndSavedEventsAppliesCast()
