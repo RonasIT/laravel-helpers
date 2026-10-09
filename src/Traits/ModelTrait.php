@@ -136,7 +136,9 @@ trait ModelTrait
         }
 
         return (clone $this)
-            ->setRawAttributes(array_merge($this->getRawOriginal(), $previous))
+            ->setRawAttributes(array_replace($this->getRawOriginal(), $previous))
+            ->syncOriginal()
+            ->syncChanges()
             ->getAttributeValue($fieldName);
     }
 
