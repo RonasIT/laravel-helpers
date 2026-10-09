@@ -2,6 +2,8 @@
 
 namespace RonasIT\Support\Tests\Support\Mock\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 class TestModelWithDependentAccessors extends TestModel
 {
     protected string $currency = 'USD';
@@ -26,5 +28,12 @@ class TestModelWithDependentAccessors extends TestModel
     public function getTitleAttribute(?string $value): string
     {
         return "{$value} ({$this->relation->count()})";
+    }
+
+    protected function meta(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => (object) ['value' => $value],
+        );
     }
 }
