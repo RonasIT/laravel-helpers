@@ -311,6 +311,61 @@ class ModelTraitTest extends TestCase
         $this->assertSame($expected['wasCleared'], $model->wasCleared('json_field'));
     }
 
+    public static function getTransitionInUpdatedAndSavedEventsData(): array
+    {
+        return [
+            [
+                'before' => 'old',
+                'after' => 'new',
+                'expected' => [
+                    'wasExchanged' => true,
+                    'wasFilled' => false,
+                    'wasCleared' => false,
+                ],
+            ],
+            [
+                'before' => null,
+                'after' => 'new',
+                'expected' => [
+                    'wasExchanged' => false,
+                    'wasFilled' => true,
+                    'wasCleared' => false,
+                ],
+            ],
+            [
+                'before' => 'old',
+                'after' => null,
+                'expected' => [
+                    'wasExchanged' => false,
+                    'wasFilled' => false,
+                    'wasCleared' => true,
+                ],
+            ],
+        ];
+    }
+
+    #[DataProvider('getTransitionInUpdatedAndSavedEventsData')]
+    public function testTransitionInUpdatedAndSavedEvents(?string $before, ?string $after, array $expected)
+    {
+        $model = $this->createModelWithTransition($before, $after, isSaveFinished: false);
+
+        $this->assertSame($expected['wasExchanged'], $model->wasExchanged('name'));
+        $this->assertSame($expected['wasFilled'], $model->wasFilled('name'));
+        $this->assertSame($expected['wasCleared'], $model->wasCleared('name'));
+        $this->assertSame($before, $model->getPreviousValue('name'));
+    }
+
+    public function testTransitionIgnoresUnsavedChanges()
+    {
+        $model = $this->createModelWithTransition('old', 'new');
+
+        $model->name = null;
+
+        $this->assertTrue($model->wasExchanged('name'));
+        $this->assertFalse($model->wasCleared('name'));
+        $this->assertSame('old', $model->getPreviousValue('name'));
+    }
+
     public function testNoChange()
     {
         $model = new TestModel();
