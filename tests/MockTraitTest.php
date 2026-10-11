@@ -3,15 +3,17 @@
 namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Runner\Version as PhpUnitVersion;
-use ReflectionClass;
-use ReflectionProperty;
 use RonasIT\Support\Tests\Support\Mock\TestMockClass;
 use RonasIT\Support\Traits\MockTrait;
 
 class MockTraitTest extends TestCase
 {
-    use MockTrait;
+    use MockTrait {
+        assertArguments as protected traitAssertArguments;
+    }
+
+    protected bool $captureArgumentsError = false;
+    protected ?ExpectationFailedException $argumentsError = null;
 
     public function testMockSingleCall()
     {
@@ -67,6 +69,8 @@ class MockTraitTest extends TestCase
 
     public function testMockNativeFunctionWhenLessRequiredParameters()
     {
+        $this->captureArgumentsError = true;
+
         $this->mockNativeFunction('RonasIT\Support\Tests', [
             $this->functionCall(
                 name: 'array_slice',
@@ -75,20 +79,18 @@ class MockTraitTest extends TestCase
             ),
         ]);
 
-        try {
-            array_slice([1, 2, 3, 4, 5], 2, 2);
-        } catch (ExpectationFailedException $e) {
-            $this->clearMockAssertionFailures();
+        array_slice([1, 2, 3, 4, 5], 2, 2);
 
-            $this->assertStringContainsString(
-                'Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.',
-                $e->getMessage(),
-            );
-        }
+        $this->assertSame(
+            'Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.',
+            $this->argumentsError->getMessage(),
+        );
     }
 
     public function testMockNativeFunctionWhenMoreExpectedParameters()
     {
+        $this->captureArgumentsError = true;
+
         $this->mockNativeFunction('RonasIT\Support\Tests', [
             $this->functionCall(
                 name: 'array_slice',
@@ -97,16 +99,12 @@ class MockTraitTest extends TestCase
             ),
         ]);
 
-        try {
-            array_slice([1, 2, 3, 4, 5], 2, 2);
-        } catch (ExpectationFailedException $e) {
-            $this->clearMockAssertionFailures();
+        array_slice([1, 2, 3, 4, 5], 2, 2);
 
-            $this->assertStringContainsString(
-                'Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.',
-                $e->getMessage(),
-            );
-        }
+        $this->assertSame(
+            'Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.',
+            $this->argumentsError->getMessage(),
+        );
     }
 
     public function testMockNativeFunctionCheckMockedResult()
@@ -178,7 +176,7 @@ class MockTraitTest extends TestCase
     public function testMockClassMethodWhenLessRequiredParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 1 arguments, actually it has 2 required arguments.');
+        $this->expectExceptionMessageCompat('Failed assert that function mockFunction was called with 1 arguments, actually it has 2 required arguments.');
 
         $this->assertArguments(
             actual: ['firstRequired', 'secondRequired', 'string', null],
@@ -192,7 +190,7 @@ class MockTraitTest extends TestCase
     public function testMockClassMethodWhenMoreExpectedParameters()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed assert that function mockFunction was called with 5 arguments, actually has 4 arguments.');
+        $this->expectExceptionMessageCompat('Failed assert that function mockFunction was called with 5 arguments, actually has 4 arguments.');
 
         $this->assertArguments(
             actual: ['firstRequired', 'secondRequired', 'string', null],
@@ -212,26 +210,22 @@ class MockTraitTest extends TestCase
         $this->assertEquals('mockFunction', $mock->mockFunction('firstRequired', 'secondRequired', null, 'string'));
     }
 
-    protected function clearMockAssertionFailures(): void
-    {
-        $class = new ReflectionClass($this);
-
-        while ($class && !$class->hasProperty('mockObjects')) {
-            $class = $class->getParentClass();
-        }
-
-        // TODO: Remove after increase min PHPUnit version up to 11
-        $isNewPhpunit = version_compare(PhpUnitVersion::id(), '11.0.0', '>=');
-
-        foreach ($class->getProperty('mockObjects')->getValue($this) as $entry) {
-            if ($isNewPhpunit) {
-                $handler = $entry['mockObject']->__phpunit_getInvocationHandler();
-                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
-                (new ReflectionProperty($handler, 'assertionFailure'))->setValue($handler, null);
-            } else {
-                $handler = $entry->__phpunit_getInvocationHandler();
-                (new ReflectionProperty($handler, 'matchers'))->setValue($handler, []);
+    protected function assertArguments(
+        $actual,
+        $expected,
+        string $class,
+        string $function,
+        int $callIndex,
+        bool $isClass = true,
+    ): void {
+        try {
+            $this->traitAssertArguments($actual, $expected, $class, $function, $callIndex, $isClass);
+        } catch (ExpectationFailedException $exception) {
+            if (!$this->captureArgumentsError) {
+                throw $exception;
             }
+
+            $this->argumentsError = $exception;
         }
     }
 }

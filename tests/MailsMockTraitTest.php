@@ -137,7 +137,7 @@ class MailsMockTraitTest extends TestCase
     public function testMailWithIncorrectSubject()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageCompat(
             'Failed assert that the expected subject "Incorrect Subject" equals to the actual "Test Subject".',
         );
 
@@ -151,7 +151,7 @@ class MailsMockTraitTest extends TestCase
     public function testMailWithoutRequiredParameters()
     {
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Missing required key "fixture" in the input data set on the step: 0.');
+        $this->expectExceptionMessageCompat('Missing required key "fixture" in the input data set on the step: 0.');
 
         Mail::to('test@mail.com')->queue(new TestMail(['name' => 'John Smith']));
 
