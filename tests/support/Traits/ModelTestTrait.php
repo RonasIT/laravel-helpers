@@ -6,15 +6,21 @@ use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 
 trait ModelTestTrait
 {
-    protected function createModelWithTransition(mixed $originValue, mixed $newValue, string $fieldName = 'name'): TestModel
-    {
-        $model = new TestModel();
-
+    protected function createModelWithTransition(
+        mixed $originValue,
+        mixed $newValue,
+        string $fieldName = 'name',
+        TestModel $model = new TestModel(),
+        bool $isSaveFinished = true,
+    ): TestModel {
         $model->forceFill([$fieldName => $originValue]);
         $model->syncOriginal();
         $model->forceFill([$fieldName => $newValue]);
         $model->syncChanges();
-        $model->syncOriginal();
+
+        if ($isSaveFinished) {
+            $model->syncOriginal();
+        }
 
         return $model;
     }
