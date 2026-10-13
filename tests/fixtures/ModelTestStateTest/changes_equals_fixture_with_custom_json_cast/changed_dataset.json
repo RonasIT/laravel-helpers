@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "name1",
+    "settings": "{\"theme\": \"dark\", \"language\": \"en\", \"notifications_email\": true, \"notifications_sms\": false}",
+    "addresses": "[{\"country\": \"USA\", \"city\": \"New York\", \"street\": \"5th Avenue\"}, {\"country\": \"UK\", \"city\": \"London\", \"street\": \"Baker Street\"}]",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 2,
+    "name": "name2",
+    "settings": "{\"theme\": \"dark\", \"language\": \"de\", \"notifications_email\": true, \"notifications_sms\": false}",
+    "addresses": "[{\"country\": \"Germany\", \"city\": \"Berlin\", \"street\": \"Unter den Linden\"}, {\"country\": \"Italy\", \"city\": \"Rome\", \"street\": \"Via del Corso\"}]",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  },
+  {
+    "id": 4,
+    "name": "name4",
+    "settings": "{\"theme\": \"system\", \"language\": \"pl\", \"notifications_email\": false, \"notifications_sms\": false}",
+    "addresses": "[{\"country\": \"Spain\", \"city\": \"Madrid\", \"street\": \"Gran Via\"}]",
+    "created_at": "2018-10-10 10:10:10",
+    "updated_at": "2018-10-10 10:10:10"
+  }
+]

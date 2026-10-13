@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase as BaseTest;
 use ReflectionClass;
@@ -16,6 +17,8 @@ class TestCase extends BaseTest
     public function setUp(): void
     {
         parent::setUp();
+
+        Carbon::setTestNow(Carbon::now());
 
         putenv('FAIL_EXPORT_JSON=true');
     }

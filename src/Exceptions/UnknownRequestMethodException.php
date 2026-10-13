@@ -2,7 +2,9 @@
 
 namespace RonasIT\Support\Exceptions;
 
-class UnknownRequestMethodException extends EntityCreateException
+use Exception;
+
+class UnknownRequestMethodException extends Exception
 {
     public function __construct(string $method)
     {

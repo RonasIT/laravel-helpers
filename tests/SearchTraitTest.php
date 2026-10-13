@@ -274,24 +274,37 @@ class SearchTraitTest extends TestCase
             ->getSearchResults();
     }
 
-    public function testSearchQueryWithFiltersFunctions()
+    public function testSearchQueryWithChainedFilters()
     {
         $this->shouldSettablePropertiesBeResetProperty->setValue($this->testRepositoryClass, false);
 
         $this->mockGetSearchResultWithFilters(self::$selectResult);
+
+        $this->callEncapsulatedMethod(
+            $this->testRepositoryClass,
+            'setAdditionalReservedFilters',
+            'date_greater',
+            'date_less',
+            'updated_at_greater',
+            'updated_at_less',
+        );
 
         $this->testRepositoryClass
             ->searchQuery([
                 'user_id_in_list' => [1, 2],
                 'user_id_not_in_list' => [3, 4],
                 'name' => 'text_name',
+                'date_greater' => Carbon::now(),
+                'date_less' => Carbon::now(),
+                'updated_at_greater' => Carbon::now(),
+                'updated_at_less' => Carbon::now(),
             ])
-            ->filterMoreOrEqualThan('date', Carbon::now())
-            ->filterLessOrEqualThan('date', Carbon::now())
-            ->filterMoreOrEqualThan('created_at', Carbon::now())
-            ->filterLessOrEqualThan('created_at', Carbon::now())
-            ->filterMoreThan('updated_at', Carbon::now())
-            ->filterLessThan('updated_at', Carbon::now())
+            ->filterGreater('date', false, 'date_greater')
+            ->filterLess('date', false, 'date_less')
+            ->filterValue('created_at', '>=', Carbon::now())
+            ->filterValue('created_at', '<=', Carbon::now())
+            ->filterGreater('updated_at', true, 'updated_at_greater')
+            ->filterLess('updated_at', true, 'updated_at_less')
             ->getSearchResults();
     }
 }
