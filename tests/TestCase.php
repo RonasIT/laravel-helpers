@@ -81,4 +81,14 @@ class TestCase extends BaseTest
 
         return $reflection->invoke($object, ...$args);
     }
+
+    // TODO: remove when min PHPUnit version is raised to 13.2
+    protected function expectExceptionMessageContains(string $message): void
+    {
+        if (method_exists($this, 'expectExceptionMessageIsOrContains')) {
+            $this->expectExceptionMessageIsOrContains($message);
+        } else {
+            $this->expectExceptionMessage($message);
+        }
+    }
 }
