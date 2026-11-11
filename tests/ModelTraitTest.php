@@ -166,7 +166,7 @@ class ModelTraitTest extends TestCase
         $model = new TestModel();
 
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessageCompat(
+        $this->expectExceptionMessageContains(
             "Attempting to lazy-load relation 'relation' on model '" . TestModel::class . "'. "
             . 'See property $disableLazyLoading.',
         );

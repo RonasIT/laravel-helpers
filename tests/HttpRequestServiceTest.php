@@ -381,7 +381,7 @@ class HttpRequestServiceTest extends TestCase
     public function testSendWithUnsupportedMethod()
     {
         $this->expectException(UnknownRequestMethodException::class);
-        $this->expectExceptionMessageCompat("Unknown request method 'unsupported'");
+        $this->expectExceptionMessageContains("Unknown request method 'unsupported'");
 
         $this->httpRequestServiceClass->send('unsupported', 'https://some.url.com');
     }
@@ -457,7 +457,7 @@ class HttpRequestServiceTest extends TestCase
     public function testSendWithRequestException()
     {
         $this->expectException(RequestException::class);
-        $this->expectExceptionMessageCompat('Some exception message');
+        $this->expectExceptionMessageContains('Some exception message');
 
         $mock = $this->createPartialMock(HttpRequestService::class, ['sendRequest']);
         $mock

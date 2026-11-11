@@ -51,7 +51,7 @@ class EntityServiceTest extends TestCase
         $className = get_class(self::$entityServiceClass);
 
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessageCompat("Method getSomething does not exists in {$className}.");
+        $this->expectExceptionMessageContains("Method getSomething does not exists in {$className}.");
 
         self::$entityServiceClass->setRepository(TestRepository::class);
 

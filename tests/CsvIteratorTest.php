@@ -29,7 +29,7 @@ class CsvIteratorTest extends TestCase
     public function testOpenNotExistsFile()
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessageCompat('fopen(not_exists_file.csv): Failed to open stream: No such file or directory');
+        $this->expectExceptionMessageContains('fopen(not_exists_file.csv): Failed to open stream: No such file or directory');
 
         new CsvIterator('not_exists_file.csv');
     }
@@ -131,7 +131,7 @@ class CsvIteratorTest extends TestCase
     public function testGeneratorWithHeadersInvalidCount()
     {
         $this->expectException(IncorrectCSVFileException::class);
-        $this->expectExceptionMessageCompat('Incorrect CSV file');
+        $this->expectExceptionMessageContains('Incorrect CSV file');
 
         $header = $this->getJsonFixture('header_invalid_count.json');
 
