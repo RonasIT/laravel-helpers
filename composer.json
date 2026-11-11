@@ -58,7 +58,7 @@
         "stop-on-failure": ["pre-commit"]
       },
       "pre-commit": [
-        "composer lint"
+        "docker-compose run --rm -T nginx vendor/bin/pint --test"
       ]
     }
   },
