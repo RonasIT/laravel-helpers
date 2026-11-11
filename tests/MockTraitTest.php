@@ -81,6 +81,7 @@ class MockTraitTest extends TestCase
 
         array_slice([1, 2, 3, 4, 5], 2, 2);
 
+        $this->assertNotNull($this->argumentsError);
         $this->assertSame(
             'Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.',
             $this->argumentsError->getMessage(),
@@ -101,6 +102,7 @@ class MockTraitTest extends TestCase
 
         array_slice([1, 2, 3, 4, 5], 2, 2);
 
+        $this->assertNotNull($this->argumentsError);
         $this->assertSame(
             'Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.',
             $this->argumentsError->getMessage(),

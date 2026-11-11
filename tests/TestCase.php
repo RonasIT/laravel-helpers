@@ -85,8 +85,10 @@ class TestCase extends BaseTest
     protected function expectExceptionMessageCompat(string $message): void
     {
         // TODO: remove when min PHPUnit version is raised to 13.2
-        method_exists($this, 'expectExceptionMessageIsOrContains')
-            ? $this->expectExceptionMessageIsOrContains($message)
-            : $this->expectExceptionMessage($message);
+        if (method_exists($this, 'expectExceptionMessageIsOrContains')) {
+            $this->expectExceptionMessageIsOrContains($message);
+        } else {
+            $this->expectExceptionMessage($message);
+        }
     }
 }
