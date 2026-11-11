@@ -58,8 +58,15 @@
         "stop-on-failure": ["pre-commit"]
       },
       "pre-commit": [
-        "docker-compose up -d php && docker-compose exec -T php vendor/bin/php-cs-fixer fix && docker-compose exec -T php vendor/bin/tlint"
+        "composer lint"
       ]
     }
+  },
+  "scripts": {
+    "lint": "pint --test",
+    "test": "phpunit",
+    "check": ["@lint", "@test"],
+    "post-install-cmd": "cghooks add --ignore-lock",
+    "post-update-cmd": "cghooks update"
   }
 }
