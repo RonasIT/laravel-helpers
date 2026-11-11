@@ -4,14 +4,9 @@ namespace RonasIT\Support\Tests;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use RonasIT\Support\Tests\Support\Mock\TestMockClass;
-use RonasIT\Support\Traits\MockTrait;
 
 class MockTraitTest extends TestCase
 {
-    use MockTrait {
-        assertArguments as protected traitAssertArguments;
-    }
-
     protected bool $captureArgumentsError = false;
     protected ?ExpectationFailedException $argumentsError = null;
 
@@ -221,7 +216,7 @@ class MockTraitTest extends TestCase
         bool $isClass = true,
     ): void {
         try {
-            $this->traitAssertArguments($actual, $expected, $class, $function, $callIndex, $isClass);
+            parent::assertArguments($actual, $expected, $class, $function, $callIndex, $isClass);
         } catch (ExpectationFailedException $exception) {
             if (!$this->captureArgumentsError) {
                 throw $exception;
