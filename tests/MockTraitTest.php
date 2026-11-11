@@ -64,8 +64,6 @@ class MockTraitTest extends TestCase
 
     public function testMockNativeFunctionWhenLessRequiredParameters()
     {
-        $this->captureArgumentsError = true;
-
         $this->mockNativeFunction('RonasIT\Support\Tests', [
             $this->functionCall(
                 name: 'array_slice',
@@ -74,19 +72,16 @@ class MockTraitTest extends TestCase
             ),
         ]);
 
-        array_slice([1, 2, 3, 4, 5], 2, 2);
+        $error = $this->catchArgumentsError(fn () => array_slice([1, 2, 3, 4, 5], 2, 2));
 
-        $this->assertNotNull($this->argumentsError);
         $this->assertSame(
             'Failed assert that function array_slice was called with 1 arguments, actually it has 2 required arguments.',
-            $this->argumentsError->getMessage(),
+            $error->getMessage(),
         );
     }
 
     public function testMockNativeFunctionWhenMoreExpectedParameters()
     {
-        $this->captureArgumentsError = true;
-
         $this->mockNativeFunction('RonasIT\Support\Tests', [
             $this->functionCall(
                 name: 'array_slice',
@@ -95,12 +90,11 @@ class MockTraitTest extends TestCase
             ),
         ]);
 
-        array_slice([1, 2, 3, 4, 5], 2, 2);
+        $error = $this->catchArgumentsError(fn () => array_slice([1, 2, 3, 4, 5], 2, 2));
 
-        $this->assertNotNull($this->argumentsError);
         $this->assertSame(
             'Failed assert that function array_slice was called with 5 arguments, actually has 4 arguments.',
-            $this->argumentsError->getMessage(),
+            $error->getMessage(),
         );
     }
 
@@ -224,5 +218,21 @@ class MockTraitTest extends TestCase
 
             $this->argumentsError = $exception;
         }
+    }
+
+    protected function catchArgumentsError(callable $callback): ExpectationFailedException
+    {
+        $this->argumentsError = null;
+        $this->captureArgumentsError = true;
+
+        try {
+            $callback();
+        } finally {
+            $this->captureArgumentsError = false;
+        }
+
+        $this->assertNotNull($this->argumentsError, 'Arguments error was not thrown.');
+
+        return $this->argumentsError;
     }
 }
