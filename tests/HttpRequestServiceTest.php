@@ -524,4 +524,20 @@ class HttpRequestServiceTest extends TestCase
         $this->assertSame(['1'], $request->getHeader('x-debug'));
         $this->assertSame(['application/json', 'text/plain'], $request->getHeader('accept'));
     }
+
+    public function testSendWithRequestExceptionInDebugMode()
+    {
+        config(['defaults.http_service_debug' => true]);
+
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessageContains('Some exception message');
+
+        $handler = HandlerStack::create(new MockHandler([
+            new RequestException('Some exception message', new Request('get', 'https://some.url.com')),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        (new HttpRequestService())->get('https://some.url.com');
+    }
 }
