@@ -17,6 +17,11 @@ Associate service class with the repository class which will using in pseudo inh
 
 Service to working with http/https protocols based on Guzzle library.
 
+Both Guzzle 7 and Guzzle 8 are supported. If your project uses Guzzle 8, keep in mind its breaking changes:
+- header values must be strings;
+- `getResponse()` is available only on `ResponseException` and its subclasses, not on the base `RequestException`;
+- no-response network errors are thrown as `NetworkException`; catch `Psr\Http\Client\NetworkExceptionInterface` to handle them on both versions.
+
 Features:
 - service can be injected via the `app()` helper, which allows to mock it in testing;
 - debug mode, write all requests into the log file. Enabling by setting config `defaults.http_service_debug` to `true`.
