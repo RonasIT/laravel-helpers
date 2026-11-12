@@ -227,9 +227,7 @@ class HttpRequestService
 
     protected function setOptions(array $headers): self
     {
-        $toString = fn ($value) => (is_scalar($value) || is_null($value)) ? (string) $value : $value;
-
-        $this->options['headers'] = array_map(fn ($value) => is_array($value) ? array_map($toString, $value) : $toString($value), $headers);
+        $this->options['headers'] = $this->normalizeHeaders($headers);
         $this->options['allow_redirects'] = $this->allowRedirects;
 
         if (!empty($this->cookies)) {
@@ -241,6 +239,13 @@ class HttpRequestService
         }
 
         return $this;
+    }
+
+    protected function normalizeHeaders(array $headers): array
+    {
+        $toString = fn ($value) => (is_scalar($value) || is_null($value)) ? (string) $value : $value;
+
+        return array_map(fn ($value) => is_array($value) ? array_map($toString, $value) : $toString($value), $headers);
     }
 
     protected function setData(string $method, array $headers, array $data = []): void
