@@ -243,9 +243,13 @@ class HttpRequestService
 
     protected function normalizeHeaders(array $headers): array
     {
-        $toString = fn ($value) => (is_scalar($value) || is_null($value)) ? (string) $value : $value;
+        array_walk_recursive($headers, function (&$value) {
+            if (is_scalar($value) || is_null($value)) {
+                $value = (string) $value;
+            }
+        });
 
-        return array_map(fn ($value) => is_array($value) ? array_map($toString, $value) : $toString($value), $headers);
+        return $headers;
     }
 
     protected function setData(string $method, array $headers, array $data = []): void
