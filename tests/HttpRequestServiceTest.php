@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
@@ -470,5 +471,27 @@ class HttpRequestServiceTest extends TestCase
         $this->app->instance(HttpRequestService::class, $mock);
 
         app(HttpRequestService::class)->get('https://some.url.com');
+    }
+
+    public function testSendWithClientExceptionKeepsResponse()
+    {
+        $mock = $this->createPartialMock(HttpRequestService::class, ['sendRequest']);
+        $mock
+            ->expects($this->once())
+            ->method('sendRequest')
+            ->willReturnCallback(fn () => throw new ClientException(
+                message: 'Some exception message',
+                request: new Request('get', 'https://some.url.com'),
+                response: new GuzzleResponse(422, [], '{"message":"Some error"}'),
+            ));
+
+        try {
+            $mock->get('https://some.url.com');
+
+            $this->fail('ClientException was not thrown');
+        } catch (ClientException) {
+            $this->assertEquals(422, $mock->getResponse()->getStatusCode());
+            $this->assertEquals(['message' => 'Some error'], $mock->json());
+        }
     }
 }
