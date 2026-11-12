@@ -2,8 +2,13 @@
 
 namespace RonasIT\Support\Tests;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -81,9 +86,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => false,
-                    'connect_timeout' => 0,
                     'body' => '{"some_key":"some_value"}',
                 ],
             ],
@@ -100,6 +103,25 @@ class HttpRequestServiceTest extends TestCase
         );
     }
 
+    public function testSaveCookieSession()
+    {
+        $this->httpRequestServiceClass->saveCookieSession();
+
+        $this->mockGuzzleClient(
+            method: 'get',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [],
+                    'cookies' => new CookieJar(),
+                    'allow_redirects' => true,
+                ],
+            ],
+        );
+
+        $this->httpRequestServiceClass->get('https://some.url.com');
+    }
+
     public function testConnectTimeout()
     {
         $this->httpRequestServiceClass->setConnectTimeout(999);
@@ -112,7 +134,6 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => true,
                     'connect_timeout' => 999,
                     'body' => '{"some_key":"some_value"}',
@@ -141,9 +162,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                     'body' => '{"some_key":"some_value"}',
                 ],
             ],
@@ -171,9 +190,7 @@ class HttpRequestServiceTest extends TestCase
                         'some_header' => 'some_header_value',
                         'content-type' => 'application/x-www-form-urlencoded',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                     'form_params' => [
                         'some_key' => 'some_value',
                     ],
@@ -199,9 +216,7 @@ class HttpRequestServiceTest extends TestCase
             'https://some.url.com',
             [
                 'headers' => [],
-                'cookies' => null,
                 'allow_redirects' => true,
-                'connect_timeout' => 0,
                 'multipart' => [
                     [
                         'name' => '0[first_file]',
@@ -254,9 +269,7 @@ class HttpRequestServiceTest extends TestCase
                 'https://some.url.com',
                 [
                     'headers' => [],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                 ],
             ],
             response: new GuzzleResponse(
@@ -309,9 +322,7 @@ class HttpRequestServiceTest extends TestCase
                 'https://some.url.com',
                 [
                     'headers' => ['content-type' => 'application/json'],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                     'json' => [
                         'some_key' => 'some_value',
                     ],
@@ -338,9 +349,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                 ],
             ],
         );
@@ -360,9 +369,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                     'body' => '{"some_key":"some_value"}',
                 ],
             ],
@@ -399,9 +406,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                     'query' => ['user' => 'admin'],
                 ],
             ],
@@ -437,9 +442,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
-                    'cookies' => null,
                     'allow_redirects' => true,
-                    'connect_timeout' => 0,
                 ],
             ],
             response: new GuzzleResponse(200, [], 'Some not json string'),
@@ -493,5 +496,32 @@ class HttpRequestServiceTest extends TestCase
             $this->assertEquals(422, $mock->getResponse()->getStatusCode());
             $this->assertEquals(['message' => 'Some error'], $mock->json());
         }
+    }
+
+    public function testSendWithNonStringHeaderValues()
+    {
+        $history = [];
+
+        $handler = HandlerStack::create(new MockHandler([new GuzzleResponse(200)]));
+        $handler->push(Middleware::history($history));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->get(
+            url: 'https://some.url.com',
+            headers: [
+                'X-Version' => 1,
+                'X-Ratio' => 1.5,
+                'X-Debug' => true,
+                'Accept' => ['application/json', 'text/plain'],
+            ],
+        );
+
+        $request = $history[0]['request'];
+
+        $this->assertSame(['1'], $request->getHeader('x-version'));
+        $this->assertSame(['1.5'], $request->getHeader('x-ratio'));
+        $this->assertSame(['1'], $request->getHeader('x-debug'));
+        $this->assertSame(['application/json', 'text/plain'], $request->getHeader('accept'));
     }
 }

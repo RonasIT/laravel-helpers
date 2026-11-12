@@ -227,10 +227,16 @@ class HttpRequestService
 
     protected function setOptions(array $headers): self
     {
-        $this->options['headers'] = $headers;
-        $this->options['cookies'] = $this->cookies;
+        $this->options['headers'] = array_map(fn ($value) => is_scalar($value) ? (string) $value : $value, $headers);
         $this->options['allow_redirects'] = $this->allowRedirects;
-        $this->options['connect_timeout'] = $this->connectTimeout;
+
+        if (!empty($this->cookies)) {
+            $this->options['cookies'] = $this->cookies;
+        }
+
+        if ($this->connectTimeout > 0) {
+            $this->options['connect_timeout'] = $this->connectTimeout;
+        }
 
         return $this;
     }
