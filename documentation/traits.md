@@ -7,27 +7,6 @@
 
 Provides CRUD-based methods to work with database-related entities.
 
-To get the concrete model type in PHPStan/Larastan and IDE, declare the repository with the `@extends` annotation:
-
-```php
-use App\Models\User;
-use RonasIT\Support\Repositories\BaseRepository;
-
-/**
- * @extends BaseRepository<User>
- */
-class UserRepository extends BaseRepository
-{
-    public function __construct()
-    {
-        $this->setModel(User::class);
-    }
-}
-```
-
-Then `find()`, `first()` and `update()` return `User|null`, `create()` returns `User`, `get()` returns `Collection<int, User>`
-and `getSearchResults()` returns `LengthAwarePaginator<int, User>`. Without `@extends` the inferred types stay `Model`, as before.
-
 ## FixturesTrait
 
 This trait is designed to make testing understandable and cleaner.
