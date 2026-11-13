@@ -11,10 +11,13 @@ use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
- * @property Model model
+ * @template TModel of Model
+ *
+ * @property TModel $model
  */
 trait EntityControlTrait
 {
+    /** @use SearchTrait<TModel> */
     use SearchTrait;
 
     protected $model;
@@ -27,11 +30,17 @@ trait EntityControlTrait
 
     protected $shouldSettablePropertiesBeReset = true;
 
+    /**
+     * @return Collection<int, TModel>
+     */
     public function all(): Collection
     {
         return $this->get();
     }
 
+    /**
+     * @return $this
+     */
     public function truncate(): self
     {
         $modelInstance = $this->model;
@@ -41,6 +50,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function force($value = true): self
     {
         $this->forceMode = $value;
@@ -48,6 +60,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     protected function setModel($modelClass): self
     {
         $this->model = new $modelClass();
@@ -120,6 +135,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel
+     */
     public function create(array $data): Model
     {
         $entityData = Arr::only($data, $this->fields);
@@ -198,6 +216,8 @@ trait EntityControlTrait
      * Update only one row by condition or primary key value
      *
      * @param  array|int  $where
+     *
+     * @return TModel|null
      */
     public function update($where, array $data): ?Model
     {
@@ -227,6 +247,9 @@ trait EntityControlTrait
         return $item;
     }
 
+    /**
+     * @return TModel
+     */
     public function updateOrCreate($where, $data): Model
     {
         $this->resetSettableProperties(false);
@@ -255,6 +278,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return Collection<int, TModel>
+     */
     public function get(int|string|array $where = []): Collection
     {
         $result = $this->getQuery($where)->get();
@@ -264,6 +290,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function first($where = []): ?Model
     {
         $result = $this->getQuery($where)->first();
@@ -273,6 +302,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function last(array $where = [], string $column = 'created_at'): ?Model
     {
         $result = $this
@@ -285,11 +317,17 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function findBy(string $field, $value): ?Model
     {
         return $this->first([$field => $value]);
     }
 
+    /**
+     * @return TModel|null
+     */
     public function find($id): ?Model
     {
         return $this->first($id);
@@ -297,6 +335,8 @@ trait EntityControlTrait
 
     /**
      * @param  array|string|int  $where  array of conditions or primary key value
+     *
+     * @return TModel
      */
     public function firstOrCreate($where, array $data = []): Model
     {
@@ -337,6 +377,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return $this
+     */
     public function withTrashed($enable = true): self
     {
         $this->withTrashed = $enable;
@@ -344,6 +387,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function onlyTrashed($enable = true): self
     {
         $this->onlyTrashed = $enable;
@@ -421,6 +467,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return Collection<int, TModel>
+     */
     public function getByList(array $values, ?string $field = null): Collection
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
