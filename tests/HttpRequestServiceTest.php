@@ -17,6 +17,7 @@ use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
+use RuntimeException;
 
 class HttpRequestServiceTest extends TestCase
 {
@@ -86,7 +87,9 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => false,
+                    'connect_timeout' => 0,
                     'body' => '{"some_key":"some_value"}',
                 ],
             ],
@@ -115,6 +118,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [],
                     'cookies' => new CookieJar(),
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                 ],
             ],
         );
@@ -134,6 +138,7 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => true,
                     'connect_timeout' => 999,
                     'body' => '{"some_key":"some_value"}',
@@ -162,7 +167,9 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                     'body' => '{"some_key":"some_value"}',
                 ],
             ],
@@ -190,7 +197,9 @@ class HttpRequestServiceTest extends TestCase
                         'some_header' => 'some_header_value',
                         'content-type' => 'application/x-www-form-urlencoded',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                     'form_params' => [
                         'some_key' => 'some_value',
                     ],
@@ -216,7 +225,9 @@ class HttpRequestServiceTest extends TestCase
             'https://some.url.com',
             [
                 'headers' => [],
+                'cookies' => null,
                 'allow_redirects' => true,
+                'connect_timeout' => 0,
                 'multipart' => [
                     [
                         'name' => '0[first_file]',
@@ -269,7 +280,9 @@ class HttpRequestServiceTest extends TestCase
                 'https://some.url.com',
                 [
                     'headers' => [],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                 ],
             ],
             response: new GuzzleResponse(
@@ -322,7 +335,9 @@ class HttpRequestServiceTest extends TestCase
                 'https://some.url.com',
                 [
                     'headers' => ['content-type' => 'application/json'],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                     'json' => [
                         'some_key' => 'some_value',
                     ],
@@ -349,7 +364,9 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                 ],
             ],
         );
@@ -369,7 +386,9 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                     'body' => '{"some_key":"some_value"}',
                 ],
             ],
@@ -406,7 +425,9 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                     'query' => ['user' => 'admin'],
                 ],
             ],
@@ -442,7 +463,9 @@ class HttpRequestServiceTest extends TestCase
                     'headers' => [
                         'some_header' => 'some_header_value',
                     ],
+                    'cookies' => null,
                     'allow_redirects' => true,
+                    'connect_timeout' => 0,
                 ],
             ],
             response: new GuzzleResponse(200, [], 'Some not json string'),
@@ -543,5 +566,32 @@ class HttpRequestServiceTest extends TestCase
         $this->app->instance(Client::class, new Client(['handler' => $handler]));
 
         (new HttpRequestService())->get('https://some.url.com');
+    }
+
+    public function testSendResetsPreviousResponseOnFailure()
+    {
+        $handler = HandlerStack::create(new MockHandler([
+            new GuzzleResponse(200, [], '{"key":"value"}'),
+            new RuntimeException('Connection failed'),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->get('https://some.url.com');
+
+        try {
+            $this->httpRequestServiceClass->get('https://some.url.com');
+
+            $this->fail('RuntimeException was not thrown');
+        } catch (RuntimeException) {
+            $this->assertNull($this->httpRequestServiceClass->getResponse());
+        }
+    }
+
+    public function testJSONWithoutResponse()
+    {
+        $this->expectException(InvalidJSONFormatException::class);
+
+        $this->httpRequestServiceClass->json();
     }
 }

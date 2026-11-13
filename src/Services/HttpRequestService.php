@@ -37,7 +37,7 @@ class HttpRequestService
 
     public function json(): array
     {
-        $stringResponse = (string) $this->response->getBody();
+        $stringResponse = (string) $this->response?->getBody();
 
         $result = json_decode($stringResponse, true);
 
@@ -48,7 +48,7 @@ class HttpRequestService
         return $result;
     }
 
-    public function getResponse(): ResponseInterface
+    public function getResponse(): ?ResponseInterface
     {
         return $this->response;
     }
@@ -111,6 +111,8 @@ class HttpRequestService
     public function send(string $method, string $url, array $data = [], array $headers = []): self
     {
         $startTime = microtime(true);
+
+        $this->response = null;
 
         $this->logRequest($method, $url, $data, $headers);
 
@@ -228,15 +230,9 @@ class HttpRequestService
     protected function setOptions(array $headers): self
     {
         $this->options['headers'] = $this->normalizeHeaders($headers);
+        $this->options['cookies'] = $this->cookies;
         $this->options['allow_redirects'] = $this->allowRedirects;
-
-        if (!empty($this->cookies)) {
-            $this->options['cookies'] = $this->cookies;
-        }
-
-        if ($this->connectTimeout > 0) {
-            $this->options['connect_timeout'] = $this->connectTimeout;
-        }
+        $this->options['connect_timeout'] = $this->connectTimeout;
 
         return $this;
     }
