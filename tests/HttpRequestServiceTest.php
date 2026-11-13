@@ -2,7 +2,13 @@
 
 namespace RonasIT\Support\Tests;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -11,6 +17,7 @@ use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
+use RuntimeException;
 
 class HttpRequestServiceTest extends TestCase
 {
@@ -97,6 +104,26 @@ class HttpRequestServiceTest extends TestCase
                 'some_header' => 'some_header_value',
             ],
         );
+    }
+
+    public function testSaveCookieSession()
+    {
+        $this->httpRequestServiceClass->saveCookieSession();
+
+        $this->mockGuzzleClient(
+            method: 'get',
+            arguments: [
+                'https://some.url.com',
+                [
+                    'headers' => [],
+                    'cookies' => new CookieJar(),
+                    'allow_redirects' => true,
+                    'connect_timeout' => 0,
+                ],
+            ],
+        );
+
+        $this->httpRequestServiceClass->get('https://some.url.com');
     }
 
     public function testConnectTimeout()
@@ -470,5 +497,101 @@ class HttpRequestServiceTest extends TestCase
         $this->app->instance(HttpRequestService::class, $mock);
 
         app(HttpRequestService::class)->get('https://some.url.com');
+    }
+
+    public function testSendWithClientExceptionKeepsResponse()
+    {
+        $mock = $this->createPartialMock(HttpRequestService::class, ['sendRequest']);
+        $mock
+            ->expects($this->once())
+            ->method('sendRequest')
+            ->willReturnCallback(fn () => throw new ClientException(
+                message: 'Some exception message',
+                request: new Request('get', 'https://some.url.com'),
+                response: new GuzzleResponse(422, [], '{"message":"Some error"}'),
+            ));
+
+        try {
+            $mock->get('https://some.url.com');
+
+            $this->fail('ClientException was not thrown');
+        } catch (ClientException) {
+            $this->assertEquals(422, $mock->getResponse()->getStatusCode());
+            $this->assertEquals(['message' => 'Some error'], $mock->json());
+        }
+    }
+
+    public function testSendWithNonStringHeaderValues()
+    {
+        $history = [];
+
+        $handler = HandlerStack::create(new MockHandler([new GuzzleResponse(200)]));
+        $handler->push(Middleware::history($history));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->get(
+            url: 'https://some.url.com',
+            headers: [
+                'X-Version' => 1,
+                'X-Ratio' => 1.5,
+                'X-Debug' => true,
+                'Authorization' => null,
+                'X-Ids' => [1, 2],
+                'Accept' => ['application/json', 'text/plain'],
+            ],
+        );
+
+        $request = $history[0]['request'];
+
+        $this->assertSame(['1'], $request->getHeader('x-version'));
+        $this->assertSame(['1.5'], $request->getHeader('x-ratio'));
+        $this->assertSame(['1'], $request->getHeader('x-debug'));
+        $this->assertSame([''], $request->getHeader('authorization'));
+        $this->assertSame(['1', '2'], $request->getHeader('x-ids'));
+        $this->assertSame(['application/json', 'text/plain'], $request->getHeader('accept'));
+    }
+
+    public function testSendWithRequestExceptionInDebugMode()
+    {
+        config(['defaults.http_service_debug' => true]);
+
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessageContains('Some exception message');
+
+        $handler = HandlerStack::create(new MockHandler([
+            new RequestException('Some exception message', new Request('get', 'https://some.url.com')),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        (new HttpRequestService())->get('https://some.url.com');
+    }
+
+    public function testSendResetsPreviousResponseOnFailure()
+    {
+        $handler = HandlerStack::create(new MockHandler([
+            new GuzzleResponse(200, [], '{"key":"value"}'),
+            new RuntimeException('Connection failed'),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->get('https://some.url.com');
+
+        try {
+            $this->httpRequestServiceClass->get('https://some.url.com');
+
+            $this->fail('RuntimeException was not thrown');
+        } catch (RuntimeException) {
+            $this->assertNull($this->httpRequestServiceClass->getResponse());
+        }
+    }
+
+    public function testJSONWithoutResponse()
+    {
+        $this->expectException(InvalidJSONFormatException::class);
+
+        $this->httpRequestServiceClass->json();
     }
 }

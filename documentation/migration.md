@@ -204,3 +204,41 @@ $data = $httpRequestService->get($url)->json();
 
 - now return generated file name instead of url/path
 - `$returnUrl` third argument had been removed
+
+## 3.9.0
+
+### Guzzle 8 support
+
+The package now allows both `guzzlehttp/guzzle` `^7.15.2` and `^8.0`. Nothing changes for a project that stays on Guzzle 7, except that a locked Guzzle version below 7.15.2 has to be updated together with the package:
+
+```sh
+composer update ronasit/laravel-helpers guzzlehttp/guzzle -W
+```
+
+#### Staying on Guzzle 7
+
+Laravel 13 allows Guzzle 8, so a project without its own Guzzle constraint may get Guzzle 8 on `composer update`. Pin the major version in the project until its code is ready:
+
+```sh
+composer require guzzlehttp/guzzle:^7.15.2
+```
+
+Projects using `ronasit/laravel-telescope-extension` stay on Guzzle 7 anyway: its `muhammadhuzaifa/telescope-guzzle-watcher` dependency requires Guzzle `^7.9`.
+
+#### Moving a project to Guzzle 8
+
+`HttpRequestService` sends the same request options on both versions, so tests asserting the options of a mocked `Client` need no changes. Check the project code for the following Guzzle 8 changes:
+
+- `getResponse()` and `hasResponse()` exist only on `ResponseException` and its subclasses (`ClientException`, `ServerException`), not on the base `RequestException`. Use `HttpRequestService::getResponse()` or catch `ResponseException`;
+- `RequestException` no longer accepts a response constructor argument, tests creating it with a response should create `ClientException` or `ServerException` instead;
+- network errors without a response are thrown as `NetworkException`, which is not a `RequestException`. Catch `Psr\Http\Client\NetworkExceptionInterface` to handle them on both versions;
+- header values passed directly to `Client` must be strings, `HttpRequestService` casts them itself;
+- `form_params` values must be scalars, nulls or nested arrays, objects are rejected;
+- the default connect timeout of `Client` is 60 seconds instead of 300. `HttpRequestService` keeps passing `connect_timeout => 0` by default, which means the libcurl default of 300 seconds on Guzzle 7 and no connect timeout on Guzzle 8. Call `setConnectTimeout()` to limit it;
+- TLS 1.2 is the minimum protocol version by default.
+
+### HttpRequestService
+
+#### getResponse(): ?ResponseInterface
+
+The method returns `null` when the last request failed without a response, it does not keep the response of the previous request anymore. The `json()` method throws `InvalidJSONFormatException` in this case.
