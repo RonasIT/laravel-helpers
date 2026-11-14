@@ -24,6 +24,13 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 
 [Follow the versioning documentation][8] to implement versioning in your Laravel app using this package.
 
+### Typed route entity
+
+Repositories and services carry the model type through `@extends BaseRepository<Event>` / `@extends EntityService<Event>`.
+`BaseRequest::loadRouteEntity()` loads the entity named by a route parameter once, responds with 404 when it is missing,
+and returns it typed without `null`, so the controller passes the model to the service instead of the id.
+[Read more][3].
+
 ## Usage
  - [Helper functions][1]
  - [Traits][2]
@@ -34,6 +41,7 @@ Versioning is a mechanism to keep your API applications in a workable state for 
  - [1.1][5]
  - [2.0.0][6]
  - [2.0.8][7]
+ - [Model generics][9]
 
 [1]:./documentation/helpers.md
 [2]:./documentation/traits.md
@@ -43,3 +51,4 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 [6]:./documentation/migration.md#2.0.0
 [7]:./documentation/migration.md#2.0.8
 [8]:./documentation/versioning.md
+[9]:./documentation/migration.md#model-generics

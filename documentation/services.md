@@ -13,6 +13,100 @@ between the service class and related repository class;
 Associate service class with the repository class which will using in pseudo inheritance.
 - $repository - valid class name of repository class.
 
+### getEntityName(): string
+
+Proxied to the repository, returns the short class name of the model handled by the repository, e.g. `Event`.
+
+### Binding the model class
+
+`BaseRepository` and `EntityService` declare the model template type. Bind it once per class, and `find()`, `first()`,
+`findBy()`, `last()`, `update()` return `Event|null`, while `create()`, `firstOrCreate()`, `updateOrCreate()` return
+`Event`, both on the repository and on the service, including after chainable calls like `with()`:
+
+```php
+/**
+ * @extends BaseRepository<Event>
+ */
+class EventRepository extends BaseRepository
+{
+    public function __construct()
+    {
+        $this->setModel(Event::class);
+    }
+}
+
+/**
+ * @extends EntityService<Event>
+ */
+class EventService extends EntityService
+{
+    public function __construct()
+    {
+        $this->setRepository(EventRepository::class);
+    }
+}
+```
+
+Classes without `@extends` keep resolving to `Model`.
+
+### Route entity loading
+
+`BaseRequest::loadRouteEntity(string $serviceClass, string $routeParam = 'id', array $relations = [], ?string $entityName = null)`
+loads the entity named by the route parameter once, from `init()`, before the `beforeAuthorization()` handlers and
+`authorize()`. When the route parameter is missing or no row matches, it throws `NotFoundHttpException` with the
+`:entity does not exist.` message, where `:entity` is `$entityName` or the short model class name. Override the text
+in the project JSON translation file, e.g. `lang/en.json`:
+
+```json
+{
+    ":entity does not exist.": "The :entity is not found."
+}
+```
+
+The request stores the result in its own non-nullable property:
+
+```php
+class GetEventRequest extends BaseRequest
+{
+    protected Event $event;
+
+    public function authorize(): bool
+    {
+        return $this->event->user_id === $this->user()->id;
+    }
+
+    public function getEvent(): Event
+    {
+        return $this->event;
+    }
+
+    protected function init(): void
+    {
+        $this->event = $this->loadRouteEntity(EventService::class, relations: ['user']);
+    }
+}
+```
+
+The controller passes the model to the Action or service instead of the id:
+
+```php
+public function get(GetEventRequest $request, GetEventAction $action): EventResource
+{
+    $event = $action->run($request->getEvent());
+
+    return EventResource::make($event);
+}
+```
+
+The Action loads the missing relations on the received model instead of searching for it again:
+
+```php
+public function run(Event $event): Event
+{
+    return $event->loadMissing('media');
+}
+```
+
 ## HttpRequestService
 
 Service to working with http/https protocols based on Guzzle library.
