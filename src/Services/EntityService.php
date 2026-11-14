@@ -11,6 +11,12 @@ use RonasIT\Support\Repositories\BaseRepository;
  *
  * @mixin BaseRepository<TModel>
  *
+ * @method $this with(array|string $relations)
+ * @method $this withCount(array|string $relations)
+ * @method $this force($value = true)
+ * @method $this withTrashed($enable = true)
+ * @method $this onlyTrashed($enable = true)
+ *
  * @property BaseRepository<TModel> $repository
  */
 class EntityService

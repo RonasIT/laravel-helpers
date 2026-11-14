@@ -19,6 +19,7 @@ function typedService(TypedTestService $service): void
     assertType(TestModel::class, $service->create([]));
     assertType(TestModel::class, $service->firstOrCreate(['id' => 1]));
     assertType(TestModel::class, $service->updateOrCreate(1, []));
+    assertType(TypedTestService::class, $service->with('relation'));
     assertType(TestModel::class . '|null', $service->with('relation')->find(1));
     assertType(TestModel::class . '|null', $service->withTrashed()->with('relation')->first());
 }

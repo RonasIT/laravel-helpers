@@ -7,6 +7,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RonasIT\Support\Tests\Support\Mock\Services\TypedTestService;
 use RonasIT\Support\Tests\Support\Request\RouteEntityTestRequest;
 use RonasIT\Support\Tests\Support\Traits\SqlMockTrait;
@@ -66,57 +67,71 @@ class BaseRequestRouteEntityTest extends TestCase
         $this->assertCount(1, $this->entityQueries);
     }
 
-    public function testLoadEntityWithCustomRouteParamAndEntityName()
+    public static function getLoadMissingEntityData(): array
     {
-        $this->mockSelectById(self::SELECT_ENTITY_QUERY, [], ['5']);
-
-        $request = $this->makeRequest('v1/test/{test_model_id}', 'v1/test/5');
-
-        $request->routeParam = 'test_model_id';
-        $request->entityName = 'Test model';
-
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Test model does not exist.');
-
-        $request->validateResolved();
+        return [
+            [
+                'routeUri' => 'v1/test/{id}',
+                'uri' => 'v1/test/1',
+                'routeParam' => 'id',
+                'entityName' => null,
+                'isTranslated' => false,
+                'bindings' => ['1'],
+                'message' => 'TestModel does not exist.',
+            ],
+            [
+                'routeUri' => 'v1/test/{id}',
+                'uri' => 'v1/test/1',
+                'routeParam' => 'id',
+                'entityName' => 'Event',
+                'isTranslated' => false,
+                'bindings' => ['1'],
+                'message' => 'Event does not exist.',
+            ],
+            [
+                'routeUri' => 'v1/test/{test_model_id}',
+                'uri' => 'v1/test/5',
+                'routeParam' => 'test_model_id',
+                'entityName' => 'Test model',
+                'isTranslated' => false,
+                'bindings' => ['5'],
+                'message' => 'Test model does not exist.',
+            ],
+            [
+                'routeUri' => 'v1/test/{id}',
+                'uri' => 'v1/test/1',
+                'routeParam' => 'id',
+                'entityName' => null,
+                'isTranslated' => true,
+                'bindings' => ['1'],
+                'message' => 'Sorry, TestModel is gone.',
+            ],
+        ];
     }
 
-    public function testLoadMissingEntity()
-    {
-        $this->mockSelectById(self::SELECT_ENTITY_QUERY, [], ['1']);
+    #[DataProvider('getLoadMissingEntityData')]
+    public function testLoadMissingEntity(
+        string $routeUri,
+        string $uri,
+        string $routeParam,
+        ?string $entityName,
+        bool $isTranslated,
+        array $bindings,
+        string $message,
+    ) {
+        if ($isTranslated) {
+            $this->app['translator']->addJsonPath($this->getFixturePath('lang'));
+        }
 
-        $request = $this->makeRequest('v1/test/{id}', 'v1/test/1');
+        $this->mockSelectById(self::SELECT_ENTITY_QUERY, [], $bindings);
 
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('TestModel does not exist.');
+        $request = $this->makeRequest($routeUri, $uri);
 
-        $request->validateResolved();
-    }
-
-    public function testLoadMissingEntityWithCustomEntityName()
-    {
-        $this->mockSelectById(self::SELECT_ENTITY_QUERY, [], ['1']);
-
-        $request = $this->makeRequest('v1/test/{id}', 'v1/test/1');
-
-        $request->entityName = 'Event';
-
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Event does not exist.');
-
-        $request->validateResolved();
-    }
-
-    public function testLoadMissingEntityWithTranslatedMessage()
-    {
-        $this->app['translator']->addJsonPath($this->getFixturePath('lang'));
-
-        $this->mockSelectById(self::SELECT_ENTITY_QUERY, [], ['1']);
-
-        $request = $this->makeRequest('v1/test/{id}', 'v1/test/1');
+        $request->routeParam = $routeParam;
+        $request->entityName = $entityName;
 
         $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Sorry, TestModel is gone.');
+        $this->expectExceptionMessage($message);
 
         $request->validateResolved();
     }
