@@ -3,10 +3,15 @@
 namespace RonasIT\Support\Services;
 
 use BadMethodCallException;
+use Illuminate\Database\Eloquent\Model;
 use RonasIT\Support\Repositories\BaseRepository;
 
 /**
- * @property BaseRepository $repository
+ * @template TModel of Model = Model
+ *
+ * @mixin BaseRepository<TModel>
+ *
+ * @property BaseRepository<TModel> $repository
  */
 class EntityService
 {

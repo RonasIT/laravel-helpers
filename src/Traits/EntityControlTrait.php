@@ -11,7 +11,9 @@ use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
- * @property Model model
+ * @template TModel of Model = Model
+ *
+ * @property TModel model
  */
 trait EntityControlTrait
 {
@@ -41,6 +43,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function force($value = true): self
     {
         $this->forceMode = $value;
@@ -120,6 +125,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel
+     */
     public function create(array $data): Model
     {
         $entityData = Arr::only($data, $this->fields);
@@ -198,6 +206,8 @@ trait EntityControlTrait
      * Update only one row by condition or primary key value
      *
      * @param  array|int  $where
+     *
+     * @return TModel|null
      */
     public function update($where, array $data): ?Model
     {
@@ -227,6 +237,9 @@ trait EntityControlTrait
         return $item;
     }
 
+    /**
+     * @return TModel
+     */
     public function updateOrCreate($where, $data): Model
     {
         $this->resetSettableProperties(false);
@@ -264,6 +277,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function first($where = []): ?Model
     {
         $result = $this->getQuery($where)->first();
@@ -273,6 +289,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function last(array $where = [], string $column = 'created_at'): ?Model
     {
         $result = $this
@@ -285,11 +304,17 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function findBy(string $field, $value): ?Model
     {
         return $this->first([$field => $value]);
     }
 
+    /**
+     * @return TModel|null
+     */
     public function find($id): ?Model
     {
         return $this->first($id);
@@ -297,6 +322,8 @@ trait EntityControlTrait
 
     /**
      * @param  array|string|int  $where  array of conditions or primary key value
+     *
+     * @return TModel
      */
     public function firstOrCreate($where, array $data = []): Model
     {
@@ -337,6 +364,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return $this
+     */
     public function withTrashed($enable = true): self
     {
         $this->withTrashed = $enable;
@@ -344,6 +374,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function onlyTrashed($enable = true): self
     {
         $this->onlyTrashed = $enable;
@@ -459,7 +492,7 @@ trait EntityControlTrait
         return $query->update(Arr::only($data, $fields));
     }
 
-    protected function getEntityName(): string
+    public function getEntityName(): string
     {
         $explodedModel = explode('\\', get_class($this->model));
 

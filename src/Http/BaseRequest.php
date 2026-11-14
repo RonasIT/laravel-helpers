@@ -2,9 +2,12 @@
 
 namespace RonasIT\Support\Http;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
 use RonasIT\Support\Exceptions\InvalidModelException;
+use RonasIT\Support\Services\EntityService;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class BaseRequest extends FormRequest
 {
@@ -72,6 +75,36 @@ class BaseRequest extends FormRequest
         foreach ($this->beforeAuthorization() as $handler) {
             $handler();
         }
+    }
+
+    /**
+     * Loads the entity identified by the route parameter, intended to be called from init().
+     *
+     * @template TModel of Model
+     *
+     * @param  class-string<EntityService<TModel>>  $serviceClass
+     *
+     * @return TModel
+     */
+    protected function loadRouteEntity(
+        string $serviceClass,
+        string $routeParam = 'id',
+        array $relations = [],
+        ?string $entityName = null,
+    ): Model {
+        $service = app($serviceClass);
+
+        $id = $this->route($routeParam);
+
+        $entity = (is_null($id)) ? null : $service->with($relations)->find($id);
+
+        if (is_null($entity)) {
+            throw new NotFoundHttpException(__(':entity does not exist.', [
+                'entity' => $entityName ?? $service->getEntityName(),
+            ]));
+        }
+
+        return $entity;
     }
 
     protected function getOrderableFields(string $modelName, array $additionalFields = []): string
