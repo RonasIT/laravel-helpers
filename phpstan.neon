@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - tests/support/Types
+        - tests/support/Mock/Repositories/TestRepository.php
+        - tests/support/Mock/Repositories/TypedTestRepository.php
+        - tests/support/Mock/Services
+        - tests/support/Request/RouteEntityTestRequest.php
