@@ -16,7 +16,7 @@ class GenericAncestorsTest extends RuleTestCase
         return self::getContainer()->getByType(ClassAncestorsRule::class);
     }
 
-    public function testGenericAncestors(): void
+    public function testTemplateDefaultAllowsOmittingExtends(): void
     {
         $this->analyse([
             __DIR__ . '/support/Mock/Repositories/TestRepository.php',
