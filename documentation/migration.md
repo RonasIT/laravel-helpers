@@ -204,3 +204,36 @@ $data = $httpRequestService->get($url)->json();
 
 - now return generated file name instead of url/path
 - `$returnUrl` third argument had been removed
+
+## Model generics
+
+### EntityControlTrait, BaseRepository, EntityService
+
+The repository and the service declare the model template type `TModel of Model = Model`. The generics are PHPDoc only,
+no runtime signature has changed, so no action is required for them.
+
+- A repository or a service without `@extends` keeps working and resolves selections to `Model|null` as before.
+  Thanks to the `Model` default, PHPStan does not report a missing generic type on such classes.
+- To get the typed model, bind it once per class:
+
+```php
+/**
+ * @extends BaseRepository<Event>
+ */
+class EventRepository extends BaseRepository
+
+/**
+ * @extends EntityService<Event>
+ */
+class EventService extends EntityService
+```
+
+- `EntityControlTrait::getEntityName()` became `public` (it was `protected`), so it is also callable on the service.
+  A project class which overrides it as `protected` gets a fatal error: change the visibility of the override to `public`.
+
+### BaseRequest
+
+The new protected `loadRouteEntity()` method is additive, existing requests work without changes. See
+[Services][services] for the new flow.
+
+[services]:services.md#route-entity-loading

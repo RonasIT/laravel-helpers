@@ -27,7 +27,8 @@
     "mpyw/laravel-database-mock": "^0.0.1-alpha5",
     "orchestra/testbench": ">=10.8",
     "phpunit/phpunit": ">=11.5.30",
-    "laravel/pint": "^1.27"
+    "laravel/pint": "^1.27",
+    "phpstan/phpstan": "^2.1"
   },
   "autoload": {
     "psr-4": {
