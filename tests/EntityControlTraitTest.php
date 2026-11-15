@@ -150,6 +150,45 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
+    public function testExistsByIntPrimaryKey()
+    {
+        $this->mockSelectById(
+            'select exists(select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->exists(1);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testExistsByStringPrimaryKey()
+    {
+        $this->mockSelectById(
+            query: 'select exists(select "test_models".*, (select count(*) from "relation_models" '
+                . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+                . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ?) as "exists"',
+            bindings: ['test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->exists('test_id_1');
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
     public function testExistsBy()
     {
         $this->mockSelectExists(
@@ -605,6 +644,26 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
+    public function testUpdateByStringPrimaryKey()
+    {
+        $this->mockSelectById(
+            query: 'select "test_models".*, (select count(*) from "relation_models" '
+                . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+                . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            bindings: ['test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->update('test_id_1', ['name' => 'test_name']);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
     public function testUpdateOrCreateEntityExists()
     {
         $this->mockUpdateOrCreateEntityExists(self::$selectResult);
@@ -648,6 +707,41 @@ class EntityControlTraitTest extends TestCase
             ->with('relation')
             ->withCount('relation')
             ->count(['id' => 1]);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testCountByIntPrimaryKey()
+    {
+        $this->mockSelectById(
+            'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->count(1);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testCountByStringPrimaryKey()
+    {
+        $this->mockSelectById(
+            query: 'select count(*) as aggregate from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
+            bindings: ['test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->count('test_id_1');
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
@@ -731,6 +825,26 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
+    public function testFirstByStringPrimaryKey()
+    {
+        $this->mockSelectById(
+            query: 'select "test_models".*, (select count(*) from "relation_models" '
+                . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+                . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+            bindings: ['test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->first('test_id_1');
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
     public function testLast()
     {
         $this->mockLast(self::$selectResult);
@@ -742,6 +856,47 @@ class EntityControlTraitTest extends TestCase
             ->with('relation')
             ->withCount('relation')
             ->last(['id' => 1]);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testLastByIntPrimaryKey()
+    {
+        $this->mockSelectById(
+            'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? '
+            . 'order by "created_at" desc limit 1',
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->last(1);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testLastByStringPrimaryKey()
+    {
+        $this->mockSelectById(
+            query: 'select "test_models".*, (select count(*) from "relation_models" '
+                . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+                . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? '
+                . 'order by "created_at" desc limit 1',
+            bindings: ['test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->last('test_id_1');
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
@@ -878,6 +1033,24 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
+    public function testForceDeleteByStringPrimaryKey()
+    {
+        $this->mockDelete(
+            sql: 'delete from "test_models" where "test_models"."deleted_at" is not null and "id" = ?',
+            bindings: ['test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->delete('test_id_1');
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
     public function testDelete()
     {
         $this->mockUpdateSqlQuery(
@@ -891,6 +1064,23 @@ class EntityControlTraitTest extends TestCase
             ->with('relation')
             ->withCount('relation')
             ->delete(1);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testDeleteByStringPrimaryKey()
+    {
+        $this->mockUpdateSqlQuery(
+            sql: 'update "test_models" set "deleted_at" = ?, "updated_at" = ? '
+                . 'where "id" = ?',
+            bindings: [Carbon::now(), Carbon::now(), 'test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->with('relation')
+            ->withCount('relation')
+            ->delete('test_id_1');
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
@@ -910,6 +1100,25 @@ class EntityControlTraitTest extends TestCase
             ->with('relation')
             ->withCount('relation')
             ->restore(1);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testRestoreByStringPrimaryKey()
+    {
+        $this->mockUpdateSqlQuery(
+            sql: 'update "test_models" set "deleted_at" = ?, "updated_at" = ? '
+                . 'where "test_models"."deleted_at" is not null and "id" = ? and "test_models"."deleted_at" is not null',
+            bindings: [null, Carbon::now(), 'test_id_1'],
+        );
+
+        self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->restore('test_id_1');
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
