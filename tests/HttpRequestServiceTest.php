@@ -4,6 +4,7 @@ namespace RonasIT\Support\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -17,7 +18,6 @@ use RonasIT\Support\Exceptions\InvalidJSONFormatException;
 use RonasIT\Support\Exceptions\UnknownRequestMethodException;
 use RonasIT\Support\Services\HttpRequestService;
 use RonasIT\Support\Tests\Support\Traits\HttpRequestServiceMockTrait;
-use RuntimeException;
 
 class HttpRequestServiceTest extends TestCase
 {
@@ -550,7 +550,7 @@ class HttpRequestServiceTest extends TestCase
     {
         $handler = HandlerStack::create(new MockHandler([
             new GuzzleResponse(200, [], '{"key":"value"}'),
-            new RuntimeException('Connection failed'),
+            new ConnectException('Connection failed', new Request('get', 'https://some.url.com')),
         ]));
 
         $this->app->instance(Client::class, new Client(['handler' => $handler]));
@@ -560,8 +560,8 @@ class HttpRequestServiceTest extends TestCase
         try {
             $this->httpRequestServiceClass->get('https://some.url.com');
 
-            $this->fail('RuntimeException was not thrown');
-        } catch (RuntimeException) {
+            $this->fail('ConnectException was not thrown');
+        } catch (ConnectException) {
             $this->assertNull($this->httpRequestServiceClass->getResponse());
         }
     }
