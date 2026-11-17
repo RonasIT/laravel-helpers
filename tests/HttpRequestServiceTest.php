@@ -515,6 +515,7 @@ class HttpRequestServiceTest extends TestCase
                 'X-Version' => 1,
                 'X-Ratio' => 1.5,
                 'X-Debug' => true,
+                'X-Flag' => false,
                 'Authorization' => null,
                 'X-Ids' => [1, 2],
                 'Accept' => ['application/json', 'text/plain'],
@@ -526,6 +527,7 @@ class HttpRequestServiceTest extends TestCase
         $this->assertSame(['1'], $request->getHeader('x-version'));
         $this->assertSame(['1.5'], $request->getHeader('x-ratio'));
         $this->assertSame(['1'], $request->getHeader('x-debug'));
+        $this->assertSame([''], $request->getHeader('x-flag'));
         $this->assertSame([''], $request->getHeader('authorization'));
         $this->assertSame(['1', '2'], $request->getHeader('x-ids'));
         $this->assertSame(['application/json', 'text/plain'], $request->getHeader('accept'));
