@@ -133,9 +133,7 @@ class HttpRequestService
 
     public function multipart(): array
     {
-        $content = $this->response
-            ->getBody()
-            ->getContents();
+        $content = (string) $this->response?->getBody();
 
         $stream = fopen('php://temp', 'rw');
         fwrite($stream, $content);

@@ -10,6 +10,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
@@ -574,5 +575,13 @@ class HttpRequestServiceTest extends TestCase
         $this->expectException(InvalidJSONFormatException::class);
 
         $this->httpRequestServiceClass->json();
+    }
+
+    public function testMultipartWithoutResponse()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Content is not valid');
+
+        $this->httpRequestServiceClass->multipart();
     }
 }
