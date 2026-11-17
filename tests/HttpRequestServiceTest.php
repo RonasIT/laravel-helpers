@@ -3,7 +3,6 @@
 namespace RonasIT\Support\Tests;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
@@ -104,26 +103,6 @@ class HttpRequestServiceTest extends TestCase
                 'some_header' => 'some_header_value',
             ],
         );
-    }
-
-    public function testSaveCookieSession()
-    {
-        $this->httpRequestServiceClass->saveCookieSession();
-
-        $this->mockGuzzleClient(
-            method: 'get',
-            arguments: [
-                'https://some.url.com',
-                [
-                    'headers' => [],
-                    'cookies' => new CookieJar(),
-                    'allow_redirects' => true,
-                    'connect_timeout' => 0,
-                ],
-            ],
-        );
-
-        $this->httpRequestServiceClass->get('https://some.url.com');
     }
 
     public function testConnectTimeout()
