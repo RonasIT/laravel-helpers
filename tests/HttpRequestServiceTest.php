@@ -481,23 +481,19 @@ class HttpRequestServiceTest extends TestCase
 
     public function testSendWithClientExceptionKeepsResponse()
     {
-        $mock = $this->createPartialMock(HttpRequestService::class, ['sendRequest']);
-        $mock
-            ->expects($this->once())
-            ->method('sendRequest')
-            ->willReturnCallback(fn () => throw new ClientException(
-                message: 'Some exception message',
-                request: new Request('get', 'https://some.url.com'),
-                response: new GuzzleResponse(422, [], '{"message":"Some error"}'),
-            ));
+        $handler = HandlerStack::create(new MockHandler([
+            new GuzzleResponse(422, [], '{"message":"Some error"}'),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
 
         try {
-            $mock->get('https://some.url.com');
+            $this->httpRequestServiceClass->get('https://some.url.com');
 
             $this->fail('ClientException was not thrown');
         } catch (ClientException) {
-            $this->assertEquals(422, $mock->getResponse()->getStatusCode());
-            $this->assertEquals(['message' => 'Some error'], $mock->json());
+            $this->assertEquals(422, $this->httpRequestServiceClass->getResponse()->getStatusCode());
+            $this->assertEquals(['message' => 'Some error'], $this->httpRequestServiceClass->json());
         }
     }
 
