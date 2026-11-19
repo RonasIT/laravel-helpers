@@ -330,7 +330,7 @@ trait EntityControlTrait
     }
 
     /**
-     * @param  array|string|int  $where  array of conditions or primary key value
+     * @param  array<string, mixed>|int|string  $where  array of conditions or primary key value
      *
      * @return TModel
      *
