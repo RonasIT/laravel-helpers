@@ -2,9 +2,12 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidModelException;
+use RonasIT\Support\Tests\Support\Mock\Models\TestModel;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepository;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryNoPrimaryKey;
 use RonasIT\Support\Tests\Support\Mock\Repositories\TestRepositoryWithDifferentTimestampNames;
@@ -822,7 +825,7 @@ class EntityControlTraitTest extends TestCase
             . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
         );
 
-        self::$testRepositoryClass
+        $result = self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
@@ -830,7 +833,162 @@ class EntityControlTraitTest extends TestCase
             ->withCount('relation')
             ->find(1);
 
+        $this->assertNull($result);
+
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testLastEmptyResult()
+    {
+        $this->mockSelectById(
+            'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null '
+            . 'order by "created_at" desc limit 1',
+        );
+
+        $result = self::$testRepositoryClass->last(['id' => 1]);
+
+        $this->assertNull($result);
+    }
+
+    public function testFirstOrFail()
+    {
+        $this->mockFirst(self::$selectResult);
+
+        $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->firstOrFail(['id' => 1]);
+
+        $this->assertInstanceOf(TestModel::class, $result);
+        $this->assertEquals(1, $result->id);
+        $this->assertTrue($result->relationLoaded('relation'));
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testFirstOrFailEmptyResult()
+    {
+        $this->mockSelectById(
+            'select "test_models".*, (select count(*) from "relation_models" '
+            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
+            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
+        );
+
+        $this->assertThrows(
+            fn () => self::$testRepositoryClass
+                ->withTrashed()
+                ->onlyTrashed()
+                ->force()
+                ->with('relation')
+                ->withCount('relation')
+                ->firstOrFail(['id' => 1]),
+            fn (ModelNotFoundException $exception) => $exception->getModel() === TestModel::class
+                && $exception->getIds() === [],
+        );
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testFirstOrFailWithoutConditionsEmptyTable()
+    {
+        $this->mockSelect('select * from "test_models" where "test_models"."deleted_at" is null limit 1');
+
+        $this->assertThrows(
+            fn () => self::$testRepositoryClass->firstOrFail(),
+            ModelNotFoundException::class,
+        );
+    }
+
+    public function testFirstOrFailSoftDeleted()
+    {
+        $this->mockSelectById('select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1');
+
+        $this->assertThrows(
+            fn () => self::$testRepositoryClass->firstOrFail(['id' => 1]),
+            ModelNotFoundException::class,
+        );
+    }
+
+    public function testFirstOrFailSoftDeletedWithTrashed()
+    {
+        $this->mockSelectById(
+            'select * from "test_models" where "id" = ? limit 1',
+            [array_merge(self::$selectResult[0], ['deleted_at' => '2020-01-01 00:00:00'])],
+        );
+
+        $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->firstOrFail(['id' => 1]);
+
+        $this->assertInstanceOf(TestModel::class, $result);
+        $this->assertTrue($result->trashed());
+    }
+
+    public function testFirstOrFailEmptyResultDoesNotAffectNextQuery()
+    {
+        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1');
+
+        $this->mockSelectById(
+            'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1',
+            self::$selectResult,
+        );
+
+        $this->assertThrows(
+            fn () => self::$testRepositoryClass
+                ->withTrashed()
+                ->force()
+                ->with('relation')
+                ->firstOrFail(['id' => 1]),
+            ModelNotFoundException::class,
+        );
+
+        $result = self::$testRepositoryClass->first(['id' => 1]);
+
+        $this->assertFalse($result->relationLoaded('relation'));
+    }
+
+    public function testFindOrFail()
+    {
+        $this->mockFind(self::$selectResult);
+
+        $result = self::$testRepositoryClass
+            ->withTrashed()
+            ->onlyTrashed()
+            ->force()
+            ->with('relation')
+            ->withCount('relation')
+            ->findOrFail(1);
+
+        $this->assertInstanceOf(TestModel::class, $result);
+        $this->assertEquals(1, $result->id);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testFindOrFailEmptyResult()
+    {
+        $this->mockSelectById('select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1');
+
+        $this->assertThrows(
+            fn () => self::$testRepositoryClass->findOrFail(1),
+            fn (ModelNotFoundException $exception) => $exception->getModel() === TestModel::class
+                && $exception->getIds() === [1],
+        );
+    }
+
+    public function testFindOrFailRespondsNotFound()
+    {
+        $this->mockSelectById(
+            query: 'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1',
+            bindings: ['1'],
+        );
+
+        Route::get('test-models/{id}', fn (string $id) => self::$testRepositoryClass->findOrFail($id));
+
+        $this->getJson('test-models/1')->assertNotFound();
     }
 
     public function testFirstOrCreateEntityExists()
