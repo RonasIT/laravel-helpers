@@ -53,6 +53,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @param  class-string<TModel>  $modelClass
+     */
     protected function setModel($modelClass): self
     {
         $this->model = new $modelClass();
@@ -66,6 +69,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return Query<TModel>
+     */
     protected function getQuery($where = []): Query
     {
         $query = $this->model->query();
@@ -342,6 +348,8 @@ trait EntityControlTrait
     }
 
     /**
+     * @param  int|string  $id
+     *
      * @return TModel
      *
      * @throws ModelNotFoundException
