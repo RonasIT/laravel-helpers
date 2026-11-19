@@ -7,6 +7,31 @@
 
 Provides CRUD-based methods to work with database-related entities.
 
+`first`, `find`, `findBy`, `last` and `update` return `null` when nothing is found. When a missing
+entity is an error, use `firstOrFail($where)` or `findOrFail($id)`: they throw
+`Illuminate\Database\Eloquent\ModelNotFoundException`, which Laravel renders as a `404` response.
+
+```php
+$user = $this->repository->findOrFail($id);
+$user = $this->repository->firstOrFail(['email' => $email]);
+```
+
+Bind the model to the repository through the `@extends` annotation, so that static analysers and IDEs
+know which model the methods return:
+
+```php
+/**
+ * @extends BaseRepository<User>
+ */
+class UserRepository extends BaseRepository
+{
+    public function __construct()
+    {
+        $this->setModel(User::class);
+    }
+}
+```
+
 ## FixturesTrait
 
 This trait is designed to make testing understandable and cleaner.

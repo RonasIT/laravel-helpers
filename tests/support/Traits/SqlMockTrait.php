@@ -43,7 +43,7 @@ trait SqlMockTrait
         );
     }
 
-    protected function mockFirst(array $selectResult): void
+    protected function mockFirst(array $selectResult = []): void
     {
         $this->mockSelectById(
             'select "test_models".*, (select count(*) from "relation_models" '
@@ -52,9 +52,25 @@ trait SqlMockTrait
             $selectResult,
         );
 
-        $this->mockSelect(
-            'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
+        if (!empty($selectResult)) {
+            $this->mockSelect(
+                'select * from "relation_models" where "relation_models"."test_model_id" in (1)',
+            );
+        }
+    }
+
+    protected function mockFirstWithoutTrashed(array $selectResult = [], array $bindings = [1]): void
+    {
+        $this->mockSelectById(
+            'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1',
+            $selectResult,
+            $bindings,
         );
+    }
+
+    protected function mockFirstWithTrashed(array $selectResult = []): void
+    {
+        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1', $selectResult);
     }
 
     protected function mockFirstBy(array $selectResult): void

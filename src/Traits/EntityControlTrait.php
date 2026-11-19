@@ -5,18 +5,20 @@ namespace RonasIT\Support\Traits;
 use Closure;
 use Illuminate\Database\Eloquent\Builder as Query;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
- * @property Model model
+ * @template TModel of Model = Model
  */
 trait EntityControlTrait
 {
     use SearchTrait;
 
+    /** @var TModel */
     protected $model;
     protected $fields;
     protected $primaryKey;
@@ -27,6 +29,9 @@ trait EntityControlTrait
 
     protected $shouldSettablePropertiesBeReset = true;
 
+    /**
+     * @return Collection<int, TModel>
+     */
     public function all(): Collection
     {
         return $this->get();
@@ -48,6 +53,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @param  class-string<TModel>  $modelClass
+     */
     protected function setModel($modelClass): self
     {
         $this->model = new $modelClass();
@@ -61,6 +69,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return Query<TModel>
+     */
     protected function getQuery($where = []): Query
     {
         $query = $this->model->query();
@@ -120,6 +131,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel
+     */
     public function create(array $data): Model
     {
         $entityData = Arr::only($data, $this->fields);
@@ -198,6 +212,8 @@ trait EntityControlTrait
      * Update only one row by condition or primary key value
      *
      * @param  array|int  $where
+     *
+     * @return TModel|null
      */
     public function update($where, array $data): ?Model
     {
@@ -227,6 +243,9 @@ trait EntityControlTrait
         return $item;
     }
 
+    /**
+     * @return TModel
+     */
     public function updateOrCreate($where, $data): Model
     {
         $this->resetSettableProperties(false);
@@ -255,6 +274,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return Collection<int, TModel>
+     */
     public function get(int|string|array $where = []): Collection
     {
         $result = $this->getQuery($where)->get();
@@ -264,6 +286,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function first($where = []): ?Model
     {
         $result = $this->getQuery($where)->first();
@@ -273,6 +298,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function last(array $where = [], string $column = 'created_at'): ?Model
     {
         $result = $this
@@ -285,18 +313,56 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return TModel|null
+     */
     public function findBy(string $field, $value): ?Model
     {
         return $this->first([$field => $value]);
     }
 
+    /**
+     * @return TModel|null
+     */
     public function find($id): ?Model
     {
         return $this->first($id);
     }
 
     /**
+     * @param  array<string, mixed>|int|string  $where  array of conditions or primary key value
+     *
+     * @return TModel
+     *
+     * @throws ModelNotFoundException
+     */
+    public function firstOrFail($where = []): Model
+    {
+        $entity = $this->first($where);
+
+        if (is_null($entity)) {
+            throw (new ModelNotFoundException())->setModel(get_class($this->model), is_array($where) ? [] : [$where]);
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @param  int|string  $id
+     *
+     * @return TModel
+     *
+     * @throws ModelNotFoundException
+     */
+    public function findOrFail($id): Model
+    {
+        return $this->firstOrFail($id);
+    }
+
+    /**
      * @param  array|string|int  $where  array of conditions or primary key value
+     *
+     * @return TModel
      */
     public function firstOrCreate($where, array $data = []): Model
     {
@@ -421,6 +487,9 @@ trait EntityControlTrait
         return $result;
     }
 
+    /**
+     * @return Collection<int, TModel>
+     */
     public function getByList(array $values, ?string $field = null): Collection
     {
         $field = (empty($field)) ? $this->primaryKey : $field;
