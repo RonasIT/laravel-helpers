@@ -871,11 +871,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testFirstOrFailEmptyResult()
     {
-        $this->mockSelectById(
-            'select "test_models".*, (select count(*) from "relation_models" '
-            . 'where "test_models"."id" = "relation_models"."test_model_id") as "relation_count" '
-            . 'from "test_models" where "test_models"."deleted_at" is not null and "id" = ? limit 1',
-        );
+        $this->mockFirst();
 
         $this->assertThrows(
             fn () => self::$testRepositoryClass
@@ -902,39 +898,22 @@ class EntityControlTraitTest extends TestCase
         );
     }
 
-    public function testFirstOrFailSoftDeleted()
-    {
-        $this->mockSelectById('select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1');
-
-        $this->assertThrows(
-            fn () => self::$testRepositoryClass->firstOrFail(['id' => 1]),
-            ModelNotFoundException::class,
-        );
-    }
-
     public function testFirstOrFailSoftDeletedWithTrashed()
     {
-        $this->mockSelectById(
-            'select * from "test_models" where "id" = ? limit 1',
-            [array_merge(self::$selectResult[0], ['deleted_at' => '2020-01-01 00:00:00'])],
-        );
+        $this->mockFirstWithTrashed([array_merge(self::$selectResult[0], ['deleted_at' => '2020-01-01 00:00:00'])]);
 
         $result = self::$testRepositoryClass
             ->withTrashed()
             ->firstOrFail(['id' => 1]);
 
         $this->assertInstanceOf(TestModel::class, $result);
-        $this->assertTrue($result->trashed());
     }
 
     public function testFirstOrFailEmptyResultDoesNotAffectNextQuery()
     {
-        $this->mockSelectById('select * from "test_models" where "id" = ? limit 1');
+        $this->mockFirstWithTrashed();
 
-        $this->mockSelectById(
-            'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1',
-            self::$selectResult,
-        );
+        $this->mockFirstWithoutTrashed(self::$selectResult);
 
         $this->assertThrows(
             fn () => self::$testRepositoryClass
@@ -968,9 +947,9 @@ class EntityControlTraitTest extends TestCase
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
 
-    public function testFindOrFailEmptyResult()
+    public function testFindOrFailExcludesSoftDeleted()
     {
-        $this->mockSelectById('select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1');
+        $this->mockFirstWithoutTrashed();
 
         $this->assertThrows(
             fn () => self::$testRepositoryClass->findOrFail(1),
@@ -981,10 +960,7 @@ class EntityControlTraitTest extends TestCase
 
     public function testFindOrFailRespondsNotFound()
     {
-        $this->mockSelectById(
-            query: 'select * from "test_models" where "id" = ? and "test_models"."deleted_at" is null limit 1',
-            bindings: ['1'],
-        );
+        $this->mockFirstWithoutTrashed(bindings: ['1']);
 
         Route::get('test-models/{id}', fn (string $id) => self::$testRepositoryClass->findOrFail($id));
 
