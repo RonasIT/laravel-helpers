@@ -2,9 +2,16 @@
 
 namespace RonasIT\Support\Tests;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidJSONFormatException;
@@ -470,5 +477,167 @@ class HttpRequestServiceTest extends TestCase
         $this->app->instance(HttpRequestService::class, $mock);
 
         app(HttpRequestService::class)->get('https://some.url.com');
+    }
+
+    public function testSendWithClientExceptionKeepsResponse()
+    {
+        $handler = HandlerStack::create(new MockHandler([
+            new GuzzleResponse(422, [], '{"message":"Some error"}'),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        try {
+            $this->httpRequestServiceClass->get('https://some.url.com');
+
+            $this->fail('ClientException was not thrown');
+        } catch (ClientException) {
+            $this->assertEquals(422, $this->httpRequestServiceClass->getResponse()->getStatusCode());
+            $this->assertEquals(['message' => 'Some error'], $this->httpRequestServiceClass->json());
+        }
+    }
+
+    public function testSendWithNonStringHeaderValues()
+    {
+        $history = [];
+
+        $handler = HandlerStack::create(new MockHandler([new GuzzleResponse(200)]));
+        $handler->push(Middleware::history($history));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->get(
+            url: 'https://some.url.com',
+            headers: [
+                'X-Version' => 1,
+                'X-Ratio' => 1.5,
+                'X-Debug' => true,
+                'X-Flag' => false,
+                'Authorization' => null,
+                'X-Ids' => [1, 2],
+                'Accept' => ['application/json', 'text/plain'],
+            ],
+        );
+
+        $request = $history[0]['request'];
+
+        $this->assertSame(['1'], $request->getHeader('x-version'));
+        $this->assertSame(['1.5'], $request->getHeader('x-ratio'));
+        $this->assertSame(['1'], $request->getHeader('x-debug'));
+        $this->assertSame([''], $request->getHeader('x-flag'));
+        $this->assertSame([''], $request->getHeader('authorization'));
+        $this->assertSame(['1', '2'], $request->getHeader('x-ids'));
+        $this->assertSame(['application/json', 'text/plain'], $request->getHeader('accept'));
+    }
+
+    public static function sendWithBodyViaRealClientData(): array
+    {
+        return [
+            [
+                'headers' => ['Content-Type' => 'application/json'],
+                'expectedBodyPart' => '{"id":1,"active":true,"name":"value"}',
+            ],
+            [
+                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                'expectedBodyPart' => 'id=1&active=1&name=value',
+            ],
+            [
+                'headers' => ['Content-Type' => 'multipart/form-data'],
+                'expectedBodyPart' => 'name="active"',
+            ],
+            [
+                'headers' => [],
+                'expectedBodyPart' => '{"id":1,"active":true,"name":"value"}',
+            ],
+        ];
+    }
+
+    #[DataProvider('sendWithBodyViaRealClientData')]
+    public function testSendWithBodyViaRealClient(array $headers, string $expectedBodyPart)
+    {
+        $history = [];
+
+        $handler = HandlerStack::create(new MockHandler([new GuzzleResponse(200)]));
+        $handler->push(Middleware::history($history));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->post(
+            url: 'https://some.url.com',
+            data: [
+                'id' => 1,
+                'active' => true,
+                'name' => 'value',
+            ],
+            headers: $headers,
+        );
+
+        $this->assertStringContainsString($expectedBodyPart, (string) $history[0]['request']->getBody());
+    }
+
+    public function testSaveCookieSessionViaRealClient()
+    {
+        $handler = HandlerStack::create(new MockHandler([
+            new GuzzleResponse(200, ['Set-Cookie' => 'session=some_value; Path=/']),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass
+            ->saveCookieSession()
+            ->get('https://some.url.com');
+
+        $this->assertEquals('some_value', $this->httpRequestServiceClass->getCookie()[0]['Value']);
+    }
+
+    public function testSendWithRequestExceptionInDebugMode()
+    {
+        config(['defaults.http_service_debug' => true]);
+
+        $this->expectException(RequestException::class);
+        $this->expectExceptionMessageContains('Some exception message');
+
+        $handler = HandlerStack::create(new MockHandler([
+            new RequestException('Some exception message', new Request('get', 'https://some.url.com')),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        (new HttpRequestService())->get('https://some.url.com');
+    }
+
+    public function testSendResetsPreviousResponseOnFailure()
+    {
+        $handler = HandlerStack::create(new MockHandler([
+            new GuzzleResponse(200, [], '{"key":"value"}'),
+            new ConnectException('Connection failed', new Request('get', 'https://some.url.com')),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->get('https://some.url.com');
+
+        try {
+            $this->httpRequestServiceClass->get('https://some.url.com');
+
+            $this->fail('ConnectException was not thrown');
+        } catch (ConnectException) {
+            $this->assertNull($this->httpRequestServiceClass->getResponse());
+        }
+    }
+
+    public function testJSONWithoutResponse()
+    {
+        $this->expectException(InvalidJSONFormatException::class);
+
+        $this->httpRequestServiceClass->json();
+    }
+
+    public function testMultipartWithoutResponse()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Content is not valid');
+
+        $this->httpRequestServiceClass->multipart();
     }
 }
