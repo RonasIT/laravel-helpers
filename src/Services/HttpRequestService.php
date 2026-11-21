@@ -122,7 +122,9 @@ class HttpRequestService
             return $this;
         } catch (RequestException $exception) {
             // TODO: remove the method_exists() check once the minimum supported guzzle version is ^8 (Guzzle 8 keeps getResponse() only on ResponseException, which does not exist in Guzzle 7)
-            $this->response = method_exists($exception, 'getResponse') ? $exception->getResponse() : null;
+            if (method_exists($exception, 'getResponse')) {
+                $this->response = $exception->getResponse();
+            }
 
             throw $exception;
         } finally {
