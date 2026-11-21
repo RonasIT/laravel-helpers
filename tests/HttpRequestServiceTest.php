@@ -530,6 +530,66 @@ class HttpRequestServiceTest extends TestCase
         $this->assertSame(['application/json', 'text/plain'], $request->getHeader('accept'));
     }
 
+    public static function sendWithBodyViaRealClientData(): array
+    {
+        return [
+            [
+                'headers' => ['Content-Type' => 'application/json'],
+                'expectedBodyPart' => '{"id":1,"active":true,"name":"value"}',
+            ],
+            [
+                'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+                'expectedBodyPart' => 'id=1&active=1&name=value',
+            ],
+            [
+                'headers' => ['Content-Type' => 'multipart/form-data'],
+                'expectedBodyPart' => 'name="active"',
+            ],
+            [
+                'headers' => [],
+                'expectedBodyPart' => '{"id":1,"active":true,"name":"value"}',
+            ],
+        ];
+    }
+
+    #[DataProvider('sendWithBodyViaRealClientData')]
+    public function testSendWithBodyViaRealClient(array $headers, string $expectedBodyPart)
+    {
+        $history = [];
+
+        $handler = HandlerStack::create(new MockHandler([new GuzzleResponse(200)]));
+        $handler->push(Middleware::history($history));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass->post(
+            url: 'https://some.url.com',
+            data: [
+                'id' => 1,
+                'active' => true,
+                'name' => 'value',
+            ],
+            headers: $headers,
+        );
+
+        $this->assertStringContainsString($expectedBodyPart, (string) $history[0]['request']->getBody());
+    }
+
+    public function testSaveCookieSessionViaRealClient()
+    {
+        $handler = HandlerStack::create(new MockHandler([
+            new GuzzleResponse(200, ['Set-Cookie' => 'session=some_value; Path=/']),
+        ]));
+
+        $this->app->instance(Client::class, new Client(['handler' => $handler]));
+
+        $this->httpRequestServiceClass
+            ->saveCookieSession()
+            ->get('https://some.url.com');
+
+        $this->assertEquals('some_value', $this->httpRequestServiceClass->getCookie()[0]['Value']);
+    }
+
     public function testSendWithRequestExceptionInDebugMode()
     {
         config(['defaults.http_service_debug' => true]);
