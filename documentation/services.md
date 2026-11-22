@@ -43,9 +43,9 @@ Method to send `PUT` request to `$url`.
 
 Method to send `PATCH` request to `$url`.
 
-### getResponse(): ResponseInterface
+### getResponse(): ?ResponseInterface
 
-Return last response object.
+Return last response object, or `null` if the last request failed without a response.
 
 ### json(): array
 

@@ -37,7 +37,7 @@ class HttpRequestService
 
     public function json(): array
     {
-        $stringResponse = (string) $this->response->getBody();
+        $stringResponse = (string) $this->response?->getBody();
 
         $result = json_decode($stringResponse, true);
 
@@ -48,7 +48,7 @@ class HttpRequestService
         return $result;
     }
 
-    public function getResponse(): ResponseInterface
+    public function getResponse(): ?ResponseInterface
     {
         return $this->response;
     }
@@ -112,6 +112,8 @@ class HttpRequestService
     {
         $startTime = microtime(true);
 
+        $this->response = null;
+
         $this->logRequest($method, $url, $data, $headers);
 
         try {
@@ -119,7 +121,10 @@ class HttpRequestService
 
             return $this;
         } catch (RequestException $exception) {
-            $this->response = $exception->getResponse();
+            // TODO: remove the method_exists() check once the minimum supported guzzle version is ^8 (Guzzle 8 keeps getResponse() only on ResponseException, which does not exist in Guzzle 7)
+            if (method_exists($exception, 'getResponse')) {
+                $this->response = $exception->getResponse();
+            }
 
             throw $exception;
         } finally {
@@ -130,9 +135,7 @@ class HttpRequestService
 
     public function multipart(): array
     {
-        $content = $this->response
-            ->getBody()
-            ->getContents();
+        $content = (string) $this->response?->getBody();
 
         $stream = fopen('php://temp', 'rw');
         fwrite($stream, $content);
@@ -213,8 +216,12 @@ class HttpRequestService
             logger('-------------------------------------');
             logger('');
             logger('getting response: ');
-            logger('code', ["<{$this->response->getStatusCode()}>"]);
-            logger('body', ["<{$this->response->getBody()}>"]);
+
+            if (!empty($this->response)) {
+                logger('code', ["<{$this->response->getStatusCode()}>"]);
+                logger('body', ["<{$this->response->getBody()}>"]);
+            }
+
             logger('time', [$endTime]);
             logger('');
         }
@@ -222,12 +229,24 @@ class HttpRequestService
 
     protected function setOptions(array $headers): self
     {
-        $this->options['headers'] = $headers;
+        $this->options['headers'] = $this->normalizeHeaders($headers);
         $this->options['cookies'] = $this->cookies;
         $this->options['allow_redirects'] = $this->allowRedirects;
         $this->options['connect_timeout'] = $this->connectTimeout;
 
         return $this;
+    }
+
+    protected function normalizeHeaders(array $headers): array
+    {
+        array_walk_recursive($headers, function (&$value) {
+            if (is_scalar($value) || is_null($value)) {
+                $value = (string) $value;
+            }
+        });
+
+        // Guzzle 7 silently drops headers with an empty array value, Guzzle 8 rejects them
+        return array_filter($headers, fn ($value) => $value !== []);
     }
 
     protected function setData(string $method, array $headers, array $data = []): void
