@@ -16,10 +16,10 @@ use Illuminate\Support\Str;
  * @template TModel of Model
  *
  * @property TModel $model
- * @property Query query
  */
 trait SearchTrait
 {
+    /** @var Query<TModel> */
     protected $query;
     protected $filter;
 

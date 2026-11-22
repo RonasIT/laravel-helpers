@@ -76,6 +76,9 @@ trait EntityControlTrait
         return $this;
     }
 
+    /**
+     * @return Query<TModel>
+     */
     protected function getQuery($where = []): Query
     {
         $query = $this->model->query();
