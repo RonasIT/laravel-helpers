@@ -245,7 +245,8 @@ class HttpRequestService
             }
         });
 
-        return $headers;
+        // Guzzle 7 silently drops headers with an empty array value, Guzzle 8 rejects them
+        return array_filter($headers, fn ($value) => $value !== []);
     }
 
     protected function setData(string $method, array $headers, array $data = []): void
