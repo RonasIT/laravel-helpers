@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use RonasIT\Support\Traits\EntityControlTrait;
 
 /**
- * @template TModel of Model
+ * @template TModel of Model = Model
  */
 class BaseRepository
 {

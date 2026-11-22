@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * @template TModel of Model
+ * @template TModel of Model = Model
  *
  * @property TModel $model
  */

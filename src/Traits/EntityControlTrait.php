@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
- * @template TModel of Model
+ * @template TModel of Model = Model
  *
  * @property TModel $model
  */
