@@ -320,6 +320,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * @return Query<TModel>
+     */
     public function getSearchQuery(): Query
     {
         return $this->query;
