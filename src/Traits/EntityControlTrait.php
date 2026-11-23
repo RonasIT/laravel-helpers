@@ -61,6 +61,8 @@ trait EntityControlTrait
     }
 
     /**
+     * @param  class-string<TModel>  $modelClass
+     *
      * @return $this
      */
     protected function setModel($modelClass): self
