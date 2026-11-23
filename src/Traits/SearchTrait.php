@@ -14,8 +14,6 @@ use Illuminate\Support\Str;
 
 /**
  * @template TModel of Model = Model
- *
- * @property TModel $model
  */
 trait SearchTrait
 {

@@ -12,14 +12,13 @@ use RonasIT\Support\Exceptions\InvalidModelException;
 
 /**
  * @template TModel of Model = Model
- *
- * @property TModel $model
  */
 trait EntityControlTrait
 {
     /** @use SearchTrait<TModel> */
     use SearchTrait;
 
+    /** @var TModel */
     protected $model;
     protected $fields;
     protected $primaryKey;
