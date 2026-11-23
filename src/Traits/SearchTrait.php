@@ -4,6 +4,7 @@ namespace RonasIT\Support\Traits;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder as Query;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
@@ -12,10 +13,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * @property Query query
+ * @template TModel of Model = Model
  */
 trait SearchTrait
 {
+    /** @var Query<TModel> */
     protected $query;
     protected $filter;
 
@@ -52,6 +54,8 @@ trait SearchTrait
     /**
      * @param  $field  string filtered field, you can pass field name with dots to filter by field of relation
      * @param  $filterName  string|null key from filters which contains filter value
+     *
+     * @return $this
      */
     public function filterBy(string $field, ?string $filterName = null): self
     {
@@ -66,6 +70,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function filterByList(string $field, ?string $filterName = null): self
     {
         $filterName ??= $this->getFilterName($field);
@@ -79,6 +86,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function filterByQuery(array $fields, string $mask = "'%{{ value }}%'"): self
     {
         if (!empty($this->filter['query'])) {
@@ -100,6 +110,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function searchQuery(array $filter = []): self
     {
         if (!empty($filter['with_trashed'])) {
@@ -154,6 +167,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * @return LengthAwarePaginator<int, TModel>
+     */
     public function getSearchResults(): LengthAwarePaginator
     {
         $this->orderBy();
@@ -190,6 +206,9 @@ trait SearchTrait
         return $paginator->setCollection($collection);
     }
 
+    /**
+     * @return $this
+     */
     public function orderBy(?string $default = null, bool $defaultDesc = false): self
     {
         $default = (empty($default)) ? $this->primaryKey : $default;
@@ -215,6 +234,9 @@ trait SearchTrait
         return ($isDesc) ? 'DESC' : 'ASC';
     }
 
+    /**
+     * @return $this
+     */
     public function filterValue(string $field, string $sign, $value): self
     {
         if (!empty($value)) {
@@ -266,6 +288,9 @@ trait SearchTrait
         };
     }
 
+    /**
+     * @return $this
+     */
     public function filterGreater(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
         $filterName = empty($filterName) ? 'from' : $filterName;
@@ -278,6 +303,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function filterLess(string $field, bool $isStrict = true, ?string $filterName = null): self
     {
         $filterName = (empty($filterName)) ? 'to' : $filterName;
@@ -290,6 +318,9 @@ trait SearchTrait
         return $this;
     }
 
+    /**
+     * @return Query<TModel>
+     */
     public function getSearchQuery(): Query
     {
         return $this->query;
