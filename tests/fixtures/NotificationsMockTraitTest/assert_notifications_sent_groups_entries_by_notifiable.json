@@ -1,0 +1,67 @@
+{
+    "RonasIT\\Support\\Tests\\Support\\Mock\\Notifications\\TestNotification": [
+        {
+            "notification": {
+                "firstParam": "value-first",
+                "secondParam": "value-2",
+                "thirdParam": 1,
+                "channels": [
+                    "database"
+                ],
+                "locale": null
+            },
+            "channels": [
+                "database"
+            ],
+            "notifiable": {
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
+                "attributes": {
+                    "id": 1
+                }
+            },
+            "locale": null
+        },
+        {
+            "notification": {
+                "firstParam": "value-third",
+                "secondParam": "value-2",
+                "thirdParam": 1,
+                "channels": [
+                    "database"
+                ],
+                "locale": null
+            },
+            "channels": [
+                "database"
+            ],
+            "notifiable": {
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
+                "attributes": {
+                    "id": 1
+                }
+            },
+            "locale": null
+        },
+        {
+            "notification": {
+                "firstParam": "value-second",
+                "secondParam": "value-2",
+                "thirdParam": 1,
+                "channels": [
+                    "database"
+                ],
+                "locale": null
+            },
+            "channels": [
+                "database"
+            ],
+            "notifiable": {
+                "class": "RonasIT\\Support\\Tests\\Support\\Mock\\Models\\TestNotifiable",
+                "attributes": {
+                    "id": 2
+                }
+            },
+            "locale": null
+        }
+    ]
+}
