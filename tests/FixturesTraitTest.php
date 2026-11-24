@@ -64,6 +64,13 @@ class FixturesTraitTest extends TestCase
     {
         putenv('FAIL_EXPORT_JSON=false');
 
+        $fixturePath = $this->getFixturePath('export_json/response.json');
+
+        $this->mockNativeFunction(
+            'RonasIT\Support\Traits',
+            $this->functionCall('chmod', [$fixturePath, 0666], true),
+        );
+
         $result = [
             'value' => 1234567890,
         ];
@@ -74,7 +81,7 @@ class FixturesTraitTest extends TestCase
 
         $this->assertEquals($this->getJsonFixture('export_json/response.json'), $result);
 
-        $this->assertFileExists($this->getFixturePath('export_json/response.json'));
+        $this->assertFileExists($fixturePath);
     }
 
     public function testGetJsonFixtureWithoutExtension()
