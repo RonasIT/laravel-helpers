@@ -50,7 +50,8 @@
   "extra": {
     "laravel": {
       "providers": [
-        "RonasIT\\Support\\HelpersServiceProvider"
+        "RonasIT\\Support\\HelpersServiceProvider",
+        "RonasIT\\Support\\ValidationServiceProvider"
       ]
     },
     "hooks": {

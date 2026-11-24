@@ -29,6 +29,7 @@ Versioning is a mechanism to keep your API applications in a workable state for 
  - [Traits][2]
  - [Services][3]
  - [Iterators][4]
+ - [Validation rules][9]
 
 ## Migration guids
  - [1.1][5]
@@ -43,3 +44,4 @@ Versioning is a mechanism to keep your API applications in a workable state for 
 [6]:./documentation/migration.md#2.0.0
 [7]:./documentation/migration.md#2.0.8
 [8]:./documentation/versioning.md
+[9]:./documentation/rules.md
