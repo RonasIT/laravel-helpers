@@ -2,6 +2,7 @@
 
 namespace RonasIT\Support\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use ReflectionProperty;
 use RonasIT\Support\Exceptions\InvalidModelException;
@@ -852,13 +853,76 @@ class EntityControlTraitTest extends TestCase
     {
         $this->mockFirstOrCreateEntityDoesntExists(self::$selectResult);
 
-        self::$testRepositoryClass
+        $result = self::$testRepositoryClass
             ->withTrashed()
             ->onlyTrashed()
             ->force()
             ->with('relation')
-            ->withCount('relation')
+            ->withCount(['relation', 'relation.child_relation'])
             ->firstOrCreate(['id' => 1], ['name' => 'test_name']);
+
+        $this->assertEqualsFixture('first_or_create_created_entity.json', $result->toArray());
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testFirstOrCreateWhereOverrideData()
+    {
+        $this->mockFirstOrCreateWhereOverrideData(self::$selectResult);
+
+        $result = self::$testRepositoryClass->firstOrCreate(['name' => 'test_name'], [
+            'name' => 'overridden_name',
+            'json_field' => ['key' => 'value'],
+        ]);
+
+        $this->assertTrue($result->wasRecentlyCreated);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testFirstOrCreateWithRelationConditions()
+    {
+        $this->mockFirstOrCreateWithRelationConditions(self::$selectResult);
+
+        $result = self::$testRepositoryClass
+            ->force()
+            ->firstOrCreate(['relation.id' => 2, 'name' => 'test_name'], [
+                'json_field' => ['key' => 'value'],
+                'unknown_field' => 'value',
+            ]);
+
+        $this->assertTrue($result->wasRecentlyCreated);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testFirstOrCreateWithNotFillableConditions()
+    {
+        $this->mockFirstOrCreateWithNotFillableConditions(self::$selectResult);
+
+        Model::shouldBeStrict();
+
+        try {
+            $result = self::$testRepositoryClass->firstOrCreate(['id' => 1], [
+                'name' => 'test_name',
+                'unknown_field' => 'value',
+            ]);
+        } finally {
+            Model::shouldBeStrict(false);
+        }
+
+        $this->assertTrue($result->wasRecentlyCreated);
+
+        $this->assertSettablePropertiesReset(self::$testRepositoryClass);
+    }
+
+    public function testFirstOrCreateWhenEntityCreatedConcurrently()
+    {
+        $this->mockFirstOrCreateWhenEntityCreatedConcurrently(self::$selectResult);
+
+        $result = self::$testRepositoryClass->firstOrCreate(['name' => 'test_name']);
+
+        $this->assertFalse($result->wasRecentlyCreated);
 
         $this->assertSettablePropertiesReset(self::$testRepositoryClass);
     }
